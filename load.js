@@ -1,12 +1,12 @@
 
 function Nop(){}
 
-!function(root){
+!function(root, scripts){
 	var xhrs = []
 	function lazy(obj, name, str) {
-	  obj[name] || (obj[name] = function() {
-		return (obj[name] = new Function("a,b,c,d", str)).apply(this, arguments)
-	  })
+		obj[name] || (obj[name] = function() {
+			return (obj[name] = new Function("a,b,c,d", str)).apply(this, arguments)
+		})
 	}
 
 	// XMLHttpRequest was unsupported in IE 5-6
@@ -32,28 +32,31 @@ function Nop(){}
 			}
 		}
 		return r
-	};
+	}
+
+	function load(files, next) {
+		if (typeof files == "string") files = [files];
+		for (var len = files.length, i=len, res = [];i--;) !function(i) {
+			xhr("GET", files[i], function(err, str) {
+				res[i] = str;
+				if (!--len) {
+					execScript( res.join("/**/;") );
+					next && next();
+					res = null;
+				}
+			}).send();
+		}(i);
+	}
+
+	/*
+	* Function.prototype.bind is most missing fn
+	* http://kangax.github.io/es5-compat-table/
+	*/
+	Function.prototype.bind || scripts.unshift("up.js")
+	load(scripts)
+
+	xhr.load = load
+
 	root.xhr = xhr
-}(this)
-
-function load(files, next) {
-	if (typeof files == "string") files = [files];
-	for (var len = files.length, i=len, res = [];i--;) !function(i) {
-		xhr("GET", files[i], function(err, str) {
-			res[i] = str;
-			if (!--len) {
-				execScript( res.join("/**/;") );
-				next && next();
-				res = null;
-			}
-		}).send();
-	}(i);
-}
-
-/*
-* Function.prototype.bind is most missing fn
-* http://kangax.github.io/es5-compat-table/
-*/
-Function.prototype.bind || _load.unshift("up.js")
-load(_load)
+}(this, [])
 
