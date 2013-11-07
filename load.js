@@ -26,7 +26,7 @@ function Nop(){}
 		r.open(method, url, next !== true)
 		if (next !== true) r.onreadystatechange = function() {
 			if (r.readyState == 4) {
-				next && next.call(r, r.status != 200 && r.status, r.responseText)
+				next && next.call(r, (r.status < 200 || url > 299) && r.status, r.responseText)
 				r.onreadystatechange = next = Nop
 				xhrs.push(r)
 			}
