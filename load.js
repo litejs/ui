@@ -23,10 +23,25 @@ function Nop(){}
 
 	function xhr(method, url, next) {
 		var r = xhrs.shift() || new XMLHttpRequest()
+		/*
+		* To be able to reuse the XHR object properly, 
+		* use the open method first and set onreadystatechange later. 
+		* This happens because IE resets the object implicitly 
+		* in the open method if the status is 'completed'.
+		*
+		* The downside to calling the open method after setting the callback 
+		* is a loss of cross-browser support for readystates.
+		* http://www.quirksmode.org/blog/archives/2005/09/xmlhttp_notes_r_2.html
+		*/
 		r.open(method, url, next !== true)
 		if (next !== true) r.onreadystatechange = function() {
 			if (r.readyState == 4) {
-				next && next.call(r, (r.status < 200 || url > 299) && r.status, r.responseText)
+				/*
+				* r.status == 304 // file found, but determined unchanged and loaded from cache
+				* Opera 8.x really loves that status
+				*/
+				method = r.status // Reuse variable for status
+				next && next.call(r, (method < 200 || method > 299) && method, r.responseText)
 				r.onreadystatechange = next = Nop
 				xhrs.push(r)
 			}
@@ -35,17 +50,17 @@ function Nop(){}
 	}
 
 	function load(files, next) {
-		if (typeof files == "string") files = [files];
+		if (typeof files == "string") files = [files]
 		for (var len = files.length, i=len, res = [];i--;) !function(i) {
 			xhr("GET", files[i], function(err, str) {
-				res[i] = str;
+				res[i] = str
 				if (!--len) {
-					execScript( res.join("/**/;") );
-					next && next();
-					res = null;
+					execScript( res.join("/**/;") )
+					next && next()
+					res = null
 				}
-			}).send();
-		}(i);
+			}).send()
+		}(i)
 	}
 
 	/*
