@@ -3,11 +3,18 @@ function Nop(){}
 
 !function(root, scripts){
 	var xhrs = []
+
+
+	function lazy(obj, name, str) {
+		if (!obj[name]) obj[name] = new Function("a,b,c,d", str)
+	}
+	/*
 	function lazy(obj, name, str) {
 		obj[name] || (obj[name] = function() {
 			return (obj[name] = new Function("a,b,c,d", str)).apply(this, arguments)
 		})
 	}
+	*/
 
 	// XMLHttpRequest was unsupported in IE 5-6
 	// MSXML version 3.0 was the last version of MSXML to support version-independent ProgIDs.
@@ -33,6 +40,14 @@ function Nop(){}
 		* is a loss of cross-browser support for readystates.
 		* http://www.quirksmode.org/blog/archives/2005/09/xmlhttp_notes_r_2.html
 		*/
+
+
+		/*
+		* Vodafone 360 doesn't pass session cookies, so they need to be passed manually
+		* if (sessionID) req.setRequestHeader("Cookie", sessionID);
+		* if (req.getResponseHeader("Set-Cookie")) sessionID = req.getResponseHeader("Set-Cookie");
+		*/
+
 		r.open(method, url, next !== true)
 		if (next !== true) r.onreadystatechange = function() {
 			if (r.readyState == 4) {
