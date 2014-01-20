@@ -1,7 +1,7 @@
 
 function Nop(){}
 
-!function(root, scripts){
+!function(root, scripts, next) {
 	var xhrs = []
 
 
@@ -83,7 +83,7 @@ function Nop(){}
 	* http://kangax.github.io/es5-compat-table/
 	*/
 	Function.prototype.bind || scripts.unshift("up.js")
-	load(scripts)
+	load(scripts, next)
 
 	xhr.load = load
 
