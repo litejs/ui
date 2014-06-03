@@ -1,0 +1,17 @@
+/*
+@font-face {
+	font-family: '<font-family>';
+	src: url('<font-file>.eot?#iefix') format('embedded-opentype');
+	src: local('<font-family>'), url('<font-file>.ttf') format('truetype'), url('<font-file>.woff') format('woff'), url('<font-file>') format('svg');
+}
+@font-face {
+	font-family: '<font-family>';
+	src: url('<font-file>.ttf') format('truetype'), url('<font-file>.woff') format('woff'), url('<font-file>') format('svg');
+}
+
+@font-face {
+	font-family: "Bitstream Vera Serif Bold";
+	src: url("/files/2468/VeraSeBd.ttf");
+}
+
+*/
