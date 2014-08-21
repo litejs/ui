@@ -4,6 +4,65 @@ function Nop(){}
 !function(root, scripts, next) {
 	var xhrs = []
 
+
+	//** error
+	, lastError
+	, unsentErrors = []
+	, esc = escape
+	, oldOnError = root.onerror
+
+	// An error has occurred.
+	// Please click 'OK' to reload.
+	//
+	// Reload the current page, without using the cache
+	// window.location.reload(true)
+
+	root.onerror = function(message, file, line, _col, _error) {
+		var args = arguments
+		, error = _error || new Error(message)
+		, stack = error.stack || error.backtrace || error.stacktrace || ""
+
+		if (oldOnError) oldOnError.apply(this, args)
+
+		// Do not send multiple copies of the same error.
+		if (lastError === (lastError =
+			[ esc(file)
+			, line
+			, _col || (root.event || args).errorCharacter || "?"
+			, esc(message)
+			].join(":")
+		)) return
+
+		// In IE <9, window.onerror is called with the function call stack intact.
+		// This means we can use arguments.callee.caller recursively
+		// to build up a fake stacktrace.
+		// It only gives us function names, but it's better than nothing.
+		if (!stack) {
+			for (args = args.callee; args = args && args.caller; ) {
+				stack += args.toString().split(/[ {]+/)[1] + "\n"
+			}
+		}
+
+		unsentErrors.push(
+			[ 1 // format version
+			, +new Date()
+			, lastError
+			, esc(stack)
+			, esc(root.location)
+			].join(":")
+		)
+	}
+
+	setInterval(function() {
+		if (unsentErrors.length && xhr.logErrors) {
+			xhr.logErrors(unsentErrors)
+			unsentErrors.length = 0
+			// var img = new Image();
+			// img.src = url + "?" + serialize(params) + "&ct=img&cb=" + new Date().getTime();
+		}
+	}, 307)
+	//*/
+
 	function lazy(obj, name, str) {
 		if (!obj[name]) obj[name] = new Function("a,b,c,d", str)
 	}
@@ -55,6 +114,16 @@ function Nop(){}
 
 
 		xhr.open(method, url, next !== true)
+
+
+		// With IE 8 XMLHttpRequest gains the timeout property.
+		// With the timeout property, Web developers can specify
+		// the length of time in milliseconds for the host to wait for a response
+		// before timing out the connection.
+
+		//xhr.timeout = 10000
+		//xhr.ontimeout = timeoutRaised
+
 		if (next !== true) xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 				// xhr.status == 304
