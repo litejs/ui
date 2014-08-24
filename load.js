@@ -1,4 +1,25 @@
 
+
+
+/*
+ * @version    0.0.21
+ * @date       2014-08-27
+ * @stability  1 - Experimental
+ * @author     Lauri Rooden <lauri@rooden.ee>
+ * @license    MIT License
+ */
+
+
+
+// Say you have an initial congestion window set to 2
+// and you can fit 1452 bytes of data in a segment.
+//
+// 1 round trip to get 2904 bytes, Initial Window (IW) = 2
+// 2 round trips to get 8712 bytes, Congestion Window (CW)=4
+// 3 round trips to get 20328 bytes, CW = 8
+// 4 round trips to get 43560 bytes, CW = 16
+
+
 function Nop(){}
 
 !function(root, scripts, next) {
