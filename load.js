@@ -2,8 +2,8 @@
 
 
 /*
- * @version    0.0.21
- * @date       2014-08-27
+ * @version    0.0.26
+ * @date       2014-11-23
  * @stability  1 - Experimental
  * @author     Lauri Rooden <lauri@rooden.ee>
  * @license    MIT License
@@ -20,17 +20,15 @@
 // 4 round trips to get 43560 bytes, CW = 16
 
 
-function Nop(){}
 
-!function(root, scripts, next) {
+!function(window, scripts, next) {
 	var xhrs = []
 
 
 	//** error
 	, lastError
 	, unsentErrors = []
-	, esc = escape
-	, oldOnError = root.onerror
+	, oldOnError = window.onerror
 
 	// An error has occurred.
 	// Please click 'OK' to reload.
@@ -38,7 +36,7 @@ function Nop(){}
 	// Reload the current page, without using the cache
 	// window.location.reload(true)
 
-	root.onerror = function(message, file, line, _col, _error) {
+	window.onerror = function(message, file, line, _col, _error) {
 		var args = arguments
 		, error = _error || new Error(message)
 		, stack = error.stack || error.backtrace || error.stacktrace || ""
@@ -47,10 +45,10 @@ function Nop(){}
 
 		// Do not send multiple copies of the same error.
 		if (lastError === (lastError =
-			[ esc(file)
+			[ file
 			, line
-			, _col || (root.event || args).errorCharacter || "?"
-			, esc(message)
+			, _col || (window.event || args).errorCharacter || "?"
+			, message
 			].join(":")
 		)) return
 
@@ -60,17 +58,18 @@ function Nop(){}
 		// It only gives us function names, but it's better than nothing.
 		if (!stack) {
 			for (args = args.callee; args = args && args.caller; ) {
-				stack += args.toString().split(/[ {]+/)[1] + "\n"
+				//stack += args.toString().split(/[ {]+/)[1] + "\n"
+				// TODO:2014-09-26:lauri:test with IE
+				stack += ("" + args).split(/ |{/)[1] + "\n"
 			}
 		}
 
 		unsentErrors.push(
-			[ 1 // format version
+			[ lastError
+			, stack
 			, +new Date()
-			, lastError
-			, esc(stack)
-			, esc(root.location)
-			].join(":")
+			, window.location
+			].join("\n")
 		)
 	}
 
@@ -84,6 +83,8 @@ function Nop(){}
 	}, 307)
 	//*/
 
+	function nop() {}
+
 	function lazy(obj, name, str) {
 		if (!obj[name]) obj[name] = new Function("a,b,c,d", str)
 	}
@@ -95,16 +96,20 @@ function Nop(){}
 
 	// XMLHttpRequest was unsupported in IE 5-6
 	// MSXML version 3.0 was the last version of MSXML to support version-independent ProgIDs.
-	lazy(root, "XMLHttpRequest", "return new ActiveXObject('MSXML2.XMLHTTP')")
+	lazy(window, "XMLHttpRequest", "return new ActiveXObject('MSXML2.XMLHTTP')")
 
 
 	// eval in a global context for non-IE & non-Chrome (removed form v8 on 2011-05-23: Version 3.3.9)
 	// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
-	if (!root.execScript && Function("d,Date","return(1,eval)('(Date)')===d")(Date,1)) root.execScript = eval
+	if (!window.execScript && Function("d,Date","return(1,eval)('(Date)')===d")(Date,1)) window.execScript = eval
 
-	lazy(root, "execScript", "d=document;b=d.body;c=d.createElement('script');c.text=a;b.insertBefore(c,b.firstChild)")
+	lazy(window, "execScript", "d=document;b=d.body;c=d.createElement('script');c.text=a;b.insertBefore(c,b.firstChild)")
 
 	// next === true is for sync call
+	//
+	// Hypertext Transfer Protocol (HTTP) Status Code Registry
+	// http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+	//
 
 	function xhr(method, url, next) {
 		var xhr = xhrs.shift() || new XMLHttpRequest()
@@ -147,18 +152,37 @@ function Nop(){}
 
 		if (next !== true) xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
-				// xhr.status == 304
-				// file found, but determined unchanged and loaded from cache
-				// Opera 8.x really loves that status
+				// From the XMLHttpRequest spec:
+				//
+				// > For 304 Not Modified responses that are a result of a user agent generated conditional request
+				// > the user agent must act as if the server gave a 200 OK response with the appropriate content.
+				//
+				// In other words, the browser will always give status code 200 OK, even for requests that hit the browser cache.
+				//
+				// However, the spec also says:
+				//
+				// > The user agent must allow author request headers to override automatic cache validation
+				// > (e.g. If-None-Match or If-Modified-Since), in which case 304 Not Modified responses must be passed through.
+				//
+				// So, there is a workaround to make the 304 Not Modified responses visible to your JavaScript code.
+				//
+				//   - Opera 8.x passes 304
+				//   - IE<10 returns 1223 and drop all response headers from PUT/POST when it should be 204,
+				//     http://www.enhanceie.com/ie/bugs.asp
+				//
 				method = xhr.status // Reuse variable for status
-				if (next) next.call(xhr, (method < 200 || method > 299) && method, xhr.responseText)
-				xhr.onreadystatechange = next = Nop
+				if (next) next.call(
+					xhr,
+					(method < 200 || method > 299) && method !== 304 && method !== 1223 && method,
+					xhr.responseText
+				)
+				xhr.onreadystatechange = next = nop
 				xhrs.push(xhr)
 			}
 		}
 		return xhr
 	}
-	root.xhr = xhr
+	window.xhr = xhr
 
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
@@ -181,6 +205,27 @@ function Nop(){}
 	load(scripts, next)
 
 	xhr.load = load
+
+
+
+
+
+
+
+
+	/*
+	var cache = {}
+	function def(name, str) {
+		var exports = {}
+		, module = { exports: exports }
+		new Function("module,exports", str).call(exports, module, exports)
+		cache[name] = module.exports
+	}
+	function req(name) {
+		return cache[name]
+	}
+	def("mod", "this.x = 1")  req("mod").x
+	*/
 
 }(this, [])
 
