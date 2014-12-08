@@ -160,20 +160,27 @@
 			if (xhr.readyState == 4) {
 				// From the XMLHttpRequest spec:
 				//
-				// > For 304 Not Modified responses that are a result of a user agent generated conditional request
-				// > the user agent must act as if the server gave a 200 OK response with the appropriate content.
+				// > For 304 Not Modified responses
+				// > that are a result of a user agent generated conditional request
+				// > the user agent must act as if the server gave a 200 OK response
+				// > with the appropriate content.
 				//
-				// In other words, the browser will always give status code 200 OK, even for requests that hit the browser cache.
+				// In other words, the browser will always give status code 200 OK,
+				// even for requests that hit the browser cache.
 				//
 				// However, the spec also says:
 				//
-				// > The user agent must allow author request headers to override automatic cache validation
-				// > (e.g. If-None-Match or If-Modified-Since), in which case 304 Not Modified responses must be passed through.
+				// > The user agent must allow author request headers
+				// > to override automatic cache validation
+				// > (e.g. If-None-Match or If-Modified-Since),
+				// > in which case 304 Not Modified responses must be passed through.
 				//
-				// So, there is a workaround to make the 304 Not Modified responses visible to your JavaScript code.
+				// So, there is a workaround to make the 304 Not Modified responses visible
+				// to your JavaScript code.
 				//
 				//   - Opera 8.x passes 304
-				//   - IE<10 returns 1223 and drop all response headers from PUT/POST when it should be 204,
+				//   - IE<10 returns 1223 and drop all response headers from PUT/POST
+				//     when it should be 204,
 				//     http://www.enhanceie.com/ie/bugs.asp
 				//
 				method = xhr.status // Reuse variable for status
@@ -220,17 +227,29 @@
 
 
 	/*
-	var cache = {}
+	var moduleCache = {}
 	function def(name, str) {
-		var exports = {}
-		, module = { exports: exports }
-		new Function("module,exports", str).call(exports, module, exports)
-		cache[name] = module.exports
+		moduleCache[name] = str
 	}
-	function req(name) {
-		return cache[name]
+	function require(name) {
+		var mod = moduleCache[name]
+		if (!mod) throw new Error("Module not found: " + name)
+		if (typeof mod == "string") {
+			var exports = {}
+			, module = { exports: exports }
+			new Function("module,exports", mod).call(exports, module, exports)
+			mod = moduleCache[name] = module.exports
+		}
+		return mod
 	}
-	def("mod", "this.x = 1")  req("mod").x
+	def("mod", "this.x = 1")  require("mod").x
+
+	// IE9 and below allows up to 32 stylesheets. The number was increased to 4095 in IE10.
+	var node = document.createElement('style')
+	document.body.appendChild(node)
+	load.css = function(str) {
+		node.innerHTML += str
+	}
 	*/
 
 }(this, [])
