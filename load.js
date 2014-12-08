@@ -52,10 +52,15 @@
 			].join(":")
 		)) return
 
+
+		//** IE-stack
+		// Disabled by default
+		/*/
 		// In IE <9, window.onerror is called with the function call stack intact.
 		// This means we can use arguments.callee.caller recursively
 		// to build up a fake stacktrace.
 		// It only gives us function names, but it's better than nothing.
+
 		if (!stack) {
 			for (args = args.callee; args = args && args.caller; ) {
 				//stack += args.toString().split(/[ {]+/)[1] + "\n"
@@ -63,6 +68,7 @@
 				stack += ("" + args).split(/ |{/)[1] + "\n"
 			}
 		}
+		//*/
 
 		unsentErrors.push(
 			[ lastError
