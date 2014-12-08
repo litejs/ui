@@ -10,7 +10,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 <html>
 	<head>
 		<!--
-		http://blog.whatwg.org/the-road-to-html-5-character-encoding
+		https://blog.whatwg.org/the-road-to-html-5-character-encoding
 		-->
 		<meta charset="UTF-8">
 
@@ -23,23 +23,34 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<!--
 		<meta http-equiv="x-dns-prefetch-control" content="off">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		Meta-tags that attempt to apply the X-Frame-Options directive DO NOT WORK.
+		You must apply the X-Frame-Options directive as HTTP Response Header.
+
+		X-Frame-Options: deny
+		Content-Security-Policy: script-src 'self'; frame-src 'none'
+		Strict-Transport-Security: max-age=778000
+
 		-->
 
-		<title>Loading..</title>
+		<title>App</title>
 		<!-- <base href="./"> -->
 
-		<link rel="stylesheet" type="text/css" href="app.css">
+		<!--
+		Place icons in the root of your domain
+		and these references are not needed.
 
-		<!-- Place favicon.ico and apple-touch-icon.png in the root of your domain and delete these references -->
 		<link rel="shortcut icon" href="favicon.ico">
 		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+		-->
+		<link rel="stylesheet" type="text/css" href="app.css">
 	</head>
 	<body>
+		<script src="litejs-src.js"></script>
+		<script src="app.js"></script>
 		<noscript>
 			<h1>Warning!</h1>This application requires JavaScript to be enabled in your Browser.
 		</noscript>
 	</body>
-	<script src="litejs-src.js"></script>
-	<script src="app.js"></script>
 </html>
 
