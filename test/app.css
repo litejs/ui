@@ -1,3 +1,23 @@
+
+/**
+ * @see http://smacss.com/book/categorizing
+ * Theme rules describe how modules or layouts might look.
+ * Without theme site must work but look like a wireframe.
+ *
+ * base and components should be reusable across projects.
+ */
+
+@import url("css/base.css");
+@import url("css/layout.css");
+@import url("css/components/more/more.css");
+@import url("css/state.css");
+@import url("css/theme.css");
+
+
+
+
+
+
 /*
 @font-face {
 	font-family: '<font-family>';
@@ -15,3 +35,5 @@
 }
 
 */
+
+
