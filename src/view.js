@@ -76,14 +76,15 @@
 			var view = this
 			, file = (View.base || "") + (view.file || view.route + ".js")
 
-			if (loadedFiles[file])
-				throw new Error("Stil No View")
+			if (loadedFiles[file]) show()
+			else xhr.load(file, loadedFiles[file] = show)
 
-			loadedFiles[file] = 1
-			xhr.load(file, function() {
+			function show() {
 				if (view.el) view.show(opts)
-				else throw new Error("No View " + view.route)
-			})
+				else if (view.route !== View["404"]) {
+					View(View["404"]).show({})
+				}
+			}
 		},
 		show: function(opts) {
 			var view = this
@@ -128,6 +129,9 @@
 	}
 
 	Object.merge(View.prototype, Event.Emitter)
+
+	View["404"] = "404"
+	View.main = "main"
 
 	View.show = function(route) {
 		var match = re.exec(route)
