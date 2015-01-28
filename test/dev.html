@@ -21,6 +21,21 @@ but you'll need the mime-type to work in older browsers and IE11.
 		-->
 
 		<!--
+		Since M31, Chrome will look for mobile-web-app-capable meta tag,
+		if there's a manifest with display specified, this is ignored.
+
+		<meta name="mobile-web-app-capable" content="yes">
+		<link rel="manifest" href="manifest.json">
+
+		Whilst Chrome temporarily accepts the usage of "apple-mobile-web-app-capable",
+		Chrome does not offer compatibility with the iOS Safari API’s including:
+
+		window.navigator.standalone
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="apple-touch-startup-image" href="/startup.png">
+		-->
+
+		<!--
 		<meta http-equiv="x-dns-prefetch-control" content="off">
 
 		To be sure you're using the latest rendering mode for IE.

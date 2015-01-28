@@ -88,30 +88,6 @@ M.on("event", function(ev) {
 })
 
 
-!function(window) {
-	var cache = window.applicationCache
-	function onUpdateReady() {
-		if (cache.status === cache.UPDATEREADY) {
-			cache.swapCache()
-			//if (confirm("A new version of this site is available. Load it?")) {
-			//	window.location.reload()
-			//}
-		}
-	}
-	if (cache) {
-		// window.applicationCache.update()
-		// // Check if a new cache is available on page load.
-		// window.applicationCache.addEventListener('ondownloading', function(e) {
-		//     window.applicationCache.abort();
-		// }, false);
-		// // Just abort the download when you catch the ondownloading event.
-
-
-		cache.addEventListener("updateready", onUpdateReady)
-		//onUpdateReady();
-	}
-}(this)
-
 
 List.api = List.extend({
 	wait: Fn.Lazy.wait.partial(['add','model','merge','on','sortFn','toString']),
