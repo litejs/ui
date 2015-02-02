@@ -107,7 +107,7 @@
 
 	// eval in a global context for non-IE & non-Chrome (removed form v8 on 2011-05-23: Version 3.3.9)
 	// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
-	if (!window.execScript && Function("d,Date","return(1,eval)('(Date)')===d")(Date,1)) window.execScript = eval
+	if (!window.execScript) Function("d,Date", "if((1,eval)('(Date)')===d)window.execScript=eval")(Date, 1)
 
 	lazy(window, "execScript", "d=document;b=d.body;c=d.createElement('script');c.text=a;b.insertBefore(c,b.firstChild)")
 
@@ -203,7 +203,7 @@
 			xhr("GET", files[i], function(err, str) {
 				res[i] = err ? "" : str
 				if (!--len) {
-					execScript( res.join("/**/;") )
+					execScript( ";" + res.join("/**/;") )
 					if (next) next()
 					res = null
 				}
