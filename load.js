@@ -107,7 +107,7 @@
 
 	// eval in a global context for non-IE & non-Chrome (removed form v8 on 2011-05-23: Version 3.3.9)
 	// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
-	if (!window.execScript) Function("d,Date", "if((1,eval)('(Date)')===d)window.execScript=eval")(Date, 1)
+	if (!window.execScript) Function("d,Date,w", "if((1,eval)('(Date)')===d)w.execScript=eval")(Date, 1, window)
 
 	lazy(window, "execScript", "d=document;b=d.body;c=d.createElement('script');c.text=a;b.insertBefore(c,b.firstChild)")
 
@@ -232,7 +232,7 @@
 
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
-		for (var len = files.length, i=len, res = [];i--;) !function(i) {
+		for (var len = files.length, i = len, res = []; i--; ) !function(i) {
 			xhr("GET", files[i], function(err, str) {
 				res[i] = err ? "" : str
 				if (!--len) {
@@ -248,15 +248,15 @@
 	// http://kangax.github.io/es5-compat-table/
 	if (!Function.prototype.bind) scripts.unshift("up.js")
 
-	load(scripts, next)
-
 	xhr.load = load
 
+	load(scripts, next)
 
-
-
-
-
+	/*
+	 * You can invalidate a URL in the browser's cache by sending a PUT method xmlhttprequest to it:
+	 * xhr("PUT", url).send()
+	 * (Works in all major browsers)
+	 */
 
 
 	/*
