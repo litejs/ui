@@ -197,6 +197,39 @@
 	}
 	window.xhr = xhr
 
+
+
+	//** require
+	var modules = {}
+	, process = {
+		env: {},
+		nextTick: window.setImmediate || window.requestAnimationFrame || window.setTimeout
+	}
+
+	//process.memoryUsage = function() {
+	//	return window.performance && window.performance.memory || {}
+	//}
+
+	function require(name) {
+		var mod = modules[name]
+		if (!mod) throw new Error("Module not found: " + name)
+		if (typeof mod == "string") {
+			var exports = modules[name] = {}
+			, module = { id: name, filename: name, exports: exports }
+			new Function("exports,module,process,require,global", mod).call(exports, exports, module, process, require, window)
+			mod = modules[name] = module.exports
+		}
+		return mod
+	}
+	window.require = require
+
+	require.def = function(map, key) {
+		for (key in map) modules[key] = map[key]
+	}
+	//*/
+
+
+
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
 		for (var len = files.length, i=len, res = [];i--;) !function(i) {
@@ -227,22 +260,6 @@
 
 
 	/*
-	var moduleCache = {}
-	function def(name, str) {
-		moduleCache[name] = str
-	}
-	function require(name) {
-		var mod = moduleCache[name]
-		if (!mod) throw new Error("Module not found: " + name)
-		if (typeof mod == "string") {
-			var exports = {}
-			, module = { exports: exports }
-			new Function("module,exports", mod).call(exports, module, exports)
-			mod = moduleCache[name] = module.exports
-		}
-		return mod
-	}
-	def("mod", "this.x = 1")  require("mod").x
 
 	// IE9 and below allows up to 32 stylesheets. The number was increased to 4095 in IE10.
 	var node = document.createElement('style')
