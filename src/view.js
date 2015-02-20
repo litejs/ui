@@ -1,7 +1,7 @@
 
 
 
-/**
+/*
  * @version    0.4.0
  * @date       2015-01-16
  * @stability  2 - Unstable

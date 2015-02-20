@@ -1,7 +1,7 @@
 
 
 
-/**
+/*
  * @version    0.1.1
  * @date       2015-01-18
  * @stability  1 - Experimental
