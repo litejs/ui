@@ -61,16 +61,12 @@
 			view.parent = typeof parent == "string" ? View(parent) : parent
 			view.selector = selector
 		},
-		getEl: function() {
+		getContentEl: function() {
 			var view = this
 			, type = typeof view.el
 			if (type == "function") view.el = view.el()
 			else if (type == "string") view.el = El(view.el)
-			return view.el
-		},
-		getContentEl: function() {
-			var view = this
-			return view.selector && view.getEl().find(view.selector) || view.getEl()
+			return view.selector && view.el.find(view.selector) || view.el
 		},
 		load: function(opts) {
 			var view = this
@@ -104,7 +100,7 @@
 			view.active = false
 
 			if (parent) {
-				parent.getContentEl().removeChild(view.getEl())
+				parent.getContentEl().removeChild(view.el)
 				parent.child = null
 			}
 			view.emit("close", opts)
@@ -119,8 +115,8 @@
 			if (parent) {
 				if (parent.child != view) {
 					if (parent.child) parent.child.close()
-					parent.child = view
-					parent.getContentEl().appendChild(view.getEl())
+					parent.child = opts._render = view
+					parent.getContentEl().appendChild(view.el)
 				}
 				parent.ping(opts)
 			}
