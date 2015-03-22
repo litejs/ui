@@ -87,7 +87,8 @@
 			View.active = view.route
 			if (view.el) {
 				if (view.active) view.close()
-				view.ping(opts)
+				view.ping(El.global.route = opts)
+				;(opts._render || view).el.render()
 				if (View.active == view.route) view.emit("show", opts)
 			} else {
 				view.load(opts)
@@ -147,5 +148,24 @@
 	}
 
 	exports.View = View
+
+	function viewPlugin(parent, name) {
+		var t = this
+		t.name = name
+		t.parent = parent
+		t.el = El("div")
+		t.el.plugin = t
+		return t
+	}
+
+	viewPlugin.prototype.done = function() {
+		var t = this
+		, arr = t.name.split(" ")
+		View(arr[0], t.el.removeChild(t.el.firstChild), arr[1], arr[2])
+		t.el.plugin = null
+		return t.parent
+	}
+
+	El.plugins.view = viewPlugin
 }(this)
 

@@ -232,8 +232,9 @@
 
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
-		for (var len = files.length, i = len, res = []; i--; ) !function(i) {
-			xhr("GET", files[i], function(err, str) {
+		for (var len = files.length, i = 0, res = []; i < len; ) !function(i) {
+			res[i] = ""
+			if (files[i]) xhr("GET", files[i], function(err, str) {
 				res[i] = err ? "" : str
 				if (!--len) {
 					execScript( ";" + res.join("/**/;") )
@@ -241,12 +242,12 @@
 					res = null
 				}
 			}).send()
-		}(i)
+		}(i++)
 	}
 
 	// Function.prototype.bind is most missing fn
 	// http://kangax.github.io/es5-compat-table/
-	if (!Function.prototype.bind) scripts.unshift("up.js")
+	// if (!Function.prototype.bind) scripts.unshift("up.js")
 
 	xhr.load = load
 
