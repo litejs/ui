@@ -117,7 +117,7 @@
 	// http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 	//
 
-	function xhr(method, url, next) {
+	function xhr(method, url, next, atr1) {
 		var xhr = xhrs.shift() || new XMLHttpRequest()
 
 		// To be able to reuse the XHR object properly,
@@ -187,7 +187,8 @@
 				if (next) next.call(
 					xhr,
 					(method < 200 || method > 299) && method !== 304 && method !== 1223 && method,
-					xhr.responseText
+					xhr.responseText,
+					atr1
 				)
 				xhr.onreadystatechange = next = nop
 				xhrs.push(xhr)
@@ -232,17 +233,21 @@
 
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
-		for (var len = files.length, i = 0, res = []; i < len; ) !function(i) {
-			res[i] = ""
-			if (files[i]) xhr("GET", files[i], function(err, str) {
-				res[i] = err ? "" : str
-				if (!--len) {
-					execScript( ";" + res.join("/**/;") )
-					if (next) next()
-					res = null
-				}
-			}).send()
-		}(i++)
+		var len = files.length
+		, i = 0
+		, pending = 0
+		, res = []
+		for (; i < len; i++) if (files[i]) {
+			xhr("GET", files[i], cb, pending++).send()
+		}
+		function cb(err, str, i) {
+			res[i] = err ? "" : str
+			if (!--pending) {
+				execScript( ";" + res.join("/**/;") )
+				if (next) next()
+				res = null
+			}
+		}
 	}
 
 	// Function.prototype.bind is most missing fn
