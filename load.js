@@ -109,7 +109,7 @@
 	// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
 	if (!window.execScript) Function("d,Date,w", "if((1,eval)('(Date)')===d)w.execScript=eval")(Date, 1, window)
 
-	lazy(window, "execScript", "d=document;b=d.body;c=d.createElement('script');c.text=a;b.insertBefore(c,b.firstChild)")
+	lazy(window, "execScript", "d=document;b=d.body;c=d.createElement('script');c.text=a;b.removeChild(b.insertBefore(c,b.firstChild))")
 
 	// next === true is for sync call
 	//
