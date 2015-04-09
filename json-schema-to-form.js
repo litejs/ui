@@ -131,7 +131,7 @@
 			}
 		}
 
-		El("input", {"type":"submit","value":"Ok"}).to(el)
+		El("input[type=submit][value=Ok]").to(el)
 
 		el.getJSON = function() {
 			var data = JSON.serializeForm(el)
