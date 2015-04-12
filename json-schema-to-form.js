@@ -1,53 +1,6 @@
 
 !function() {
-	function This() { return this }
 
-	Number.prototype.safe = This
-
-	function fixType(obj, key, attr) {
-		var val = obj[key]
-
-		if (attr && typeof val !== attr.type) {
-			if (attr.type == "number") obj[key] = parseFloat( (obj[key]+"").replace(",", ".") )
-			if (attr.type == "integer") obj[key] |= 0
-
-			if (attr.type == "array" ) {
-				if (typeof val == "string") {
-					if (val.charAt(0) == "[") {
-						try {
-							obj[key] = JSON.parse(val)
-						}catch(e){}
-					} else {
-						obj[key] = val ? val.split(/[, ]+/).map(function(_n, _i, _arr){ fixType(_arr, _i, attr.items); return _arr[_i] }) : []
-					}
-				}
-			}
-
-			if (attr.type == "boolean" ) {
-				obj[key] = val == "on"
-			}
-
-			if (attr.type == "date-time") {
-				obj[key] = val.date()
-			}
-
-			if (attr.type == "object" ) {
-
-			}
-		}
-	}
-
-	/*
-	var ex = {
-		myList: function(prop, field) {
-			List(prop.myList).each(function(item) {
-				El("option", {value: item.get("id") } )
-				.to(field).innerHTML = item.get("id") +". "+ item.get("name")
-			})
-		}
-	}
-	 */
-	//
 	var template = [""
 		, "@template form-field"
 		, " label"
@@ -135,11 +88,7 @@
 
 		el.getJSON = function() {
 			var data = JSON.serializeForm(el)
-			, prop = def.properties
-
-			Object.each(data, function(val, key){
-				fixType(data, key, prop[key])
-			})
+			JSON.applySchemaTypes(data, def)
 			return data
 		}
 
