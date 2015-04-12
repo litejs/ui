@@ -57,7 +57,7 @@
 	View.prototype = {
 		init: function(el, parent, selector) {
 			var view = this
-			view.el = el
+			view.el = typeof el == "string" ? El.tpl(el) : el
 			view.parent = typeof parent == "string" ? View(parent) : parent
 			view.selector = selector
 		},
