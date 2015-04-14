@@ -140,7 +140,7 @@
 	}
 
 	View.def = function(str) {
-		for (var match, re = /(\S+)\?(\S+)/g; match = re.exec(str);) {
+		for (var match, re = /(\S+) (\S+)/g; match = re.exec(str);) {
 			match[2].split(",").map(function(route) {
 				View(route).file = match[1]
 			})
