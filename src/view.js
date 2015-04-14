@@ -65,7 +65,7 @@
 			var view = this
 			, type = typeof view.el
 			if (type == "function") view.el = view.el()
-			else if (type == "string") view.el = El(view.el)
+			else if (type == "string") view.el = El.tpl(view.el)
 			return view.selector && view.el.find(view.selector) || view.el
 		},
 		load: function(opts) {
