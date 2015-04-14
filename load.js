@@ -23,6 +23,7 @@
 
 !function(window, scripts, next) {
 	var xhrs = []
+	, styleNode
 
 
 	//** error
@@ -117,7 +118,7 @@
 	// http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 	//
 
-	function xhr(method, url, next, atr1) {
+	function xhr(method, url, next, attr1, attr2) {
 		var xhr = xhrs.shift() || new XMLHttpRequest()
 
 		// To be able to reuse the XHR object properly,
@@ -188,7 +189,9 @@
 					xhr,
 					(method < 200 || method > 299) && method !== 304 && method !== 1223 && method,
 					xhr.responseText,
-					atr1
+					url,
+					attr1,
+					attr2
 				)
 				xhr.onreadystatechange = next = nop
 				xhrs.push(xhr)
@@ -230,6 +233,15 @@
 	//*/
 
 
+	/*
+
+	// IE9 and below allows up to 32 stylesheets. The number was increased to 4095 in IE10.
+	var node = document.createElement('style')
+	document.body.appendChild(node)
+	load.css = function(str) {
+		node.innerHTML += str
+	}
+	*/
 
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
@@ -240,8 +252,20 @@
 		for (; i < len; i++) if (files[i]) {
 			xhr("GET", files[i], cb, pending++).send()
 		}
-		function cb(err, str, i) {
-			res[i] = err ? "" : str
+		function cb(err, str, file, i) {
+			var type = file.split(".").pop()
+			res[i] = ""
+			if (type == "tpl") {
+				El.tpl(str)
+			} else if (type == "css") {
+				if (!styleNode) {
+					styleNode = document.createElement("style")
+					document.body.appendChild(styleNode)
+				}
+				styleNode.innerHTML += str
+			} else if (!err) {
+				res[i] = str
+			}
 			if (!--pending) {
 				execScript( ";" + res.join("/**/;") )
 				if (next) next()
@@ -265,15 +289,6 @@
 	 */
 
 
-	/*
-
-	// IE9 and below allows up to 32 stylesheets. The number was increased to 4095 in IE10.
-	var node = document.createElement('style')
-	document.body.appendChild(node)
-	load.css = function(str) {
-		node.innerHTML += str
-	}
-	*/
 
 }(this, [])
 
