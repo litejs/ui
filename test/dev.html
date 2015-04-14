@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<!--
+A manifest file must be served with the mime-type text/cache-manifest
+This requirement was dropped from the specification some time ago,
+and no longer required by the latest versions of Chrome, Safari and Firefox,
+but you'll need the mime-type to work in older browsers and IE11.
+
+<html manifest="cache.manifest">
+-->
+<html>
+	<head>
+		<!--
+		https://blog.whatwg.org/the-road-to-html-5-character-encoding
+		-->
+		<meta charset="UTF-8">
+
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1">
+		<!-- Resize allowed:
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+		-->
+
+		<!--
+		Since M31, Chrome will look for mobile-web-app-capable meta tag,
+		if there's a manifest with display specified, this is ignored.
+
+		<meta name="mobile-web-app-capable" content="yes">
+		<link rel="manifest" href="manifest.json">
+
+		Whilst Chrome temporarily accepts the usage of "apple-mobile-web-app-capable",
+		Chrome does not offer compatibility with the iOS Safari API’s including:
+
+		window.navigator.standalone
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="apple-touch-startup-image" href="/startup.png">
+		-->
+
+		<!--
+		<meta http-equiv="x-dns-prefetch-control" content="off">
+
+		To be sure you're using the latest rendering mode for IE.
+		The best practice is an X-UA-Compatible HTTP Header.
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		Meta-tags that attempt to apply the X-Frame-Options directive DO NOT WORK.
+		You must apply the X-Frame-Options directive as HTTP Response Header.
+
+		X-Frame-Options: deny
+		Content-Security-Policy: script-src 'self'; frame-src 'none'
+		Strict-Transport-Security: max-age=778000
+
+		-->
+
+		<title>App</title>
+		<!-- <base href="./"> -->
+
+		<!--
+		Place icons in the root of your domain
+		and these references are not needed.
+
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+		-->
+		<link rel="stylesheet" href="app.css">
+	</head>
+	<body>
+		<script src="../src/bootstrap.js"></script>
+		<script src="../up.js"></script>
+		<script src="../litejs.js"></script>
+		<script src="../src/json-serialize-form.js"></script>
+		<script src="js/app.js"></script>
+		<noscript>
+			<h1>Warning!</h1>This application requires JavaScript to be enabled in your Browser.
+		</noscript>
+	</body>
+</html>
+

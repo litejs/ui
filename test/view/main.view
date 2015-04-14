@@ -1,0 +1,105 @@
+
+@template nav-row
+	span
+		a &href: "{href}"; txt: "{name|lang}"; class:"selected", "'#' + route._r == href"
+
+@template top
+	.top
+		h1 Header
+		ul.nav &each: lng in _.list
+			a &lang:"{lng}"; txt:"{lng|upper}"; on:"click", Controller.setLang; class:"selected", d.lng == El.i18n.get(); class:"lang-{lng}"
+		.nav
+			nav-row &with:{href:"#home",        name:"Home"}
+			nav-row &with:{href:"#users",       name:"Users"}
+			nav-row &with:{href:"#settings",    name:"Settings"}
+			nav-row &with:{href:"#test",        name:"Test"}
+			nav-row &with:{href:"#broken-link", name:"Broken link"}
+
+@template footer
+	.footer
+		.lft | Plain text
+		.rgt Plain text
+
+@view #public #body .content
+	.route
+		top
+		.content
+		footer
+
+@view #private #body .content
+	.route
+		button &txt:_("logout"); on:"click", Controller.logout
+		top
+		.content
+		footer
+
+@view 404 #public
+	.page
+		h2 Error 404
+		| Page not found.
+		| Maybe you want to look something else?
+
+@view home #public
+	.page
+		h2 Home
+		div _welcome
+
+@view login #public
+	form[action="javascript:"][method=POST] &on:"submit", Controller.login
+		h2 Login
+		label
+			span Username
+			input[name=name]
+		label
+			span Password
+			input[name=pass][type=password]
+		input[type=submit] &val:_("Log In")
+
+
+@view users #public
+	.page
+		h2 Users
+		ul &each: user in ["1", "2", "3", "4", "5"] limit:2 offset:1
+			li
+				a &href: "#users/{user}"; txt: _("User {user}")
+
+@view users/{id} #public
+	.page
+		h2 User #{route.id}
+
+@view settings #private
+	.page
+		h2 Settings for {user.name}
+		.h | Settings
+		| Lot of settings
+		ul &each: row in ["A", "B", "C"]
+			li
+				span Row {row}
+				input[name=a0][type=checkbox][data-bind="checked:Math.random()>.5"]
+				input[name=a1][type=checkbox][data-bind="disabled:Math.random()>.5"]
+
+
+@view app #body .content
+	.x
+		.app
+			.top
+				ul.reset.app--row.nav
+					li.nav--rgt.rel>a.nav.b-blue[href="#"] Sisene
+					li.nav>a.nav[href="http://www.litejs.com/"] litejs.com
+			.menu
+				ul.reset.nav#tabs.app--row
+					li.nav>a.nav[href="#cart"] Ostukorv
+					li.nav>a.nav[href="#shop"] Poed
+			.content.app--row.stack.anim
+			.footer--spacer
+		.footer
+			.app--row
+				dl.footer--item
+					dt litejs.com
+					dd>a[href="#help"] How to use
+					dd>a[href="#privacy"] Privacy
+				dl.footer--item
+					dt Contacts
+					dd>a[href="mailto:mail@to.com"] email
+
+.x
