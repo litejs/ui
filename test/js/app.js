@@ -34,74 +34,6 @@ _.add("et", {
 	name: "Nimi"
 })
 
-!function(xhr) {
-	var authorization, pollOpen
-
-	xhr.get = function(url, next) {
-		makeReq("GET", url, next).send()
-	}
-
-	xhr.del = function(url, next) {
-		makeReq("DELETE", url, next).send()
-	}
-
-	xhr.post = function(url, data, next) {
-		makeReq("POST", url, next).send(JSON.stringify(data))
-	}
-
-	xhr.patch = function(url, data, next) {
-		makeReq("PATCH", url, next).send(JSON.stringify(data))
-	}
-
-	xhr.poll = function(s) {
-		if (pollOpen != (pollOpen = s)) longPoll()
-	}
-
-	xhr.auth = function(data, next) {
-		xhr.post("/api/v1/auth", data, function(err, json) {
-			authorization = !err && json.authorization
-			if (next) next(err, json)
-			M.emit("login_ok/fail")
-		})
-	}
-
-	xhr.logout = function() {
-		xhr.post("/api/v1/logout", {}, function(err, json) {
-			authorization = null
-			history.setUrl('welcome', true)
-			location.reload( false )
-		})
-	}
-
-	function makeReq(method, url, next) {
-		var req = xhr(method, url, function(err, txt) {
-			if (err == 401) return M.emit("login_fail")
-			// if Content-Type == "application/json"
-			if (next) next(err, !err && txt && JSON.parse(txt), req)
-		})
-		if (authorization) req.setRequestHeader("Authorization", authorization)
-		req.setRequestHeader("Content-Type", "application/json")
-		return req
-	}
-
-	function longPoll() {
-		if (pollOpen) xhr.get("/api/v1/logs", pollHandler)
-	}
-
-	function pollHandler(err, res) {
-		var i = 0
-		, events = !err && (Array.isArray(res) ? res : res.events)
-		, len = events && events.length || 0
-
-		if (len) for (;i<len;) M.emit("event", events[i++])
-
-		setTimeout(longPoll, err ? 6000 : 600)
-	}
-	xhr._logErrors = function(arr) {
-		xhr("POST", "/errlog").send(arr.join("\n\n"))
-	}
-}(xhr)
-
 
 
 
@@ -138,6 +70,9 @@ _.add("et", {
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.
 	View("#body", document.body)
+	.on("ping", function() {
+		document.body.findAll(".nav").render()
+	})
 
 	View("#private")
 	.on("ping", function(opts) {
