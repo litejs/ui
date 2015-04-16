@@ -97,9 +97,9 @@
 		if (!obj[name]) obj[name] = new Function("a,b,c,d", str)
 	}
 	// function lazy(obj, name, str) {
-	// 	obj[name] || (obj[name] = function() {
+	// 	if (!obj[name]) obj[name] = function() {
 	// 		return (obj[name] = new Function("a,b,c,d", str)).apply(this, arguments)
-	// 	})
+	// 	}
 	// }
 
 	// XMLHttpRequest was unsupported in IE 5-6
@@ -212,7 +212,7 @@
 	}
 
 	//process.memoryUsage = function() {
-	//	return window.performance && window.performance.memory || {}
+	//	return (window.performance || {}).memory || {}
 	//}
 
 	function require(name) {
@@ -234,15 +234,8 @@
 	//*/
 
 
-	/*
-
-	// IE9 and below allows up to 32 stylesheets. The number was increased to 4095 in IE10.
-	var node = document.createElement('style')
-	document.body.appendChild(node)
-	load.css = function(str) {
-		node.innerHTML += str
-	}
-	*/
+	// IE9 and below allows up to 32 stylesheets.
+	// The number was increased to 4095 in IE10.
 
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
@@ -281,7 +274,6 @@
 
 	// Function.prototype.bind is most missing fn
 	// http://kangax.github.io/es5-compat-table/
-	// if (!Function.prototype.bind) scripts.unshift("up.js")
 
 	xhr.load = load
 
