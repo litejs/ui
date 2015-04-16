@@ -16,7 +16,6 @@
 	, fnStr = ""
 	, reStr = ""
 	, views = {}
-	, loadedFiles = {}
 	, groupsCount = 1
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
@@ -70,17 +69,16 @@
 		},
 		load: function(opts) {
 			var view = this
-			, file = (View.base || "") + (view.file || view.route + ".js")
+			, files = (view.file || view.route + ".js")
+			.replace(/^|,/g, "$&" + (View.base || ""))
+			.split(",")
 
-			if (loadedFiles[file]) show()
-			else xhr.load(file, loadedFiles[file] = show)
-
-			function show() {
+			xhr.load(files, function() {
 				if (view.el) view.show(opts)
 				else if (view.route !== View["404"]) {
 					View(View["404"]).show({})
 				}
-			}
+			})
 		},
 		show: function(opts) {
 			var view = this
