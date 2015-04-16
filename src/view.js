@@ -46,7 +46,7 @@
 			fnStr += (fnStr ? "||" : "") + "a[" + startLen + "]&&(" + a + ")"
 			reStr += (reStr ? "|" : "") + "(" + _re + ")"
 
-			fn = new Function("a", "var o={};return " + fnStr + ",o")
+			fn = new Function("o,a", "return a&&(" + fnStr + "),o")
 			re = new RegExp("^\\/?(?:" + reStr + ")[\\/\\s]*$")
 		}
 
@@ -82,10 +82,11 @@
 		},
 		show: function(opts) {
 			var view = this
+			if (!opts) opts = {_r: view.route}
 			View.active = view.route
 			if (view.el) {
 				if (view.active) view.close()
-				view.ping(El.global.route = opts)
+				view.ping(opts)
 				;(opts._render || view).el.render()
 				if (View.active == view.route) view.emit("show", opts)
 			} else {
@@ -125,16 +126,11 @@
 
 	Object.merge(View.prototype, Event.Emitter)
 
-	View["404"] = "404"
-	View.main = "main"
+	View.home = "home"
 
 	View.show = function(route) {
-		var match = re.exec(route)
-		View(
-			match && (match = fn(match))._r ||
-			route && View["404"] ||
-			View.main
-		).show(match || {})
+		var match = fn({_r:"404"}, re.exec(route || View.home))
+		View(match._r).show(El.global.route = match)
 	}
 
 	View.def = function(str) {
