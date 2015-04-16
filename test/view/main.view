@@ -1,7 +1,4 @@
 
-@template nav-row
-	span
-		a &href: "{href}"; txt: "{name|lang}"; class:"selected", "'#' + route._r == href"
 
 @template top
 	.top
@@ -9,11 +6,13 @@
 		ul.nav &each: lng in _.list
 			a &lang:"{lng}"; txt:"{lng|upper}"; on:"click", Controller.setLang; class:"selected", d.lng == El.i18n.get(); class:"lang-{lng}"
 		.nav
-			nav-row &with:{href:"#home",        name:"Home"}
-			nav-row &with:{href:"#users",       name:"Users"}
-			nav-row &with:{href:"#settings",    name:"Settings"}
-			nav-row &with:{href:"#test",        name:"Test"}
-			nav-row &with:{href:"#broken-link", name:"Broken link"}
+			@template nav-row
+				a &class:"selected", (location.hash||View.home).indexOf(n.href.split('#')[1])>-1
+			nav-row[href="#home"] Home
+			nav-row[href="#users"] Users
+			nav-row[href="#settings"] Settings
+			nav-row[href="#test"] Test
+			nav-row[href="#broken-link"] Broken link
 
 @template footer
 	.footer

@@ -20,25 +20,7 @@ _.def({ "en":"In English"
 	, "se":"på Svenska"
 })
 
-_.add("et", {
-	Header: "Pealkiri",
-	Home: "Kodu",
-	Users: "Kasutajad",
-	"User {user}": "Kasutaja {user}",
-	_welcome: "tervitustekst",
-	date: "%Y %H:%M:%S %z",
-	Bye: "Lõpp",
-	Settings: "Suvandid",
-	"Broken link": "Katkine link",
-	"Error 404": "Viga 404",
-	name: "Nimi"
-})
-
-
-
-
-
-
+El.global.location = location
 
 
 !function(View, Controller) {
@@ -47,9 +29,10 @@ _.add("et", {
 
 
 	Controller.setLang = function() {
-		_.use(this.attr("lang"))
-		console.log("lang", _.get())
-		document.body.render()
+		lang = _.use(this.attr("lang"))
+		xhr.load("lang/" + lang + ".js", function() {
+			document.body.render()
+		})
 	}
 
 	Controller.login = function(e) {
@@ -65,7 +48,7 @@ _.add("et", {
 
 	document.title = "Litejs Example"
 
-	View.def("main.tpl #public,#private,404,home,login,users,users/{id},settings")
+	View.def("main.tpl,main.css #public,#private,404,home,login,users,users/{id},settings")
 
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.
@@ -78,12 +61,11 @@ _.add("et", {
 	.on("ping", function(opts) {
 		var url = history.getUrl()
 		if (!user && View.active != "login") {
-			View.show("login")
+			View("login").show()
 		}
 	})
 
 	// Define landing page
-	View.main = "home"
 	View.base = "views/"
 
 	// Read in templates from element with id=index
