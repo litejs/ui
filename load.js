@@ -24,6 +24,7 @@
 !function(window, scripts, next) {
 	var styleNode
 	, xhrs = []
+	, loaded = {}
 
 
 	//** error
@@ -245,13 +246,15 @@
 
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
-		var len = files.length
+		var file
+		, len = files.length
 		, i = 0
 		, pending = 0
 		, res = []
-		for (; i < len; i++) if (files[i]) {
-			xhr("GET", files[i], cb, pending++).send()
+		for (; i < len; i++) if ((file = files[i]) && !loaded[file]) {
+			xhr("GET", loaded[file] = file, cb, pending++).send()
 		}
+		if (!pending && next) next()
 		function cb(err, str, file, i) {
 			var type = file.split(".").pop()
 			res[i] = ""
