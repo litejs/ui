@@ -22,8 +22,8 @@
 
 
 !function(window, scripts, next) {
-	var xhrs = []
-	, styleNode
+	var styleNode
+	, xhrs = []
 
 
 	//** error
@@ -255,16 +255,18 @@
 		function cb(err, str, file, i) {
 			var type = file.split(".").pop()
 			res[i] = ""
-			if (type == "tpl") {
-				El.tpl(str)
-			} else if (type == "css") {
-				if (!styleNode) {
-					styleNode = document.createElement("style")
-					document.body.appendChild(styleNode)
+			if (!err) {
+				if (type == "tpl") {
+					El.tpl(str)
+				} else if (type == "css") {
+					if (!styleNode) {
+						styleNode = document.createElement("style")
+						document.body.appendChild(styleNode)
+					}
+					styleNode.innerHTML += str
+				} else {
+					res[i] = str
 				}
-				styleNode.innerHTML += str
-			} else if (!err) {
-				res[i] = str
 			}
 			if (!--pending) {
 				execScript( ";" + res.join("/**/;") )
@@ -290,5 +292,5 @@
 
 
 
-}(this, [])
+}(this,[])
 
