@@ -54,6 +54,7 @@ El.global.location = location
 	// It could be any element on page but we want to start from `BODY`.
 	View("#body", document.body)
 	.on("ping", function() {
+		console.log("render body")
 		document.body.findAll(".nav").render()
 	})
 
@@ -63,6 +64,12 @@ El.global.location = location
 		if (!user && View.active != "login") {
 			View("login").show()
 		}
+	})
+
+	View("users")
+	.on("ping", function(opts) {
+		setTimeout(this.wait(opts), 2000)
+		setTimeout(this.wait(opts), 1000)
 	})
 
 	// Define landing page

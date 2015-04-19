@@ -49,6 +49,14 @@
 			fn = new Function("o,a", "return a&&(" + fnStr + "),o")
 			re = new RegExp("^\\/?(?:" + reStr + ")[\\/\\s]*$")
 		}
+		view.pending = 0
+		view.cb = function() {
+			setTimeout(function() {
+				if (--view.pending === 0) {
+					attachView(view, view._opts)
+				}
+			}, 1)
+		}
 	}
 
 	View.prototype = {
@@ -68,6 +76,7 @@
 		show: function(opts) {
 			var view = this
 			if (!opts) opts = {_r: view.route}
+			view._opts = opts
 			View.active = view.route
 			// Why to close? Isn't a render enough
 			if (view.active) view.close()
@@ -86,9 +95,12 @@
 			view.emit("close", opts)
 			if (view.child) view.child.close()
 		},
+		wait: function() {
+			this.pending++
+			return this.cb
+		},
 		ping: function(opts) {
 			var view = this
-			, parent = view.parent
 
 			if (!view.el) {
 				var files = (view.file || view.route + ".js")
@@ -106,21 +118,27 @@
 
 			view.active = true
 
-			if (parent) {
-				if (parent.child != view) {
-					if (parent.child) parent.child.close()
+			view.emit("ping", opts)
+			attachView(view, opts)
+		}
+	}
+
+	function attachView(view, opts) {
+		if (View.active != opts._r) return
+		var parent = view.parent
+		if (parent) {
+			if (parent.child != view) {
+				if (parent.child) parent.child.close()
+				if (!view.pending) {
 					parent.child = opts._render = view
 					parent.getContentEl().appendChild(view.el)
 				}
-				parent.ping(opts)
 			}
-			if (View.active == opts._r) {
-				view.emit("ping", opts)
-			}
-			if (View.active == view.route) {
-				;(opts._render || view).el.render()
-				view.emit("show", opts)
-			}
+			parent.ping(opts)
+		}
+		if (View.active == view.route) {
+			;(opts._render || view).el.render()
+			view.emit("show", opts)
 		}
 	}
 
