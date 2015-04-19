@@ -65,19 +65,6 @@
 			else if (type == "string") view.el = El.tpl(view.el)
 			return view.selector && view.el.find(view.selector) || view.el
 		},
-		load: function(opts) {
-			var view = this
-			, files = (view.file || view.route + ".js")
-			.replace(/^|,/g, "$&" + (View.base || ""))
-			.split(",")
-
-			xhr.load(files, function() {
-				if (view.el) view.show(opts)
-				else if (view.route !== View["404"]) {
-					View(View["404"]).show({})
-				}
-			})
-		},
 		show: function(opts) {
 			var view = this
 			if (!opts) opts = {_r: view.route}
@@ -102,6 +89,20 @@
 		ping: function(opts) {
 			var view = this
 			, parent = view.parent
+
+			if (!view.el) {
+				var files = (view.file || view.route + ".js")
+				.replace(/^|,/g, "$&" + (View.base || ""))
+				.split(",")
+
+				xhr.load(files, function() {
+					if (view.el) view.ping(opts)
+					else if (view.route != "404") {
+						View("404").show()
+					}
+				})
+				return
+			}
 
 			view.active = true
 
