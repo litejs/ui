@@ -49,8 +49,6 @@
 			fn = new Function("o,a", "return a&&(" + fnStr + "),o")
 			re = new RegExp("^\\/?(?:" + reStr + ")[\\/\\s]*$")
 		}
-
-		if (View.active == route) view.show()
 	}
 
 	View.prototype = {
@@ -84,14 +82,9 @@
 			var view = this
 			if (!opts) opts = {_r: view.route}
 			View.active = view.route
-			if (view.el) {
-				if (view.active) view.close()
-				view.ping(opts)
-				;(opts._render || view).el.render()
-				if (View.active == view.route) view.emit("show", opts)
-			} else {
-				view.load(opts)
-			}
+			// Why to close? Isn't a render enough
+			if (view.active) view.close()
+			view.ping(opts)
 		},
 		close: function(opts) {
 			var view = this
@@ -120,7 +113,13 @@
 				}
 				parent.ping(opts)
 			}
-			view.emit("ping", opts)
+			if (View.active == opts._r) {
+				view.emit("ping", opts)
+			}
+			if (View.active == view.route) {
+				;(opts._render || view).el.render()
+				view.emit("show", opts)
+			}
 		}
 	}
 
