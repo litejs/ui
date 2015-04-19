@@ -27,10 +27,13 @@ El.global.location = location
 	var user
 	, app = El(".app")
 
+	function setLang(lang, next) {
+		xhr.load("lang/" + lang + ".js", next)
+	}
+
 
 	Controller.setLang = function() {
-		lang = _.use(this.attr("lang"))
-		xhr.load("lang/" + lang + ".js", function() {
+		setLang(_.use(this.attr("lang")), function() {
 			document.body.render()
 		})
 	}
@@ -75,11 +78,16 @@ El.global.location = location
 	// Define landing page
 	View.base = "views/"
 
+	var lang = _.use(navigator.language || navigator.userLanguage)
+	setLang(lang, init)
+
 	// Read in templates from element with id=index
 	//El.include("index")
 
-	// Start a router to showing views
-	history.start(View.show)
+	function init() {
+		// Start a router to showing views
+		history.start(View.show)
+	}
 
 }(View, Controller)
 
