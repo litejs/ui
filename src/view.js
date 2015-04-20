@@ -12,7 +12,7 @@
 
 
 !function(exports) {
-	var fn, re
+	var fn, re, lastOpts
 	, fnStr = ""
 	, reStr = ""
 	, views = {}
@@ -49,14 +49,6 @@
 			fn = new Function("o,a", "return a&&(" + fnStr + "),o")
 			re = new RegExp("^\\/?(?:" + reStr + ")[\\/\\s]*$")
 		}
-		view.pending = 0
-		view.cb = function() {
-			setTimeout(function() {
-				if (--view.pending === 0) {
-					attachView(view, view._opts)
-				}
-			}, 1)
-		}
 	}
 
 	View.prototype = {
@@ -66,38 +58,35 @@
 			view.parent = typeof parent == "string" ? View(parent) : parent
 			view.selector = selector
 		},
-		getContentEl: function() {
-			var view = this
-			, type = typeof view.el
-			if (type == "function") view.el = view.el()
-			else if (type == "string") view.el = El.tpl(view.el)
-			return view.selector && view.el.find(view.selector) || view.el
-		},
 		show: function(opts) {
 			var view = this
-			if (!opts) opts = {_r: view.route}
-			view._opts = opts
-			View.active = view.route
-			// Why to close? Isn't a render enough
-			if (view.active) view.close()
-			view.ping(opts)
+			view.ping(lastOpts = opts || {_r: view.route})
 		},
 		close: function(opts) {
 			var view = this
-			, parent = view.parent
 
-			view.active = false
-
-			if (parent) {
-				parent.getContentEl().removeChild(view.el)
-				parent.child = null
+			if (view.open) {
+				toggleView(view, false)
+				view.emit("close", opts)
+				if (view.child) view.child.close()
 			}
-			view.emit("close", opts)
-			if (view.child) view.child.close()
 		},
-		wait: function() {
-			this.pending++
-			return this.cb
+		wait: function(opts) {
+			var view = this
+			view.pending = true
+			if (!opts._p) {
+				opts._p = 0
+			}
+			opts._p++
+			return function() {
+				setTimeout(function() {
+					console.log("pending", opts)
+					if (!--opts._p && lastOpts == opts) {
+						view.pending = false
+						_ping(view, opts)
+					}
+				}, 1)
+			}
 		},
 		ping: function(opts) {
 			var view = this
@@ -115,31 +104,45 @@
 				})
 				return
 			}
-
-			view.active = true
+			view.pending = false
 
 			view.emit("ping", opts)
-			attachView(view, opts)
+			_ping(view, opts)
 		}
 	}
 
-	function attachView(view, opts) {
-		if (View.active != opts._r) return
+	function _ping(view, opts) {
 		var parent = view.parent
+		if (lastOpts != opts) return
 		if (parent) {
-			if (parent.child != view) {
+			if (!view.open) {
 				if (parent.child) parent.child.close()
 				if (!view.pending) {
-					parent.child = opts._render = view
-					parent.getContentEl().appendChild(view.el)
+					toggleView(opts._render = view, true)
 				}
+			} else if (view.pending) {
+				toggleView(view, false)
 			}
 			parent.ping(opts)
 		}
-		if (View.active == view.route) {
+		if (opts._r == view.route) {
 			;(opts._render || view).el.render()
 			view.emit("show", opts)
 		}
+	}
+
+	function toggleView(view, open) {
+		var type
+		, parent = view.parent
+		if (!parent) return
+		type = typeof parent.el
+		if (type == "function") parent.el = parent.el()
+		else if (type == "string") parent.el = El.tpl(parent.el)
+		parent.child = view
+		view.open = open
+		;(parent.selector && parent.el.find(parent.selector) || parent.el)[
+			open ? "appendChild" : "removeChild"
+		](view.el)
 	}
 
 	Object.merge(View.prototype, Event.Emitter)
