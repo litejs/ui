@@ -258,10 +258,11 @@
 					//xhr[++seq] = str
 					//res[i] = "El.tpl(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				} else if (type == "css") {
-					(
-						styleNode ||
-						(styleNode = document.body.appendChild(document.createElement("style")))
-					).innerHTML += str
+					if (!styleNode) {
+						styleNode = document.body.appendChild(document.createElement("style"))
+					}
+					if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
+					else styleNode.appendChild(document.createTextNode(str))
 				} else {
 					res[i] = str
 				}
