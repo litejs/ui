@@ -25,6 +25,7 @@
 	var styleNode
 	, xhrs = []
 	, loaded = {}
+	//, seq = 0
 
 
 	//** error
@@ -188,7 +189,7 @@
 				method = xhr.status // Reuse variable for status
 				if (next) next.call(
 					xhr,
-					(method < 200 || method > 299) && method !== 304 && method !== 1223 && method,
+					(method < 200 || method > 299) && method != 304 && method != 1223 && method,
 					xhr.responseText,
 					url,
 					attr1,
@@ -254,12 +255,13 @@
 			if (!err) {
 				if (type == "tpl") {
 					El.tpl(str)
+					//xhr[++seq] = str
+					//res[i] = "El.tpl(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				} else if (type == "css") {
-					if (!styleNode) {
-						styleNode = document.createElement("style")
-						document.body.appendChild(styleNode)
-					}
-					styleNode.innerHTML += str
+					(
+						styleNode ||
+						(styleNode = document.body.appendChild(document.createElement("style")))
+					).innerHTML += str
 				} else {
 					res[i] = str
 				}
