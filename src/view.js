@@ -37,7 +37,7 @@
 		if (route.charAt(0) != "#") {
 			var startLen = groupsCount++
 			, a = ["o._r='" + route + "'"]
-			, _re = route.replace(/:(\w+)/g, "{$1}").replace(parseRe, function(_, key) {
+			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
 					a.push("o['" + key + "']=a[" + (groupsCount++) + "]") && "([^/]+?)" :
 					escapeRegExp(_)
@@ -74,13 +74,9 @@
 		wait: function(opts) {
 			var view = this
 			view.pending = true
-			if (!opts._p) {
-				opts._p = 0
-			}
-			opts._p++
+			opts._p = 1 + (opts._p | 0)
 			return function() {
 				setTimeout(function() {
-					console.log("pending", opts)
 					if (!--opts._p && lastOpts == opts) {
 						view.pending = false
 						_ping(view, opts)
