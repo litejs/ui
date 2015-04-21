@@ -51,7 +51,8 @@ El.global.location = location
 
 	document.title = "Litejs Example"
 
-	View.def("main.tpl,main.css #public,#private,404,home,login,users,users/{id},settings")
+	View.def("main.tpl,main.css #public,#private,404,home,login,users,users/{id}")
+	View.def("main.tpl,main.css,settings.tpl,settings.css settings")
 
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.
@@ -69,7 +70,7 @@ El.global.location = location
 		}
 	})
 
-	View("users")
+	View("users/{id}")
 	.on("ping", function(opts) {
 		setTimeout(this.wait(opts), 2000)
 		setTimeout(this.wait(opts), 1000)
