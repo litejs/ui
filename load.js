@@ -252,7 +252,7 @@
 		}
 		if (!pending && next) next()
 		function cb(err, str, file, i) {
-			var type = file.split(".").pop()
+			var type = file.split("?")[0].split(".").pop()
 			res[i] = ""
 			if (!err) {
 				if (type == "tpl") {
