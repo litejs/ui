@@ -1,0 +1,30 @@
+
+@keyframes loader {
+	0%  { opacity: 0; }
+	33% { opacity: 0; }
+	66% { opacity: 1; }
+	to  { opacity: 0; }
+}
+
+@-webkit-keyframes loader {
+	0%  { opacity: 0; }
+	33% { opacity: 0; }
+	66% { opacity: 1; }
+	to  { opacity: 0; }
+}
+
+.loader:empty {
+	color: #e66;
+	text-shadow: 0 0 .3em #666;
+	font-size: 2em;
+	line-height: 6em;
+	text-align: center;
+}
+.loader:after {
+	animation: none;
+}
+.loader:empty:after {
+	content: "Loading ...";
+	-webkit-animation: loader 3s infinite;
+	animation: loader 3s infinite;
+}

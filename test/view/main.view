@@ -15,22 +15,27 @@
 			nav-row[href="#broken-link"] Broken link
 
 @template footer
-	.footer
-		.lft | Plain text
-		.rgt Plain text
+	.footer.app--row
+		dl.footer--item
+			dt litejs.com
+			dd>a[href="#help"] How to use
+			dd>a[href="#privacy"] Privacy
+		dl.footer--item
+			dt Contacts
+			dd>a[href="mailto:mail@to.com"] email
 
 @view #public #body .content
-	.route
-		top
-		.content
-		footer
+	.app
+		top.app__row
+		.content.loader.app__row
+		footer.app__row
 
 @view #private #body .content
-	.route
-		button &txt:_("logout"); on:"click", Controller.logout
-		top
-		.content
-		footer
+	.app
+		top.app__row
+			button.top__logout &txt:_("logout"); on:"click", Controller.logout
+		.content.loader.app__row
+		footer.app__row
 
 @view 404 #public
 	.page
@@ -77,16 +82,7 @@
 				ul.reset.nav#tabs.app--row
 					li.nav>a.nav[href="#cart"] Ostukorv
 					li.nav>a.nav[href="#shop"] Poed
-			.content.app--row.stack.anim
+			.content.app--row.stack.anim.loader
 			.footer--spacer
-		.footer
-			.app--row
-				dl.footer--item
-					dt litejs.com
-					dd>a[href="#help"] How to use
-					dd>a[href="#privacy"] Privacy
-				dl.footer--item
-					dt Contacts
-					dd>a[href="mailto:mail@to.com"] email
 
 .x

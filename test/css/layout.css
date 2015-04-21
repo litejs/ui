@@ -22,3 +22,13 @@ html {
 }
 
 
+.app__row {
+	margin: 0 1em;
+}
+
+.lg .app__row {
+	width: 990px;
+	margin: 0 auto;
+	zoom: 1;
+}
+

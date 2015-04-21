@@ -20,6 +20,17 @@ Function.prototype.trace = function(name) {
 	fn
 }
 
+xhr._load = xhr.load
+
+xhr.now = +new Date()
+xhr.load = function(files, next) {
+	if (typeof files == "string") files = [files]
+	files = files.map(function(file) {
+		return file + "?" + xhr.now
+	})
+	return xhr._load(files, next)
+}
+
 
 View.prototype.show = View.prototype.show.trace("View.show")
 View.prototype.ping = View.prototype.ping.trace("View.ping")

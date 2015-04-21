@@ -1,11 +1,16 @@
 body {
 	background: #ddd;
 }
-.page {
-	background: #fff;
+
+.top {
+	position: relative;
 }
-.content:empty {
-	background: red;
-	min-height: 9em;
+.top__logout {
+	position: absolute;
+	top: 1em;
+	right: 1em;
 }
 
+.content {
+	background: #fff;
+}
