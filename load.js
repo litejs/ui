@@ -23,6 +23,8 @@
 
 !function(window, scripts, next) {
 	var styleNode
+	, document = window.document
+	, head = document.getElementsByTagName("head")[0]
 	, xhrs = []
 	, loaded = {}
 	//, seq = 0
@@ -259,7 +261,9 @@
 					//res[i] = "El.tpl(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				} else if (type == "css") {
 					if (!styleNode) {
-						styleNode = document.body.appendChild(document.createElement("style"))
+						// Safari and IE6-8 requires dynamically created
+						// <style> elements to be inserted into the <head>
+						styleNode = head.appendChild(document.createElement("style"))
 					}
 					if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
 					else styleNode.appendChild(document.createTextNode(str))
