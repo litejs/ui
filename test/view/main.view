@@ -71,6 +71,12 @@
 	.page
 		h2 User #{route.id}
 
+@view test #public
+	.page
+		h2 Test
+		ul
+			li>a[href="#test-form1"] Form 1
+
 @view app #body .content
 	.x
 		.app

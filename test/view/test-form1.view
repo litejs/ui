@@ -1,0 +1,46 @@
+@view test-form1 #public
+	.x
+		h2 Test 1
+		form[action="javascript:"][method=POST][data-expect='{"name":"smith","pet":"dog"}'] &on:"submit", Controller.logForm
+			input[name="name"][value="smith"]
+			select[name="pet"]
+				option[value=cat] Cat
+				option[value=dog]:selected Dog
+				option Bird
+				option
+			input[type="submit"]
+		h2 Test 2
+		form[action="javascript:"][method=POST][data-expect='{"user":{"email":"jsmith@example.com","pets":["cat","dog"]}}'] &on:"submit", Controller.logForm
+			input[name="user[email]"][value="jsmith@example.com"]
+			input[name="user[pets][]"][type="checkbox"][value="cat"]:checked
+			input[name="user[pets][]"][type="checkbox"][value="dog"]:checked
+			input[name="user[pets][]"][type="checkbox"][value="bird"]
+			input[name="user[pets][]"][type="checkbox"]
+			input[type="submit"]
+		h2 Test 3
+		form[action="javascript:"][method=POST][data-expect='{"user":{"email":"jsmith@example.com","pets":{"a":"cat","b":"dog"}}}'] &on:"submit", Controller.logForm
+			input[name="user[email]"][value="jsmith@example.com"]
+			input[name="user[pets][a]"][type="checkbox"][value="cat"]:checked
+			input[name="user[pets][b]"][type="checkbox"][value="dog"]:checked
+			input[name="user[pets][c]"][type="checkbox"][value="bird"]
+			input[name="user[pets][c]"][type="checkbox"]
+			input[type="submit"]
+		h2 Test 4
+		form[action="javascript:"][method=POST][data-expect='{"user":{"email":"jsmith@example.com","pet":"dog"}}'] &on:"submit", Controller.logForm
+			input[name="user[email]"][value="jsmith@example.com"]
+			input[name="user[pet]"][type="radio"][value="cat"]
+			input[name="user[pet]"][type="radio"][value="dog"]:checked
+			input[name="user[pet]"][type="radio"][value="bird"]
+			input[name="user[pet]"][type="radio"]
+			input[type="submit"]
+		h2 Test 5
+		form[action="javascript:"][method=POST][data-expect='{"name":"smith","pets":["dog"]}'] &on:"submit", Controller.logForm
+			input[name="name"][value="smith"]
+			select[name="pets"]:multiple
+				option[value=cat] Cat
+				option[value=dog]:selected Dog
+				option Bird
+				option
+			input[type="submit"]
+
+.x

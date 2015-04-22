@@ -44,6 +44,12 @@ El.global.location = location
 		View.show(history.getUrl())
 	}
 
+	Controller.logForm = function(e) {
+		var data = JSON.serializeForm(this)
+		console.log("logForm expect", this.attr("data-expect"))
+		console.log("logForm actual", JSON.stringify(data))
+	}
+
 	Controller.logout = function() {
 		user = null
 		View.show(history.getUrl())
@@ -51,8 +57,9 @@ El.global.location = location
 
 	document.title = "Litejs Example"
 
-	View.def("main.tpl,main.css #public,#private,404,home,login,users,users/{id}")
+	View.def("main.tpl,main.css #public,#private,404,home,login,users,users/{id},test")
 	View.def("main.tpl,main.css,settings.tpl,settings.css settings")
+	View.def("main.tpl,main.css,test-form1.tpl test-form1")
 
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.
