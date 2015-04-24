@@ -88,7 +88,7 @@
 
 		el.getJSON = function() {
 			var data = JSON.serializeForm(el)
-			JSON.applySchemaTypes(data, def)
+			JSON.schemaApplyTypes(data, def)
 			return data
 		}
 
