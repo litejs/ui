@@ -3,8 +3,8 @@
 @template top
 	.top
 		h1 Header
-		ul.nav &each: lng in _.list
-			a &lang:"{lng}"; txt:"{lng|upper}"; on:"click", Controller.setLang; class:"selected", d.lng == El.i18n.get(); class:"lang-{lng}"
+		.nav &each: lng in _.list
+			a &lang:"{lng}"; txt:"{lng|upper}"; on:"click", Mediator.setLang; class:"selected", d.lng == El.i18n.get(); class:"lang-{lng}"
 		.nav
 			@template nav-row
 				a &class:"selected", (location.hash||View.home).indexOf(n.href.split('#')[1])>-1
@@ -25,31 +25,31 @@
 			dd>a[href="mailto:mail@to.com"] email
 
 @view #public #body .content
-	.app
+	.app.max-height
 		top.app__row
 		.content.loader.app__row
-		footer.app__row
+		.footer--spacer
+	footer.app__row
 
 @view #private #body .content
-	.app
+	.app.max-height
 		top.app__row
-			button.top__logout &txt:_("logout"); on:"click", Controller.logout
+			button.top__logout &txt:_("logout"); on:"click", "logout"
 		.content.loader.app__row
-		footer.app__row
+		.footer--spacer
+	footer.app__row
 
 @view 404 #public
-	.page
-		h2 Error 404
-		| Page not found.
-		| Maybe you want to look something else?
+	h2 Error 404
+	| Page not found.
+	| Maybe you want to look something else?
 
 @view home #public
-	.page
-		h2 Home
-		div _welcome
+	h2 Home
+	div _welcome
 
 @view login #public
-	form[action="javascript:"][method=POST] &on:"submit", Controller.login
+	form[action="javascript:"][method=POST] &emitForm:"login"
 		h2 Login
 		label
 			span Username
@@ -61,34 +61,16 @@
 
 
 @view users #public
-	.page
-		h2 Users
-		ul &each: user in ["1", "2", "3", "4", "5"] limit:2 offset:1
-			li
-				a &href: "#users/{user}"; txt: _("User {user}")
+	h2 Users
+	ul &each: user in ["1", "2", "3", "4", "5"] limit:2 offset:1
+		li
+			a &href: "#users/{user}"; txt: _("User {user}")
 
 @view users/{id} #public
-	.page
-		h2 User #{route.id}
+	h2 User #{route.id}
 
 @view test #public
-	.page
-		h2 Test
-		ul
-			li>a[href="#test-form1"] Form 1
+	h2 Test
+	ul
+		li>a[href="#test-form1"] Form 1
 
-@view app #body .content
-	.x
-		.app
-			.top
-				ul.reset.app--row.nav
-					li.nav--rgt.rel>a.nav.b-blue[href="#"] Sisene
-					li.nav>a.nav[href="http://www.litejs.com/"] litejs.com
-			.menu
-				ul.reset.nav#tabs.app--row
-					li.nav>a.nav[href="#cart"] Ostukorv
-					li.nav>a.nav[href="#shop"] Poed
-			.content.app--row.stack.anim.loader
-			.footer--spacer
-
-.x

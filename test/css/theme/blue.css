@@ -60,7 +60,8 @@ a:hover {
 }
 
 .nav {
-	overflow: auto;
+	display: block;
+	height: 2.4em;
 }
 
 .nav a {
@@ -68,7 +69,46 @@ a:hover {
 	float: left;
 	margin: 0 .3em;
 	padding: .3em;
-	background: #ddd;
+	background: #eee;
 
 }
+
+
+
+.app {
+	margin: 0 auto -150px; /* the bottom margin is the negative value of the footer's height */
+}
+
+
+.footer,
+.footer--spacer {
+	clear: both;
+	height: 149px;
+}
+
+.footer {
+	background-image: linear-gradient(#257, #27b);
+}
+
+
+.footer--item {
+	display: block;
+	float: left;
+	width: 30%;
+	margin: 1.75em 0 0 1.75em;
+	font-size: 1.15em; /* 15/12 */
+	line-height: 1.4;
+}
+
+.footer--item dt {
+	color: #789;
+	font-weight: bold;
+}
+
+.footer--item dd {
+	margin: 0;
+}
+
+
+
 

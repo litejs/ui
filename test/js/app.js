@@ -8,9 +8,7 @@ if (self !== top) throw top.location = self.location
 
 
 
-// Mediator
-var M = Object.create(Event.Emitter)
-, Controller = {}
+var Mediator = Object.create(Event.Emitter)
 , _ = El.i18n
 
 _.def({ "en":"In English"
@@ -23,7 +21,7 @@ _.def({ "en":"In English"
 El.global.location = location
 
 
-!function(View, Controller) {
+!function(View, Mediator) {
 	var user
 	, app = El(".app")
 
@@ -32,27 +30,26 @@ El.global.location = location
 	}
 
 
-	Controller.setLang = function() {
+	Mediator.setLang = function() {
 		setLang(_.use(this.attr("lang")), function() {
 			document.body.render()
 		})
 	}
 
-	Controller.login = function(e) {
-		var data = JSON.serializeForm(this)
+	Mediator.on("login", function(e, data) {
 		user = El.global.user = data
 		View.show(history.getUrl())
-	}
+	})
 
-	Controller.logForm = function(e) {
+	Mediator.on("logout", function() {
+		user = null
+		View.show(history.getUrl())
+	})
+
+	Mediator.logForm = function(e) {
 		var data = JSON.serializeForm(this)
 		console.log("logForm expect", this.attr("data-expect"))
 		console.log("logForm actual", JSON.stringify(data))
-	}
-
-	Controller.logout = function() {
-		user = null
-		View.show(history.getUrl())
 	}
 
 	document.title = "Litejs Example"
@@ -97,7 +94,7 @@ El.global.location = location
 		history.start(View.show)
 	}
 
-}(View, Controller)
+}(View, Mediator)
 
 
 

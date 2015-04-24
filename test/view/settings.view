@@ -10,4 +10,3 @@
 				input[name=a0][type=checkbox][data-bind="checked:Math.random()>.5"]
 				input[name=a1][type=checkbox][data-bind="disabled:Math.random()>.5"]
 
-.x

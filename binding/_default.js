@@ -13,6 +13,12 @@
 		if (!enabled) return node.kill()
 	}
 	bindings["on"] = function(node, data, ev, fn) {
+		if (typeof fn == "string") {
+			var _fn = fn
+			fn = function(e) {
+				Mediator.emit(_fn, e)
+			}
+		}
 		node.on(ev, fn)
 	}
 	bindings["with"] = function(node, data, map) {
@@ -21,5 +27,11 @@
 	}
 	bindings["with"].once = 1
 
+	bindings.emitForm = function(node, data, ev, a1, a2) {
+		node.on("submit", function(e) {
+			var data = JSON.serializeForm(this)
+			Mediator.emit(ev, e, data, a1, a2)
+		})
+	}
 }(El.bindings)
 
