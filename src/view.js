@@ -127,6 +127,8 @@
 		}
 	}
 
+	var dummy = El("div")
+
 	function toggleView(view, open) {
 		var type
 		, parent = view.parent
@@ -136,6 +138,11 @@
 		else if (type == "string") parent.el = El.tpl(parent.el)
 		parent.child = view
 		view.open = open
+		view.el.to(open ?
+			parent.selector && parent.el.find(parent.selector) || parent.el :
+			dummy)
+		return
+
 		;(parent.selector && parent.el.find(parent.selector) || parent.el)[
 			open ? "appendChild" : "removeChild"
 		](view.el)
@@ -170,9 +177,21 @@
 	}
 
 	viewPlugin.prototype.done = function() {
-		var t = this
+		var temp
+		, t = this
 		, arr = t.name.split(" ")
-		View(arr[0], t.el.removeChild(t.el.firstChild), arr[1], arr[2])
+		, el = t.el.firstChild
+		, i = 0
+
+		if (t.el.childNodes.length > 1) {
+			el = []
+			for (; temp = t.el.childNodes[i]; ) {
+				el[i++] = temp
+			}
+			el = new El.wrap(el)
+		}
+
+		View(arr[0], el, arr[1], arr[2])
 		t.el.plugin = null
 		return t.parent
 	}
