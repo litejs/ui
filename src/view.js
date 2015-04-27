@@ -110,8 +110,7 @@
 
 	function _ping(view, opts) {
 		var parent = view.parent
-		if (lastOpts != opts) return
-		if (parent) {
+		if (lastOpts == opts && parent) {
 			if (!view.open) {
 				if (parent.child) parent.child.close()
 				if (!view.pending) {
@@ -122,7 +121,7 @@
 			}
 			parent.ping(opts)
 		}
-		if (opts._r == view.route) {
+		if (lastOpts == opts && opts._r == view.route) {
 			;(opts._render || view).el.render()
 			view.emit("show", opts)
 		}
