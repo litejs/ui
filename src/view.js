@@ -19,6 +19,7 @@
 	, groupsCount = 1
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
+	, detached = El("div")
 
 	function escapeRegExp(string) {
 		return string.replace(escapeRe, "\\$&")
@@ -127,7 +128,6 @@
 		}
 	}
 
-	var dummy = El("div")
 
 	function toggleView(view, open) {
 		var type
@@ -140,12 +140,8 @@
 		view.open = open
 		view.el.to(open ?
 			parent.selector && parent.el.find(parent.selector) || parent.el :
-			dummy)
-		return
-
-		;(parent.selector && parent.el.find(parent.selector) || parent.el)[
-			open ? "appendChild" : "removeChild"
-		](view.el)
+			detached
+		)
 	}
 
 	Object.merge(View.prototype, Event.Emitter)
@@ -177,21 +173,15 @@
 	}
 
 	viewPlugin.prototype.done = function() {
-		var temp
-		, t = this
+		var t = this
 		, arr = t.name.split(" ")
-		, el = t.el.firstChild
-		, i = 0
 
-		if (t.el.childNodes.length > 1) {
-			el = []
-			for (; temp = t.el.childNodes[i]; ) {
-				el[i++] = temp
-			}
-			el = new El.wrap(el)
-		}
-
-		View(arr[0], el, arr[1], arr[2])
+		View(
+			arr[0],
+			t.el.childNodes.length > 1 ? new El.wrap(t.el.childNodes) : t.el.firstChild,
+			arr[1],
+			arr[2]
+		)
 		t.el.plugin = null
 		return t.parent
 	}
