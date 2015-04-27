@@ -163,29 +163,15 @@
 
 	exports.View = View
 
-	function viewPlugin(parent, name) {
-		var t = this
-		t.name = name
-		t.parent = parent
-		t.el = El("div")
-		t.el.plugin = t
-		return t
-	}
+	El.plugins.view = El.plugins.template.extend({
+		done: function() {
+			var t = this
+			, parent = t.parent
+			, arr = t.name.split(" ")
+			View(arr[0], t._done(), arr[1], arr[2])
+			return parent
+		}
+	})
 
-	viewPlugin.prototype.done = function() {
-		var t = this
-		, arr = t.name.split(" ")
-
-		View(
-			arr[0],
-			t.el.childNodes.length > 1 ? new El.wrap(t.el.childNodes) : t.el.firstChild,
-			arr[1],
-			arr[2]
-		)
-		t.el.plugin = null
-		return t.parent
-	}
-
-	El.plugins.view = viewPlugin
 }(this)
 
