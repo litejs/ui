@@ -1,9 +1,33 @@
 
-
 html {
-	background: #fff;
+	background: #ddd;
 	color: #333;
 	font-family: "Georgia", "Times New Roman", serif;
+}
+
+/**
+ *  1. Fix margin 0 auto in IE4-5.5
+ *  2. The bottom margin is the negative value of the footer's height
+ */
+
+body {
+	font-size: 2em;
+	text-align: center;    /* 1 */
+}
+
+.app {
+	margin: 0 auto -150px; /* 2 */
+}
+
+.app__row {
+	text-align: left;      /* 1 */
+	margin: 0 1em;
+}
+
+.lg .app__row {
+	width: 990px;
+	margin: 0 auto;
+	zoom: 1;
 }
 
 /*
@@ -75,13 +99,9 @@ a:hover {
 
 
 
-.app {
-	margin: 0 auto -150px; /* the bottom margin is the negative value of the footer's height */
-}
-
 
 .footer,
-.footer--spacer {
+.footer__spacer {
 	clear: both;
 	height: 149px;
 }

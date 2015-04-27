@@ -20,12 +20,6 @@ html {
 	line-height: 1.62;
 }
 
-html,
-body {
-	overflow-y: scroll;
-	height: 100%;
-}
-
 .max-height {
 	height: auto !important;
 	height: 100%;

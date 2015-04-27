@@ -21,6 +21,7 @@ _.def({ "en":"In English"
 El.global.location = location
 
 
+
 !function(View, Mediator) {
 	var user
 	, app = El(".app")
@@ -37,7 +38,7 @@ El.global.location = location
 	}
 
 	Mediator.on("login", function(e, data) {
-		user = El.global.user = data
+		user = data
 		View.show(history.getUrl())
 	})
 
@@ -62,7 +63,7 @@ El.global.location = location
 	// It could be any element on page but we want to start from `BODY`.
 	View("#body", document.body)
 	.on("ping", function() {
-		console.log("render body")
+		El.global.user = user
 		document.body.findAll(".nav").render()
 	})
 

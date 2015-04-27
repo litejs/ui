@@ -15,7 +15,7 @@
 			nav-row[href="#broken-link"] Broken link
 
 @template footer
-	.footer.app--row
+	.footer
 		dl.footer--item
 			dt litejs.com
 			dd>a[href="#help"] How to use
@@ -28,7 +28,7 @@
 	.app.max-height
 		top.app__row
 		.content.loader.app__row
-		.footer--spacer
+		.footer__spacer
 	footer.app__row
 
 @view #private #body .content
@@ -36,7 +36,7 @@
 		top.app__row
 			button.top__logout &txt:_("logout"); on:"click", "logout"
 		.content.loader.app__row
-		.footer--spacer
+		.footer__spacer
 	footer.app__row
 
 @view 404 #public
@@ -73,4 +73,8 @@
 	h2 Test
 	ul
 		li>a[href="#test-form1"] Form 1
+	@rel user home vnd.app.home
+		.home {home.name}
+	@rel user home vnd.app.home.v2
+		.home {home.homeName}
 

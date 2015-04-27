@@ -7,6 +7,11 @@ html {
 	overflow-y: scroll;                   /* 1 */
 }
 
+html,
+body {
+	height: 100%;
+}
+
 
 /**
  *  1. Fix position: fixed in most Android 2.2–2.3 browsers
@@ -21,14 +26,4 @@ html {
 	-webkit-backface-visibility: hidden;   /* 1 */
 }
 
-
-.app__row {
-	margin: 0 1em;
-}
-
-.lg .app__row {
-	width: 990px;
-	margin: 0 auto;
-	zoom: 1;
-}
 
