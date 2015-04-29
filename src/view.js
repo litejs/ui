@@ -76,33 +76,30 @@
 			var view = this
 			view.pending = true
 			opts._p = 1 + (opts._p | 0)
+			function cb() {
+				if (--opts._p || lastOpts != opts) return
+				view.pending = false
+				if (!view.el && view.route != "404") {
+					View("404").show()
+				} else {
+					_ping(view, opts)
+				}
+			}
 			return function() {
-				setTimeout(function() {
-					if (!--opts._p && lastOpts == opts) {
-						view.pending = false
-						_ping(view, opts)
-					}
-				}, 1)
+				setTimeout(cb, 1)
 			}
 		},
 		ping: function(opts) {
 			var view = this
 
 			if (!view.el) {
-				var files = (view.file || view.route + ".js")
-				.replace(/^|,/g, "$&" + (View.base || ""))
-				.split(",")
-
-				xhr.load(files, function() {
-					if (view.el) view.ping(opts)
-					else if (view.route != "404") {
-						View("404").show()
-					}
-				})
-				return
+				xhr.load(
+					(view.file || view.route + ".js")
+					.replace(/^|,/g, "$&" + (View.base || ""))
+					.split(","),
+					view.wait(opts)
+				)
 			}
-			view.pending = false
-
 			view.emit("ping", opts)
 			_ping(view, opts)
 		}
@@ -121,7 +118,7 @@
 			}
 			parent.ping(opts)
 		}
-		if (lastOpts == opts && opts._r == view.route) {
+		if (lastOpts == opts && !view.pending && opts._r == view.route) {
 			;(opts._render || view).el.render()
 			view.emit("show", opts)
 		}
