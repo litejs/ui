@@ -63,13 +63,13 @@
 			var view = this
 			view.ping(lastOpts = opts || {_r: view.route})
 		},
-		close: function(opts) {
+		close: function(opts, nextEl) {
 			var view = this
 
 			if (view.open) {
+				view.emit("close", opts, nextEl)
 				toggleView(view, false)
-				view.emit("close", opts)
-				if (view.child) view.child.close()
+				if (view.child) view.child.close(opts)
 			}
 		},
 		wait: function(opts) {
@@ -109,7 +109,7 @@
 		var parent = view.parent
 		if (lastOpts == opts && parent) {
 			if (!view.open) {
-				if (parent.child) parent.child.close()
+				if (parent.child) parent.child.close(opts, view.el)
 				if (!view.pending) {
 					toggleView(opts._render = view, true)
 				}
