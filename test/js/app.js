@@ -1,10 +1,9 @@
 
 // Clickjacking defense,
 // site should break out of the site that is framing it.
-// There are multiple ways of defeating this script.
 // If the user’s browser has Javascript turned off,
 // the site will not display at all.
-if (self !== top) throw top.location = self.location
+if (this != top) throw top.location = this.location
 
 
 

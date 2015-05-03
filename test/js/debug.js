@@ -9,7 +9,7 @@ Function.prototype.trace = function(name) {
 	var fn = this
 	, count = 0
 	name = name || fn
-	return "console" in window ?
+	return window.console ?
 		function() {
 			var c = ++count
 			console.info('->', name,c, this, arguments)
