@@ -4,7 +4,11 @@
 	.top
 		h1 Header
 		.nav &each: lng in _.list
-			a &lang:"{lng}"; txt:"{lng|upper}"; on:"click", Mediator.setLang; class:"selected", d.lng == El.i18n.get(); class:"lang-{lng}"
+			a {lng|upper}
+				&lang:"{lng}"
+				&on:"click", Mediator.setLang
+				&class:"selected", d.lng == El.i18n.get()
+				&class:"lang-{lng}"
 		.nav
 			@template nav-row
 				a &class:"selected", (location.hash||View.home).indexOf(n.href.split('#')[1])>-1
@@ -34,7 +38,8 @@
 @view #private #body .content
 	.app.max-height
 		top.app__row
-			button.top__logout &txt:_("logout"); on:"click", "logout"
+			button.top__logout Logout
+				&on:"click", "logout"
 		.content.loader.app__row
 		.footer__spacer
 	footer.app__row
@@ -64,7 +69,8 @@
 	h2 Users
 	ul &each: user in ["1", "2", "3", "4", "5"] limit:2 offset:1
 		li
-			a &href: "#users/{user}"; txt: _("User {user}")
+			a User {user}
+				&href: "#users/{user}"
 
 @view users/{id} #public
 	h2 User #{route.id}
