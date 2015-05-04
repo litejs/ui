@@ -119,6 +119,7 @@
 			parent.ping(opts)
 		}
 		if (lastOpts == opts && !view.pending && opts._r == view.route) {
+			if (view.child) view.child.close(opts, view.el)
 			;(opts._render || view).el.render()
 			view.emit("show", opts)
 		}
