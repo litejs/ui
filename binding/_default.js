@@ -3,16 +3,24 @@
 	var hasOwn = Object.prototype.hasOwnProperty
 	, slice = Array.prototype.slice
 
+	bindingFn.once = bindingFn.raw =
+	bindingWith.once =
+	bindingOn.once =
+	emitForm.once =
+	true
+
+	bindings.fn = bindingFn
 	function bindingFn(node, data, fn) {
 		fn.apply(node, slice.call(arguments, 3))
 	}
-	bindingFn.raw = bindingFn.once = true
-	bindings.init = bindings.fn = bindingFn
 
-	bindings["if"] = function(node, data, enabled) {
+	bindings["if"] = bindingIf
+	function bindingIf(node, data, enabled) {
 		if (!enabled) return node.kill()
 	}
-	bindings["on"] = function(node, data, ev, fn) {
+
+	bindings.on = bindingOn
+	function bindingOn(node, data, ev, fn) {
 		if (typeof fn == "string") {
 			var _fn = fn
 			fn = function(e) {
@@ -21,13 +29,15 @@
 		}
 		node.on(ev, fn)
 	}
-	bindings["with"] = function(node, data, map) {
+
+	bindings.with = bindingWith
+	function bindingWith(node, data, map) {
 		Object.merge(El.getScope(node, true), map)
 		return node.render()
 	}
-	bindings["with"].once = 1
 
-	bindings.emitForm = function(node, data, ev, a1, a2) {
+	bindings.emitForm = emitForm
+	function emitForm(node, data, ev, a1, a2) {
 		node.on("submit", function(e) {
 			var data = JSON.serializeForm(this)
 			Mediator.emit(ev, e, data, a1, a2)
