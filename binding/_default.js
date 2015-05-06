@@ -20,11 +20,11 @@
 	}
 
 	bindings.on = bindingOn
-	function bindingOn(node, data, ev, fn) {
+	function bindingOn(node, data, ev, fn, a1, a2) {
 		if (typeof fn == "string") {
 			var _fn = fn
 			fn = function(e) {
-				Mediator.emit(_fn, e)
+				Mediator.emit(_fn, e, a1, a2)
 			}
 		}
 		node.on(ev, fn)
