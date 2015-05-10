@@ -7,11 +7,11 @@
 			a {lng|upper}
 				&lang:"{lng}"
 				&on:"click", Mediator.setLang
-				&class:"selected", d.lng == El.i18n.get()
+				&class:"selected", lng == El.i18n.get()
 				&class:"lang-{lng}"
 		.nav
 			@template nav-row
-				a &class:"selected", (location.hash||View.home).indexOf(n.href.split('#')[1])>-1
+				a &class:"selected", (location.hash||View.home).indexOf(this.href.split('#')[1])>-1
 			nav-row[href="#home"] Home
 			nav-row[href="#users"] Users
 			nav-row[href="#settings"] Settings
