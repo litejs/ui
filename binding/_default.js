@@ -11,7 +11,7 @@
 
 	bindings.fn = bindingFn
 	function bindingFn(data, fn) {
-		fn.apply(this, slice.call(arguments, 3))
+		fn.apply(this, slice.call(arguments, 2))
 	}
 
 	bindings["if"] = bindingIf
