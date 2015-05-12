@@ -17,7 +17,7 @@ _.def({ "en":"In English"
 	, "se":"på Svenska"
 })
 
-El.global.location = location
+El.data.location = location
 
 
 
@@ -62,7 +62,7 @@ El.global.location = location
 	// It could be any element on page but we want to start from `BODY`.
 	View("#body", document.body)
 	.on("ping", function() {
-		El.global.user = user
+		El.data.user = user
 		document.body.findAll(".nav").render()
 	})
 

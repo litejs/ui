@@ -147,7 +147,7 @@
 
 	View.show = function(route) {
 		var match = fn({_r:"404"}, re.exec(route || View.home))
-		View(match._r).show(El.global.route = match)
+		View(match._r).show(El.data.route = match)
 	}
 
 	View.def = function(str) {
@@ -164,11 +164,24 @@
 		done: function() {
 			var t = this
 			, parent = t.parent
-			, arr = t.name.split(" ")
+			, arr = t.name.split(/\s+/)
 			View(arr[0], t._done(), arr[1], arr[2])
 			return parent
 		}
 	})
 
+	var dummy = El("div")
+
+	El.plugins["view-link"] = El.plugins.template.extend({
+		done: function() {
+			var t = this
+			, arr = t.name.split(/\s+/)
+			View(arr[0], dummy, arr[2])
+			.on("show", function() {
+				View.show(arr[1])
+			})
+			return t.parent
+		}
+	})
 }(this)
 

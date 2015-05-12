@@ -32,8 +32,7 @@
 
 	bindings.with = bindingWith
 	function bindingWith(data, map) {
-		Object.merge(El.getScope(this, true), map)
-		return this.render()
+		return this.render(Object.merge(El.scope(this, data), map))
 	}
 
 	bindings.emitForm = emitForm
