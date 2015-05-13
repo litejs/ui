@@ -12,7 +12,7 @@
 
 
 !function(exports) {
-	var fn, re, lastOpts
+	var fn, re, lastView, lastOpts
 	, fnStr = ""
 	, reStr = ""
 	, views = {}
@@ -60,8 +60,9 @@
 		},
 		show: function(opts) {
 			var child
-			, view = this
+			, view = lastView = this
 			lastOpts = opts || {_r: view.route}
+			if (view.open) view.close(opts)
 			for (; view; child = view, view = view.parent) {
 				if (view.child && view.child != child) {
 					view.child.close(opts)
@@ -81,20 +82,20 @@
 				view.open = view.parent.child = null
 			}
 		},
-		wait: function(opts) {
+		wait: function(opts, emit) {
 			var view = this
 			, parent = view.parent
 			opts._p = 1 + (opts._p | 0)
 			function cb() {
 				if (--opts._p || lastOpts != opts) return
 				if (view.el && view.parent == parent) {
-					view.ping(opts, 1)
+					view.ping(opts, !emit)
 				} else {
-					;(view.el ? view : View("404")).show(opts)
+					;(view.el ? lastView : View("404")).show(opts)
 				}
 			}
 			return function() {
-				setTimeout(cb, 1)
+				;(window.requestAnimationFrame || setTimeout)(cb, 1)
 			}
 		},
 		ping: function(opts, silent) {
@@ -103,13 +104,12 @@
 			, child = view.child
 
 			if (!view.el && view.file) {
-				xhr.load(
+				return xhr.load(
 					view.file
 					.replace(/^|,/g, "$&" + (View.base || ""))
 					.split(","),
-					view.wait(opts)
+					view.wait(opts, 1)
 				)
-				view.file = null
 			}
 
 			if (!silent) view.emit("ping", opts)
