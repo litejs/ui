@@ -11,7 +11,7 @@
 
 	bindings.fn = bindingFn
 	function bindingFn(data, fn) {
-		fn.apply(this, slice.call(arguments, 2))
+		return fn.apply(this, slice.call(arguments, 2))
 	}
 
 	bindings["if"] = bindingIf
@@ -30,7 +30,7 @@
 		this.on(ev, fn)
 	}
 
-	bindings.with = bindingWith
+	bindings["with"] = bindingWith
 	function bindingWith(data, map) {
 		return this.render(Object.merge(El.scope(this, data), map))
 	}
