@@ -19,7 +19,6 @@
 	, groupsCount = 1
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
-	, detached = El("div")
 
 	function escapeRegExp(string) {
 		return string.replace(escapeRe, "\\$&")
@@ -60,85 +59,81 @@
 			view.selector = selector
 		},
 		show: function(opts) {
-			var view = this
-			view.ping(lastOpts = opts || {_r: view.route})
+			var child
+			, view = this
+			lastOpts = opts || {_r: view.route}
+			for (; view; child = view, view = view.parent) {
+				if (view.child && view.child != child) {
+					view.child.close(opts)
+				}
+				view.child = child
+			}
+			// child is now the root view
+			child.ping(lastOpts)
 		},
 		close: function(opts, nextEl) {
 			var view = this
 
 			if (view.open) {
 				view.emit("close", opts, nextEl)
-				toggleView(view, false)
 				if (view.child) view.child.close(opts)
+				view.open.kill()
+				view.open = view.parent.child = null
 			}
 		},
 		wait: function(opts) {
 			var view = this
-			view.pending = true
+			, parent = view.parent
 			opts._p = 1 + (opts._p | 0)
 			function cb() {
 				if (--opts._p || lastOpts != opts) return
-				view.pending = false
-				if (!view.el && view.route != "404") {
-					View("404").show()
+				if (view.el && view.parent == parent) {
+					view.ping(opts, 1)
 				} else {
-					_ping(view, opts)
+					;(view.el ? view : View("404")).show(opts)
 				}
 			}
 			return function() {
 				setTimeout(cb, 1)
 			}
 		},
-		ping: function(opts) {
+		ping: function(opts, silent) {
 			var view = this
+			, parent = view.parent
+			, child = view.child
 
-			if (!view.el) {
+			if (!view.el && view.file) {
 				xhr.load(
-					(view.file || view.route + ".js")
+					view.file
 					.replace(/^|,/g, "$&" + (View.base || ""))
 					.split(","),
 					view.wait(opts)
 				)
+				view.file = null
 			}
-			view.emit("ping", opts)
-			_ping(view, opts)
-		}
-	}
 
-	function _ping(view, opts) {
-		var parent = view.parent
-		if (lastOpts == opts && parent) {
-			if (!view.open) {
-				if (parent.child) parent.child.close(opts, view.el)
-				if (!view.pending) {
-					toggleView(opts._render = view, true)
+			if (!silent) view.emit("ping", opts)
+
+			if (lastOpts == opts && !opts._p) {
+				var type = typeof view.el
+				if (type == "function") view.el = view.el()
+				else if (type == "string") view.el = El.tpl(view.el)
+				if (parent && !view.open) {
+					view.open = view.el.cloneNode(true)
+					view.open.to(
+						parent.selector && parent.open && parent.open.find(parent.selector) || parent.open || parent.el
+					)
+					view.open.render()
 				}
-			} else if (view.pending) {
-				toggleView(view, false)
+				if (child) {
+					child.ping(opts)
+				}
 			}
-			parent.ping(opts)
-		}
-		if (lastOpts == opts && !view.pending && opts._r == view.route) {
-			if (view.child) view.child.close(opts, view.el)
-			;(opts._render || view).el.render()
-			view.emit("show", opts)
-		}
-	}
 
-
-	function toggleView(view, open) {
-		var type
-		, parent = view.parent
-		if (!parent) return
-		type = typeof parent.el
-		if (type == "function") parent.el = parent.el()
-		else if (type == "string") parent.el = El.tpl(parent.el)
-		parent.child = view
-		view.open = open
-		view.el.to(open ?
-			parent.selector && parent.el.find(parent.selector) || parent.el :
-			detached
-		)
+			if (lastOpts == opts && !opts._p && view.route == opts._r) {
+				view.emit("show", opts)
+			}
+		}
 	}
 
 	Object.merge(View.prototype, Event.Emitter)
