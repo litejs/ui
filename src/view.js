@@ -62,7 +62,10 @@
 			var child
 			, view = lastView = this
 			lastOpts = opts || {_r: view.route}
-			if (view.open) view.close(opts)
+			if (view.open) {
+				view.close(opts)
+				view.parent.open.render()
+			}
 			for (; view; child = view, view = view.parent) {
 				if (view.child && view.child != child) {
 					view.child.close(opts)
