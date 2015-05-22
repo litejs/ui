@@ -28,7 +28,7 @@
     h2 Users
     ul &each: user in ["1", "2", "3", "4", "5"]
       li
-        a &href: "#users/{user}"; txt: El.i18n("User {user}")
+        a &href: "#users/{user}".format(data); txt: El.i18n("User {user}").format(data)
 
 @view users/{id} #main
   .page

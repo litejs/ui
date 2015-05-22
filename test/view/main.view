@@ -5,10 +5,10 @@
 		h1 Header
 		.nav &each: lng in _.list
 			a {lng|upper}
-				&lang:"{lng}"
+				&lang:lng
 				&on:"click", Mediator.setLang
 				&class:"selected", lng == El.i18n.get()
-				&class:"lang-{lng}"
+				&class:"lang-" + lng
 		.nav
 			@template nav-row
 				a &class:"selected", (location.hash||View.home).indexOf(this.href.split('#')[1])>-1
