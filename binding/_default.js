@@ -10,17 +10,17 @@
 	true
 
 	bindings.fn = bindingFn
-	function bindingFn(data, fn) {
+	function bindingFn(fn) {
 		return fn.apply(this, slice.call(arguments, 2))
 	}
 
 	bindings["if"] = bindingIf
-	function bindingIf(data, enabled) {
+	function bindingIf(enabled) {
 		if (!enabled) return this.kill()
 	}
 
 	bindings.on = bindingOn
-	function bindingOn(data, ev, fn, a1, a2) {
+	function bindingOn(ev, fn, a1, a2) {
 		if (typeof fn == "string") {
 			var _fn = fn
 			fn = function(e) {
@@ -36,7 +36,7 @@
 	}
 
 	bindings.emitForm = emitForm
-	function emitForm(data, ev, a1, a2) {
+	function emitForm(ev, a1, a2) {
 		this.on("submit", function(e) {
 			var data = JSON.serializeForm(this)
 			Mediator.emit(ev, e, data, a1, a2)
