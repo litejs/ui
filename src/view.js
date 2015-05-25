@@ -123,6 +123,7 @@
 				else if (type == "string") view.el = El.tpl(view.el)
 				if (parent && !view.open) {
 					view.open = view.el.cloneNode(true)
+					parent.emit("beforeChild", opts)
 					view.open.to(
 						parent.selector && parent.open && parent.open.find(parent.selector) || parent.open || parent.el
 					)

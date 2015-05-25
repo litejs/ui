@@ -11,7 +11,7 @@
 
 	bindings.fn = bindingFn
 	function bindingFn(fn) {
-		return fn.apply(this, slice.call(arguments, 2))
+		return fn.apply(this, slice.call(arguments, 1))
 	}
 
 	bindings["if"] = bindingIf
@@ -31,8 +31,8 @@
 	}
 
 	bindings["with"] = bindingWith
-	function bindingWith(data, map) {
-		return this.render(Object.merge(El.scope(this, data), map))
+	function bindingWith(map) {
+		return this.render(Object.merge(El.scope(this, true), map))
 	}
 
 	bindings.emitForm = emitForm
