@@ -70,7 +70,7 @@
 	ul &each: user in ["1", "2", "3", "4", "5"] limit:2 offset:1
 		li
 			a User {user}
-				&href: "#users/{user}"
+				&href: "#users/" + user
 
 @view users/{id} #public
 	h2 User #{route.id}

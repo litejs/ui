@@ -32,8 +32,8 @@ xhr.load = function(files, next) {
 }
 
 
-View.prototype.show = View.prototype.show.trace("View.show")
-View.prototype.ping = View.prototype.ping.trace("View.ping")
-View.prototype.emit = View.prototype.emit.trace("View.emit")
-View.prototype.close = View.prototype.close.trace("View.close")
+//View.prototype.show = View.prototype.show.trace("View.show")
+//View.prototype.ping = View.prototype.ping.trace("View.ping")
+//View.prototype.emit = View.prototype.emit.trace("View.emit")
+//View.prototype.close = View.prototype.close.trace("View.close")
 
