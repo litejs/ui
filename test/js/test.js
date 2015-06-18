@@ -3,7 +3,7 @@
 function test() {
 	describe.it.waitTill = function(actual, options) {
 		var result
-		, count = 10
+		, count = 30
 		, resume = this.wait()
 
 		this.ok(function() {
@@ -28,6 +28,15 @@ function test() {
 		return this.waitTill(function() {
 			return document.body.find(actual)
 		}, options || "Expected: selector "+actual+" should be in dom")
+	}
+	describe.it.countSelectors = function(actual, expected, options) {
+		this.waitSelector(actual, options)
+		this.ok(function() {
+			var nodes = document.body.findAll(actual)
+			, count = nodes && nodes.length
+			return count === expected
+		}, options || actual + " should have text " + expected)
+		return this
 	}
 	describe.it.haveText = function(actual, expected, options) {
 		this.waitSelector(actual, options)
@@ -96,6 +105,7 @@ function test() {
 	}).
 	waitSelector("a[href$='#users'].selected").
 	viewOpen("users").
+	countSelectors("ul.users>li", 8).
 
 	click("a[href$='#home']").
 	waitSelector("a[href$='#home'].selected").

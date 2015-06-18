@@ -67,10 +67,10 @@
 
 @view users #public
 	h2 Users
-	ul &each: user in ["1", "2", "3", "4", "5"] limit:2 offset:1
+	ul.users &list: Data("users")
 		li
-			a User {user}
-				&href: "#users/" + user
+			a {item.name}
+				&href: "#users/" + item.id
 
 @view users/{id} #public
 	h2 User #{route.id}

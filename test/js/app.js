@@ -20,6 +20,59 @@ _.def({ "en":"In English"
 El.data.location = location
 
 
+El.bindings.list = function(list) {
+	var node = this
+	, data = El.scope(node)
+	, child = node._child
+
+	if (!child) {
+		child = node._child = node.removeChild(node.firstChild)
+	}
+
+	if (!list || node._list == list) return
+
+	if (node._list) clear()
+
+	node._list = data.list = list
+
+	node.on("kill", clear)
+
+	list
+	.each(clone)
+	.on("add", clone).on("remove", remove)
+
+	// Do not render childs when list initialized
+	return true
+
+	function clone(item, pos) {
+		var clone = child.cloneNode(true)
+		, scope = El.scope(clone, data)
+		scope.item = item.data
+		scope.model = item
+		function up() {
+			clone.render(scope)
+		}
+		item.on("change", up)
+		clone.on("kill", function(){
+			item.off("change", up)
+		})
+		return clone.to(node, pos).render(scope)
+	}
+
+	function remove(item, pos) {
+		node.childNodes[pos].kill()
+	}
+
+	function clear() {
+		var list = node._list
+		node.empty()
+		if (list) {
+			node._list = null
+			list.off("add", clone).off("remove", remove)
+		}
+	}
+}
+
 
 !function(View, Mediator) {
 	var user
