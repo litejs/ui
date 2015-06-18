@@ -1,90 +1,87 @@
 
 
 function test() {
-	describe.it.viewOpen = function(actual, expected, options) {
-		var el
-		, self = this
+	describe.it.waitTill = function(actual, options) {
+		var result
 		, count = 10
 		, resume = this.wait()
-		this.ok(function(){return!!el}, options || "Expected: View "+actual+" should be open")
+
+		this.ok(function() {
+			return !!result
+		}, options || "Expected: function returns something")
+		test()
+
+		return this
+
 		function test() {
-			el = View(actual).open
-			if (!el && count--) return setTimeout(test, 50)
+			result = actual()
+			if (!result && count--) return setTimeout(test, 50)
 			resume()
 		}
-		test()
-		return this
 	}
-	describe.it.waitSelector = function(actual, expected, options) {
-		var el
-		, self = this
-		, count = 10
-		, resume = this.wait()
-		this.ok(function(){return!!el}, options || "Expected: selector "+actual+" should be in dom")
-		function test() {
-			el = document.body.find(actual)
-			if (!el && count--) return setTimeout(test, 50)
-			resume()
-		}
-		test()
-		return this
+	describe.it.viewOpen = function(actual, options) {
+		return this.waitTill(function() {
+			return View(actual).open
+		}, options || "Expected: View "+actual+" should be open")
+	}
+	describe.it.waitSelector = function(actual, options) {
+		return this.waitTill(function() {
+			return document.body.find(actual)
+		}, options || "Expected: selector "+actual+" should be in dom")
 	}
 	describe.it.haveText = function(actual, expected, options) {
-		var el, text
-		, self = this
-		, count = 10
-		, resume = this.wait()
-		this.ok(function(){return text == expected}, options || "Expected: text should be: " + expected)
-		function test() {
-			el = document.body.find(actual)
-			if (!el && count--) return setTimeout(test, 50)
-			text = el.txt()
-			resume()
-		}
-		test()
+		this.waitSelector(actual, options)
+		this.ok(function() {
+			var node = document.body.find(actual)
+			, txt = node && node.txt()
+			return txt === expected
+		}, options || actual + " should have text " + expected)
 		return this
 	}
 	describe.it.fill = function(actual, expected, options) {
-		var el, text
-		, self = this
-		, count = 10
-		, resume = this.wait()
-		this.ok(function(){return!!el}, options || "Expected: value should be: " + expected)
-		function test() {
-			el = document.body.find(actual)
-			if (!el && count--) return setTimeout(test, 50)
-			if (el) el.val(expected)
-			resume()
-		}
-		test()
+		this.waitSelector(actual, options)
+		this.ok(function() {
+			var node = document.body.find(actual)
+			, val = node && node.val(expected)
+			return val === expected
+		}, options || actual + " should have value " + expected)
 		return this
 	}
 	describe.it.click = function(actual, expected, options) {
-		var el = document.body.find(actual)
-		this.ok(!!el, options || "Expected: click target "+actual+" should be in dom")
-		var attr = {
-			pointerX: 0,
-			pointerY: 0,
-			button: 0,
-			ctrlKey: false,
-			altKey: false,
-			shiftKey: false,
-			metaKey: false,
-			bubbles: true,
-			cancelable: true
-		}
-		if (el) {
-			if (el.fireEvent) {
-				el.fireEvent("onclick")
-			} else {
-				var ev = document.createEvent("MouseEvents")
-				ev.initMouseEvent("click", true, true, document.defaultView,
-					attr.button, attr.pointerX, attr.pointerY, attr.pointerX, attr.pointerY,
-					attr.ctrlKey, attr.altKey, attr.shiftKey, attr.metaKey, attr.button, el)
-				el.dispatchEvent(ev)
+		this.waitSelector(actual, options)
+		this.ok(function() {
+			var ev
+			, node = document.body.find(actual)
+			, attr = {
+				pointerX: 0, pointerY: 0, button: 0,
+				ctrlKey: false, altKey: false, shiftKey: false, metaKey: false,
+				bubbles: true, cancelable: true
 			}
-		}
+
+			if (node) {
+				if (node.fireEvent) {
+					node.fireEvent("onclick")
+				} else {
+					ev = document.createEvent("MouseEvents")
+					ev.initMouseEvent("click", true, true, document.defaultView, attr.button,
+						attr.pointerX, attr.pointerY, attr.pointerX, attr.pointerY,
+						attr.ctrlKey, attr.altKey, attr.shiftKey, attr.metaKey,
+						attr.button, node)
+					node.dispatchEvent(ev)
+				}
+			}
+			return !!node
+		}, options || actual + " should be clickable")
 		return this
+	}
+
+	function isVisible(node) {
+		var style = window.getComputedStyle ? window.getComputedStyle(node, null) : node.currentStyle
+	}
+
+	describe.it.isVisible = function(actual, expected, options) {
+		var node = actual
+		, visible = node.offsetHeight != 0
 	}
 
 	describe("Example UI").
