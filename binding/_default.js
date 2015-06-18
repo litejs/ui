@@ -40,6 +40,7 @@
 		this.on("submit", function(e) {
 			var data = JSON.serializeForm(this)
 			Mediator.emit(ev, e, data, a1, a2)
+			return false
 		})
 	}
 }(El.bindings)
