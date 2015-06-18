@@ -27,7 +27,7 @@
 	, head = document.getElementsByTagName("head")[0]
 	, xhrs = []
 	, loaded = {}
-	//, seq = 0
+	, seq = 0
 
 
 	//** error
@@ -256,9 +256,8 @@
 			res[i] = ""
 			if (!err) {
 				if (type == "tpl") {
-					El.tpl(str)
-					//xhr[++seq] = str
-					//res[i] = "El.tpl(xhr[" + seq + "]);delete xhr[" + seq + "]"
+					xhr[++seq] = str
+					res[i] = "El.tpl(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				} else if (type == "css") {
 					if (!styleNode) {
 						// Safari and IE6-8 requires dynamically created
