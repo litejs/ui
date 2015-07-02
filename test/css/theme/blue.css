@@ -1,8 +1,6 @@
 
 html {
 	background: #ddd;
-	color: #333;
-	font-family: "Georgia", "Times New Roman", serif;
 }
 
 /**
@@ -11,7 +9,10 @@ html {
  */
 
 body {
+	color: #333;
+	font-family: "Georgia", "Times New Roman", serif;
 	font-size: 2em;
+	font: 2em/1.62 "Georgia", "Times New Roman", serif;
 	text-align: center;    /* 1 */
 }
 
