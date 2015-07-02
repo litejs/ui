@@ -1,23 +1,22 @@
 
 /**
- *  1. Do not adjusts the text size automatically.
+ *  1. 62.5% brings standard font size so that 1em = 10px.
+ *     This is because the default size for ‘medium’ text in all modern browsers is 16px.
+ *  2. Do not adjusts the text size automatically.
  *     IE Phone note - If the viewport is set using <meta> element,
  *     the value of the CSS text-size-adjust property is ignored.
  *     Webkit bug - If -webkit-text-size-adjust is explicitely set to none,
  *     Webkit-based desktop browsers, like Chrome or Safari,
  *     instead of ignoring the property, will prevent the user to zoom in or out the Web page.
  *     See Bug 56543, Bug 163359, and Bug 84186.
- *  2. IE for Windows Phone 8.1 supports "-webkit-text-size-adjust" as an alias for "-ms-text-size-adjust".
- *  3. 62.5% brings standard font size so that 1em = 10px.
- *     This is because the default size for ‘medium’ text in all modern browsers is 16px.
+ *  3. IE for Windows Phone 8.1 supports "-webkit-text-size-adjust" as an alias for "-ms-text-size-adjust".
  */
 
 html {
-	-webkit-text-size-adjust: 100%;       /* 1 */
-	    -ms-text-size-adjust: 100%;       /* 2 */
+	font-size: 62.5%;                     /* 1 */
+	-webkit-text-size-adjust: 100%;       /* 2 */
+	    -ms-text-size-adjust: 100%;       /* 3 */
 	-webkit-font-smoothing: antialiased;
-	font-size: 62.5%;                     /* 3 */
-	line-height: 1.62;
 }
 
 .max-height {
@@ -37,19 +36,6 @@ img,
 	outline: 0;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	margin: 0;
-	padding: 1em 0 .5em 0;
-	font-weight: normal;
-	font-family: georgia, serif;
-	font-style: italic;
-}
-
 a {
 	color: inherit;
 	text-decoration: none;
@@ -62,7 +48,7 @@ a {
  *     and it does not render well with some fonts (Helvetica Neue on macs for example).
  */
 
-a,
+a[href],
 button,
 .hand {
 	cursor: pointer;
@@ -90,15 +76,6 @@ select,
 svg,
 video {
 	vertical-align: middle;
-	/*
-	 * Use W3C Box Model by default for IE6-7
-	 * Traditional Box Model box-sizing: border-box;
-	 *
-	 * meter and progress tag is border-box by default in webkit
-	 */
-	-webkit-box-sizing: content-box; /* Chrome4+, Safary3.1+ */
-	   -moz-box-sizing: content-box; /* Firefox */
-	        box-sizing: content-box; /* IE8+, Chrome10+, Safary5+, Opera8.5+ */
 }
 
 /* tables still need cellspacing="0" in the markup */
@@ -159,6 +136,7 @@ button,
 [draggable=true] {
 	-webkit-user-drag: element;
 	 -khtml-user-drag: element;
+	        user-drag: element;
 }
 
 /* for IE8 */
@@ -176,12 +154,13 @@ button,
 /*
 global classes
 */
-.hide {
-	display: none;
+.hide,
+.hidden {
+	display: none !important;
 	visibility: hidden;
 }
 .transparent {
-	opacity:0 !important;
+	opacity: 0 !important;
 	filter: alpha(opacity=0) !important;
 }
 .max {
@@ -212,14 +191,20 @@ global classes
 /* for slider knob */
 .anim {
 	-webkit-transition: all 0.3s ease-out;
-	     -moz-transition: all 0.3s ease-out;
-	       -o-transition: all 0.3s ease-out;
-	          transition: all 0.3s ease-out;
+	   -moz-transition: all 0.3s ease-out;
+	     -o-transition: all 0.3s ease-out;
+	        transition: all 0.3s ease-out;
 
 	-webkit-transform: translate3d(0, 0, 0); /* for remove first flicker on iphone */
 }
 
+.left {
+	float: left;
+}
 
+.right {
+	float: right;
+}
 
 
 
