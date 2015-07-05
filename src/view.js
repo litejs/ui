@@ -61,7 +61,8 @@
 		show: function(opts) {
 			var child
 			, view = lastView = this
-			lastOpts = opts || {_r: view.route}
+			El.data.viewOpts = opts = opts || {}
+			opts._r = view.route
 			if (view.open) {
 				view.close(opts)
 			}
@@ -72,7 +73,7 @@
 				view.child = child
 			}
 			// child is now the root view
-			child.ping(lastOpts)
+			child.ping(lastOpts = opts)
 		},
 		close: function(opts, nextEl) {
 			var view = this
