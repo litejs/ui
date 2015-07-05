@@ -7,7 +7,7 @@
 			a {lng|upper}
 				&lang:lng
 				&on:"click", Mediator.setLang
-				&class:"selected", lng == El.i18n.get()
+				&class:"selected", lng == _.current
 				&class:"lang-" + lng
 		.nav
 			@template nav-row
@@ -19,12 +19,12 @@
 			nav-row[href="#broken-link"] Broken link
 
 @template footer
-	.footer
-		dl.footer--item
+	.footer.grid.pad-3
+		dl.footer__item.col-4
 			dt litejs.com
 			dd>a[href="#help"] How to use
 			dd>a[href="#privacy"] Privacy
-		dl.footer--item
+		dl.footer__item.col-4
 			dt Contacts
 			dd>a[href="mailto:mail@to.com"] email
 

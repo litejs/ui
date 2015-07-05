@@ -10,8 +10,6 @@ html {
 
 body {
 	color: #333;
-	font-family: "Georgia", "Times New Roman", serif;
-	font-size: 2em;
 	font: 2em/1.62 "Georgia", "Times New Roman", serif;
 	text-align: center;    /* 1 */
 }
@@ -30,6 +28,18 @@ body {
 	margin: 0 auto;
 	zoom: 1;
 }
+
+.footer,
+.footer__spacer {
+	display: block;
+	clear: both;
+	height: 150px;         /* 2 */
+}
+
+/**
+ * box-sizing vendor prefixes is needed for Safari<5.1, Chrome<10, Firefox<29, Android<4
+ */
+
 
 /*
  * Remove text-shadow in selection highlight:
@@ -72,12 +82,8 @@ a:hover {
 	color: #03C;
 }
 
-.global-width {
-	width: 930px;
-	margin: 0 auto;
-	padding: 0 20px;
-	position: relative;
-	overflow: hidden;
+h1 {
+	margin: 0;
 }
 
 .selected {
@@ -98,35 +104,33 @@ a:hover {
 
 }
 
-
-
-
-.footer,
-.footer__spacer {
-	clear: both;
-	height: 149px;
+.content {
+	padding: 1em 1em 3em;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
 }
+
+
 
 .footer {
 	background-image: linear-gradient(#257, #27b);
 }
 
 
-.footer--item {
-	display: block;
-	float: left;
-	width: 30%;
-	margin: 1.75em 0 0 1.75em;
+.footer__item {
+	margin: 0;
 	font-size: 1.15em; /* 15/12 */
 	line-height: 1.4;
 }
 
-.footer--item dt {
+.footer__item dt {
+	margin: 0;
 	color: #789;
 	font-weight: bold;
 }
 
-.footer--item dd {
+.footer__item dd {
 	margin: 0;
 }
 

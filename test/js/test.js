@@ -125,7 +125,7 @@ function test() {
 	waitSelector("a[href$='#settings'].selected").
 	fill("input[name=name]", "Kala").
 	click("input[type=submit]").
-	waitSelector(".top__logout").
+	click(".top__logout").
 	done()
 }
 
