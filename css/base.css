@@ -163,9 +163,16 @@ button,
 }
 
 
-/*
-global classes
-*/
+/**
+ * Global Classes
+ * --------------
+ *
+ *  1. Fix position: fixed in most Android 2.2–2.3 browsers
+ *     http://benfrain.com/easy-css-fix-fixed-positioning-android-2-2-2-3/
+ *     That will also stop the paint happening on scroll
+ *     thus improves scroll performance.
+ */
+
 .hide,
 .hidden {
 	display: none !important;
@@ -179,6 +186,11 @@ global classes
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
+}
+.fix {
+	position: absolute;
+	position: fixed;
+	-webkit-backface-visibility: hidden;   /* 1 */
 }
 .abs {
 	position: absolute;
