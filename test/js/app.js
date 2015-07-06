@@ -110,6 +110,7 @@ El.bindings.list = function(list) {
 	View.def("main.tpl,main.css #public,#private,404,home,login,users,users/{id},test")
 	View.def("main.tpl,main.css,settings.tpl,settings.css settings")
 	View.def("main.tpl,main.css,test-form1.tpl test-form1")
+	View.def("main.tpl,main.css,test-grid.tpl test-grid")
 
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.

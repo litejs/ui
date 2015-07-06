@@ -1,0 +1,29 @@
+@view test-grid #public
+	h2 Test golden grid
+	.grid.pad-2.bg3
+		.col-g2>.bg1 c1
+		.col-g3>.bg1 c2
+		.col-g1.col-md-g2>.bg1 c3
+		.col-g1.col-md-g3>.bg1 c4
+		.col-g1.col-md-g2>.bg1 c5
+		.col-g1.col-md-g4>.bg1 c6
+		.col-g1.col-md-g5>.bg1 c7
+		.col-g1.col-md-g2.col-lg-g3>.bg1 c8
+		.col-g1.col-md-g3.col-lg-g5>.bg1 c9
+		.col-g1.col-md-g2.col-lg-g6>.bg1 c10
+		.col-g1.col-md-g4.col-lg-g4>.bg1 c11
+		.col-g1.col-md-g5.col-lg-g5>.bg1 c12
+	h2 Test 12th grid
+	.grid.pad-2.bg3
+		.col-12>.bg1 c1
+		.col-12>.bg1 c2
+		.col-12.col-md-6>.bg1 c1
+		.col-12.col-md-6>.bg1 c2
+		.col-12.col-md-6>.bg1 c2
+		.col-12.col-md-6>.bg1 c2
+		.col-12.col-md-6.col-lg-3>.bg1 c1
+		.col-12.col-md-6.col-lg-3>.bg1 c2
+		.col-12.col-md-6.col-lg-3>.bg1 c2
+		.col-12.col-md-6.col-lg-3>.bg1 c2
+
+

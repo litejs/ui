@@ -78,7 +78,8 @@
 @view test #public
 	h2 Test
 	ul
-		li>a[href="#test-form1"] Form 1
+		li>a[href="#test-form1"] Test form
+		li>a[href="#test-grid"] Test grid
 	@rel user home vnd.app.home
 		.home {home.name}
 	@rel user home vnd.app.home.v2
