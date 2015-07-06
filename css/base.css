@@ -10,6 +10,7 @@
  *     instead of ignoring the property, will prevent the user to zoom in or out the Web page.
  *     See Bug 56543, Bug 163359, and Bug 84186.
  *  3. IE for Windows Phone 8.1 supports "-webkit-text-size-adjust" as an alias for "-ms-text-size-adjust".
+ *  4. Firefox<29, iOS<4, Android<4 need vendor prefixes.
  */
 
 html {
@@ -17,6 +18,15 @@ html {
 	-webkit-text-size-adjust: 100%;       /* 2 */
 	    -ms-text-size-adjust: 100%;       /* 3 */
 	-webkit-font-smoothing: antialiased;
+	-webkit-box-sizing: border-box;       /* 4 */
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+
+*, *:before, *:after {
+	-webkit-box-sizing: inherit;          /* 4 */
+	   -moz-box-sizing: inherit;
+	        box-sizing: inherit;
 }
 
 .max-height {

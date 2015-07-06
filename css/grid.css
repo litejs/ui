@@ -4,9 +4,6 @@
 	display: block;
 	overflow: auto;
 	clear: both;
-	-webkit-box-sizing: border-box;
-	   -moz-box-sizing: border-box;
-	        box-sizing: border-box;
 }
 
 .pad-3  { padding: 1.24em; }
@@ -30,9 +27,6 @@
 	float: left;
 	overflow: auto;
 	min-height: 1px;
-	-webkit-box-sizing: border-box;
-	   -moz-box-sizing: border-box;
-	        box-sizing: border-box;
 }
 
 .col-12, .sm .col-sm-12, .md .col-md-12, .lg .col-lg-12 { width: 100%; }
