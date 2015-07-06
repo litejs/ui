@@ -46,10 +46,12 @@ img,
 	outline: 0;
 }
 
+/*
 a {
 	color: inherit;
 	text-decoration: none;
 }
+*/
 
 /**
  *  1. Alternate cursor for IE
