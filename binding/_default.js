@@ -43,5 +43,43 @@
 			return false
 		})
 	}
+
+	function getChilds(node) {
+		var child
+		, childs = node._childs
+		if (!childs) {
+			for (node._childs = childs = []; child = node.firstChild;) {
+				childs.push(child);
+				node.removeChild(child)
+			}
+		}
+		return childs
+	}
+
+	bindings.each = bindingsEach
+
+	function bindingsEach(data, expr) {
+		var node = this
+		, child = getChilds(node)[0]
+		, match = /^\s*(\w+) in (\w*)(.*)/.exec(expr)
+		, fn = "with(data){var out=[],loop={i:0,offset:0},_1,_2=" + match[2]
+		+ match[3].replace(/ (limit|offset):\s*(\d+)/ig, ";loop.$1=$2")
+		+ ";if(_2)for(_1 in _2)if(hasOwn.call(_2,_1)&&!(loop.offset&&loop.offset--)){"
+		+     "loop.i++;"
+		+     "if(loop.limit&&loop.i-loop.offset>loop.limit)break;"
+		+     "var clone=el.cloneNode(true)"
+		+     ",scope=El.scope(clone,data);"
+		+     "scope.loopKey=loop.key=_1;"
+		+     "scope.loop=loop;"
+		+     "scope." + match[1] + "=_2[_1];"
+		+     "out.push(clone);"
+		+ "};return out}"
+
+		var childs = Function("hasOwn,el,data", fn)(hasOwn, child, data)
+
+		node.empty().append(childs).render()
+		return node
+	}
+	bindingsEach.raw = bindingsEach.once = 1
 }(El.bindings)
 
