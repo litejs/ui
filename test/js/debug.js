@@ -31,6 +31,18 @@ xhr.load = function(files, next) {
 	return xhr._load(files, next)
 }
 
+El.path = function(node) {
+	var str = ""
+
+	if (node && node.tagName) {
+		str = El.path(node.parentNode)
+		if (str) str += " > "
+		str += node.tagName.toLowerCase()
+		if (node.id) str += "#" + node.id
+		if (node.className) str += "." + node.className.replace(/\s+/g, ".")
+	}
+	return str
+}
 
 //View.prototype.show = View.prototype.show.trace("View.show")
 //View.prototype.ping = View.prototype.ping.trace("View.ping")
