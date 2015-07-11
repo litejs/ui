@@ -137,7 +137,7 @@ El.bindings.list = function(list) {
 	// Define landing page
 	View.base = "views/"
 
-	var lang = _.use(navigator.language || navigator.userLanguage)
+	var lang = _.use([].concat(navigator.languages, navigator.language, navigator.userLanguage, "en").filter(_.get)[0])
 	setLang(lang, init)
 
 	// Read in templates from element with id=index
