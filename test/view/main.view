@@ -69,7 +69,8 @@
 	h2 Users
 	ul.users &list: Data("users")
 		li
-			a {item.name}
+			a
+				&txt: item.name
 				&href: "#users/" + item.id
 
 @view users/{id} #public
