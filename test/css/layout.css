@@ -26,4 +26,7 @@ body {
 	-webkit-backface-visibility: hidden;   /* 1 */
 }
 
+.lg .col-lg-push-3  { left: 25%; }
+.lg .col-lg-pull-6  { right: 50%; }
+
 
