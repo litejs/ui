@@ -38,6 +38,8 @@ html {
 html,
 body,
 form,
+fieldset,
+legend,
 img,
 .btn,
 .reset {

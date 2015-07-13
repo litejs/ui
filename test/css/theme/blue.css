@@ -119,6 +119,17 @@ h1 {
 .bg3 { background: #ccc; }
 
 
+
+.login {
+	max-width: 600px;
+	margin: 0 auto;
+}
+.md .login__label,
+.lg .login__label {
+	padding-right: 1em;
+	text-align: right;
+}
+
 .modal__content {
 	position: absolute;
 	left: 0;
