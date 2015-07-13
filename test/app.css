@@ -2,17 +2,28 @@
 /**
  * @see http://smacss.com/book/categorizing
  * Theme rules describe how modules or layouts might look.
- * Without theme site must work but look like a wireframe.
+ * Without theme site must work but look more like a wireframe.
  *
  * base and components should be reusable across projects.
+ *
+ *  1. Base rules are almost exclusively single element selectors.
+ *  2. Layout rules divide the page into sections.
+ *     Layouts hold one or more modules together.
+ *  3. Modules are the reusable, modular parts of our design.
+ *     They are the callouts, the sidebar sections, the product lists and so on.
+ *  4. State rules are ways to describe how our modules or layouts will look when in a particular state.
+ *     Is it hidden or expanded? Is it active or inactive?
+ *     They are about describing how a module or layout looks on screens that are smaller or bigger.
+ *     They are also about describing how a module might look in different views like the home page or the inside page.
+ *  5. Theme rules are similar to state rules in that they describe how modules or layouts might look. Most sites don’t require a layer of theming but it is good to be aware of it.
  */
 
-@import url("css/base.css");
-@import url("css/layout.css");
-@import url("css/grid.css");
-/*@import url("css/components/more/more.css");*/
-@import url("css/state.css");
-@import url("css/theme.css");
+@import url("css/base.css");             /* 1 */
+@import url("css/layout.css");           /* 2 */
+@import url("css/modules/grid.css");     /* 3 */
+@import url("css/modules/media.css");    /* 3 */
+@import url("css/state.css");            /* 4 */
+@import url("css/theme/blue.css");       /* 5 */
 
 
 
