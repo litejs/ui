@@ -28,6 +28,15 @@
 			dt Contacts
 			dd>a[href="mailto:mail@to.com"] email
 
+@template confirm
+	.modal.abs.max.fix
+		.abs.max.modal__background
+		.grid.pad-1.modal__content
+			.col-12 {title}
+			.col-12 {body}
+			.col-6>.btn Cancel
+			.col-6>.btn Ok
+
 @view #public #body .content
 	.app.max-height
 		top.app__row
