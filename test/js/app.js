@@ -20,10 +20,11 @@ _.def({ "en":"In English"
 El.data.location = location
 
 
-El.bindings.list = function(list) {
+El.bindings.list = function(list, extra) {
 	var node = this
 	, data = El.scope(node)
 	, child = node._child
+	, extraLen = 0
 
 	if (!child) {
 		child = node._child = node.removeChild(node.firstChild)
@@ -37,9 +38,19 @@ El.bindings.list = function(list) {
 
 	node.on("kill", clear)
 
+	node.addClass("loading")
+
+	if (extra) {
+		extra.each(clone)
+		extraLen = extra.length
+	}
+
 	list
 	.each(clone)
 	.on("add", clone).on("remove", remove)
+	.then(function() {
+		node.rmClass("loading")
+	})
 
 	// Do not render childs when list initialized
 	return true
@@ -47,20 +58,22 @@ El.bindings.list = function(list) {
 	function clone(item, pos) {
 		var clone = child.cloneNode(true)
 		, scope = El.scope(clone, data)
-		scope.item = item.data
+		scope.item = item.data || item
 		scope.model = item
 		function up() {
 			clone.render(scope)
 		}
-		item.on("change", up)
-		clone.on("kill", function(){
-			item.off("change", up)
-		})
-		return clone.to(node, pos).render(scope)
+		if (item.on) {
+			item.on("change", up)
+			clone.on("kill", function(){
+				item.off("change", up)
+			})
+		}
+		return clone.to(node, extraLen + pos).render(scope)
 	}
 
 	function remove(item, pos) {
-		node.childNodes[pos].kill()
+		node.childNodes[extraLen + pos].kill()
 	}
 
 	function clear() {
