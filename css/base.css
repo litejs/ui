@@ -39,6 +39,7 @@ html,
 body,
 form,
 img,
+.btn,
 .reset {
 	margin: 0;
 	padding: 0;
@@ -62,6 +63,7 @@ a {
 
 a[href],
 button,
+.btn,
 .hand {
 	cursor: pointer;
 	*cursor: hand;       /* 1 */
@@ -136,6 +138,7 @@ img {
 
 button,
 [draggable=true],
+.btn,
 .noselect {
 	-webkit-user-select: none;
 	 -khtml-user-select: none;
@@ -206,7 +209,9 @@ button,
 	position: relative;
 	height: 100%;
 }
-.nowrap {
+
+.btn,
+.ellipsis {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
