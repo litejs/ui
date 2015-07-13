@@ -7,6 +7,7 @@
 	bindingWith.once =
 	bindingOn.once =
 	emitForm.once =
+	bindingsEach.raw = bindingsEach.once =
 	true
 
 	bindings.fn = bindingFn
@@ -80,6 +81,5 @@
 		node.empty().append(childs).render()
 		return node
 	}
-	bindingsEach.raw = bindingsEach.once = 1
 }(El.bindings)
 

@@ -291,7 +291,5 @@
 	 * (Works in all major browsers)
 	 */
 
-
-
 }(this,[])
 

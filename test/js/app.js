@@ -89,7 +89,6 @@ El.bindings.list = function(list, extra) {
 
 !function(View, Mediator) {
 	var user
-	, app = El(".app")
 
 	function setLang(lang, next) {
 		xhr.load("lang/" + lang + ".js", next)
@@ -147,7 +146,6 @@ El.bindings.list = function(list, extra) {
 		setTimeout(this.wait(opts), 1000)
 	})
 
-	// Define landing page
 	View.base = "views/"
 
 	var lang = _.use([].concat(navigator.languages, navigator.language, navigator.userLanguage, "en").filter(_.get)[0])
