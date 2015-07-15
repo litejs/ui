@@ -1,17 +1,19 @@
 
 
 @template top
-	.top
-		h1 Header
-		.nav &each: lng in _.list
-			a {lng|upper}
-				&lang:lng
-				&on:"click", Mediator.setLang
-				&class:"selected", lng == _.current
-				&class:"lang-" + lng
-		.nav
+	.bg-1
+		.top.t-1.app__row
+			.right.lang &each: lng in _.list
+				a - {lng|upper} -
+					&lang:lng
+					&on:"click", Mediator.setLang
+					&class:"selected", lng == _.current
+					&class:"lang-" + lng
+			a[href="#home"].home-link Header
+	.bg-2
+		.menu.app__row
 			@template nav-row
-				a &class:"selected", (location.hash||View.home).indexOf(this.href.split('#')[1])>-1
+				a.menu__item &class:"selected", (location.hash||View.home).indexOf(this.href.split('#')[1])>-1
 			nav-row[href="#home"] Home
 			nav-row[href="#users"] Users
 			nav-row[href="#settings"] Settings
@@ -19,14 +21,15 @@
 			nav-row[href="#broken-link"] Broken link
 
 @template footer
-	.footer.grid.pad-3
-		dl.footer__item.col-4
-			dt litejs.com
-			dd>a[href="#help"] How to use
-			dd>a[href="#privacy"] Privacy
-		dl.footer__item.col-4
-			dt Contacts
-			dd>a[href="mailto:mail@to.com"] email
+	.bg-1
+		.footer.app__row.grid.pad-3
+			dl.footer__item.col-4
+				dt litejs.com
+				dd>a[href="#help"] How to use
+				dd>a[href="#privacy"] Privacy
+			dl.footer__item.col-4
+				dt Contacts
+				dd>a[href="mailto:mail@to.com"] email
 
 @template confirm
 	.modal.abs.max.fix
@@ -39,19 +42,19 @@
 
 @view #public #body .content
 	.app.max-height
-		top.app__row
+		top
 		.content.loader.app__row
 		.footer__spacer
-	footer.app__row
+	footer
 
 @view #private #body .content
 	.app.max-height
-		top.app__row
+		top
 			button.top__logout Logout
 				&on:"click", "logout"
 		.content.loader.app__row
 		.footer__spacer
-	footer.app__row
+	footer
 
 @view 404 #public
 	h2 Error 404
@@ -67,14 +70,14 @@
 		fieldset.grid.pad-2.login
 			legend Login
 			label.col-12
-				.col-12.col-md-5.login__label Username
-				input.col-12.col-md-7[name=name]
+				.col-12.col-md-4.login__label Username
+				input.col-12.col-md-8[name=name]
 			label.col-12
-				.col-12.col-md-5.login__label Password
-				input.col-12.col-md-7[name=pass][type=password]
+				.col-12.col-md-4.login__label Password
+				input.col-12.col-md-8[name=pass][type=password]
 			.col-12
-				.col-12.col-md-5
-				input.btn.col-12.col-md-7[type=submit] Log In
+				.col-12.col-md-4
+				input.btn.col-12.col-md-8[type=submit] Log In
 
 
 @view users #public

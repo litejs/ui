@@ -24,6 +24,7 @@ html {
 }
 
 *, *:before, *:after {
+	color: inherit;
 	-webkit-box-sizing: inherit;          /* 4 */
 	   -moz-box-sizing: inherit;
 	        box-sizing: inherit;

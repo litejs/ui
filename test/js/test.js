@@ -114,11 +114,11 @@ function test() {
 	it ("should change language").
 	click("a.lang-en").
 	waitSelector("a.lang-en.selected").
-	haveText("h1", "Header").
+	haveText("a.home-link", "Header").
 
 	click("a.lang-et").
 	waitSelector("a.lang-et.selected").
-	haveText("h1", "Pealkiri").
+	haveText("a.home-link", "Pealkiri").
 
 	it ("should log in").
 	click("a[href$='#settings']").

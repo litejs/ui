@@ -129,7 +129,7 @@ El.bindings.list = function(list, extra) {
 	View("#body", document.body)
 	.on("ping", function() {
 		El.data.user = user
-		document.body.findAll(".nav").render()
+		document.body.findAll(".menu,.lang").render()
 	})
 
 	View("#private")
