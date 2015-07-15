@@ -1,6 +1,7 @@
 
 
-.grid {
+.grid,
+.row {
 	display: block;
 	overflow: auto;
 	clear: both;
@@ -14,9 +15,9 @@
 }
 
 .pad-3 { padding: 1.24em; }
-.pad-2, .grid.pad-3, .grid.pad-3 > [class*="col-"] { padding: .62em; }
-.pad-1, .grid.pad-2, .grid.pad-2 > [class*="col-"] { padding: .31em; }
-.grid.pad-1, .grid.pad-1 > [class*="col-"] { padding: .155em; }
+.pad-2, .grid.pad-3, .grid.pad-3 > [class*="col-"], .grid.pad-3 > .row > [class*="col-"] { padding: .62em; }
+.pad-1, .grid.pad-2, .grid.pad-2 > [class*="col-"], .grid.pad-2 > .row > [class*="col-"] { padding: .31em; }
+        .grid.pad-1, .grid.pad-1 > [class*="col-"], .grid.pad-1 > .row > [class*="col-"] { padding: .15em; }
 
 .col-g1, .md .col-md-g1, .lg .col-md-g1, .lg .col-lg-g1 { width: 100%; }
 .col-g2, .md .col-md-g2, .lg .col-md-g2, .lg .col-lg-g2 { width: 61.8%; }
