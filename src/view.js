@@ -43,7 +43,7 @@
 					escapeRegExp(_)
 			})
 
-			fnStr += (fnStr ? "||" : "") + "a[" + startLen + "]&&(" + a + ")"
+			fnStr += (fnStr ? "||" : "") + "(o._u=a[" + startLen + "])&&(" + a + ")"
 			reStr += (reStr ? "|" : "") + "(" + _re + ")"
 
 			fn = new Function("o,a", "return a&&(" + fnStr + "),o")
