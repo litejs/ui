@@ -44,6 +44,10 @@ body {
 	text-shadow: 2px 1px 1px #000;
 }
 
+.lang > .selected {
+	text-decoration: underline;
+}
+
 .menu {
 	padding-top: 9px;
 }

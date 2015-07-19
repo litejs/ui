@@ -1,5 +1,5 @@
 
-_.add("se", {
+_.add("sv", {
 	Home: "Hem",
 	name: "namn"
 })

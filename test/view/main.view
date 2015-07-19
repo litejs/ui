@@ -49,9 +49,9 @@
 
 @view #private #body .content
 	.app.max-height
+		button.top__logout.right Logout
+			&on:"click", "logout"
 		top
-			button.top__logout Logout
-				&on:"click", "logout"
 		.content.loader.app__row
 		.footer__spacer
 	footer

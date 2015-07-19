@@ -10,11 +10,16 @@ if (this != top) throw top.location = this.location
 var Mediator = Object.create(Event.Emitter)
 , _ = El.i18n
 
-_.def({ "en":"In English"
-	, "et":"Eesti keeles"
-	, "ru":"На русском"
-	, "fi":"Suomeksi"
-	, "se":"på Svenska"
+_.def(  { "en": "In English"
+	, "et": "Eesti keeles"
+	, "ru": "На русском"
+	, "fi": "Suomeksi"      // Finnish
+	, "sv": "På Svenska"    // Swedish
+	//, "lt": "Lietuviškai"   // Lithuanian
+	//, "lv": "Latviski"      // Latvian
+	//, "pl": "Polski"        // Polish
+	//, "de": "Deutsch"
+	//, "fr": "Français"
 })
 
 El.data.location = location
