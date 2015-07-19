@@ -4,9 +4,8 @@
 	.bg-1
 		.top.t-1.app__row
 			.right.lang &each: lng in _.list
-				a - {lng|upper} -
-					&lang:lng
-					&on:"click", Mediator.setLang
+				a.hand - {lng|upper} -
+					&on:"click", _.setLang.bind(null, lng)
 					&class:"selected", lng == _.current
 					&class:"lang-" + lng
 			a[href="#home"].home-link Header
@@ -64,6 +63,8 @@
 @view home #public
 	h2 Home
 	div _welcome
+	.time
+		&txt: (new Date()).format()
 
 @view login #public
 	form[action="javascript:"][method=POST] &emitForm:"login"

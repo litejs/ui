@@ -22,6 +22,14 @@ _.def(  { "en": "In English"
 	//, "fr": "Français"
 })
 
+_.setLang = function(lang) {
+	document.documentElement.lang = lang = _.use(lang)
+	xhr.load("lang/" + lang + ".js", function() {
+		Date.names = _("__date").split(" ")
+		document.body.render()
+	})
+}
+
 El.data.location = location
 
 
@@ -95,17 +103,6 @@ El.bindings.list = function(list, extra) {
 !function(View, Mediator) {
 	var user
 
-	function setLang(lang, next) {
-		xhr.load("lang/" + lang + ".js", next)
-	}
-
-
-	Mediator.setLang = function() {
-		setLang(_.use(this.attr("lang")), function() {
-			document.body.render()
-		})
-	}
-
 	Mediator.on("login", function(e, data) {
 		user = data
 		View.show(history.getUrl())
@@ -124,10 +121,10 @@ El.bindings.list = function(list, extra) {
 
 	document.title = "Litejs Example"
 
-	View.def("main.tpl,main.css #public,#private,404,home,login,users,users/{id},test")
-	View.def("main.tpl,main.css,settings.tpl,settings.css settings")
-	View.def("main.tpl,main.css,test-form1.tpl test-form1")
-	View.def("main.tpl,main.css,test-grid.tpl test-grid")
+	View.def("main.tpl #public,#private,404,home,login,users,users/{id},test")
+	View.def("main.tpl,settings.tpl,settings.css settings")
+	View.def("main.tpl,test-form1.tpl test-form1")
+	View.def("main.tpl,test-grid.tpl test-grid")
 
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.
@@ -153,13 +150,15 @@ El.bindings.list = function(list, extra) {
 
 	View.base = "views/"
 
-	var lang = _.use([].concat(navigator.languages, navigator.language, navigator.userLanguage, "en").filter(_.get)[0])
-	setLang(lang, init)
+	var lang = [].concat(navigator.languages, navigator.language, navigator.userLanguage, "en").filter(_.get)[0]
+
+	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.tpl"], init)
 
 	// Read in templates from element with id=index
 	//El.include("index")
 
 	function init() {
+		_.setLang(lang)
 		// Start a router to showing views
 		history.start(View.show)
 	}
