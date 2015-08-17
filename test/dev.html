@@ -20,11 +20,11 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 		-->
 
+		<meta name="mobile-web-app-capable" content="yes">
 		<!--
 		Since M31, Chrome will look for mobile-web-app-capable meta tag,
 		if there's a manifest with display specified, this is ignored.
 
-		<meta name="mobile-web-app-capable" content="yes">
 		<link rel="manifest" href="manifest.json">
 
 		Whilst Chrome temporarily accepts the usage of "apple-mobile-web-app-capable",
@@ -33,6 +33,12 @@ but you'll need the mime-type to work in older browsers and IE11.
 		window.navigator.standalone
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link rel="apple-touch-startup-image" href="/startup.png">
+		-->
+
+		<!--
+		Turn off telephone number detection in Safari on iOS,
+		you can still use the "tel" URI scheme.
+		<meta name="format-detection" content="telephone=no">
 		-->
 
 		<!--
@@ -79,9 +85,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<script exclude src="js/debug.js"></script>
 		<script exclude src="//www.litejs.com/pub/testman.js"></script>
 		<script exclude src="js/test.js"></script>
-		<noscript>
-			<h1>Error</h1>This application requires JavaScript to be enabled in your Browser.
-		</noscript>
+		<noscript><h1>Error</h1>This application requires JavaScript</noscript>
 	</body>
 </html>
 

@@ -17,7 +17,6 @@
 			nav-row[href="#users"] Users
 			nav-row[href="#settings"] Settings
 			nav-row[href="#test"] Test
-			nav-row[href="#broken-link"] Broken link
 
 @template footer
 	.bg-1
@@ -95,6 +94,7 @@
 @view test #public
 	h2 Test
 	ul
+		li>a[href="#broken-link"] Test broken link
 		li>a[href="#test-form1"] Test form
 		li>a[href="#test-grid"] Test grid
 	@rel user home vnd.app.home
