@@ -66,6 +66,7 @@ a {
 
 a[href],
 button,
+label,
 .btn,
 .hand {
 	cursor: pointer;
@@ -213,7 +214,14 @@ button,
 	height: 100%;
 }
 
+
+/* establishes a new block formatting context */
+.block {
+	overflow: hidden;
+}
+
 .btn,
+.nowrap,
 .ellipsis {
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -236,6 +244,16 @@ button,
 
 .right {
 	float: right;
+}
+.t-left {
+	text-align: left;
+}
+
+.t-center {
+	text-align: center;
+}
+.t-right {
+	text-align: right;
 }
 
 
