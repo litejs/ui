@@ -20,12 +20,12 @@
 
 @template footer
 	.bg-1
-		.footer.app__row.grid.pad-3
-			dl.footer__item.col-4
+		.footer.app__row.grid.pad-3.c2
+			.footer__item.col-4
 				dt litejs.com
 				dd>a[href="#help"] How to use
 				dd>a[href="#privacy"] Privacy
-			dl.footer__item.col-4
+			.footer__item.col-4
 				dt Contacts
 				dd>a[href="mailto:mail@to.com"] email
 

@@ -83,22 +83,5 @@ body {
 
 
 
-.footer__item {
-	margin: 0;
-	font-size: 1.15em; /* 15/12 */
-	line-height: 1.4;
-}
-
-.footer__item dt {
-	margin: 0;
-	color: #789;
-	font-weight: bold;
-}
-
-.footer__item dd {
-	margin: 0;
-}
-
-
 
 
