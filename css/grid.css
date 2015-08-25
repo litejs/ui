@@ -5,6 +5,7 @@
 	display: block;
 	overflow: hidden;
 	clear: both;
+	border: 0px solid transparent;
 }
 
 [class*="col-"] {
@@ -14,10 +15,16 @@
 	min-height: 1px;
 }
 
-.pad-3 { padding: 1.2em; }
-.pad-2, .grid.pad-3, .grid.pad-3 > [class*="col-"], .grid.pad-3 > .row > [class*="col-"] { padding: .8em; }
-.pad-1, .grid.pad-2, .grid.pad-2 > [class*="col-"], .grid.pad-2 > .row > [class*="col-"] { padding: .4em; }
-        .grid.pad-1, .grid.pad-1 > [class*="col-"], .grid.pad-1 > .row > [class*="col-"] { padding: .2em; }
+.row,
+[class*="col-"] {
+	border-style: inherit;
+	border-color: inherit;
+}
+
+.pad-3 { border-width: 1.2em; }
+.pad-2, .grid.pad-3, .grid.pad-3 > [class*="col-"], .grid.pad-3 > .row > [class*="col-"] { border-width: .8em; }
+.pad-1, .grid.pad-2, .grid.pad-2 > [class*="col-"], .grid.pad-2 > .row > [class*="col-"] { border-width: .4em; }
+        .grid.pad-1, .grid.pad-1 > [class*="col-"], .grid.pad-1 > .row > [class*="col-"] { border-width: .2em; }
 
 .col-g1, .md .col-md-g1, .lg .col-md-g1, .lg .col-lg-g1 { width: 100%; }
 .col-g2, .md .col-md-g2, .lg .col-md-g2, .lg .col-lg-g2 { width: 61.8%; }

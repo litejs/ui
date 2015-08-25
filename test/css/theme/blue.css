@@ -46,6 +46,11 @@ h6 {
 	background-image: linear-gradient(#38c, #269);
 }
 
+.bg3 {
+	background-color: #ccc;
+	border-color: #fff;
+}
+
 .t-1 {
 	color: #def;
 	font-size: 0.75em;
