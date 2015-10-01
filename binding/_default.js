@@ -4,6 +4,7 @@
 	, slice = Array.prototype.slice
 
 	bindingFn.once =
+	bindingIf.once =
 	bindingWith.once =
 	bindingOn.once =
 	emitForm.once =
