@@ -37,10 +37,10 @@
 	}
 
 	bindings.emitForm = emitForm
-	function emitForm(ev, a1, a2) {
+	function emitForm(ev, a1, a2, a3, a4) {
 		this.on("submit", function(e) {
 			var data = JSON.serializeForm(this)
-			Mediator.emit(ev, e, data, a1, a2)
+			Mediator.emit(ev, e, data, a1, a2, a3, a4)
 			return false
 		})
 	}
