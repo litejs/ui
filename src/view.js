@@ -146,7 +146,11 @@
 
 	View.show = function(route) {
 		var match = fn({_r:"404"}, re.exec(route || View.home))
-		View(match._r).show(El.data.route = match)
+		, view = View(match._r)
+		if (!view.open || view._u != match._u) {
+			view._u = match._u
+			view.show(El.data.route = match)
+		}
 	}
 
 	View.def = function(str) {
