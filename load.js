@@ -188,7 +188,7 @@
 				//     when it should be 204,
 				//     http://www.enhanceie.com/ie/bugs.asp
 				//
-				method = xhr.status // Reuse variable for status
+				method = xhr.status || -1 // Reuse variable for status
 				if (next) next.call(
 					xhr,
 					(method < 200 || method > 299) && method != 304 && method != 1223 && method,
