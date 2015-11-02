@@ -151,6 +151,7 @@
 
 
 		xhr.open(method, url, next !== true)
+		xhr._next = next
 
 
 		// With IE 8 XMLHttpRequest gains the timeout property.
@@ -189,7 +190,7 @@
 				//     http://www.enhanceie.com/ie/bugs.asp
 				//
 				method = xhr.status || -1 // Reuse variable for status
-				if (next) next.call(
+				if (xhr._next) xhr._next.call(
 					xhr,
 					(method < 200 || method > 299 && method != 304 && method != 1223) && method,
 					xhr.responseText,
@@ -197,7 +198,7 @@
 					attr1,
 					attr2
 				)
-				xhr.onreadystatechange = next = nop
+				xhr.onreadystatechange = xhr._next = nop
 				xhrs.push(xhr)
 			}
 		}
