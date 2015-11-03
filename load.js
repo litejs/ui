@@ -248,12 +248,27 @@
 		, i = 0
 		, pending = 0
 		, res = []
-		for (; i < len; i++) if ((file = files[i]) && !loaded[file]) {
-			xhr("GET", loaded[file] = file, cb, pending++).send()
+
+		for (; i < len; i++) if ((file = files[i]) !== loaded[file]) {
+			if (loaded[file]) {
+				loaded[file]._next = function(old) {
+					return function() {
+						old.apply(this, arguments)
+						cb.apply(this, arguments)
+					}
+				}(loaded[file]._next)
+			} else {
+				loaded[file] = xhr("GET", file, cb, pending)
+				loaded[file].send()
+			}
+			pending += 1
 		}
+
 		if (!pending && next) next()
+
 		function cb(err, str, file, i) {
 			var type = file.split("?")[0].split(".").pop()
+			loaded[file] = file
 			res[i] = ""
 			if (!err) {
 				if (type == "tpl") {
