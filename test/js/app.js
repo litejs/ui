@@ -26,6 +26,11 @@ _.setLang = function(lang) {
 	document.documentElement.lang = lang = _.use(lang)
 	xhr.load("lang/" + lang + ".js", function() {
 		Date.names = _("__date").split(" ")
+		String.alphabet = _("__alphabet")
+		String.ordinal = _("__ordinal")
+		String.plural = _("__plural")
+		Object.merge(Date.masks, _("__dateMasks"))
+
 		document.body.render()
 	})
 }
