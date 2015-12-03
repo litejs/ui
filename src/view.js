@@ -103,24 +103,13 @@
 			, parent = view.parent
 			, child = view.child
 
-			if (!view.el) {
-				var resume = view.wait(opts, 1)
-				if (view.pending) {
-					view.on("load", resume)
-				} else if (view.file) {
-					view.pending = true
-					xhr.load(
-						view.file
-						.replace(/^|,/g, "$&" + (View.base || ""))
-						.split(","),
-						function() {
-							view.pending = false
-							view.emit("load")
-							resume()
-						}
-					)
-				}
-				return
+			if (!view.el && view.file) {
+				return xhr.load(
+					view.file
+					.replace(/^|,/g, "$&" + (View.base || ""))
+					.split(","),
+					view.wait(opts, 1)
+				)
 			}
 
 			if (!silent) view.emit("ping", opts)
