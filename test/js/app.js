@@ -104,6 +104,18 @@ El.bindings.list = function(list, extra) {
 	}
 }
 
+El.bindings.fixReadonlyCheckbox = function() {
+	var el = this
+	function False(e) {
+		console.log(this.readOnly)
+		if (this.readOnly) {
+			Event.stop(e)
+			return false
+		}
+	}
+	el.on("click", False).on("mousedown", False)
+}
+El.bindings.fixReadonlyCheckbox.once = 1
 
 !function(View, Mediator) {
 	var user
