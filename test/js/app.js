@@ -8,7 +8,15 @@ if (this != top) throw top.location = this.location
 
 
 var Mediator = Object.create(Event.Emitter)
-, _ = El.i18n
+, _ = El.data._ = El.i18n
+
+El.data.Fn = Fn
+El.data.Mediator = Mediator
+El.data.Date = Date
+El.data.Math = Math
+El.data.View = View
+El.data.started = new Date()
+El.data.welcomeText = "_welcome"
 
 _.def(  { "en": "In English"
 	, "et": "Eesti keeles"

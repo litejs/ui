@@ -62,8 +62,16 @@
 @view home #public
 	h2 Home
 	div _welcome
+		&on: "click", Fn("this.style.fontStyle = this.style.fontStyle == 'italic' ? '' : 'italic'")
+	div &txt: _("_welcome")
+		&on: "mouseover", Fn("this.addClass('bg3'),this.txt(this.txt() == _('_welcome') ? 'Over!' : _('_welcome'))")
+		&on: "mouseout", Fn("this.rmClass('bg3'),this.txt(_('_welcome'))")
+	div &txt: _(welcomeText)
+	div &txt: _(nonExistingWelcomeText)
 	.time
-		&txt: (new Date()).format()
+		&txt: started.format()
+	.time
+		&txt: new Date().format()
 
 @view login #public
 	form[action="javascript:"][method=POST] &emitForm:"login"

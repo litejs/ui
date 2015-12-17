@@ -34,3 +34,5 @@ var Data = List.extend({
 	}
 })
 
+El.data.Data = Data
+
