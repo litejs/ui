@@ -132,8 +132,12 @@ El.bindings.fixReadonlyCheckbox.once = 1
 
 	Mediator.logForm = function(e) {
 		var data = JSON.serializeForm(this)
-		console.log("logForm expect", this.attr("data-expect"))
-		console.log("logForm actual", JSON.stringify(data))
+		, matches = this.attr("data-expect") == JSON.stringify(data)
+		if (matches) {
+			console.log("logForm", matches, JSON.stringify(data), data)
+		} else {
+			console.error("logForm", matches, JSON.stringify(data),"!==",this.attr("data-expect"), data)
+		}
 	}
 
 	document.title = "Litejs Example"
