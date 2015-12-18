@@ -25,6 +25,12 @@ body {
 	background: #b3d4fc;
 }
 
+input[disabled],
+input[readonly] {
+	color: #666;
+	font-style: italic;
+}
+
 h1,
 h2,
 h3,
