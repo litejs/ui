@@ -249,7 +249,7 @@
 		, pending = 0
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) !== loaded[file]) {
+		for (; i < len; i++) if ((file = files[i]) && file !== loaded[file]) {
 			if (loaded[file]) {
 				loaded[file]._next = function(old) {
 					return function() {
