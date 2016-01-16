@@ -185,11 +185,14 @@
 				// to your JavaScript code.
 				//
 				//   - Opera 8.x passes 304
-				//   - IE<10 returns 1223 and drop all response headers from PUT/POST
+				//   - IE9 returns 1223 and drop all response headers from PUT/POST
 				//     when it should be 204,
 				//     http://www.enhanceie.com/ie/bugs.asp
-				//
-				method = xhr.status || -1 // Reuse variable for status
+				//   - File protocol returns status code 0
+				//   - Android 4.1 returns status code 0 when cache manifest is used
+				//   - IE 10-11 returns status code 0 with CORS for codes 401, 403
+
+				method = xhr.status || 200 // Reuse variable for status
 				if (xhr._next) xhr._next.call(
 					xhr,
 					(method < 200 || method > 299 && method != 304 && method != 1223) && method,
