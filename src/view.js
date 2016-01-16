@@ -133,10 +133,12 @@
 
 			if (lastOpts == opts && !opts._p && view.route == opts._r) {
 				view.emit("show", opts)
+				View.emit("show", opts)
 			}
 		}
 	}
 
+	Object.merge(View, Event.Emitter)
 	Object.merge(View.prototype, Event.Emitter)
 
 	View.home = "home"

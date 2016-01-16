@@ -179,6 +179,10 @@ El.bindings.fixReadonlyCheckbox.once = 1
 
 	View.base = "views/"
 
+	View.on("show", function() {
+		console.log("View show", arguments)
+	})
+
 	var lang = [].concat(navigator.languages, navigator.language, navigator.userLanguage, "en").filter(_.get)[0]
 
 	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.tpl"], init)
