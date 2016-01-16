@@ -159,16 +159,17 @@ button,
 	        user-drag: element;
 }
 
-/* for IE8 */
-:focus {
-	outline: none;
-}
 
-/* for FireFox */
-::-moz-focus-inner {
-	border: 0;
-	padding: 0;
-}
+/**
+ * Do not remove focus retangle,
+ * do it more visible when needed.
+ *
+ *  - for IE8
+ *    :focus { outline: 5px solid red; }
+ *  - for FireFox
+ *    ::-moz-focus-inner { border: 5px solid red; padding: 0; }
+ */
+
 
 
 /**

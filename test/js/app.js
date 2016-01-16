@@ -180,7 +180,9 @@ El.bindings.fixReadonlyCheckbox.once = 1
 	View.base = "views/"
 
 	View.on("show", function() {
-		console.log("View show", arguments)
+		// When a View completes, blur focused link
+		var el = document.activeElement
+		if (el && el.tagName == "A") el.blur()
 	})
 
 	var lang = [].concat(navigator.languages, navigator.language, navigator.userLanguage, "en").filter(_.get)[0]
