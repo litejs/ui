@@ -10,27 +10,31 @@ but you'll need the mime-type to work in older browsers and IE11.
 <html>
 	<head>
 		<!--
-		https://blog.whatwg.org/the-road-to-html-5-character-encoding
+		  1. https://blog.whatwg.org/the-road-to-html-5-character-encoding
+		  2. Options:
+		         resize enabled: width=device-width,initial-scale=1
+		         resize denied: width=device-width,initial-scale=1,maximum-scale=1
+		     minimal-ui for iOS 7.1
+		  3. Since Chrome 31.
+		     Chrome temporarily accepts the usage of "apple-mobile-web-app-capable"
+		     Meta tag apple-touch-fullscreen behave the same way as apple-mobile-web-app-capable.
+		     Only the last one is mentioned in Safari documentation, so I would stick with it.
+		     It looks to me as if apple-touch-fullscreen was used in early demos/previews,
+		     so it was left working later when the SDK got actually released,
+		     but the preferred version is the one documented.
+		  4. Since Chrome 39 you can use Web App Manifest.
+		     http://www.w3.org/TR/appmanifest/
+		     If there's a manifest with display specified,
+		     "mobile-web-app-capable" is ignored.
 		-->
-		<meta charset="UTF-8">
 
-		<meta name="viewport" content="initial-scale=1,maximum-scale=1">
-		<!-- Resize allowed:
-		<meta name="viewport" content="width=device-width,initial-scale=1">
-		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-		-->
+		<meta charset="UTF-8">                                            <!-- 1 -->
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1">  <!-- 2 -->
+		<meta name="mobile-web-app-capable" content="yes">                <!-- 3 -->
+		<!-- <link rel="manifest" href="manifest.webmanifest"> -->        <!-- 4 -->
 
-		<meta name="mobile-web-app-capable" content="yes">
 		<!--
-		Since M31, Chrome will look for mobile-web-app-capable meta tag,
-		if there's a manifest with display specified, this is ignored.
-
-		<link rel="manifest" href="manifest.json">
-
-		Whilst Chrome temporarily accepts the usage of "apple-mobile-web-app-capable",
-		Chrome does not offer compatibility with the iOS Safari API’s including:
-
-		window.navigator.standalone
+		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link rel="apple-touch-startup-image" href="/startup.png">
 		-->
@@ -39,6 +43,11 @@ but you'll need the mime-type to work in older browsers and IE11.
 		Turn off telephone number detection in Safari on iOS,
 		you can still use the "tel" URI scheme.
 		<meta name="format-detection" content="telephone=no">
+		-->
+
+		<!--
+		Remove tap highlight in IE10 and IE11 on Windows Phone.
+		<meta name="msapplication-tap-highlight" content="no">
 		-->
 
 		<!--
@@ -56,6 +65,9 @@ but you'll need the mime-type to work in older browsers and IE11.
 		Strict-Transport-Security: max-age=778000
 
 		-->
+
+		<meta name="application-name" content="App">
+		<meta name="msapplication-tooltip" content="App">
 
 		<title>App</title>
 		<!-- <base href="./"> -->
