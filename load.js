@@ -22,9 +22,7 @@
 
 
 !function(window, scripts, next) {
-	var styleNode
-	, document = window.document
-	, head = document.getElementsByTagName("head")[0]
+	var document = window.document
 	, xhrs = []
 	, loaded = {}
 	, seq = 0
@@ -274,20 +272,11 @@
 			loaded[file] = file
 			res[i] = ""
 			if (!err) {
-				if (type == "tpl") {
+				if (type == "tpl" || type == "css") {
 					xhr[++seq] = str
-					res[i] = "El.tpl(xhr[" + seq + "]);delete xhr[" + seq + "]"
-				} else if (type == "css") {
-					if (!styleNode) {
-						// Safari and IE6-8 requires dynamically created
-						// <style> elements to be inserted into the <head>
-						styleNode = head.appendChild(document.createElement("style"))
-					}
-					if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
-					else styleNode.appendChild(document.createTextNode(str))
-				} else {
-					res[i] = str
+					str = "El." + type + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				}
+				res[i] = str
 			}
 			if (!--pending) {
 				execScript( ";" + res.join("/**/;") )
