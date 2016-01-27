@@ -252,12 +252,12 @@
 
 		for (; i < len; i++) if ((file = files[i]) && file !== loaded[file]) {
 			if (loaded[file]) {
-				loaded[file]._next = function(old) {
-					return function() {
-						old.apply(this, arguments)
-						cb.apply(this, arguments)
+				loaded[file]._next = function(old, i2) {
+					return function(err, str, file, i1) {
+						old(err, str, file, i1)
+						cb(1, str, file, i2)
 					}
-				}(loaded[file]._next)
+				}(loaded[file]._next, i)
 			} else {
 				loaded[file] = xhr("GET", file, cb, pending)
 				loaded[file].send()
