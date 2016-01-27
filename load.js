@@ -268,13 +268,13 @@
 		if (!pending && next) next()
 
 		function cb(err, str, file, i) {
-			var type = file.split("?")[0].split(".").pop()
 			loaded[file] = file
 			res[i] = ""
 			if (!err) {
-				if (type == "tpl" || type == "css") {
+				err = file.split("?")[0].split(".").pop()
+				if (err == "tpl" || err == "css") {
 					xhr[++seq] = str
-					str = "El." + type + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
+					str = "El." + err + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				}
 				res[i] = str
 			}
