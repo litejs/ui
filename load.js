@@ -247,8 +247,7 @@
 			}
 			if (!--pending) {
 				execScript( res.join("/**/;") )
-				if (next) next()
-				res = null
+				if (next) next(files, res)
 			}
 		}
 	}
