@@ -195,11 +195,15 @@ El.bindings.fixReadonlyCheckbox.once = 1
 	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.tpl"], init)
 
 
-	/*
-	xhr.load(["js/test-load1.js", "js/test-load1.js", "js/test-load1.js"], console.log.bind(console, "load done 1"))
-	xhr.load(["js/test-load1.js", "js/test-load2.js", "js/test-load1.js"], console.log.bind(console, "load done 2"))
-	xhr.load(["js/test-load1.js"], console.log.bind(console, "load done 3"))
-	*/
+	xhr.load(["js/test-load1.js", "js/test-load1.js", "//www.litejs.com/pub/crypto.js", "js/test-load1.js"], loadDone)
+	xhr.load(["js/test-load1.js", "js/test-load2.js", "js/test-load1.js"], loadDone)
+	xhr.load(["js/test-load1.js", "js/test-load2.js"], loadDone)
+
+	function loadDone(files, res) {
+		window.console && console.log("load done", files, res.map(function(str) {
+			return crypto.sha1 && crypto.sha1("blob " + str.length + "\0" + str)
+		}))
+	}
 
 	// Read in templates from element with id=index
 	//El.include("index")
