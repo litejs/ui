@@ -22,8 +22,7 @@
 
 
 !function(window, scripts, next) {
-	var document = window.document
-	, xhrs = []
+	var xhrs = []
 	, loaded = {}
 	, seq = 0
 
