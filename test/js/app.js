@@ -177,6 +177,11 @@ El.bindings.fixReadonlyCheckbox.once = 1
 		setTimeout(this.wait(opts), 1000)
 	})
 
+	View("users")
+	.on("ping", function(opts) {
+		this.wait(opts)()
+	})
+
 	View.base = "views/"
 
 	View.on("show", function() {

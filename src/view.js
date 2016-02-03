@@ -91,10 +91,11 @@
 			opts._p = 1 + (opts._p | 0)
 			return function() {
 				if (--opts._p || lastOpts != opts) return
+				lastOpts = Object.merge({}, opts)
 				if (view.el && view.parent == parent) {
-					view.ping(opts, !emit)
+					view.ping(lastOpts, !emit)
 				} else {
-					;(view.el ? lastView : View("404")).show(opts)
+					;(view.el ? lastView : View("404")).show(lastOpts)
 				}
 			}
 		},
