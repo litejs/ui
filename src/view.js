@@ -180,7 +180,7 @@
 			var t = this
 			, arr = t.name.split(/\s+/)
 			View(arr[0], dummy, arr[2])
-			.on("show", function() {
+			.on("ping", function() {
 				View.show(arr[1])
 			})
 			return t.parent
