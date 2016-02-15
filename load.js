@@ -271,11 +271,12 @@
 			res[i] = ""
 			if (!err) {
 				err = file.split("?")[0].split(".").pop()
-				if (err == "tpl" || err == "css") {
+				if (err == "js") {
+					res[i] = str
+				} else {
 					xhr[++seq] = str
-					str = "El." + err + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
+					res[i] = "El." + err + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				}
-				res[i] = str
 			}
 			if (!--pending) {
 				execScript( res.join("/**/;") )
