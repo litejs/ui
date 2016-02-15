@@ -12,7 +12,7 @@
 
 
 !function(exports) {
-	var fn, re, lastView, lastOpts
+	var fn, lastView, lastOpts, lastUrl
 	, fnStr = ""
 	, reStr = ""
 	, views = {}
@@ -36,18 +36,20 @@
 
 		if (route.charAt(0) != "#") {
 			var startLen = groupsCount++
-			, a = ["o._r='" + route + "'"]
+			, params = ","
 			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
-					a.push("o['" + key + "']=a[" + (groupsCount++) + "]") && "([^/]+?)" :
+					(params += "o['" + key + "']=u[" + (groupsCount++) + "],") && "([^/]+?)" :
 					escapeRegExp(_)
 			})
 
-			fnStr += (fnStr ? "||" : "") + "(o._u=a[" + startLen + "])&&(" + a + ")"
+			fnStr += "u[" + startLen + "]?(" + params.slice(1) + "'" + route + "'):"
 			reStr += (reStr ? "|" : "") + "(" + _re + ")"
 
-			fn = new Function("o,a", "return a&&(" + fnStr + "),o")
-			re = new RegExp("^\\/?(?:" + reStr + ")[\\/\\s]*$")
+			fn = new Function(
+				"u,o,r",
+				"return (u=/^\\/?(?:" + reStr + ")[\\/\\s]*$/.exec(u))?(" + fnStr + "r):r"
+			)
 		}
 	}
 
@@ -144,12 +146,12 @@
 
 	View.home = "home"
 
-	View.show = function(route) {
-		var match = fn({_r:"404"}, re.exec(route || View.home))
-		, view = View(match._r)
-		if (!view.open || view._u != match._u) {
-			view._u = match._u
-			view.show(El.data.route = match)
+	View.show = function(url) {
+		var params = {}
+		, view = View(fn(url || View.home, params, "404"))
+		if (!view.open || lastUrl != url) {
+			params._u = lastUrl = url
+			view.show(El.data.route = params)
 		}
 	}
 
