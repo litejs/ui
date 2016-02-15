@@ -278,7 +278,7 @@
 				res[i] = str
 			}
 			if (!--pending) {
-				execScript( ";" + res.join("/**/;") )
+				execScript( res.join("/**/;") )
 				if (next) next()
 				res = null
 			}
