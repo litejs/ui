@@ -30,65 +30,32 @@
 	//** error
 	, lastError
 	, unsentErrors = []
-	, oldOnError = window.onerror
 
-	// An error has occurred.
-	// Please click 'OK' to reload.
-	//
-	// Reload the current page, without using the cache
-	// window.location.reload(true)
-
-	window.onerror = function(message, file, line, _col, _error) {
-		var args = arguments
-		, error = _error || new Error(message)
-		, stack = error.stack || error.backtrace || error.stacktrace || ""
-
-		if (oldOnError) oldOnError.apply(this, args)
-
+	window.onerror = function(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
-		if (lastError === (lastError =
+		if (lastError !== (lastError =
 			[ file
 			, line
-			, _col || (window.event || args).errorCharacter || "?"
+			, col || (window.event || {}).errorCharacter || "?"
 			, message
 			].join(":")
-		)) return
-
-
-		//** IE-stack
-		// Disabled by default
-		/*/
-		// In IE <9, window.onerror is called with the function call stack intact.
-		// This means we can use arguments.callee.caller recursively
-		// to build up a fake stacktrace.
-		// It only gives us function names, but it's better than nothing.
-
-		if (!stack) {
-			for (args = args.callee; args = args && args.caller; ) {
-				//stack += args.toString().split(/[ {]+/)[1] + "\n"
-				// TODO:2014-09-26:lauri:test with IE
-				stack += ("" + args).split(/ |{/)[1] + "\n"
-			}
-		}
-		//*/
-
-		unsentErrors.push(
+		) && 1 == unsentErrors.push(
 			[ lastError
-			, stack
+			, error && (error.stack || error.backtrace || error.stacktrace) || "-"
 			, +new Date()
 			, window.location
 			].join("\n")
-		)
+		)) setTimeout(sendErrors, 307)
 	}
 
-	setInterval(function() {
-		if (unsentErrors.length && xhr.logErrors) {
+	function sendErrors() {
+		if (xhr.logErrors) {
 			xhr.logErrors(unsentErrors)
 			unsentErrors.length = 0
-			// var img = new Image();
-			// img.src = url + "?" + serialize(params) + "&ct=img&cb=" + new Date().getTime();
+		} else {
+			setTimeout(sendErrors, 1307)
 		}
-	}, 307)
+	}
 	//*/
 
 	function nop() {}
