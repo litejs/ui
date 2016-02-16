@@ -195,9 +195,11 @@ El.bindings.fixReadonlyCheckbox.once = 1
 	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.tpl"], init)
 
 
+	/*
 	xhr.load(["js/test-load1.js", "js/test-load1.js", "js/test-load1.js"], console.log.bind(console, "load done 1"))
 	xhr.load(["js/test-load1.js", "js/test-load2.js", "js/test-load1.js"], console.log.bind(console, "load done 2"))
 	xhr.load(["js/test-load1.js"], console.log.bind(console, "load done 3"))
+	*/
 
 	// Read in templates from element with id=index
 	//El.include("index")

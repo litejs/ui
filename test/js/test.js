@@ -40,7 +40,7 @@ function test() {
 	}
 	describe.it.haveText = function(actual, expected, options) {
 		this.waitSelector(actual, options)
-		this.ok(function() {
+		this.waitTill(function() {
 			var node = document.body.find(actual)
 			, txt = node && node.txt()
 			return txt === expected
@@ -68,15 +68,19 @@ function test() {
 			}
 
 			if (node) {
-				if (node.fireEvent) {
-					node.fireEvent("onclick")
-				} else {
+				if (node.dispatchEvent) {
 					ev = document.createEvent("MouseEvents")
 					ev.initMouseEvent("click", true, true, document.defaultView, attr.button,
 						attr.pointerX, attr.pointerY, attr.pointerX, attr.pointerY,
 						attr.ctrlKey, attr.altKey, attr.shiftKey, attr.metaKey,
 						attr.button, node)
 					node.dispatchEvent(ev)
+				} else if (node.click) {
+					node.click()
+				} else if (node.fireEvent) {
+					node.fireEvent("onclick")
+				} else if (typeof node.onclick == "function") {
+					node.onclick()
 				}
 			}
 			return !!node
