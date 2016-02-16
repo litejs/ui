@@ -130,12 +130,12 @@ El.bindings.fixReadonlyCheckbox.once = 1
 
 	Mediator.on("login", function(e, data) {
 		user = data
-		View.show(history.getUrl())
+		View.show(true)
 	})
 
 	Mediator.on("logout", function() {
 		user = null
-		View.show(history.getUrl())
+		View.show(true)
 	})
 
 	Mediator.logForm = function(e) {

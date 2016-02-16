@@ -147,6 +147,10 @@
 	View.home = "home"
 
 	View.show = function(url) {
+		if (url === true) {
+			url = lastUrl
+			lastUrl = 0
+		}
 		var params = {}
 		, view = View(fn(url || View.home, params, "404"))
 		if (!view.open || lastUrl != url) {
