@@ -6,6 +6,10 @@ function test() {
 		, count = 30
 		, resume = this.wait()
 
+		if (options.timeout) {
+			count = 0 | (options.timeout / 50)
+		}
+
 		this.ok(function() {
 			return !!result
 		}, options || "Expected: function returns something")
@@ -110,6 +114,9 @@ function test() {
 	waitSelector("a[href$='#users'].selected").
 	viewOpen("users").
 	countSelectors("ul.users>li", 8).
+
+	click("ul.users a[href]").
+	viewOpen("users/{id}", {timeout: 3000}).
 
 	click("a[href$='#home']").
 	waitSelector("a[href$='#home'].selected").
