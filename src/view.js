@@ -15,7 +15,7 @@
 	var fn, lastView, lastOpts, lastUrl
 	, fnStr = ""
 	, reStr = ""
-	, views = {}
+	, views = View.views = {}
 	, groupsCount = 1
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
