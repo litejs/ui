@@ -136,7 +136,7 @@
 
 			if (lastOpts == opts && !opts._p && view.route == opts._r) {
 				view.emit("show", opts)
-				View.emit("show", opts)
+				View.emit("show", view.route, opts)
 			}
 		}
 	}
