@@ -64,7 +64,7 @@
 			var child
 			, view = lastView = this
 			opts = opts || {}
-			opts._r = view.route
+			View.active = view.route
 			if (view.open) {
 				view.close(opts)
 			}
@@ -134,7 +134,7 @@
 				}
 			}
 
-			if (lastOpts == opts && !opts._p && view.route == opts._r) {
+			if (lastOpts == opts && lastView == view && !opts._p) {
 				view.emit("show", opts)
 				View.emit("show", view.route, opts)
 			}
