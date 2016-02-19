@@ -12,7 +12,7 @@
 
 
 !function(exports) {
-	var fn, lastView, lastOpts, lastUrl
+	var fn, lastView, lastParams, lastUrl
 	, fnStr = ""
 	, reStr = ""
 	, views = View.views = {}
@@ -60,48 +60,48 @@
 			view.parent = typeof parent == "string" ? View(parent) : parent
 			view.selector = selector
 		},
-		show: function(opts) {
+		show: function(params) {
 			var child
 			, view = lastView = this
-			opts = opts || {}
+			params = params || {}
 			View.active = view.route
 			if (view.open) {
-				view.close(opts)
+				view.close(params)
 			}
 			for (; view; child = view, view = view.parent) {
 				if (view.child && view.child != child) {
-					view.child.close(opts)
+					view.child.close(params)
 				}
 				view.child = child
 			}
 			// child is now the root view
-			child.ping(lastOpts = opts)
+			child.ping(lastParams = params)
 		},
-		close: function(opts, nextEl) {
+		close: function(params, nextEl) {
 			var view = this
 
 			if (view.open) {
-				view.emit("close", opts, nextEl)
-				if (view.child) view.child.close(opts)
+				view.emit("close", params, nextEl)
+				if (view.child) view.child.close(params)
 				view.open.kill()
 				view.open = view.parent.child = null
 			}
 		},
-		wait: function(opts, emit) {
+		wait: function(params, emit) {
 			var view = this
 			, parent = view.parent
-			opts._p = 1 + (opts._p | 0)
+			params._p = 1 + (params._p | 0)
 			return function() {
-				if (--opts._p || lastOpts != opts) return
-				lastOpts = Object.merge({}, opts)
+				if (--params._p || lastParams != params) return
+				lastParams = Object.merge({}, params)
 				if (view.el && view.parent == parent) {
-					view.ping(lastOpts, !emit)
+					view.ping(lastParams, !emit)
 				} else {
-					;(view.el ? lastView : View("404")).show(lastOpts)
+					;(view.el ? lastView : View("404")).show(lastParams)
 				}
 			}
 		},
-		ping: function(opts, silent) {
+		ping: function(params, silent) {
 			var view = this
 			, parent = view.parent
 			, child = view.child
@@ -111,32 +111,32 @@
 					view.file
 					.replace(/^|,/g, "$&" + (View.base || ""))
 					.split(","),
-					view.wait(opts, 1)
+					view.wait(params, 1)
 				)
 			}
 
-			if (!silent) view.emit("ping", opts)
+			if (!silent) view.emit("ping", params)
 
-			if (lastOpts == opts && !opts._p) {
+			if (lastParams == params && !params._p) {
 				var type = typeof view.el
 				if (type == "function") view.el = view.el()
 				else if (type == "string") view.el = El.tpl(view.el)
 				if (parent && !view.open) {
 					view.open = view.el.cloneNode(true)
-					parent.emit("beforeChild", opts)
+					parent.emit("beforeChild", params)
 					view.open.to(
 						parent.selector && parent.open && parent.open.find(parent.selector) || parent.open || parent.el
 					)
 					view.open.render()
 				}
 				if (child) {
-					child.ping(opts)
+					child.ping(params)
 				}
 			}
 
-			if (lastOpts == opts && lastView == view && !opts._p) {
-				view.emit("show", opts)
-				View.emit("show", view.route, opts)
+			if (lastParams == params && lastView == view && !params._p) {
+				view.emit("show", params)
+				View.emit("show", view.route, params)
 			}
 		}
 	}
