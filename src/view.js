@@ -63,7 +63,7 @@
 		show: function(opts) {
 			var child
 			, view = lastView = this
-			El.data.viewOpts = opts = opts || {}
+			opts = opts || {}
 			opts._r = view.route
 			if (view.open) {
 				view.close(opts)
