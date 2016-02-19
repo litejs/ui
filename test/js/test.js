@@ -100,7 +100,7 @@ function test() {
 		, styleSheets = document.styleSheets
 		, styleSheetsCount = styleSheets.length
 		, ignoreFiles = options.ignoreFiles
-		, cleanSelectorRe = /:(?:focus|active|empty|hover|:after|:selection)\b/g
+		, cleanSelectorRe = /:(?:focus|active|empty|hover|:after|:before|:selection)\b/g
 
 		while (styleSheet = styleSheets[--styleSheetsCount]) {
 			parseStyleSheet(styleSheet)
