@@ -1,6 +1,8 @@
 
 
 function test() {
+	var GLOBAL = {}
+
 	describe.it.waitTill = function(actual, options) {
 		var result
 		, count = 30
@@ -92,6 +94,16 @@ function test() {
 		return this
 	}
 
+	describe.it.collectViewsUsage = function() {
+		var viewsUsage = GLOBAL.viewsUsage = {}
+
+		View.on("show", function(route) {
+			viewsUsage[route] = viewsUsage[route] || 0
+			viewsUsage[route]++
+		})
+		return this
+	}
+
 	function isVisible(node) {
 		var style = window.getComputedStyle ? window.getComputedStyle(node, null) : node.currentStyle
 	}
@@ -103,6 +115,7 @@ function test() {
 
 	describe("Example UI").
 	it ("should navigate").
+	collectViewsUsage().
 	run(function() {
 		location.hash = ""
 	}).
@@ -121,6 +134,39 @@ function test() {
 	click("a[href$='#home']").
 	waitSelector("a[href$='#home'].selected").
 	viewOpen("home").
+
+	click("a[href$='#settings']").
+	waitSelector("a[href$='#settings'].selected").
+	//viewOpen("settings").
+
+	click("a[href$='#test']").
+	waitSelector("a[href$='#test'].selected").
+	viewOpen("test").
+
+	click("a[href$='#broken-link']").
+	viewOpen("404").
+
+	click("a[href$='#test']").
+	click("a[href$='#test-grid']").
+	viewOpen("test-grid").
+
+	click("a[href$='#test']").
+	click("a[href$='#test-form1']").
+	viewOpen("test-form1").
+
+	test("it should use all views", function(assert) {
+		var route
+		, routes = Object.keys(View.views)
+		, len = routes.length
+		, viewsUsage = GLOBAL.viewsUsage
+
+		assert.plan(len)
+		assert.options.noStack = true
+
+		while (route = routes[--len]) {
+			assert.ok(viewsUsage[route], "Unused view " + route)
+		}
+	}).
 
 	it ("should change language").
 	click("a.lang-en").
