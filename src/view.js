@@ -115,7 +115,10 @@
 				)
 			}
 
-			if (!silent) view.emit("ping", params)
+			if (!silent) {
+				view.emit("ping", params)
+				View.emit("ping", view.route, params)
+			}
 
 			if (lastParams == params && !params._p) {
 				var type = typeof view.el
