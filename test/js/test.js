@@ -93,6 +93,54 @@ function test() {
 		}, options || actual + " should be clickable")
 		return this
 	}
+	describe.it.collectCssUsage = function(options) {
+		options = options || {}
+		var styleSheet
+		, selectors = GLOBAL.selectorsUsage = {}
+		, styleSheets = document.styleSheets
+		, styleSheetsCount = styleSheets.length
+		, ignoreFiles = options.ignoreFiles
+		, cleanSelectorRe = /:(?:focus|active|empty|hover|:after|:selection)\b/g
+
+		while (styleSheet = styleSheets[--styleSheetsCount]) {
+			parseStyleSheet(styleSheet)
+		}
+
+		function parseStyleSheet(styleSheet) {
+			var rule
+			, rules = styleSheet.rules || styleSheet.cssRules
+			, rulesCount = rules.length
+			, fileName = (styleSheet.href||"").split("/").pop()
+
+			if (ignoreFiles && ignoreFiles.indexOf(fileName) > -1) return
+
+			while (rule = rules[--rulesCount]) {
+				if (rule.styleSheet) {
+					parseStyleSheet(rule.styleSheet)
+				} else if (rule.selectorText) {
+					rule.selectorText.split(/\s*,\s*/).each(function(sel) {
+						sel = sel.replace(cleanSelectorRe, "")
+						selectors[sel] = selectors[sel] || {files: [], count: 0}
+						if (selectors[sel].files.indexOf(fileName + ":" + rulesCount) == -1) {
+							selectors[sel].files.unshift(fileName + ":" + rulesCount)
+						}
+					})
+				} else {
+					//console.log("bad rule", rule)
+				}
+			}
+		}
+		View.on("show", function() {
+			var sel
+			, arr = Object.keys(selectors)
+			, len = arr.length
+
+			while (sel = arr[--len]) {
+				selectors[sel].count += document.documentElement.findAll(sel).length
+			}
+		})
+		return this
+	}
 
 	describe.it.collectViewsUsage = function() {
 		var viewsUsage = GLOBAL.viewsUsage = {}
@@ -116,6 +164,7 @@ function test() {
 	describe("Example UI").
 	it ("should navigate").
 	collectViewsUsage().
+	collectCssUsage({ignoreFiles: ["base.css", "grid.css"]}).
 	run(function() {
 		location.hash = ""
 	}).
@@ -153,6 +202,22 @@ function test() {
 	click("a[href$='#test']").
 	click("a[href$='#test-form1']").
 	viewOpen("test-form1").
+
+	test("it should use all css rules", function(assert) {
+		var sel
+		, selectors = GLOBAL.selectorsUsage
+		, arr = Object.keys(selectors)
+		, len = arr.length
+
+		assert.plan(len)
+		assert.options.noStack = true
+
+		while (sel = arr[--len]) {
+			assert.ok(selectors[sel].count, "Unused rule in " + selectors[sel].files + ": " + sel)
+		}
+		return true
+
+	}).
 
 	test("it should use all views", function(assert) {
 		var route
