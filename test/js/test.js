@@ -247,7 +247,7 @@ function test() {
 		assert.options.noStack = true
 
 		while (sel = arr[--len]) {
-			assert.ok(selectors[sel].count, "Unused rule in " + selectors[sel].files + ": " + sel)
+			assert.ok(selectors[sel].count, "Unused rule '" + sel + "' in " + selectors[sel].files)
 		}
 		return true
 
