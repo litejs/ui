@@ -146,8 +146,12 @@ function test() {
 		var viewsUsage = GLOBAL.viewsUsage = {}
 
 		View.on("show", function(route) {
-			viewsUsage[route] = viewsUsage[route] || 0
-			viewsUsage[route]++
+			var view = View.views[route]
+
+			do {
+				viewsUsage[route] = viewsUsage[route] || 0
+				viewsUsage[route]++
+			} while (route = (view = view.parent || {}).route)
 		})
 		return this
 	}
@@ -219,20 +223,6 @@ function test() {
 
 	}).
 
-	test("it should use all views", function(assert) {
-		var route
-		, routes = Object.keys(View.views)
-		, len = routes.length
-		, viewsUsage = GLOBAL.viewsUsage
-
-		assert.plan(len)
-		assert.options.noStack = true
-
-		while (route = routes[--len]) {
-			assert.ok(viewsUsage[route], "Unused view " + route)
-		}
-	}).
-
 	it ("should change language").
 	click("a.lang-en").
 	waitSelector("a.lang-en.selected").
@@ -248,6 +238,21 @@ function test() {
 	fill("input[name=name]", "Kala").
 	click("input[type=submit]").
 	click(".top__logout").
+
+	test("it should use all views", function(assert) {
+		var route
+		, routes = Object.keys(View.views)
+		, len = routes.length
+		, viewsUsage = GLOBAL.viewsUsage
+
+		assert.plan(len)
+		assert.options.noStack = true
+
+		while (route = routes[--len]) {
+			assert.ok(viewsUsage[route], "Unused view " + route)
+		}
+	}).
+
 	done()
 }
 
