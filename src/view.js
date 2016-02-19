@@ -66,23 +66,23 @@
 			params = params || {}
 			View.active = view.route
 			if (view.open) {
-				view.close(params)
+				view.close()
 			}
 			for (; view; child = view, view = view.parent) {
 				if (view.child && view.child != child) {
-					view.child.close(params)
+					view.child.close()
 				}
 				view.child = child
 			}
 			// child is now the root view
 			child.ping(lastParams = params)
 		},
-		close: function(params, nextEl) {
+		close: function() {
 			var view = this
 
 			if (view.open) {
-				view.emit("close", params, nextEl)
-				if (view.child) view.child.close(params)
+				view.emit("close")
+				if (view.child) view.child.close()
 				view.open.kill()
 				view.open = view.parent.child = null
 			}
