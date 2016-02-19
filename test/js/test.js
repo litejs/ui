@@ -110,7 +110,7 @@ function test() {
 			var rule
 			, rules = styleSheet.rules || styleSheet.cssRules
 			, rulesCount = rules.length
-			, fileName = (styleSheet.href||"").split("/").pop()
+			, fileName = relative(location.href.replace(/\/[^\/]*$/, ""), styleSheet.href||"")
 
 			if (ignoreFiles && ignoreFiles.indexOf(fileName) > -1) return
 
@@ -160,6 +160,36 @@ function test() {
 		var style = window.getComputedStyle ? window.getComputedStyle(node, null) : node.currentStyle
 	}
 
+	function clear(path) {
+		if (typeof path != "string") {
+			throw new TypeError("Path must be a string. Received " + typeof path)
+		}
+		return path.replace(/\/+$/, "")
+	}
+	var normalizeRe = /^\.\/|(?:^\/\.\.|\/)(\/)|\/(?:[^\/]*\/\.)?\.(\/|$)/
+
+	function normalize(path) {
+		for (; path != (path = path.replace(normalizeRe, "$1$2")); );
+		return path
+	}
+
+	function relative(from, to) {
+		from = normalize(clear(from))
+		to = normalize(clear(to))
+
+		if (from === to) return ""
+
+		from = from.split("/")
+		to = to.split("/")
+
+		for (var i = common = from.length; i--; ) {
+			if (from[i] !== to[i]) common = i
+			from[i] = ".."
+		}
+
+		return from.slice(common).concat(to.slice(common)).join("/")
+	}
+
 	describe.it.isVisible = function(actual, expected, options) {
 		var node = actual
 		, visible = node.offsetHeight != 0
@@ -168,7 +198,7 @@ function test() {
 	describe("Example UI").
 	it ("should navigate").
 	collectViewsUsage().
-	collectCssUsage({ignoreFiles: ["base.css", "grid.css"]}).
+	collectCssUsage({ignoreFiles: ["css/base.css", "css/modules/grid.css"]}).
 	run(function() {
 		location.hash = ""
 	}).
