@@ -154,6 +154,7 @@ El.bindings.fixReadonlyCheckbox.once = 1
 	View.def("main.tpl,settings.tpl,settings.css settings")
 	View.def("main.tpl,test-form1.tpl test-form1")
 	View.def("main.tpl,test-grid.tpl test-grid")
+	View.def("main.tpl,testman.tpl testman")
 
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.
@@ -194,6 +195,8 @@ El.bindings.fixReadonlyCheckbox.once = 1
 
 	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.tpl"], init)
 
+	/*
+
 
 	xhr.load(["js/test-load1.js", "js/test-load1.js", "//www.litejs.com/pub/crypto.js", "js/test-load1.js"], loadDone)
 	xhr.load(["js/test-load1.js", "js/test-load2.js", "js/test-load1.js"], loadDone)
@@ -204,6 +207,7 @@ El.bindings.fixReadonlyCheckbox.once = 1
 			return crypto.sha1 && crypto.sha1("blob " + str.length + "\0" + str)
 		}))
 	}
+	*/
 
 	// Read in templates from element with id=index
 	//El.include("index")

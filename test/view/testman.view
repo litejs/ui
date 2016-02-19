@@ -1,0 +1,13 @@
+
+
+@view testman #public
+	h2 Testman
+	div * Refresh to test again
+		&class: "hidden", !describe.result
+	div
+		&class: "hidden", !!describe.result
+		.btn Run
+			&on: "click", Fn("test()")
+	pre
+		&txt: describe.result || ""
+

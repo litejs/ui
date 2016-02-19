@@ -103,6 +103,7 @@
 @view test #public
 	h2 Test
 	ul
+		li>a[href="#testman"] Testman
 		li>a[href="#broken-link"] Test broken link
 		li>a[href="#test-form1"] Test form
 		li>a[href="#test-grid"] Test grid
