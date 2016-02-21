@@ -131,6 +131,8 @@
 						parent.selector && parent.open && parent.open.find(parent.selector) || parent.open || parent.el
 					)
 					view.open.render()
+					view.emit("open", params)
+					View.emit("open", view.route, params)
 				}
 				if (child) {
 					child.ping(params)
