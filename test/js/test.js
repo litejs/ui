@@ -74,6 +74,26 @@ function test() {
 	assertViewsUsage().
 	assertCssUsage().
 
+	test("it shold have a good coverage", function(assert) {
+		assert.plan(4)
+		assert.options.noStack = true
+
+		//delete __coverage__.l
+		var sum = coverageUtils.summarizeCoverage(__coverage__)
+
+		function add(key) {
+			var map = sum[key]
+			, misses = map.total-map.covered
+			assert.ok(
+				map.pct == 100,
+				key + " coverage is " +map.pct+ "% ["+map.covered+"/"+map.total+"]")
+		}
+		add("statements")
+		add("branches")
+		add("functions")
+		add("lines")
+	}).
+
 	done(function() {
 		document.body.render()
 	})

@@ -11,3 +11,29 @@
 	pre
 		&txt: describe.result || ""
 
+@js
+	El.data.coverageUtils = coverageUtils
+	El.data.__coverage__ = __coverage__
+
+@css
+	.error {color:red;background:#fdd;}
+	.zebra {background-image:-webkit-repeating-linear-gradient(top, #444 0px, #444 22px, #2f2f2f 22px, #2f2f2f 44px);background-image:repeating-linear-gradient(top, #444 0px, #444 22px, #2f2f2f 22px, #2f2f2f 44px);}
+
+@view testman/{key} #public
+	h2 Testman coverage
+		&init: coverageUtils.addDerivedInfo(__coverage__)
+	div
+		&each: file in __coverage__
+		div
+			h3 {file.path}
+			pre.nowrap
+				&each: line in file.code
+				.row
+					&init: data.count = file.l[loopKey]
+					&init: data.count !== void 0 && (data.count+="")
+					&class: "error", count==="0"
+					.right
+						&txt: count
+					.code
+						&txt: line
+

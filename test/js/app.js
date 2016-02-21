@@ -154,7 +154,7 @@ El.bindings.fixReadonlyCheckbox.once = 1
 	View.def("main.tpl,settings.tpl,settings.css settings")
 	View.def("main.tpl,test-form1.tpl test-form1")
 	View.def("main.tpl,test-grid.tpl test-grid")
-	View.def("main.tpl,testman.tpl testman")
+	View.def("main.tpl,testman.tpl testman,testman/{key}")
 
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.
