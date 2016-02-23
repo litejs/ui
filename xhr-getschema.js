@@ -17,6 +17,8 @@
 	 * JSON Activity Streams
 	 * http://activitystrea.ms/specs/json/schema/activity-schema.html
 	 * https://tools.ietf.org/html/draft-snell-activitystreams-09
+	 *
+	 * official mime type is "application/schema+json"
 	 */
 
 	function getSchema(ref, callback, bundle) {
@@ -24,14 +26,19 @@
 		, file = parts[0]
 		, path = decodeURIComponent((parts[1] || "").replace(/\+/g, " "))
 
-		if (cache[file]) return callback && callback(null, JSON.pointer(cache[file], path))
-		if (pending) return pending.push(arguments)
+		if (cache[file]) {
+			return callback && callback(null, JSON.pointer(cache[file], path))
+		}
+		if (pending) {
+			return pending.push(arguments)
+		}
 
 		if (bundle) pending = []
 
-		xhr("GET", file, function(err, text, i) {
+		xhr("GET", file, function(err, text) {
 			if (err) return callback(err)
-			var schema = cache[file] = JSON.parse(text)
+			var i
+			, schema = cache[file] = JSON.parse(text)
 			, refs = []
 			findSubschemas(schema, refs)
 			if (refs[0]) resolveRefs(refs, callback, schema)
