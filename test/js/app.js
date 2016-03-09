@@ -125,6 +125,10 @@ El.bindings.fixReadonlyCheckbox = function() {
 }
 El.bindings.fixReadonlyCheckbox.once = 1
 
+El.bindings.init = function() {}
+El.bindings.init.once = 1
+El.bindings.run = function() {}
+
 !function(View, Mediator) {
 	var user
 
@@ -154,7 +158,7 @@ El.bindings.fixReadonlyCheckbox.once = 1
 	View.def("main.tpl,settings.tpl,settings.css settings")
 	View.def("main.tpl,test-form1.tpl test-form1")
 	View.def("main.tpl,test-grid.tpl test-grid")
-	View.def("main.tpl,testman.tpl testman,testman/{key}")
+	View.def("main.tpl,testman.tpl testman,testman/lcov,testman/lcov/{file}")
 
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.

@@ -2,38 +2,83 @@
 
 @view testman #public
 	h2 Testman
-	div * Refresh to test again
+	div
 		&class: "hidden", !describe.result
+		div * Refresh to test again
+		a.btn[href="#testman/lcov"] See code coverage
 	div
 		&class: "hidden", !!describe.result
 		.btn Run
 			&on: "click", Fn("test()")
-	pre
+	pre.code
 		&txt: describe.result || ""
 
 @js
+	El.data.JSON = JSON
 	El.data.coverageUtils = coverageUtils
 	El.data.__coverage__ = __coverage__
+	El.data.encodeURIComponent = encodeURIComponent
+	El.data.decodeURIComponent = decodeURIComponent
 
 @css
 	.error {color:red;background:#fdd;}
 	.zebra {background-image:-webkit-repeating-linear-gradient(top, #444 0px, #444 22px, #2f2f2f 22px, #2f2f2f 44px);background-image:repeating-linear-gradient(top, #444 0px, #444 22px, #2f2f2f 22px, #2f2f2f 44px);}
 
-@view testman/{key} #public
-	h2 Testman coverage
+@css
+	.code {
+		font-family: monospace, monospace;
+		font-size: 13px;
+		line-height: 15px;
+	}
+
+@view testman/lcov #public
+	h2 Code coverage report
 		&init: coverageUtils.addDerivedInfo(__coverage__)
+	table.code
+		thead
+			tr
+				th File
+				th Statements
+				th Branches
+				th Functions
+				th Lines
+		tbody
+			&each: file in __coverage__
+			tr
+				&nop: data.sum = coverageUtils.summarizeFileCoverage(file)
+				td
+					a
+						&txt: file.path.slice(31)
+						&href: "#testman/lcov/" + encodeURIComponent(file.path)
+				td &txt: "{pct}% ({covered}/{total})".format(sum.statements)
+				td &txt: "{pct}% ({covered}/{total})".format(sum.branches)
+				td &txt: "{pct}% ({covered}/{total})".format(sum.functions)
+				td &txt: "{pct}% ({covered}/{total})".format(sum.lines)
+		tfoot
+			tr
+				&nop: data.sum = coverageUtils.summarizeCoverage(__coverage__)
+				th Total
+				th &txt: "{pct}% ({covered}/{total})".format(sum.statements)
+				th &txt: "{pct}% ({covered}/{total})".format(sum.branches)
+				th &txt: "{pct}% ({covered}/{total})".format(sum.functions)
+				th &txt: "{pct}% ({covered}/{total})".format(sum.lines)
+
+@view testman/lcov/{file} #public
+	h2 Testman coverage
+		&nop: coverageUtils.addDerivedInfo(__coverage__)
 	div
-		&each: file in __coverage__
-		div
-			h3 {file.path}
-			pre.nowrap
+		&nop: data.file = __coverage__[decodeURIComponent(route.file)]
+		&nop: data.source = ""
+		h3 {file.path}
+		.rel.code
+			.t-right
 				&each: line in file.code
-				.row
-					&init: data.count = file.l[loopKey]
-					&init: data.count !== void 0 && (data.count+="")
+				div
+					&nop: data.count = file.l[loopKey]
+					&nop: data.count !== void 0 && (data.count+="")
 					&class: "error", count==="0"
-					.right
-						&txt: count
-					.code
-						&txt: line
+					&txt: count || "-"
+					&nop: _super.source += line + "\n"
+			pre.abs
+				&txt: data.source
 
