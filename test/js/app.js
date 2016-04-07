@@ -5,6 +5,17 @@
 // the site will not display at all.
 if (this != top) throw top.location = this.location
 
+if (this.console && console.log) {
+	// Warning! This developer tool will grant others administrative access to your own account.
+	console.log(
+		"%cStop!\n%cThis developer tool lets you hack and give others access only to your own account.\nSee %s for more information.",
+		"font:bold 50px monospace;color:red;text-shadow:#000 3px 3px",
+		"font:20px sans-serif",
+		location.href.split("#")[0] + "#selfxss"
+	)
+	// also disable javascript: links
+}
+
 
 
 var Mediator = Object.create(Event.Emitter)
@@ -129,7 +140,7 @@ El.bindings.init = function() {}
 El.bindings.init.once = 1
 El.bindings.run = function() {}
 
-!function(View, Mediator) {
+!function(View, Mediator, navigator) {
 	var user
 
 	Mediator.on("login", function(e, data) {
@@ -195,7 +206,17 @@ El.bindings.run = function() {}
 		if (el && el.tagName == "A") el.blur()
 	})
 
-	var lang = [].concat(navigator.languages, navigator.language, navigator.userLanguage, "en").filter(_.get)[0]
+	var intlLang, intlZone, opts
+
+	try {
+		opts = Intl.DateTimeFormat().resolvedOptions()
+		intlLang = opts.locale
+		intlZone = opts.timezone
+	} catch(e) { }
+
+	var lang = [].concat(
+		navigator.languages, navigator.language, navigator.userLanguage, "en"
+	).filter(_.get)[0]
 
 	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.tpl"], init)
 
@@ -222,7 +243,7 @@ El.bindings.run = function() {}
 		history.start(View.show)
 	}
 
-}(View, Mediator)
+}(View, Mediator, navigator)
 
 
 

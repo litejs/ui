@@ -2,7 +2,7 @@
 <html><body>
 <script id="index" type="text/haml">
 
-@view #main #body .content
+@view main body .content
   .route
     h1 Main Header
     ul.nav
@@ -13,24 +13,25 @@
     .footer
       h6 Bye
 
-@view home #main
+@view home main
   .page
     h2 Subheader Home
     p Welcome
 
-@view settings #main
+@view settings main
   .page
     h2 Subheader Settings
     p You Can Set Things Up
 
-@view users #main
+@view users main
   .page
     h2 Users
-    ul &each: user in ["1", "2", "3", "4", "5"]
+    ul &each: userId in ["1", "2", "3", "4", "5"]
       li
-        a &href: "#users/{user}".format(data); txt: El.i18n("User {user}").format(data)
+        a User {userId}
+          &href: "#users/" + userId
 
-@view users/{id} #main
+@view users/{id} main
   .page
     h2 User #{route.id}
 
@@ -40,10 +41,10 @@
 <script>
 // Add `#body` view, it is a starting point for us.
 // It could be any element on page but we want to start from `BODY`.
-View("#body", document.body)
+View("body", document.body)
 
 // Read in templates from element with id=index
-El.include("index")
+El.tpl(index.innerHTML)
 
 // You must define at least one language
 El.i18n.def({
@@ -55,6 +56,6 @@ El.i18n.def({
 // Start a router to showing views
 history.start(View.show)
 </script>
-<noscript><h1>Warning!</h1>This application requires JavaScript to be enabled in your Browser.</noscript>
+<noscript><h1>Error</h1>This application requires JavaScript</noscript>
 </body></html>
 
