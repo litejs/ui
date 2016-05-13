@@ -24,6 +24,7 @@ body {
 
 .app__row {
 	text-align: left;      /* 2 */
+	padding: 0 8px;
 }
 
 .lg .app__row {

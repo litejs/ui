@@ -122,6 +122,26 @@ h6 {
 .c1 { color: #fff; }
 .c2 { color: #789; }
 
+.p0, .p00, .p01, .p02, .p03, .p04 { padding-top:    0; padding-bottom:    0; }
+.p1, .p10, .p11, .p12, .p13, .p14 { padding-top:  4px; padding-bottom:  4px; }
+.p2, .p20, .p21, .p22, .p23, .p24 { padding-top:  8px; padding-bottom:  8px; }
+.p3, .p30, .p31, .p32, .p33, .p34 { padding-top: 12px; padding-bottom: 12px; }
+.p4, .p40, .p41, .p42, .p43, .p44 { padding-top: 16px; padding-bottom: 16px; }
+
+.p0, .p00, .p10, .p20, .p30, .p40 { padding-left:    0; padding-right:    0; }
+.p1, .p01, .p11, .p21, .p31, .p41 { padding-left:  4px; padding-right:  4px; }
+.p2, .p02, .p12, .p22, .p32, .p42 { padding-left:  8px; padding-right:  8px; }
+.p3, .p03, .p13, .p23, .p33, .p43 { padding-left: 12px; padding-right: 12px; }
+.p4, .p04, .p14, .p24, .p34, .p44 { padding-left: 16px; padding-right: 16px; }
+
+.p0t { padding-top:    0; }
+.p4t { padding-top: 16px; }
+.p0r { padding-right:  0; }
+.p0b { padding-bottom: 0; }
+.p0l { padding-left:   0; }
+
+.m1b { margin-bottom: 4px; }
+
 
 
 
