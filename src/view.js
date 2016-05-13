@@ -164,28 +164,5 @@
 
 	exports.View = View
 
-	El.plugins.view = El.plugins.template.extend({
-		done: function() {
-			var t = this
-			, parent = t.parent
-			, arr = t.name.split(/\s+/)
-			View(arr[0], t._done(), arr[1], arr[2])
-			return parent
-		}
-	})
-
-	var dummy = El("div")
-
-	El.plugins["view-link"] = El.plugins.template.extend({
-		done: function() {
-			var t = this
-			, arr = t.name.split(/\s+/)
-			View(arr[0], dummy, arr[2])
-			.on("ping", function() {
-				View.show(arr[1])
-			})
-			return t.parent
-		}
-	})
 }(this)
 

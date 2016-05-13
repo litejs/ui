@@ -100,11 +100,17 @@
 @view users/{id} #public
 	h2 User #{route.id}
 
+@view ok #public
+	h1 Ok!
+
+@view-link test-view-link ok
+
 @view test #public
 	h2 Test
 	ul
 		li>a[href="#testman"] Testman
 		li>a[href="#broken-link"] Test broken link
+		li>a[href="#test-view-link"] Test View link
 		li>a[href="#test-form1"] Test form
 		li>a[href="#test-grid"] Test grid
 	@rel user home vnd.app.home

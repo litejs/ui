@@ -623,7 +623,27 @@
 			}
 		}),
 		js: js,
-		template: template
+		template: template,
+		view: template.extend({
+			done: function() {
+				var t = this
+				, parent = t.parent
+				, arr = t.name.split(/\s+/)
+				View(arr[0], t._done(), arr[1], arr[2])
+				return parent
+			}
+		}),
+		"view-link": template.extend({
+			done: function() {
+				var t = this
+				, arr = t.name.split(/\s+/)
+				View(arr[0], null, arr[2])
+				.on("ping", function() {
+					View.show(arr[1])
+				})
+				return t.parent
+			}
+		})
 	}
 
 	El.view = El.tpl = tpl
