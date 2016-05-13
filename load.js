@@ -1,16 +1,6 @@
 
 
 
-/*
- * @version    0.1.1
- * @date       2015-01-18
- * @stability  1 - Experimental
- * @author     Lauri Rooden <lauri@rooden.ee>
- * @license    MIT License
- */
-
-
-
 // Say you have an initial congestion window set to 2
 // and you can fit 1452 bytes of data in a segment.
 //

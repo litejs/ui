@@ -1,16 +1,6 @@
 
 
 
-/*
- * @version    0.4.0
- * @date       2015-01-16
- * @stability  2 - Unstable
- * @author     Lauri Rooden <lauri@rooden.ee>
- * @license    MIT License
- */
-
-
-
 !function(exports) {
 	var fn, lastView, lastParams, lastUrl
 	, fnStr = ""
