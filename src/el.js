@@ -585,7 +585,7 @@
 		}
 	}
 
-	function js(parent) {
+	function js(parent, params) {
 		var t = this
 		t.txtMode = t.parent = parent
 		t.txt = ""
