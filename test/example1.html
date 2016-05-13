@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html><body>
-<script id="index" type="text/haml">
+<link rel="stylesheet" href="app.css">
+<script id="index" type="text/tpl">
 
 @view main body .content
-  .route
-    h1 Main Header
-    ul.nav
-      li>a[href="#home"] Home
-      li>a[href="#users"] Users
-      li>a[href="#settings"] Settings
-    .content
-    .footer
-      h6 Bye
+  .app.max-height
+    .app__row.bg-1.top.t-1 Main Header
+    .app__row.bg-2
+      .menu
+        a.menu__item[href="#home"] Home
+        a.menu__item[href="#users"] Users
+        a.menu__item[href="#settings"] Settings
+    .app__row.content
+    .footer__spacer
+  .app__row.footer.bg-1
+    h6 Bye
 
 @view home main
   .page

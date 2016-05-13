@@ -21,7 +21,7 @@
 
 @template footer
 	.bg-1
-		.footer.app__row.grid.pad-3.c2
+		.footer.app__row.grid-3.c2
 			.footer__item.col-4
 				dt litejs.com
 				dd>a[href="#help"] How to use
@@ -33,7 +33,7 @@
 @template confirm
 	.modal.abs.max.fix
 		.abs.max.modal__background
-		.grid.pad-1.modal__content
+		.grid-1.modal__content
 			.col-12 {title}
 			.col-12 {body}
 			.col-6>.btn Cancel
