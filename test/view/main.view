@@ -76,17 +76,17 @@
 
 @view login #public
 	form[action="javascript:"][method=POST] &emitForm:"login"
-		fieldset.grid.pad-2.login
+		fieldset.grid-2.login
 			legend Login
 			label.col-12
 				.col-12.col-md-4.login__label Username
-				input.col-12.col-md-8[name=name]
+				.col-12.col-md-8>input[name=name]
 			label.col-12
 				.col-12.col-md-4.login__label Password
-				input.col-12.col-md-8[name=pass][type=password]
+				.col-12.col-md-8>input[name=pass][type=password]
 			.col-12
 				.col-12.col-md-4
-				input.btn.col-12.col-md-8[type=submit] Log In
+				.col-12.col-md-8>input.btn[type=submit] Log In
 
 
 @view users #public
