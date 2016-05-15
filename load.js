@@ -10,6 +10,9 @@
 // 4 round trips to get 43560 bytes, CW = 16
 
 
+// Scripts that are dynamically created and added to the document are async by default
+// HTML5 declared that browsers shouldn’t download scripts with an unrecognised type
+
 
 !function(window, scripts, next) {
 	var xhrs = []

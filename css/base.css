@@ -159,8 +159,6 @@ button,
 	        user-drag: element;
 }
 
-::-moz-focus-inner { border: 0; padding: 0; }
-
 /**
  * Do not remove focus retangle,
  * do it more visible when needed.

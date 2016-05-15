@@ -2,10 +2,17 @@
 <html><body>
 <link rel="stylesheet" href="app.css">
 <script id="index" type="text/tpl">
-
+/ An end-of-line comment starts with slash
+/
+/      +-- route, this view is accessible from #main url
+/      |
+/      |    +-- parent view route
+/      |    |
+/      |    |      +-- optional selector for child view
+/      |    |      |
 @view main body .content
   .app.max-height
-    .app__row.bg-1.top.t-1 Main Header
+    .app__row.bg-1.top.t-1 LiteJS Minimal Example
     .app__row.bg-2
       .menu
         a.menu__item[href="#home"] Home
@@ -40,7 +47,7 @@
 
 .index
 </script>
-<script src="../litejs.js"></script>
+<script src="../dist/litejs.js"></script>
 <script>
 // Add `#body` view, it is a starting point for us.
 // It could be any element on page but we want to start from `BODY`.
