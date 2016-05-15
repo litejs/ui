@@ -32,17 +32,39 @@ xhr.load = function(files, next) {
 }
 
 El.path = function(node) {
-	var str = ""
+	var parent
+	, str = ""
 
 	if (node && node.tagName) {
+		parent = node.parentNode
+
+
 		str = El.path(node.parentNode)
 		if (str) str += " > "
 		str += node.tagName.toLowerCase()
 		if (node.id) str += "#" + node.id
 		if (node.className) str += "." + node.className.replace(/\s+/g, ".")
+
+		if (node != parent.firstChild) {
+			var count = 0
+			for (var n, i = 0, nodes = parent.childNodes; (n = nodes[i++]) != node; ) {
+				if (n.tagName == node.tagName) count++
+			}
+			if (count) {
+				str += ":nth-of-type(" + (count + 1) + ")"
+			}
+		}
 	}
 	return str
 }
+
+/*
+document.body.on("click", function(e) {
+	var target = e.target || e.srcElement
+	, path = El.path(target)
+	console.log("click", target.find.call(document.documentElement, path) == target, path)
+})
+*/
 
 //View.prototype.show = View.prototype.show.trace("View.show")
 //View.prototype.ping = View.prototype.ping.trace("View.ping")

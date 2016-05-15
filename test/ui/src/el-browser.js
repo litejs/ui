@@ -4,7 +4,7 @@ global.Fn = require("functional-lite").Fn
 global.Event = require("browser-event-lite").Event
 
 require("../src/format.js")
-require("../src/el.js")
+require("../el.js")
 global.i18n = window.El.i18n
 
 El.get = function(id) {
