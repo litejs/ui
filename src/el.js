@@ -606,7 +606,7 @@
 			done: Fn("El.css(this.txt),this.parent")
 		}),
 		def: js.extend({
-			done: Fn("View.def(this.txt),this.parent")
+			done: Fn("View.def(this.params),this.parent")
 		}),
 		each: js.extend({
 			done: function() {

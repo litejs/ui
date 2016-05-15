@@ -165,12 +165,6 @@ El.bindings.run = function() {}
 
 	document.title = "Litejs Example"
 
-	View.def("main.tpl #public,#private,404,home,login,users,users/{id},test")
-	View.def("main.tpl,settings.tpl,settings.css settings")
-	View.def("main.tpl,test-form1.tpl test-form1")
-	View.def("main.tpl,test-grid.tpl test-grid")
-	View.def("main.tpl,testman.tpl testman,testman/lcov,testman/lcov/{file}")
-
 	// Add `#body` view, it is a starting point for us.
 	// It could be any element on page but we want to start from `BODY`.
 	View("#body", document.body)
@@ -218,7 +212,7 @@ El.bindings.run = function() {}
 		navigator.languages, navigator.language, navigator.userLanguage, "en"
 	).filter(_.get)[0]
 
-	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.tpl"], init)
+	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.view"], init)
 
 	/*
 
