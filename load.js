@@ -18,6 +18,7 @@
 	var xhrs = []
 	, loaded = {}
 	, seq = 0
+	, ie678 = !+"\v1"
 
 
 	//** error
@@ -53,8 +54,10 @@
 
 	function nop() {}
 
-	function lazy(obj, name, str) {
-		if (!obj[name]) obj[name] = new Function("a,b,c,d", str)
+	function lazy(obj, name, str, force) {
+		if (force || !obj[name]) {
+			obj[name] = new Function("a,b,c,d", str)
+		}
 	}
 	// function lazy(obj, name, str) {
 	// 	if (!obj[name]) obj[name] = function() {
@@ -63,13 +66,18 @@
 	// }
 
 	// XMLHttpRequest was unsupported in IE 5-6
+	// IE7-8 XMLHttpRequest PATCH is not supported, use ActiveXObject there.
+	// IE does not allow to add arbitrary properties to ActiveX objects.
+	// IE does not allow to assign or read the readystatechange after the send().
 	// MSXML version 3.0 was the last version of MSXML to support version-independent ProgIDs.
-	lazy(window, "XMLHttpRequest", "return new ActiveXObject('MSXML2.XMLHTTP')")
+	lazy(window, "XMLHttpRequest", "return new ActiveXObject('MSXML2.XMLHTTP')", ie678)
 
 
 	// eval in a global context for non-IE & non-Chrome (removed form v8 on 2011-05-23: Version 3.3.9)
 	// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
-	if (!window.execScript) Function("d,Date,w", "w.execScript=(1,eval)('(Date)')==d&&eval")(Date, 1, window)
+	if (!window.execScript) {
+		Function("d,Date,w", "w.execScript=(1,eval)('(Date)')==d&&eval")(Date, 1, window)
+	}
 
 	lazy(window, "execScript", "d=document;b=d.body;c=d.createElement('script');c.text=a;b.removeChild(b.insertBefore(c,b.firstChild))")
 
@@ -108,7 +116,6 @@
 
 
 		xhr.open(method, url, next !== true)
-		xhr._next = next
 
 
 		// With IE 8 XMLHttpRequest gains the timeout property.
@@ -150,7 +157,7 @@
 				//   - IE 10-11 returns status code 0 with CORS for codes 401, 403
 
 				method = xhr.status || 200 // Reuse variable for status
-				if (xhr._next) xhr._next.call(
+				if (next) next.call(
 					xhr,
 					(method < 200 || method > 299 && method != 304 && method != 1223) && method,
 					xhr.responseText,
@@ -158,7 +165,7 @@
 					attr1,
 					attr2
 				)
-				xhr.onreadystatechange = xhr._next = nop
+				xhr.onreadystatechange = next = nop
 				xhrs.push(xhr)
 			}
 		}
@@ -211,15 +218,17 @@
 
 		for (; i < len; i++) if ((file = files[i]) && file !== loaded[file]) {
 			if (loaded[file]) {
-				loaded[file]._next = function(old, i2) {
-					return function(err, str, file, i1) {
-						old(err, str, file, i1)
+				!function(old, i2) {
+					loaded[file] = function(err, str, file, i) {
+						old(err, str, file, i)
 						cb(1, str, file, i2)
 					}
-				}(loaded[file]._next, i)
+				}(loaded[file], i)
 			} else {
-				loaded[file] = xhr("GET", file, cb, pending)
-				loaded[file].send()
+				loaded[file] = cb
+				xhr("GET", file, function(err, str, file, i) {
+					loaded[file](err, str, file, i)
+				}, pending).send()
 			}
 			pending += 1
 		}
