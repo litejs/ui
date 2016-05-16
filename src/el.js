@@ -407,14 +407,25 @@
 		var el = this
 		, type = el.type
 		, opts = el.options
+		, checkbox = type == "checkbox" || type == "radio"
 
 		if (arguments.length) {
-			return el.value = val
+			if (opts) {
+				val = Array.isArray(val) ? val : [ val ]
+				for (type = 0; el = opts[type++]; ) {
+					el.selected = val.indexOf(el.value) > -1
+				}
+				return val
+			}
+			return checkbox ?
+			(el.checked = !!val) :
+			(el.value = val)
 		}
 
 		if (opts) {
 			if (type == "select-multiple") {
-				for (val = [], type = 0; el = opts[type++]; ) {
+				val = []
+				for (type = 0; el = opts[type++]; ) {
 					if (el.selected && !el.disabled) {
 						val.push(el.valObject || el.value)
 					}
@@ -426,7 +437,8 @@
 			el = val > -1 && opts[val] || el
 		}
 
-		return (type == "checkbox" || type == "radio") && !el.checked ? null :
+		return checkbox && !el.checked ?
+		(type == "radio" ? void 0 : null) :
 		el.valObject || el.value
 	}
 
