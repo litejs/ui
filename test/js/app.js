@@ -19,8 +19,9 @@ if (this.console && console.log) {
 
 
 var Mediator = Object.create(Event.Emitter)
-, _ = El.data._ = El.i18n
+, _ = El.i18n
 
+El.data.history = history
 El.data.Fn = Fn
 El.data.Mediator = Mediator
 El.data.Date = Date
@@ -54,7 +55,6 @@ _.setLang = function(lang) {
 	})
 }
 
-El.data.location = location
 
 
 El.bindings.list = function(list, extra) {
@@ -231,11 +231,22 @@ El.bindings.run = function() {}
 	// Read in templates from element with id=index
 	//El.include("index")
 
+	var base = document.documentElement.getElementsByTagName("base")[0]
+	base = base && base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
+
 	function init() {
 		_.setLang(lang)
 		// Start a router to showing views
-		history.start(View.show)
+		history.start(View.show, base)
 	}
+
+	if (base && history.pushState) document.body.on("click", function(e) {
+		var target = e.target
+		if (target.tagName == "A") {
+			history.setUrl(target.href.split("#")[1])
+			Event.stop(e)
+		}
+	})
 
 }(View, Mediator, navigator)
 

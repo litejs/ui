@@ -18,7 +18,7 @@
 		.menu.app__row
 			@template nav-row
 				a.menu__item
-					&class:"selected", (location.href.split("#")[1]||View.home).indexOf(this.href.split('#')[1]) == 0
+					&class:"selected", (history.getUrl()||View.home).indexOf(this.href.split("#")[1]) == 0
 			nav-row[href="#home"] Home
 			nav-row[href="#users"] Users
 			nav-row[href="#settings"] Settings
