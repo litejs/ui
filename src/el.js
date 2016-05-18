@@ -199,7 +199,10 @@
 	}
 
 	function hasClass(name) {
-		return this.className.split(/\s+/).indexOf(name) > -1
+		var el = this
+		return el.classList ?
+		el.classList.contains(name) :
+		(" " + el.className + " ").indexOf(name) > -1
 	}
 	proto.hasClass = hasClass
 
