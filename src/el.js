@@ -640,6 +640,7 @@
 				return this.parent
 			}
 		}),
+		el: template,
 		js: js,
 		template: template,
 		view: template.extend({
