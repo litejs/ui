@@ -190,7 +190,8 @@
 		return this
 	}
 
-	proto.to = function(parent, before) {
+	proto.to = to
+	function to(parent, before) {
 		append.call(parent, this, before)
 		return this
 	}
@@ -552,7 +553,7 @@
 				}
 			} else {
 				if (name) {
-					parent = El(name, 0, 1).to(parent)
+					parent = to.call(El(name, 0, 1), parent)
 					// TODO:2015-02-27:lauri:should we find a child to where put a content?
 					stack.unshift(q)
 				}
