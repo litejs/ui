@@ -18,9 +18,6 @@
 		"class": function(name, fn) {
 			toggleClass.call(this, name, arguments.length < 2 || fn)
 		},
-		css: function(key, val) {
-			this.style[key.camelCase()] = val || ""
-		},
 		data: function(key, val) {
 			this.attr("data-" + key, val)
 		},
@@ -313,6 +310,11 @@
 		} else if (current) {
 			el.removeAttribute(key)
 		}
+	}
+
+	proto.css = bindings.css = css
+	function css(key, val) {
+		this.style[key.camelCase()] = val || ""
 	}
 
 	function elScope(node, parent, _scope) {
