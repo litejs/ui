@@ -127,9 +127,10 @@
 	 */
 
 	function El(name, args, silence) {
-		var el
+		var el, pres
 		, pre = {}
 		name = name.replace(selectorRe, function(_, op, key, _sub, fn, val, quotation) {
+			pres = 1
 			val = quotation ? val.slice(1, -1) : val || key
 			pre[op =
 				op == "." ?
@@ -146,7 +147,11 @@
 
 		// NOTE: IE-s cloneNode consolidates the two text nodes together as one
 		// http://brooknovak.wordpress.com/2009/08/23/ies-clonenode-doesnt-actually-clone/
-		el = (elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true).attr(pre)
+		el = (elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true)
+
+		if (pres) {
+			attr.call(el, pre)
+		}
 
 		return silence || !args ? el :
 		(args.constructor == Object ? attr : append).call(el, args)
