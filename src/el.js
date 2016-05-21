@@ -504,6 +504,11 @@
 
 	addWrapProto("closest")
 
+	wrapProto.append = function(el) {
+		this.push(el)
+		return this
+	}
+
 	wrapProto.cloneNode = function(deep) {
 		return new ElWrap(this.map(function(el) {
 			return el.cloneNode(deep)
