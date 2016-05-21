@@ -422,7 +422,7 @@
 
 		if (arguments.length) {
 			if (opts) {
-				val = Array.isArray(val) ? val : [ val ]
+				val = (Array.isArray(val) ? val : [ val ]).map(String)
 				for (type = 0; el = opts[type++]; ) {
 					el.selected = val.indexOf(el.value) > -1
 				}
