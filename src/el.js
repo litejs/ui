@@ -273,10 +273,19 @@
 		return this
 	}
 
+	proto.one = function(ev, fn) {
+		var el = this
+		function remove() {
+			el.non(ev, fn).non(ev, remove)
+		}
+		return el.on(ev, fn).on(ev, remove)
+	}
+
 	proto.non = function(ev, fn) {
 		Event.remove(this, ev, fn)
 		return this
 	}
+
 	proto.emit = function() {
 		Event.Emitter.emit.apply(this, arguments)
 	}
