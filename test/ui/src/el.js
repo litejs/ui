@@ -5,7 +5,7 @@ dom.HTMLElement.prototype.matches = dom.HTMLElement.prototype.closest = null
 dom.document.documentElement = {}
 
 global.document = dom.document
-global.HTMLElement = dom.HTMLElement
+global.Element = dom.HTMLElement
 global.window = global
 global.navigator = {language: "en-US"}
 

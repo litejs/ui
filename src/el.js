@@ -11,7 +11,7 @@
 	, elCache = El.cache = {}
 	, scopeSeq = 0
 	, scopeData = El.data = { _: i18n }
-	, proto = (window.HTMLElement || window.Element || El)[protoStr]
+	, proto = (window.Element || El)[protoStr]
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w\:.#\[\]=])*)[ \t]*(.*?)$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*\:((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, bindings = El.bindings = {
