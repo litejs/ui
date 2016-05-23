@@ -203,30 +203,35 @@
 
 	function hasClass(name) {
 		var el = this
-		return el.classList ?
-		el.classList.contains(name) :
-		(" " + el.className + " ").indexOf(name) > -1
+		, current = el.getAttribute("class") || ""
+		return !!current && current.split(/\s+/).indexOf(name) > -1
 	}
 	proto.hasClass = hasClass
 
 	function addClass(name) {
 		var el = this
-		, current = el.className
+		, current = el.getAttribute("class") || ""
 
 		if (current) {
-			name = hasClass.call(el, name) ? current : current + " " + name
+			name = current.split(/\s+/).indexOf(name) > -1 ? current : current + " " + name
 		}
 
-		if (current != name) el.className = name
+		if (current != name) {
+			el.setAttribute("class", name)
+		}
 		return el
 	}
 	proto.addClass = addClass
 
 	function rmClass(name) {
 		var el = this
+		, current = el.getAttribute("class") || ""
 
-		if (hasClass.call(el, name)) {
-			el.className = (" " + el.className + " ").replace(" " + name + " ", " ").trim()
+		if (current) {
+			name = (" " + current + " ").replace(" " + name + " ", " ").trim()
+			if (current != name) {
+				el.setAttribute("class", name)
+			}
 		}
 
 		return el
@@ -234,7 +239,10 @@
 	proto.rmClass = rmClass
 
 	function toggleClass(name, force) {
-		if (arguments.length == 1) force = !hasClass.call(this, name)
+		if (arguments.length === 1) {
+			force = !hasClass.call(this, name)
+		}
+		console.log("len", arguments.length, force, !hasClass.call(this, name))
 		return ( force ? addClass : rmClass ).call(this, name), force
 	}
 	proto.toggleClass = toggleClass
