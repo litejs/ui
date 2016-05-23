@@ -1,0 +1,89 @@
+@js
+	var ns = "http://www.w3.org/2000/svg"
+	, xlinkNs = "http://www.w3.org/1999/xlink"
+	, noSvg = !document.createElementNS || !document.createElementNS(ns, "svg").createSVGRect
+	function c(name) {
+		El.cache[name] = document.createElementNS(ns, name)
+		El.cache["svg|"+name] = document.createElementNS(ns, name)
+	}
+	if (noSvg) {
+		return
+	}
+	"svg circle clipPath defs g path rect text stop use linearGradient".replace(/\w+/g, c)
+	//http://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+	function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+		var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0
+		return { x: centerX + (radius * Math.cos(angleInRadians)),
+		   y: centerY + (radius * Math.sin(angleInRadians)) }
+	}
+	function describeArc(x, y, radius, startAngle, endAngle) {
+		var start = polarToCartesian(x, y, radius, endAngle)
+		var end = polarToCartesian(x, y, radius, startAngle)
+		var arcSweep = endAngle - startAngle <= 180 ? "0" : "1"
+		var d = [
+			"M", start.x, start.y,
+			"A", radius, radius, 0, arcSweep, 0, end.x, end.y
+		].join(" ")
+		return d
+	}
+	El.bindings.arc = function(x, y, radius, startAngle, endAngle) {
+		this.setAttribute("d", describeArc(x, y, radius, 3.6*startAngle, 3.6*endAngle))
+	}
+	El.bindings.xlink = function(href) {
+		this.setAttributeNS(xlinkNs, "xlink:href", href)
+		//this.setAttribute("xlink:href", href)
+	}
+	El.bindings.xlink.once=1
+
+@css
+	svg {
+		overflow: visible;
+		fill: currentColor;
+	}
+	.arc {
+		stroke: #7F3F98;
+		stroke-width: 8px;
+		fill: none;
+		transition: all .2s;
+	}
+	.arc+.arc                     { stroke: #F36E21; }
+	.arc+.arc+.arc                { stroke: #A6AEAE; }
+	.arc+.arc+.arc+.arc           { stroke: red; }
+	.arc+.arc+.arc+.arc+.arc      { stroke: green; }
+	.arc+.arc+.arc+.arc+.arc+.arc { stroke: blue; }
+	.arc:hover {
+		stroke-width: 12px;
+		filter: drop-shadow(2px 2px 2px rgba(0,0,0,.6));
+	}
+
+
+@view test-svg #public
+	h2 SVG
+	svg[viewBox="0 0 60 60"][height=128][width=128].hidden
+		def
+			g#cir
+				circle[cx=30][cy=30][r=30]
+				circle[cx=30][cy=30][r=25][fill=none][stroke=gray][stroke-width=8]
+	.grid-2
+		svg[viewBox="0 0 60 60"][width=128]
+			&css: "color", "blue"
+			use[color=blue] &xlink: "#cir"
+			path.arc &arc:30,30,25,0,30
+			text[x=75][y=15][font-family=Verdana][font-size=10] Hello, out there
+	.grid-2
+		h3 tooltip
+			&data: "tooltip", "Hello"
+		svg[viewBox="0 0 60 60"][width=128]
+			path.arc &arc:30,30,12,0,30
+			path.arc &arc:30,30,12,30,90
+			path.arc &arc:30,30,12,90,100
+			path.arc &arc:30,30,25,0,40
+				&data: "tooltip", "Option C 40%"
+			path.arc &arc:30,30,25,40,70
+				&data: "tooltip", "Option B 30%"
+			path.arc
+				&arc:30,30,25,70,100
+				&data: "tooltip", "Option A 30%"
+
+
+
