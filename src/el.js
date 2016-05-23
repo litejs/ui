@@ -273,6 +273,13 @@
 		Event.Emitter.emit.apply(this, arguments)
 	}
 
+	/*
+	var namespaces = {
+		xlink: "http://www.w3.org/1999/xlink",
+		svg: "http://www.w3.org/2000/svg"
+	}
+	*/
+
 	proto.attr = attr
 	function attr(key, val) {
 		var current
@@ -284,6 +291,14 @@
 			}
 			return el
 		}
+
+		/* Accept namespaced arguments
+		current = key.split("|")
+		if (current[1]) {
+			el.setAttributeNS(namespaces[current[0]], current[1], val)
+			return
+		}
+		*/
 
 		current = el.getAttribute(key)
 
