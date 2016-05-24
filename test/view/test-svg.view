@@ -27,6 +27,7 @@
 		return d
 	}
 	El.bindings.arc = function(x, y, radius, startAngle, endAngle) {
+		// var length = path.getTotalLength();
 		this.setAttribute("d", describeArc(x, y, radius, 3.6*startAngle, 3.6*endAngle))
 	}
 	El.bindings.xlink = function(href) {

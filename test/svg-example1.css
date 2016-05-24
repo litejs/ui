@@ -1,0 +1,35 @@
+
+html,
+body,
+svg {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+* {
+	stroke-width: 0;
+}
+
+.bg1 {
+	fill: #ddd;
+}
+.content {
+	stroke: #ddd;
+	stroke-width: 1px;
+	margin-bottom: 5px;
+}
+
+.Menu-item {
+	fill: blue;
+}
+.Menu-item:hover {
+	filter: drop-shadow(1px 1px 1px rgba(0,0,0,.6));
+	text-decoration: underline wavy;
+}
+
+
+

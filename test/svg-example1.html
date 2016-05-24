@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html><body>
+<link rel="stylesheet" href="svg-example1.css">
+<script id="index" type="text/tpl">
+@view main body .content
+  svg[viewBox="0 0 200 100"][preserveAspectRatio="xMidYMin meet"]
+    rect.bg1[x=5][y=5][width=190][height=20][rx=3][ry=3]
+    text[x=10][y=17][font-family=Verdana][font-size=5] Full SVG single-page application example
+    rect.bg1[x=5][y=30][width=50][height=65][rx=3][ry=3]
+    a.Menu-item &xlink: "#home"
+      text[x=10][y=40][font-family=Verdana][font-size=5] Home
+    a.Menu-item &xlink: "#settings"
+      text[x=10][y=50][font-family=Verdana][font-size=5] Settings
+    / svg nesting for relative position
+    svg[x=60][y=30][width=135][height=65][viewBox="0 0 135 65"]
+      rect.bg1[x=0][y=0][width="100%"][height="100%"][rx=3][ry=3]
+      g.content
+
+@view home main
+  text[x=5][y=15][font-family=Verdana][font-size=10] Main page
+
+@view settings main
+  text[x=5][y=15][font-family=Verdana][font-size=10] Settings page
+  text[x=5][y=25][font-family=Verdana][font-size=5] Subheader
+
+</script>
+<script src="../dist/litejs.js"></script>
+<script>
+// Add `#body` view, it is a starting point for us.
+// It could be any element on page but we want to start from `BODY`.
+View("body", document.body)
+
+
+// Populate cache with svg namespace nodes
+// In html-svg mixed page you should prefix svg elements,
+// e.g. El.cache["svg-" + name] = document.createElementNS(ns, name)
+
+var ns = "http://www.w3.org/2000/svg"
+, xlinkNs = "http://www.w3.org/1999/xlink"
+, noSvg = !document.createElementNS || !document.createElementNS(ns, "svg").createSVGRect
+function c(name) {
+	El.cache[name] = document.createElementNS(ns, name)
+}
+if (noSvg) {
+	alert("SVG not supported")
+}
+El.bindings.xlink = function(href) {
+	this.setAttributeNS(xlinkNs, "xlink:href", href)
+}
+El.bindings.xlink.once = 1
+"svg a circle clipPath defs g path rect text stop use linearGradient".replace(/\w+/g, c)
+// Read in templates from element with id=index
+El.tpl(index.innerHTML)
+
+// You must define at least one language
+El.i18n.def({
+	"en":"In English",
+	"et":"Eesti keeles",
+	"fi":"Suomeksi"
+})
+
+// Start a router to showing views
+history.start(View.show)
+</script>
+<noscript><h1>Error</h1>This application requires JavaScript</noscript>
+</body></html>
+
