@@ -141,8 +141,29 @@ h6 {
 .p0l { padding-left:   0; }
 
 .m1b { margin-bottom: 4px; }
+.m2b { margin-bottom: 8px; }
 
 
 
+[data-on-empty]:empty:after {
+	content: attr(data-on-empty);
+	color: #999;
+	font-style: italic;
+	text-align: center;
+	font-weight: normal;
+	display: block;
+	padding: 1em;
+}
+
+.loading[data-on-loading]:empty:after {
+	content: attr(data-on-loading);
+}
+
+.loading[data-on-empty]:empty:after {
+	content: "Loading..";
+}
+.loading[data-on-empty]:lang(et):empty:after {
+	content: "Laen..";
+}
 
 

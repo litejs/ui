@@ -7,6 +7,9 @@
 @def testman.tpl testman,testman/lcov,testman/lcov/{file}
 
 
+@template form-js
+	form[action="javascript:"][method=POST]
+
 @template top
 	.bg-1
 		.top.t-1.app__row
@@ -105,7 +108,8 @@
 				&href: "#users/" + item.id
 
 @view users/{id} #public
-	h2 User #{route.id}
+	form-js
+		&schemaToForm: "schema/user.json", "edit", "Form1"
 
 @view ok #public
 	h1 Ok!

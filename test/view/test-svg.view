@@ -31,6 +31,7 @@
 		this.setAttribute("d", describeArc(x, y, radius, 3.6*startAngle, 3.6*endAngle))
 	}
 	El.bindings.xlink = function(href) {
+		// https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2
 		this.setAttributeNS(xlinkNs, "xlink:href", href)
 		//this.setAttribute("xlink:href", href)
 	}

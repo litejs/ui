@@ -1,0 +1,37 @@
+{
+  "definitions": {
+    "id": {
+      "readonly": true,
+      "required": true,
+      "type": "integer"
+    },
+    "name": {
+      "description": "Full name",
+      "required": true,
+      "title": "Name",
+      "type": "string"
+    },
+    "url": {
+      "description": "URL of resource",
+      "example": "http://example.com",
+      "format": "uri",
+      "pattern": "^https?://",
+      "type": [
+        "null",
+        "string"
+      ]
+    }
+  },
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "id": {
+      "$ref": "#/definitions/id"
+    },
+    "name": {
+      "$ref": "#/definitions/name"
+    }
+  },
+  "type": "object"
+}

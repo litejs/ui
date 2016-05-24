@@ -212,7 +212,7 @@ El.bindings.run = function() {}
 		navigator.languages, navigator.language, navigator.userLanguage, "en"
 	).filter(_.get)[0]
 
-	xhr.load(["lang/" + _.use(lang) + ".js", "views/main.view"], init)
+	xhr.load(["lang/" + _.use(lang) + ".js", "views/Form1.tpl", "views/main.view"], init)
 
 	/*
 
