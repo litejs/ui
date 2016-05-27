@@ -208,7 +208,7 @@
 	// IE9 and below allows up to 32 stylesheets.
 	// The number was increased to 4095 in IE10.
 
-	function load(files, next) {
+	function load(files, next, raw) {
 		if (typeof files == "string") files = [files]
 		var file
 		, len = files.length
@@ -239,17 +239,16 @@
 			loaded[file] = file
 			res[i] = ""
 			if (!err) {
+				res[i] = str
 				err = file.split("?")[0].split(".").pop()
-				if (err == "js") {
-					res[i] = str
-				} else {
+				if (!raw && err != "js") {
 					xhr[++seq] = str
 					res[i] = "El." + err + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				}
 			}
 			if (!--pending) {
-				execScript( res.join("/**/;") )
-				if (next) next(files, res)
+				if (!raw) execScript( res.join("/**/;") )
+				if (next) next(files, res, raw)
 			}
 		}
 	}

@@ -23,12 +23,12 @@ Function.prototype.trace = function(name) {
 xhr._load = xhr.load
 
 xhr.now = +new Date()
-xhr.load = function(files, next) {
+xhr.load = function(files, next, raw) {
 	if (typeof files == "string") files = [files]
 	files = files.map(function(file) {
 		return file + "?" + xhr.now
 	})
-	return xhr._load(files, next)
+	return xhr._load(files, next, raw)
 }
 
 El.path = function(node) {
