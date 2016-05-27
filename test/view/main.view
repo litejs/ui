@@ -1,10 +1,10 @@
 
 
-@def settings.tpl,settings.css settings
-@def test-form1.tpl test-form1
-@def test-grid.tpl test-grid
-@def tooltip.tpl,test-svg.view test-svg
-@def testman.tpl testman,testman/lcov,testman/lcov/{file}
+@def settings settings.tpl,settings.css
+@def test-form1 test-form1.tpl
+@def test-grid test-grid.tpl
+@def test-svg tooltip.tpl,test-svg.view
+@def testman,testman/lcov,testman/lcov/{file} testman.tpl
 
 
 @template form-js
