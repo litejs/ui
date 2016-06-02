@@ -30,6 +30,10 @@ El.data.View = View
 El.data.started = new Date()
 El.data.welcomeText = "_welcome"
 
+El.data.emit = function(a, b, c, d, e, f) {
+	return Mediator.emit.bind(Mediator, a, b, c, d, e, f)
+}
+
 _.def(  { "en": "In English"
 	, "et": "Eesti keeles"
 	, "ru": "На русском"

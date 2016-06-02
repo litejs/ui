@@ -5,6 +5,7 @@
 @def test-grid test-grid.tpl
 @def test-svg tooltip.tpl,test-svg.view
 @def testman,testman/lcov,testman/lcov/{file} testman.tpl
+@def test-material-ui components/Slider.tpl,material-ui.tpl,test-material-ui.view
 
 
 @template form-js
@@ -22,7 +23,7 @@
 	.bg-2
 		.menu.app__row
 			@template nav-row
-				a.menu__item
+				a.menu__item.waves
 					&class:"selected", (history.getUrl()||View.home).indexOf(this.href.split("#")[1]) == 0
 			nav-row[href="#home"] Home
 			nav-row[href="#users"] Users
@@ -125,6 +126,7 @@
 		li>a[href="#test-form1"] Test form
 		li>a[href="#test-svg"] Test SVG
 		li>a[href="#test-grid"] Test grid
+		li>a[href="#test-material-ui"] Test Material-UI
 	@rel user home vnd.app.home
 		.home {home.name}
 	@rel user home vnd.app.home.v2
