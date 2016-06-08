@@ -732,6 +732,14 @@
 	El.view = El.tpl = tpl
 	//*/
 
+	El.scrollLeft = function() {
+		return window.pageXOffset || root.scrollLeft || body.scrollLeft
+	}
+
+	El.scrollTop = function() {
+		return window.pageYOffset || root.scrollTop || body.scrollTop
+	}
+
 	//** responsive
 	var lastSize, lastOrient
 	, breakpoints = {
