@@ -113,8 +113,26 @@
 			}).join("||")
 		))
 	}
+
+	// Note: querySelector in IE8 supports only CSS 2.1 selectors
+	proto.find = !ie678 && proto.querySelector || function(sel) {
+		return findEl(this, sel, true)
+	}
+
+	proto.findAll = proto.querySelectorAll ?
+		function(sel) {
+			return new ElWrap(this.querySelectorAll(sel))
+		} :
+		function(sel) {
+			return new ElWrap(findEl(this, sel))
+		}
 	/*/
 	, closest = proto.closest
+
+	proto.find = proto.querySelector
+	proto.findAll = function(sel) {
+		return new ElWrap(this.querySelectorAll(sel))
+	}
 	//*/
 
 
@@ -159,171 +177,6 @@
 	}
 	window.El = El
 
-	function append(child, before) {
-		var fragment
-		, el = this
-		, i = 0
-		, tmp = typeof child
-		if (child) {
-			if (tmp == "string" || tmp == "number") child = document.createTextNode(child)
-			else if ( !("nodeType" in child) && "length" in child ) {
-				// document.createDocumentFragment is unsupported in IE5.5
-				// fragment = "createDocumentFragment" in document ? document.createDocumentFragment() : El("div")
-				for (
-					tmp = child.length
-					, fragment = document.createDocumentFragment();
-					i < tmp; ) append.call(fragment, child[i++])
-				child = fragment
-			}
-
-			if (child.nodeType) {
-				tmp = el.insertBefore ? el : el[el.length - 1]
-				tmp.insertBefore(child,
-					(before === true ? tmp.firstChild :
-					typeof before == "number" ? tmp.childNodes[
-						before < 0 ? tmp.childNodes.length - before - 2 : before
-					] : before) || null
-				)
-			}
-		}
-		return el
-	}
-	proto.append = append
-
-	proto.after = function(silbing, before) {
-		// call append so it works with DocumentFragment
-		append.call(silbing.parentNode, this, before ? silbing : silbing.nextSibling)
-		return this
-	}
-
-	proto.to = to
-	function to(parent, before) {
-		append.call(parent, this, before)
-		return this
-	}
-
-	// setAttribute("class") is broken in IE7
-	// className is object in SVGElements
-
-	function hasClass(name) {
-		var el = this
-		, current = el.className || ""
-		, useAttr = typeof current != "string"
-
-		if (useAttr) {
-			current = el.getAttribute("class") || ""
-		}
-
-		return !!current && current.split(/\s+/).indexOf(name) > -1
-	}
-	proto.hasClass = hasClass
-
-	function addClass(name) {
-		var el = this
-		, current = el.className || ""
-		, useAttr = typeof current != "string"
-
-		if (useAttr) {
-			current = el.getAttribute("class") || ""
-		}
-
-		if (current) {
-			name = current.split(/\s+/).indexOf(name) > -1 ? current : current + " " + name
-		}
-
-		if (current != name) {
-			if (useAttr) {
-				el.setAttribute("class", name)
-			} else {
-				el.className = name
-			}
-		}
-		return el
-	}
-	proto.addClass = addClass
-
-	function rmClass(name) {
-		var el = this
-		, current = el.className || ""
-		, useAttr = typeof current != "string"
-
-		if (useAttr) {
-			current = el.getAttribute("class") || ""
-		}
-
-		if (current) {
-			name = (" " + current + " ").replace(" " + name + " ", " ").trim()
-			if (current != name) {
-				if (useAttr) {
-					el.setAttribute("class", name)
-				} else {
-					el.className = name
-				}
-			}
-		}
-
-		return el
-	}
-	proto.rmClass = rmClass
-
-	function toggleClass(name, force) {
-		if (arguments.length === 1) {
-			force = !hasClass.call(this, name)
-		}
-		return ( force ? addClass : rmClass ).call(this, name), force
-	}
-	proto.toggleClass = toggleClass
-
-	proto.empty = function() {
-		for (var node, el = this; node = el.firstChild; ) kill.call(node)
-		return el
-	}
-
-	function kill() {
-		var id
-		, el = this
-		if (el.emit) el.emit("kill")
-		if (el.parentNode) el.parentNode.removeChild(el)
-		if (Event.removeAll) Event.removeAll(el)
-		if (el.empty) el.empty()
-		if (id = el.attr && el.attr("data-scope")) {
-			delete elScope[id]
-		}
-		if (el.valObject) el.valObject = null
-		return el
-	}
-	proto.kill = kill
-
-	proto.on = function(ev, fn) {
-		// element.setCapture(retargetToElement)
-		Event.add(this, ev, fn)
-		return this
-	}
-
-	proto.one = function(ev, fn) {
-		var el = this
-		function remove() {
-			el.non(ev, fn).non(ev, remove)
-		}
-		return el.on(ev, fn).on(ev, remove)
-	}
-
-	proto.non = function(ev, fn) {
-		Event.remove(this, ev, fn)
-		return this
-	}
-
-	proto.emit = function() {
-		Event.Emitter.emit.apply(this, arguments)
-	}
-
-	/*
-	var namespaces = {
-		xlink: "http://www.w3.org/1999/xlink",
-		svg: "http://www.w3.org/2000/svg"
-	}
-	*/
-
 	proto.attr = attr
 	function attr(key, val) {
 		var current
@@ -337,6 +190,11 @@
 		}
 
 		/* Accept namespaced arguments
+		var namespaces = {
+			xlink: "http://www.w3.org/1999/xlink",
+			svg: "http://www.w3.org/2000/svg"
+		}
+
 		current = key.split("|")
 		if (current[1]) {
 			el.setAttributeNS(namespaces[current[0]], current[1], val)
@@ -376,84 +234,6 @@
 			el.removeAttribute(key)
 		}
 	}
-
-	proto.css = bindings.css = css
-	function css(key, val) {
-		this.style[key.camelCase()] = val || ""
-	}
-
-	function elScope(node, parent, _scope) {
-		if (_scope = elScope[attr.call(node, "data-scope")]) {
-			return _scope
-		}
-		if (!parent || parent === true) {
-			_scope = closest.call(node, "[data-scope]")
-			_scope = _scope && elScope[attr.call(_scope, "data-scope")] || scopeData
-		}
-		if (parent) {
-			attr.call(node, "data-scope", ++scopeSeq)
-			_scope = elScope[scopeSeq] = Object.create(parent = (_scope || parent))
-			_scope._super = parent
-		}
-		return _scope
-	}
-	El.scope = elScope
-
-	function render(scope, skipSelf) {
-		var bind, newBind, fn
-		, node = this
-
-		if (node.nodeType != 1) {
-			return node
-		}
-
-		// TODO:2015-05-25:lauri:Use elScope
-		scope = elScope[attr.call(node, "data-scope")]
-		|| scope
-		|| (bind = closest.call(node, "[data-scope]")) && elScope[attr.call(bind, "data-scope")]
-		|| scopeData
-
-		if (bind = !skipSelf && attr.call(node, "data-bind")) {
-			newBind = bind
-			// i18n(bind, lang).format(scope)
-			// document.documentElement.lang
-			// document.getElementsByTagName('html')[0].getAttribute('lang')
-
-			fn = "data b r->data&&(" + bind.replace(renderRe, function(match, name, args) {
-				return bindings[name] ?
-				(hasOwn.call(bindings[name], "once") && (newBind = newBind.replace(match, "")),
-					"(r=b['" + name + "'].call(this" + (bindings[name].raw ? ",data,'" + args + "'" : args ? "," + args : "") + ")||r),") :
-				"this.attr('" + name + "'," + args + "),"
-			}) + "r)"
-			if (bind != newBind) attr.call(node, "data-bind", newBind)
-
-			try {
-				if (Fn(fn, node, scope)(scope, bindings)) {
-					return node
-				}
-			} catch (e) {
-				//** debug
-				e.message += " in binding: " + bind
-				console.error(e)
-				if (window.onerror) window.onerror(e.message, e.fileName, e.lineNumber)
-				//*/
-				return node
-			}
-		}
-
-		for (bind = node.firstChild; bind; bind = newBind) {
-			newBind = bind.nextSibling
-			render.call(bind, scope)
-		}
-		//** modernBrowser
-		if (ie678 && node.nodeName == "SELECT") {
-			node.parentNode.insertBefore(node, node)
-		}
-		//*/
-		return node
-	}
-
-	proto.render = render
 
 	// In Safari 2.x, innerText functions properly only
 	// if an element is neither hidden (via style.display == "none")
@@ -512,26 +292,241 @@
 		el.valObject || el.value
 	}
 
-	//** modernBrowser
-	// Note: querySelector in IE8 supports only CSS 2.1 selectors
-	proto.find = !ie678 && proto.querySelector || function(sel) {
-		return findEl(this, sel, true)
-	}
+	proto.append = append
+	function append(child, before) {
+		var fragment
+		, el = this
+		, i = 0
+		, tmp = typeof child
+		if (child) {
+			if (tmp == "string" || tmp == "number") child = document.createTextNode(child)
+			else if ( !("nodeType" in child) && "length" in child ) {
+				// document.createDocumentFragment is unsupported in IE5.5
+				// fragment = "createDocumentFragment" in document ? document.createDocumentFragment() : El("div")
+				for (
+					tmp = child.length
+					, fragment = document.createDocumentFragment();
+					i < tmp; ) append.call(fragment, child[i++])
+				child = fragment
+			}
 
-	proto.findAll = proto.querySelectorAll ?
-		function(sel) {
-			return new ElWrap(this.querySelectorAll(sel))
-		} :
-		function(sel) {
-			return new ElWrap(findEl(this, sel))
+			if (child.nodeType) {
+				tmp = el.insertBefore ? el : el[el.length - 1]
+				tmp.insertBefore(child,
+					(before === true ? tmp.firstChild :
+					typeof before == "number" ? tmp.childNodes[
+						before < 0 ? tmp.childNodes.length - before - 2 : before
+					] : before) || null
+				)
+			}
 		}
-	/*/
-	proto.find = proto.querySelector
-	proto.findAll = function(sel) {
-		return new ElWrap(this.querySelectorAll(sel))
+		return el
 	}
-	//*/
 
+	proto.after = function(silbing, before) {
+		// call append so it works with DocumentFragment
+		append.call(silbing.parentNode, this, before ? silbing : silbing.nextSibling)
+		return this
+	}
+
+	proto.to = to
+	function to(parent, before) {
+		append.call(parent, this, before)
+		return this
+	}
+
+	// setAttribute("class") is broken in IE7
+	// className is object in SVGElements
+
+	proto.hasClass = hasClass
+	function hasClass(name) {
+		var el = this
+		, current = el.className || ""
+		, useAttr = typeof current != "string"
+
+		if (useAttr) {
+			current = el.getAttribute("class") || ""
+		}
+
+		return !!current && current.split(/\s+/).indexOf(name) > -1
+	}
+
+	proto.addClass = addClass
+	function addClass(name) {
+		var el = this
+		, current = el.className || ""
+		, useAttr = typeof current != "string"
+
+		if (useAttr) {
+			current = el.getAttribute("class") || ""
+		}
+
+		if (current) {
+			name = current.split(/\s+/).indexOf(name) > -1 ? current : current + " " + name
+		}
+
+		if (current != name) {
+			if (useAttr) {
+				el.setAttribute("class", name)
+			} else {
+				el.className = name
+			}
+		}
+		return el
+	}
+
+	proto.rmClass = rmClass
+	function rmClass(name) {
+		var el = this
+		, current = el.className || ""
+		, useAttr = typeof current != "string"
+
+		if (useAttr) {
+			current = el.getAttribute("class") || ""
+		}
+
+		if (current) {
+			name = (" " + current + " ").replace(" " + name + " ", " ").trim()
+			if (current != name) {
+				if (useAttr) {
+					el.setAttribute("class", name)
+				} else {
+					el.className = name
+				}
+			}
+		}
+
+		return el
+	}
+
+	proto.toggleClass = toggleClass
+	function toggleClass(name, force) {
+		if (arguments.length === 1) {
+			force = !hasClass.call(this, name)
+		}
+		return ( force ? addClass : rmClass ).call(this, name), force
+	}
+
+	proto.css = bindings.css = function(key, val) {
+		this.style[key.camelCase()] = val || ""
+	}
+
+	proto.on = function(ev, fn) {
+		// element.setCapture(retargetToElement)
+		Event.add(this, ev, fn)
+		return this
+	}
+
+	proto.one = function(ev, fn) {
+		var el = this
+		function remove() {
+			el.non(ev, fn).non(ev, remove)
+		}
+		return el.on(ev, fn).on(ev, remove)
+	}
+
+	proto.non = function(ev, fn) {
+		Event.remove(this, ev, fn)
+		return this
+	}
+
+	proto.emit = function() {
+		Event.Emitter.emit.apply(this, arguments)
+	}
+
+	proto.empty = function() {
+		for (var node, el = this; node = el.firstChild; ) {
+			kill.call(node)
+		}
+		return el
+	}
+
+	proto.kill = kill
+	function kill() {
+		var id
+		, el = this
+		if (el.emit) el.emit("kill")
+		if (el.parentNode) el.parentNode.removeChild(el)
+		if (Event.removeAll) Event.removeAll(el)
+		if (el.empty) el.empty()
+		if (id = el.attr && el.attr("data-scope")) {
+			delete elScope[id]
+		}
+		if (el.valObject) el.valObject = null
+		return el
+	}
+
+	El.scope = elScope
+	function elScope(node, parent, _scope) {
+		if (_scope = elScope[attr.call(node, "data-scope")]) {
+			return _scope
+		}
+		if (!parent || parent === true) {
+			_scope = closest.call(node, "[data-scope]")
+			_scope = _scope && elScope[attr.call(_scope, "data-scope")] || scopeData
+		}
+		if (parent) {
+			attr.call(node, "data-scope", ++scopeSeq)
+			_scope = elScope[scopeSeq] = Object.create(parent = (_scope || parent))
+			_scope._super = parent
+		}
+		return _scope
+	}
+
+	proto.render = render
+	function render(scope, skipSelf) {
+		var bind, newBind, fn
+		, node = this
+
+		if (node.nodeType != 1) {
+			return node
+		}
+
+		// TODO:2015-05-25:lauri:Use elScope
+		scope = elScope[attr.call(node, "data-scope")]
+		|| scope
+		|| (bind = closest.call(node, "[data-scope]")) && elScope[attr.call(bind, "data-scope")]
+		|| scopeData
+
+		if (bind = !skipSelf && attr.call(node, "data-bind")) {
+			newBind = bind
+			// i18n(bind, lang).format(scope)
+			// document.documentElement.lang
+			// document.getElementsByTagName('html')[0].getAttribute('lang')
+
+			fn = "data b r->data&&(" + bind.replace(renderRe, function(match, name, args) {
+				return bindings[name] ?
+				(hasOwn.call(bindings[name], "once") && (newBind = newBind.replace(match, "")),
+					"(r=b['" + name + "'].call(this" + (bindings[name].raw ? ",data,'" + args + "'" : args ? "," + args : "") + ")||r),") :
+				"this.attr('" + name + "'," + args + "),"
+			}) + "r)"
+			if (bind != newBind) attr.call(node, "data-bind", newBind)
+
+			try {
+				if (Fn(fn, node, scope)(scope, bindings)) {
+					return node
+				}
+			} catch (e) {
+				//** debug
+				e.message += " in binding: " + bind
+				console.error(e)
+				if (window.onerror) window.onerror(e.message, e.fileName, e.lineNumber)
+				//*/
+				return node
+			}
+		}
+
+		for (bind = node.firstChild; bind; bind = newBind) {
+			newBind = bind.nextSibling
+			render.call(bind, scope)
+		}
+		//** modernBrowser
+		if (ie678 && node.nodeName == "SELECT") {
+			node.parentNode.insertBefore(node, node)
+		}
+		//*/
+		return node
+	}
 
 	function ElWrap(nodes) {
 		/**
