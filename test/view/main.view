@@ -8,12 +8,12 @@
 @def test-material-ui components/Slider.tpl,material-ui.tpl,test-material-ui.view
 
 
-@template form-js
+@el form-js
 	form[action="javascript:"][method=POST]
 
-@template top
+@el top
 	.bg-1
-		.top.t-1.app__row
+		.top.t-1.App-row
 			.right.lang &each: lng in _.list
 				a.hand - {lng|upper} -
 					&on:"click", _.setLang.bind(null, lng)
@@ -22,27 +22,27 @@
 			a[href="#home"].home-link Header
 			span.sizeHint Responsive
 	.bg-2
-		.menu.app__row
-			@template nav-row
-				a.menu__item.waves
+		.Menu.App-row
+			@el nav-row
+				a.Menu-item.waves
 					&class:"selected", (history.getUrl()||View.home).indexOf(this.href.split("#")[1]) == 0
 			nav-row[href="#home"] Home
 			nav-row[href="#users"] Users
 			nav-row[href="#settings"] Settings
 			nav-row[href="#test"] Test
 
-@template footer
+@el Footer
 	.bg-1
-		.footer.app__row.grid-3.c2
-			.footer__item.col-4
+		.Footer.App-row.grid-3.c2
+			.Footer-item.col-4
 				dt litejs.com
 				dd>a[href="#help"] How to use
 				dd>a[href="#privacy"] Privacy
-			.footer__item.col-4
+			.Footer-item.col-4
 				dt Contacts
 				dd>a[href="mailto:mail@to.com"] email
 
-@template confirm
+@el confirm
 	.modal.abs.max.fix
 		.abs.max.modal__background
 		.grid-1.modal__content
@@ -52,20 +52,20 @@
 			.col-6>.btn Ok
 
 @view #public #body .content
-	.app.max-height
+	.App.max-height
 		top
-		.content.loader.app__row
-		.footer__spacer
-	footer
+		.content.loader.App-row
+		.Footer-spacer
+	Footer
 
 @view #private #body .content
-	.app.max-height
+	.App.max-height
 		button.top__logout.right Logout
 			&on:"click", "logout"
 		top
-		.content.loader.app__row
-		.footer__spacer
-	footer
+		.content.loader.App-row
+		.Footer-spacer
+	Footer
 
 @view 404 #public
 	h2 Error 404

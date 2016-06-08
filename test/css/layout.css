@@ -18,16 +18,16 @@ body {
 	text-align: center;    /* 2 */
 }
 
-.app {
+.App {
 	margin: 0 auto -150px; /* 3 */
 }
 
-.app__row {
+.App-row {
 	text-align: left;      /* 2 */
 	padding: 0 8px;
 }
 
-.lg .app__row {
+.lg .App-row {
 	width: 990px;
 	margin: 0 auto;
 	zoom: 1;
@@ -38,13 +38,13 @@ body {
 	line-height: 43px;
 	font-size: .75em;
 }
-.menu {
+.Menu {
 	height: 56px;
 	font-size: .75em;
 }
 
-.footer,
-.footer__spacer {
+.Footer,
+.Footer-spacer {
 	display: block;
 	clear: both;
 	height: 149px;         /* 3 */

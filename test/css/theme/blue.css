@@ -67,11 +67,11 @@ h6 {
 	text-decoration: underline;
 }
 
-.menu {
+.Menu {
 	padding-top: 9px;
 }
 
-.menu__item {
+.Menu-item {
 	line-height: 44px;
 	padding: 0 1em;
 	margin: 2px 5px 0 0;
@@ -89,13 +89,13 @@ h6 {
 	float: left;
 }
 
-.menu__item:hover, .menu__item.selected {
+.Menu-item:hover, .Menu-item.selected {
 	background-image: linear-gradient(#fff, rgba(255,255,255,0));
 	border-bottom-color: #f2f7fb;
 	color: #000;
 }
 
-.menu__item:active {
+.Menu-item:active {
 	background-image: linear-gradient(#49d, rgba(255,255,255,0));
 }
 

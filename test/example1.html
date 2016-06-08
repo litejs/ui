@@ -3,24 +3,26 @@
 <link rel="stylesheet" href="app.css">
 <script id="index" type="text/tpl">
 / An end-of-line comment starts with slash
-/
-/      +-- route, this view is accessible from #main url
-/      |
-/      |    +-- parent view route
-/      |    |
-/      |    |      +-- optional selector for child view
-/      |    |      |
+/  +------------------ plugins starts with `@`
+/  |   +-------------- route, this view is accessible from #main url
+/  |   |    +--------- parent view route
+/  |   |    |      +-- optional selector for child view
+/  |   |    |      |
 @view main body .content
-  .app.max-height
-    .app__row.bg-1.top.t-1 LiteJS Minimal Example
-    .app__row.bg-2
-      .menu
-        a.menu__item[href="#home"] Home
-        a.menu__item[href="#users"] Users
-        a.menu__item[href="#settings"] Settings
-    .app__row.content
-    .footer__spacer
-  .app__row.footer.bg-1
+  / selector declares an element, you can leave off the tag to get a div
+  .App.max-height
+    .App-row.bg-1.top.t-1 LiteJS Minimal Example
+    .App-row.bg-2
+      .Menu
+        / Custom elements can be defined inline
+        @el Menu-item
+          a.Menu-item
+        Menu-item[href="#home"] Home
+        Menu-item[href="#users"] Users
+        Menu-item[href="#settings"] Settings
+    .App-row.content
+    .Footer-spacer
+  .App-row.Footer.bg-1
     h6 Bye
 
 @view home main
