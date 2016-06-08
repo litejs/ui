@@ -202,23 +202,41 @@
 		return this
 	}
 
+	// setAttribute("class") is broken in IE7
+	// className is object in SVGElements
+
 	function hasClass(name) {
 		var el = this
-		, current = el.getAttribute("class") || ""
+		, current = el.className || ""
+		, useAttr = typeof current != "string"
+
+		if (useAttr) {
+			current = el.getAttribute("class") || ""
+		}
+
 		return !!current && current.split(/\s+/).indexOf(name) > -1
 	}
 	proto.hasClass = hasClass
 
 	function addClass(name) {
 		var el = this
-		, current = el.getAttribute("class") || ""
+		, current = el.className || ""
+		, useAttr = typeof current != "string"
+
+		if (useAttr) {
+			current = el.getAttribute("class") || ""
+		}
 
 		if (current) {
 			name = current.split(/\s+/).indexOf(name) > -1 ? current : current + " " + name
 		}
 
 		if (current != name) {
-			el.setAttribute("class", name)
+			if (useAttr) {
+				el.setAttribute("class", name)
+			} else {
+				el.className = name
+			}
 		}
 		return el
 	}
@@ -226,12 +244,21 @@
 
 	function rmClass(name) {
 		var el = this
-		, current = el.getAttribute("class") || ""
+		, current = el.className || ""
+		, useAttr = typeof current != "string"
+
+		if (useAttr) {
+			current = el.getAttribute("class") || ""
+		}
 
 		if (current) {
 			name = (" " + current + " ").replace(" " + name + " ", " ").trim()
 			if (current != name) {
-				el.setAttribute("class", name)
+				if (useAttr) {
+					el.setAttribute("class", name)
+				} else {
+					el.className = name
+				}
 			}
 		}
 
