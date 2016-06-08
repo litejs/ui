@@ -1,11 +1,12 @@
 
 
 
-!function(window, document, protoStr) {
+!function(window, document, Event, protoStr) {
 	var currentLang, styleNode
 	, hasOwn = Object[protoStr].hasOwnProperty
 	, wrapProto = []
 	, body = document.body
+	, root = document.documentElement
 	, createElement = document.createElement
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
 	, elCache = El.cache = {}
@@ -709,6 +710,52 @@
 	El.view = El.tpl = tpl
 	//*/
 
+	//** responsive
+	var lastSize, lastOrient
+	, breakpoints = {
+		sm: 0,
+		md: 601,
+		lg: 1025
+	}
+	, setBreakpointsRated = function() {
+		setBreakpoints()
+	}.rate(100, true)
+
+	function setBreakpoints(_breakpoints) {
+		// document.documentElement.clientWidth is 0 in IE5
+		var key, val, next
+		, width = root.offsetWidth
+		, map = breakpoints = _breakpoints || breakpoints
+
+		for (key in map) {
+			if (map[key] > width) break
+			next = key
+		}
+
+		if ( next != lastSize ) {
+			rmClass.call(root, lastSize)
+			addClass.call(root, lastSize = next)
+		}
+
+		next = width > root.offsetHeight ? "landscape" : "portrait"
+
+		if ( next != lastOrient) {
+			rmClass.call(root, lastOrient)
+			addClass.call(root, lastOrient = next)
+		}
+
+		next = window.Mediator || window.M
+		if (next) next.emit("resize")
+	}
+	El.setBreakpoints = setBreakpoints
+
+	setBreakpointsRated()
+
+	Event.add(window, "resize", setBreakpointsRated)
+	Event.add(window, "orientationchange", setBreakpointsRated)
+	Event.add(window, "load", setBreakpointsRated)
+	//*/
+
 
 	//** i18n
 	function i18n(text, lang) {
@@ -754,6 +801,6 @@
 	// i18nUse("en")
 	//*/
 
-}(window, document, "prototype")
+}(window, document, Event, "prototype")
 
 

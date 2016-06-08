@@ -20,6 +20,7 @@
 					&class:"selected", lng == _.current
 					&class:"lang-" + lng
 			a[href="#home"].home-link Header
+			span.sizeHint Responsive
 	.bg-2
 		.menu.app__row
 			@template nav-row
