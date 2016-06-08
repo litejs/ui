@@ -7,6 +7,7 @@ dom.document.documentElement = {}
 global.document = dom.document
 global.Element = dom.HTMLElement
 global.window = global
+global.attachEvent = function() {}
 global.navigator = {language: "en-US"}
 
 

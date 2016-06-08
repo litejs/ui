@@ -174,7 +174,7 @@ El.bindings.run = function() {}
 	View("#body", document.body)
 	.on("ping", function() {
 		El.data.user = user
-		document.body.findAll(".menu,.lang").render()
+		document.body.findAll(".Menu,.lang").render()
 	})
 
 	View("#private")

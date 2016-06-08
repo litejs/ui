@@ -3,7 +3,8 @@ global.Fn = require("functional-lite").Fn
 
 global.Event = require("browser-event-lite").Event
 
-require("../src/format.js")
+require("../format.js")
+require("../timing.js")
 require("../el.js")
 global.i18n = window.El.i18n
 
