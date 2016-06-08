@@ -48,29 +48,51 @@
 
 @js
 	El.bindings.SliderInit = function() {
-		var undef, knobLen, offset, px, drag, min, max, step, minPx, maxPx
+		var knobLen, offset, px, drag, min, max, step, minPx, maxPx
 		, el = this
 		, track = el.firstChild
 		, fill = track.firstChild
 		, knob = fill.lastChild
 		, value = el.attr("valu") || 0
-		, v = ((" "+el.className+" ").indexOf(" vertical ") !== -1)
-		, o = "offset" + (v ? "Height" : "Width")
-		, od = v ? "height" : "width"
-		, op = "offset" + (v ? "Top" : "Left")
-		function load() {
+		function load(e) {
 			min = el.min || 0
 			max = el.max || 100
 			step = el.step || 1
-			knobLen = knob[o]>>1
+			knobLen = knob.offsetWidth>>1
 			minPx = 0
-			maxPx = track[o] - knobLen - knobLen
+			maxPx = track.offsetWidth - knobLen - knobLen
 			px = maxPx / (max - min)
 			offset = el.getBoundingClientRect().left + knobLen
+			if (e && track.childNodes.length > 1) {
+				var diff = Event.pointerX(e) - offset
+				diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
+				fill = track.firstChild
+				for (var next, x = maxPx, tmp = fill; tmp; tmp = tmp.nextSibling) {
+					next = Math.abs(diff - tmp.offsetWidth)
+					if (next < x) {
+						fill = tmp
+						knob = fill.firstChild
+						x = next
+					}
+				}
+				if (fill.previousSibling) maxPx = fill.previousSibling.offsetWidth - knobLen - knobLen
+				if (fill.nextSibling) minPx = fill.nextSibling.offsetWidth
+			}
+		}
+		function start(e) {
+			load(e)
+			fill.rmClass("anim")
+			knob.addClass("is-active")
+			drag = true
+			move(e)
+			if (el.onDragStart) {
+				el.onDragStart()
+			}
+			document.body.on("mouseup", stop).on("mousemove", move)
 		}
 		function move(e) {
-			var diff = v ? maxPx - Event.pointerY(e) + offset : Event.pointerX(e) - offset
-			diff = (diff>maxPx ? maxPx : (diff<minPx?minPx:diff))
+			var diff = Event.pointerX(e) - offset
+			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
 			el.set( diff / px, diff )
 			if (el.onMove) {
 				el.onMove( diff + knobLen )
@@ -96,36 +118,12 @@
 				el.onChange(val)
 			}
 			value = el.valu = val
-			if (!drag || pos !== undef) {
-				fill.style[od] = ((pos || value*px)+knobLen) + "px"
+			if (!drag || pos !== void 0) {
+				fill.style.width = ((pos || value*px)+knobLen) + "px"
 			}
 		}
-		el.on("mousedown", function(e) {
-			load()
-			if (track.childNodes.length > 1) {
-				var diff = v ? maxPx - Event.pointerY(e) + offset : Event.pointerX(e) - offset
-				diff = (diff>maxPx ? maxPx : (diff<0?0:diff))
-				fill = track.firstChild
-				for (var next, x = maxPx, tmp = fill; tmp; tmp = tmp.nextSibling) {
-					next = Math.abs(diff - tmp.offsetWidth)
-					if (next < x) {
-						fill = tmp
-						knob = fill.firstChild
-						x = next
-					}
-				}
-				if (fill.previousSibling) maxPx = fill.previousSibling.offsetWidth - knobLen - knobLen
-				if (fill.nextSibling) minPx = fill.nextSibling.offsetWidth
-			}
-			fill.rmClass("anim")
-			knob.addClass("is-active")
-			drag = true
-			move(e)
-			if (el.onDragStart) {
-				el.onDragStart()
-			}
-			document.body.on("mouseup", stop).on("mousemove", move)
-		}).on("wheel", function(e,delta) {
+		el.on("mousedown", start).on("wheel", function(e, delta) {
+			load(e)
 			el.set( 1*value + delta*step, 0, 1 )
 		})
 		Event.touchAsMouse(el)
