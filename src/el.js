@@ -732,12 +732,24 @@
 	El.view = El.tpl = tpl
 	//*/
 
-	El.scrollLeft = function() {
-		return window.pageXOffset || root.scrollLeft || body.scrollLeft
+	El.scrollLeft = scrollLeft
+	function scrollLeft() {
+		return window.pageXOffset || root.scrollLeft || body.scrollLeft || 0
 	}
 
-	El.scrollTop = function() {
-		return window.pageYOffset || root.scrollTop || body.scrollTop
+	El.scrollTop = scrollTop
+	function scrollTop() {
+		return window.pageYOffset || root.scrollTop || body.scrollTop || 0
+	}
+
+	El.mouseLeft = function(e) {
+		if (e.changedTouches) e = e.changedTouches[0]
+		return e.pageX || e.clientX + scrollLeft()
+	}
+
+	El.mouseTop = function(e) {
+		if (e.changedTouches) e = e.changedTouches[0]
+		return e.pageY || e.clientY + scrollTop()
 	}
 
 	//** responsive
