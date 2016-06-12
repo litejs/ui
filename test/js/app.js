@@ -167,6 +167,13 @@ El.bindings.run = function() {}
 		}
 	}
 
+	Event.setKeyMap({
+		H: history.setUrl.bind(null, "home"),
+		U: history.setUrl.bind(null, "users"),
+		S: history.setUrl.bind(null, "settings"),
+		T: history.setUrl.bind(null, "test")
+	})
+
 	document.title = "Litejs Example"
 
 	// Add `#body` view, it is a starting point for us.
