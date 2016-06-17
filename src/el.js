@@ -709,10 +709,22 @@
 		template: template,
 		view: template.extend({
 			done: function() {
-				var t = this
+				var fn
+				, t = this
 				, parent = t.parent
 				, arr = t.name.split(/\s+/)
-				View(arr[0], t._done(), arr[1], arr[2])
+				, bind = t.el.attr("data-bind")
+				, view = View(arr[0], t._done(), arr[1], arr[2])
+				if (bind) {
+					fn = bind.replace(renderRe, function(match, name, args) {
+						return "(this['" + name + "']" + (
+							typeof view[name] == "function" ?
+							"(" + (args || "") + "))," :
+							"=" + args + "),"
+						)
+					}) + "1"
+					Fn(fn, view, scopeData)()
+				}
 				return parent
 			}
 		}),

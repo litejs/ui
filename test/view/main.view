@@ -73,6 +73,7 @@
 	\ Maybe you want to look something else?
 
 @view home #public
+	&on: "show", Fn('document.title="Home!"')
 	h2 Home
 	div _welcome
 		&on: "click", Fn("this.style.fontStyle = this.style.fontStyle == 'italic' ? '' : 'italic'")
@@ -102,6 +103,10 @@
 
 
 @view users #public
+	&keyMap: {Q: Fn('document.title="Qsers!"')}
+	&on: "show", Fn('document.title="Users!"')
+	&on: "open", Fn('Event.setKeyMap(this.keyMap)')
+	&on: "close", Fn('Event.rmKeyMap(this.keyMap)')
 	h2 Users
 	ul.users &list: Data("users")
 		li
