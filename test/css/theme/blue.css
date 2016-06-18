@@ -8,6 +8,7 @@
 
 html {
 	background: linear-gradient(#fff, #cde) fixed;
+	will-change: transform;
 }
 
 body {
