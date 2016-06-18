@@ -31,21 +31,21 @@
 		svg[viewBox="0 0 60 60"][width=128]
 			&css: "color", "blue"
 			use[color=blue] &xlink: "#cir"
-			path.arc &arc:30,30,25,0,30
+			path.arc &arc:0,30,25
 			text[x=75][y=15][font-family=Verdana][font-size=10] Hello, out there
 	.grid-2
 		h3 tooltip
 			&data: "tooltip", "Hello"
 		svg[viewBox="0 0 60 60"][width=128]
-			path.arc &arc:30,30,12,0,30
-			path.arc &arc:30,30,12,30,90
-			path.arc &arc:30,30,12,90,100
-			path.arc &arc:30,30,25,0,40
+			path.arc &arc:0,30,12
+			path.arc &arc:30,90,12
+			path.arc &arc:90,100,12
+			path.arc &arc:0,40,25
 				&data: "tooltip", "Option C 40%"
-			path.arc &arc:30,30,25,40,70
+			path.arc &arc:40,70,25
 				&data: "tooltip", "Option B 30%"
 			path.arc
-				&arc:30,30,25,70,100
+				&arc:70,100,25
 				&data: "tooltip", "Option A 30%"
 
 

@@ -26,9 +26,16 @@
 		].join(" ")
 		return d
 	}
-	bindings.arc = function(x, y, radius, startAngle, endAngle) {
+	bindings.arc = function(startAngle, endAngle, radius, x, y) {
+		var center = (y && x && radius) || this.viewportElement.viewBox.baseVal.width >> 1
 		// var length = path.getTotalLength();
-		this.setAttribute("d", describeArc(x, y, radius, 3.6*startAngle, 3.6*endAngle))
+		this.setAttribute("d", describeArc(
+			x || center,
+			y || center,
+			radius || center,
+			3.6 * startAngle,
+			3.6 * endAngle
+		))
 	}
 	bindings.xlink = function(href) {
 		// https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2
