@@ -74,6 +74,6 @@
 	form-js.grid-1[data-expect='{"name1":"readonly"}'] &on:"submit", Mediator.logForm
 		.col-1of3>input[name="name1"]
 		.col-1of3
-			textarea[name="name2"]
+			textarea[name="name2"] &persist: "name2"
 		.col-1of3>input[type="submit"]
 
