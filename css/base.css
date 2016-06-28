@@ -11,6 +11,10 @@
  *     See Bug 56543, Bug 163359, and Bug 84186.
  *  3. IE for Windows Phone 8.1 supports "-webkit-text-size-adjust" as an alias for "-ms-text-size-adjust".
  *  4. Firefox<29, iOS<4, Android<4 need vendor prefixes.
+ *  5. Disable double-tap gestures to remove 350 millisecond delay before single taps.
+ *  6. Improve scroll performance by stop the paint on scroll.
+ *     Fix position: fixed in most Android 2.2–2.3 browsers
+ *     http://benfrain.com/easy-css-fix-fixed-positioning-android-2-2-2-3/
  */
 
 html {
@@ -21,6 +25,9 @@ html {
 	-webkit-box-sizing: border-box;       /* 4 */
 	   -moz-box-sizing: border-box;
 	        box-sizing: border-box;
+	touch-action: manipulation;           /* 5 */
+	-webkit-backface-visibility: hidden;  /* 6 */
+	        backface-visibility: hidden;
 }
 
 *, *:before, *:after {
@@ -28,6 +35,9 @@ html {
 	-webkit-box-sizing: inherit;          /* 4 */
 	   -moz-box-sizing: inherit;
 	        box-sizing: inherit;
+	touch-action: inherit;
+	-webkit-backface-visibility: inherit;
+	        backface-visibility: inherit;
 }
 
 .max-height {
@@ -172,11 +182,6 @@ button,
 /**
  * Global Classes
  * --------------
- *
- *  1. Fix position: fixed in most Android 2.2–2.3 browsers
- *     http://benfrain.com/easy-css-fix-fixed-positioning-android-2-2-2-3/
- *     That will also stop the paint happening on scroll
- *     thus improves scroll performance.
  */
 
 .hide,
@@ -196,7 +201,6 @@ button,
 .fix {
 	position: absolute;
 	position: fixed;
-	-webkit-backface-visibility: hidden;   /* 1 */
 }
 .abs {
 	position: absolute;
@@ -227,14 +231,21 @@ button,
 	white-space: nowrap;
 }
 
-/* for slider knob */
+/**
+ *  1. Trigger GPU acceleration.
+ *     Remove first flicker on iphone.
+ */
+
 .anim {
 	-webkit-transition: all .2s cubic-bezier(0, 0, .2, 1) 0s;
 	   -moz-transition: all .2s cubic-bezier(0, 0, .2, 1) 0s;
 	     -o-transition: all .2s cubic-bezier(0, 0, .2, 1) 0s;
 	        transition: all .2s cubic-bezier(0, 0, .2, 1) 0s;
 
-	-webkit-transform: translate3d(0, 0, 0); /* for remove first flicker on iphone */
+	-webkit-transform: translate3d(0, 0, 0);     /* 1 */
+	        transform: translate3d(0, 0, 0);
+	-webkit-perspective: 1000;
+	        perspective: 1000;
 }
 
 .sm .sm-left,
