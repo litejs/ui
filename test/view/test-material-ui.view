@@ -23,18 +23,18 @@
 				li.mat-Menu-item.waves Yet Another Action
 		.col-3 Fab buttons
 		.col-9
-			Fab>\+
-				&data: "tooltip", "Hello"
+			Fab.tooltip--top>\+
+				&data: "tooltip", "Hello1"
 				&on: "click", emit("showMenu", this, "Fab-menu1", "rightEdge", "bottom", 0, 1)
 			Fab.Fab--red.tooltip--left>\—
 				&data: "tooltip", "World\n2"
 				&on: "click", emit("showMenu", this, "Fab-menu2", "leftEdge", "bottom", 0, 1)
 			Fab.tooltip--right>\+
-				&data: "tooltip", "Hello"
-			Fab.tooltip--top>\+
-				&data: "tooltip", "Hello"
+				&data: "tooltip", "Hello2"
+			Fab>\+
+				&data: "tooltip", "Hello3"
 			Fab.tooltip--bottom>\+
-				&data: "tooltip", "Hello"
+				&data: "tooltip", "Hello4"
 		.col-3 Checkboxes
 		.col-9
 			Checkbox

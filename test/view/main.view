@@ -5,7 +5,7 @@
 @def test-grid test-grid.tpl
 @def test-svg ../../svg.js,tooltip.tpl,test-svg.view
 @def testman,testman/lcov,testman/lcov/{file} testman.tpl
-@def test-material-ui components/Slider.tpl,material-ui.tpl,test-material-ui.view
+@def test-material-ui components/Slider.tpl,components/material.css,components/material.js,components/material.tpl,test-material-ui.view
 
 
 @el form-js
