@@ -205,6 +205,15 @@ El.bindings.run = function() {}
 
 	View.base = "views/"
 
+	document.body.on("click", function(e) {
+		var target = e.target
+		, fastLink = target.tagName == "A" && target.href.split("#")
+
+		if (fastLink && fastLink[0] == location.href.split("#")[0]) {
+			View.show(fastLink[1])
+		}
+	})
+
 	View.on("show", function() {
 		// When a View completes, blur focused link
 		var el = document.activeElement
