@@ -216,8 +216,13 @@ El.bindings.run = function() {}
 
 	View.on("show", function() {
 		// When a View completes, blur focused link
-		var el = document.activeElement
-		if (el && el.tagName == "A") el.blur()
+		// IE8 can throw an exception for document.activeElement.
+		try {
+			var el = document.activeElement
+			, tag = el && el.tagName
+			if (tag == "A" || tag == "BUTTON") el.blur()
+		} catch(e) {}
+		document.body.findAll(".js-viewRender").render()
 	})
 
 	var intlLang, intlZone, opts

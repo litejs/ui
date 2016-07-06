@@ -22,10 +22,10 @@
 			a[href="#home"].home-link Header
 			span.sizeHint Responsive
 	.bg-2
-		.Menu.App-row
+		.Menu.App-row.js-viewRender
 			@el nav-row
 				a.Menu-item.waves
-					&class:"selected", (history.getUrl()||View.home).indexOf(this.href.split("#")[1]) == 0
+					&class: "selected", View(this.href.split("#")[1]).open
 			nav-row[href="#home"] Home
 			nav-row[href="#users"] Users
 			nav-row[href="#settings"] Settings
@@ -41,6 +41,7 @@
 			.Footer-item.col-4
 				dt Contacts
 				dd>a[href="mailto:mail@to.com"] email
+				dd>a[href="https://fb.com/LiteJS#info"] Fb
 
 @el confirm
 	.modal.abs.max.fix
