@@ -14,15 +14,15 @@
 		return string.replace(escapeRe, "\\$&")
 	}
 
-	function View(route, el, parent, selector) {
+	function View(route, el, parent) {
 		var view = this
 		if (views[route]) {
-			if (el) views[route].init(el, parent, selector)
+			if (el) views[route].init(el, parent)
 			return views[route]
 		}
-		if (!(view instanceof View)) return new View(route, el, parent, selector)
+		if (!(view instanceof View)) return new View(route, el, parent)
 		views[view.route = route] = view
-		view.init(el, parent, selector)
+		view.init(el, parent)
 
 		if (route.charAt(0) != "#") {
 			var startLen = groupsCount++
@@ -44,11 +44,10 @@
 	}
 
 	View.prototype = {
-		init: function(el, parent, selector) {
+		init: function(el, parent) {
 			var view = this
 			view.el = el
 			view.parent = typeof parent == "string" ? View(parent) : parent
-			view.selector = selector
 		},
 		show: function(params) {
 			var child
@@ -117,9 +116,7 @@
 				if (parent && !view.open) {
 					view.open = view.el.cloneNode(true)
 					parent.emit("beforeChild", params)
-					view.open.to(
-						parent.selector && parent.open && parent.open.find(parent.selector) || parent.open || parent.el
-					)
+					;(parent.open || parent.el).append(view.open)
 					view.open.render()
 					view.emit("open", params)
 					View.emit("open", view.route, params)

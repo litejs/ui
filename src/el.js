@@ -11,6 +11,7 @@
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
 	, elCache = El.cache = {}
 	, scopeSeq = 0
+	, childSeq = 0
 	, scopeData = El.data = { _: i18n }
 	, proto = (window.Element || El)[protoStr]
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w\:.#\[\]=])*)[ \t]*(.*?)$/gm
@@ -61,12 +62,11 @@
 		"*": "~a.indexOf(v)"
 	}
 
-	function findEl(node, sel, first) {
+	function findEl(node, fn, first) {
 		var el
 		, i = 0
 		, out = []
 		, next = node.firstChild
-		, fn = selectorFn(sel)
 
 		for (; (el = next); ) {
 			if (fn(el)) {
@@ -116,7 +116,7 @@
 
 	// Note: querySelector in IE8 supports only CSS 2.1 selectors
 	proto.find = !ie678 && proto.querySelector || function(sel) {
-		return findEl(this, sel, true)
+		return findEl(this, selectorFn(sel), true)
 	}
 
 	proto.findAll = proto.querySelectorAll ?
@@ -124,7 +124,7 @@
 			return new ElWrap(this.querySelectorAll(sel))
 		} :
 		function(sel) {
-			return new ElWrap(findEl(this, sel))
+			return new ElWrap(findEl(this, selectorFn(sel)))
 		}
 	/*/
 	, closest = proto.closest
@@ -312,6 +312,11 @@
 
 			if (child.nodeType) {
 				tmp = el.insertBefore ? el : el[el.length - 1]
+				if (i = tmp.attr && tmp.attr("data-child")) {
+					before = findEl(tmp, Fn("v->n->n.nodeType===8&&n.nodeValue==v")(i), 1) || tmp
+					tmp = before.parentNode
+					// TODO:2016-07-05:lauri:handle numeric befores
+				}
 				tmp.insertBefore(child,
 					(before === true ? tmp.firstChild :
 					typeof before == "number" ? tmp.childNodes[
@@ -559,14 +564,21 @@
 	addWrapProto("closest")
 
 	wrapProto.append = function(el) {
-		this.push(el)
+		var elWrap = this
+		if (elWrap._childId != void 0) {
+			elWrap[elWrap._childId].append(el)
+		} else {
+			this.push(el)
+		}
 		return this
 	}
 
 	wrapProto.cloneNode = function(deep) {
-		return new ElWrap(this.map(function(el) {
+		var clone = new ElWrap(this.map(function(el) {
 			return el.cloneNode(deep)
 		}))
+		clone._childId = this._childId
+		return clone
 	}
 
 	//** modernBrowser
@@ -654,8 +666,27 @@
 
 	template[protoStr] = {
 		_done: function() {
-			var t = this
-			, el = t.el.childNodes.length > 1 ? new ElWrap(t.el.childNodes) : t.el.firstChild
+			var i, el, childId
+			, t = this
+			, childNodes = t.el.childNodes
+			, i = childNodes.length
+
+			for (; i--; ) {
+				el = childNodes[i]
+				if (el._childKey) {
+					childId = i
+					el.attr("data-child", el._childKey)
+					break
+				}
+			}
+
+			if (childNodes[1]) {
+				el = new ElWrap(childNodes)
+				el._childId = childId
+			} else {
+				el = childNodes[0]
+			}
+
 			t.el.plugin = t.el = t.parent = null
 			return el
 		},
@@ -681,6 +712,18 @@
 		binding: js.extend({
 			done: function() {
 				Object.merge(bindings, Function("return({" + this.txt + "})")())
+				return this.parent
+			}
+		}),
+		child: template.extend({
+			done: function() {
+				var key = "@child-" + (++childSeq)
+				, root = this.parent
+				for (; root.parentNode.parentNode; ) {
+					root = root.parentNode
+				}
+				root._childKey = key
+				this.parent.append(document.createComment(key))
 				return this.parent
 			}
 		}),
