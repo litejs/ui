@@ -2,7 +2,7 @@
 <html><body>
 <link rel="stylesheet" href="svg-example1.css">
 <script id="index" type="text/tpl">
-@view main body .content
+@view main body
   svg[viewBox="0 0 200 100"][preserveAspectRatio="xMidYMin meet"]
     rect.bg1[x=5][y=5][width=190][height=20][rx=3][ry=3]
     text[x=10][y=17][font-family=Verdana][font-size=5] Full SVG single-page application example
@@ -14,7 +14,8 @@
     / svg nesting for relative position
     svg[x=60][y=30][width=135][height=65][viewBox="0 0 135 65"]
       rect.bg1[x=0][y=0][width="100%"][height="100%"][rx=3][ry=3]
-      g.content
+      g
+        @child
 
 @view home main
   text[x=5][y=15][font-family=Verdana][font-size=10] Main page

@@ -6,9 +6,8 @@
 /  +------------------ plugins starts with `@`
 /  |   +-------------- route, this view is accessible from #main url
 /  |   |    +--------- parent view route
-/  |   |    |      +-- optional selector for child view
-/  |   |    |      |
-@view main body .content
+/  |   |    |
+@view main body
   / selector declares an element, you can leave off the tag to get a div
   .App.max-height
     .App-row.bg-1.top.t-1 LiteJS Minimal Example
@@ -20,7 +19,8 @@
         Menu-item[href="#home"] Home
         Menu-item[href="#users"] Users
         Menu-item[href="#settings"] Settings
-    .App-row.content
+    .App-row
+      @child
     .Footer-spacer
   .App-row.Footer.bg-1
     h6 Bye

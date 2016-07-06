@@ -51,19 +51,21 @@
 			.col-6>.btn Cancel
 			.col-6>.btn Ok
 
-@view #public #body .content
+@view #public #body
 	.App.max-height
 		top
 		.content.loader.App-row
+			@child
 		.Footer-spacer
 	Footer
 
-@view #private #body .content
+@view #private #body
 	.App.max-height
 		button.top__logout.right Logout
 			&on:"click", "logout"
 		top
 		.content.loader.App-row
+			@child
 		.Footer-spacer
 	Footer
 
