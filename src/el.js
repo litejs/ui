@@ -62,23 +62,6 @@
 		"*": "~a.indexOf(v)"
 	}
 
-	function findEl(node, fn, first) {
-		var el
-		, i = 0
-		, out = []
-		, next = node.firstChild
-
-		for (; (el = next); ) {
-			if (fn(el)) {
-				if (first) return el
-				out.push(el)
-			}
-			next = el.firstChild || el.nextSibling
-			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
-		}
-		return first ? null : out
-	}
-
 	function selectorFn(str) {
 		// jshint evil:true
 		return selectorCache[str] ||
@@ -134,6 +117,23 @@
 		return new ElWrap(this.querySelectorAll(sel))
 	}
 	//*/
+
+	function findEl(node, fn, first) {
+		var el
+		, i = 0
+		, out = []
+		, next = node.firstChild
+
+		for (; (el = next); ) {
+			if (fn(el)) {
+				if (first) return el
+				out.push(el)
+			}
+			next = el.firstChild || el.nextSibling
+			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
+		}
+		return first ? null : out
+	}
 
 
 	/**
