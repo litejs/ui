@@ -148,8 +148,13 @@ El.bindings.run = function() {}
 	var user
 
 	Mediator.on("login", function(e, data) {
+		var err
+		if (data.name != "a") {
+			err = "Login fail. Try name: a"
+			data = null
+		}
 		user = El.data.user = data
-		View.show(true)
+		View.show(true, {error: err})
 	})
 
 	Mediator.on("logout", function() {

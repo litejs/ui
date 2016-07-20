@@ -101,6 +101,7 @@
 	form[action="javascript:"][method=POST] &emitForm:"login"
 		fieldset.grid-2.login
 			legend Login
+			.error {route.error||""}
 			label.col-12
 				.col-12.col-md-4.login__label Username
 				.col-12.col-md-8>input[name=name]
