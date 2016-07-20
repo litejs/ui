@@ -32,7 +32,7 @@
 
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	, ie678 = !+"\v1"
-	, ie67 = ie678 && (document.documentMode|0) < 8
+	, ie67 = ie678 && /* istanbul ignore next: IE fix */ (document.documentMode|0) < 8
 
 	// Element.matches is supported from Chrome 34, Firefox 34
 	, matches = proto.matches = proto.matches || function(selector) {
@@ -183,8 +183,8 @@
 		, el = this
 
 		if (key && key.constructor == Object) {
-			for (val in key) {
-				attr.call(el, val, key[val])
+			for (current in key) {
+				attr.call(el, current, key[current])
 			}
 			return el
 		}
@@ -220,6 +220,7 @@
 		// http://msdn.microsoft.com/en-us/library/ms536614(VS.85).aspx
 
 		//** modernBrowser
+		// istanbul ignore next: IE fix
 		if (ie67 && (key == "id" || key == "name" || key == "checked")) {
 			el.mergeAttributes(createElement('<INPUT '+key+'="' + val + '">'), false)
 		} else
