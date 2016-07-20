@@ -607,7 +607,7 @@
 
 	//** templates
 
-	function tpl(str) {
+	function parseTemplate(str) {
 		var parent = El("div")
 		, stack = [-1]
 		, parentStack = []
@@ -660,7 +660,7 @@
 		work("", "")
 	}
 
-	function template(parent, name) {
+	function plugin(parent, name) {
 		var t = this
 		t.name = name
 		t.parent = parent
@@ -668,7 +668,7 @@
 		t.el.plugin = t
 	}
 
-	template[protoStr] = {
+	plugin[protoStr] = {
 		_done: function() {
 			var i, el, childId
 			, t = this
@@ -718,7 +718,7 @@
 				Object.merge(bindings, Function("return({" + this.txt + "})")())
 			}
 		}),
-		child: template.extend({
+		child: plugin.extend({
 			done: function() {
 				var key = "@child-" + (++childSeq)
 				, root = this.parent
@@ -744,14 +744,14 @@
 					if (!val || val.constructor != Object) {
 						val = { item: val }
 					}
-					tpl(txt.format(val))
+					parseTemplate(txt.format(val))
 				})
 			}
 		}),
-		el: template,
+		el: plugin,
 		js: js,
-		template: template,
-		view: template.extend({
+		template: plugin,
+		view: plugin.extend({
 			done: function() {
 				var fn
 				, t = this
@@ -770,7 +770,7 @@
 				}
 			}
 		}),
-		"view-link": template.extend({
+		"view-link": plugin.extend({
 			done: function() {
 				var t = this
 				, arr = t.name.split(/\s+/)
@@ -782,7 +782,7 @@
 		})
 	}
 
-	El.view = El.tpl = tpl
+	El.view = El.tpl = parseTemplate
 	//*/
 
 	El.scrollLeft = scrollLeft
