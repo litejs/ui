@@ -42,7 +42,7 @@
 
 	bindings["with"] = bindingWith
 	function bindingWith(map) {
-		return this.render(Object.merge(El.scope(this, true), map))
+		return this.render(JSON.merge(El.scope(this, true), map))
 	}
 
 	bindings.emitForm = emitForm
