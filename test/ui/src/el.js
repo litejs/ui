@@ -10,6 +10,7 @@ global.window = global
 global.attachEvent = function() {}
 global.navigator = {language: "en-US"}
 
+JSON.merge = require("json-util").merge
 
 require("./el-browser.js")
 

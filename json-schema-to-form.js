@@ -115,7 +115,7 @@
 			sc.add = add
 			sc.del = del
 
-			Object.merge(sc, schema)
+			JSON.merge(sc, schema)
 
 			fieldset.append(row.render(sc))
 

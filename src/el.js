@@ -586,11 +586,11 @@
 	// IE 6-7
 	if (proto == El[protoStr]) {
 		document.createElement = function(name) {
-			return Object.merge(createElement(name), proto)
+			return JSON.merge(createElement(name), proto)
 		}
 
 		// NOTE: document.body will not get extended with later added extensions
-		Object.merge(body, proto)
+		JSON.merge(body, proto)
 	}
 	//*/
 
@@ -716,7 +716,7 @@
 	El.plugins = {
 		binding: js.extend({
 			done: function() {
-				Object.merge(bindings, Function("return({" + this.txt + "})")())
+				JSON.merge(bindings, Function("return({" + this.txt + "})")())
 			}
 		}),
 		child: plugin.extend({
@@ -879,7 +879,7 @@
 
 	function i18nAdd(lang, texts) {
 		if (i18n.list.indexOf(lang) == -1) i18n.list.push(lang)
-		Object.merge(i18n[lang] || (i18n[lang] = {}), texts)
+		JSON.merge(i18n[lang] || (i18n[lang] = {}), texts)
 		if (!currentLang) i18nUse(lang)
 	}
 

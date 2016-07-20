@@ -82,7 +82,7 @@
 			params._p = 1 + (params._p | 0)
 			return function() {
 				if (--params._p || lastParams != params) return
-				lastParams = Object.merge({}, params)
+				lastParams = JSON.merge({}, params)
 				if (view.el && view.parent == parent) {
 					view.ping(lastParams, !emit)
 				} else {
@@ -133,8 +133,8 @@
 		}
 	}
 
-	Object.merge(View, Event.Emitter)
-	Object.merge(View.prototype, Event.Emitter)
+	JSON.merge(View, Event.Emitter)
+	JSON.merge(View.prototype, Event.Emitter)
 
 	View.home = "home"
 

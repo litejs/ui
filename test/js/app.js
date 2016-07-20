@@ -53,7 +53,7 @@ _.setLang = function(lang) {
 		String.alphabet = _("__alphabet")
 		String.ordinal = _("__ordinal")
 		String.plural = _("__plural")
-		Object.merge(Date.masks, _("__dateMasks"))
+		JSON.merge(Date.masks, _("__dateMasks"))
 
 		document.body.render()
 	})
