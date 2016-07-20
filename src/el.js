@@ -608,8 +608,7 @@
 	//** templates
 
 	function tpl(str) {
-		var root = document.createDocumentFragment()
-		, parent = root
+		var parent = El("div")
 		, stack = [-1]
 		, parentStack = []
 
@@ -659,8 +658,6 @@
 		}
 		str.replace(templateRe, work)
 		work("", "")
-		root = root.childNodes
-		return root.length == 1 ? root[0] : root
 	}
 
 	function template(parent, name) {
