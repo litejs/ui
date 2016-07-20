@@ -148,12 +148,12 @@ El.bindings.run = function() {}
 	var user
 
 	Mediator.on("login", function(e, data) {
-		user = data
+		user = El.data.user = data
 		View.show(true)
 	})
 
 	Mediator.on("logout", function() {
-		user = null
+		user = El.data.user = null
 		View.show(true)
 	})
 

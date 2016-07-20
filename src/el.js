@@ -611,27 +611,33 @@
 		var root = document.createDocumentFragment()
 		, parent = root
 		, stack = [-1]
+		, parentStack = []
 
 		function work(all, indent, plugin, name, q, text) {
+			var tmp
 			for (q = indent.length; q <= stack[0]; ) {
+				if (parent.plugin) {
+					parent.plugin.done()
+				}
+				parent = parentStack.pop()
 				stack.shift()
-				parent = (parent.plugin) ? parent.plugin.done() : parent.parentNode || parent[0].parentNode
 			}
 
 			if (parent.txtMode) {
 				parent.txt += all + "\n"
 			} else if (plugin) {
 				if (El.plugins[name]) {
-					parent = (new El.plugins[name](parent, text)).el
+					parentStack.push(parent)
 					stack.unshift(q)
+					parent = (new El.plugins[name](parent, text)).el
 				} else {
 					parent.append(all)
 				}
 			} else {
 				if (name) {
-					parent = to.call(El(name, 0, 1), parent)
-					// TODO:2015-02-27:lauri:should we find a child to where put a content?
+					parentStack.push(parent)
 					stack.unshift(q)
+					parent = to.call(El(name, 0, 1), parent)
 				}
 				if (text) {
 					q = text.charAt(0)
@@ -706,13 +712,12 @@
 		t.params = params
 	}
 
-	js[protoStr].done = Fn("Function(this.txt)(),this.parent")
+	js[protoStr].done = Fn("Function(this.txt)()")
 
 	El.plugins = {
 		binding: js.extend({
 			done: function() {
 				Object.merge(bindings, Function("return({" + this.txt + "})")())
-				return this.parent
 			}
 		}),
 		child: template.extend({
@@ -724,14 +729,13 @@
 				}
 				root._childKey = key
 				this.parent.append(document.createComment(key))
-				return this.parent
 			}
 		}),
 		css: js.extend({
-			done: Fn("El.css(this.txt),this.parent")
+			done: Fn("El.css(this.txt)")
 		}),
 		def: js.extend({
-			done: Fn("View.def(this.params),this.parent")
+			done: Fn("View.def(this.params)")
 		}),
 		each: js.extend({
 			done: function() {
@@ -744,7 +748,6 @@
 					}
 					tpl(txt.format(val))
 				})
-				return this.parent
 			}
 		}),
 		el: template,
@@ -754,7 +757,6 @@
 			done: function() {
 				var fn
 				, t = this
-				, parent = t.parent
 				, arr = t.name.split(/\s+/)
 				, bind = t.el.attr("data-bind")
 				, view = View(arr[0], t._done(), arr[1], arr[2])
@@ -768,7 +770,6 @@
 					}) + "1"
 					Fn(fn, view, scopeData)()
 				}
-				return parent
 			}
 		}),
 		"view-link": template.extend({
@@ -779,7 +780,6 @@
 				.on("ping", function() {
 					View.show(arr[1])
 				})
-				return t.parent
 			}
 		})
 	}

@@ -14,6 +14,8 @@
 @el top
 	.bg-1
 		.top.t-1.App-row
+			.right
+				@child
 			.right.lang &each: lng in _.list
 				a.hand - {lng|upper} -
 					&on:"click", _.setLang.bind(null, lng)
@@ -21,6 +23,7 @@
 					&class:"lang-" + lng
 			a[href="#home"].home-link Header
 			span.sizeHint Responsive
+@el Menu
 	.bg-2
 		.Menu.App-row.js-viewRender
 			@el nav-row
@@ -55,6 +58,7 @@
 @view #public #body
 	.App.max-height
 		top
+		Menu
 		.content.loader.App-row
 			@child
 		.Footer-spacer
@@ -62,9 +66,12 @@
 
 @view #private #body
 	.App.max-height
-		button.top__logout.right Logout
-			&on:"click", "logout"
 		top
+			.p2
+				span {user.name}
+				button.c0 Logout
+					&on:"click", "logout"
+		Menu
 		.content.loader.App-row
 			@child
 		.Footer-spacer
