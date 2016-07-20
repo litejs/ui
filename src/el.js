@@ -658,6 +658,7 @@
 			}
 		}
 		str.replace(templateRe, work)
+		work("", "")
 		root = root.childNodes
 		return root.length == 1 ? root[0] : root
 	}
