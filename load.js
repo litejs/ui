@@ -157,8 +157,9 @@
 				//   - IE 10-11 returns status code 0 with CORS for codes 401, 403
 				//     Fix: Internet options -> Trusted sites -> Custom Level ->
 				//          Miscellaneous -> Access data sources across domains -> Enable
+				//   - Use CloudFlare status "522 Connection Timed Out" for network error
 
-				method = xhr.status || (xhr.responseText ? 200 : 0) // Reuse variable for status
+				method = xhr.status || (xhr.responseText ? 200 : 522) // Reuse variable for status
 				if (next) next.call(
 					xhr,
 					(method < 200 || method > 299 && method != 304 && method != 1223) && method,
