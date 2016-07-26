@@ -138,13 +138,18 @@
 
 	View.home = "home"
 
+	View.get = get
+	function get(url, params) {
+		return View(fn(url || View.home, params || {}, "404"))
+	}
+
 	View.show = function(url, _params) {
 		if (url === true) {
 			url = lastUrl
 			lastUrl = 0
 		}
 		var params = _params || {}
-		, view = View(fn(url || View.home, params, "404"))
+		, view = get(url, params)
 		if (!view.open || lastUrl != url) {
 			params._u = lastUrl = url
 			view.show(El.data.route = params)
