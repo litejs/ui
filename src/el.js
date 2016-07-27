@@ -613,8 +613,9 @@
 		, stack = [-1]
 		, parentStack = []
 
-		function work(all, indent, plugin, name, q, text) {
-			var tmp
+		function work(all, indent, plugin, name, q, text, offset) {
+			if (offset && all === indent) return
+
 			for (q = indent.length; q <= stack[0]; ) {
 				if (parent.plugin) {
 					parent.plugin.done()
