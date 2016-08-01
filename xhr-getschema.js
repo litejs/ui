@@ -54,6 +54,7 @@
 			if (refs[0]) {
 				// TODO:2014-12-23:lauri:resolve multiple refs
 				// TODO:2014-12-23:lauri:resolve refs from other files
+				// TODO:2016-07-26:lauri:Fix resolving circular refs
 				for (i = 0; ref = refs[i]; i += 3) !function(ref, i, next) {
 					getSchema(ref, function(err, schema) {
 						refs[i+1][refs[i+2]] = schema
