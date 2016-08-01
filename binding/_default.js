@@ -30,11 +30,11 @@
 	}
 
 	bindings.on = bindingOn
-	function bindingOn(ev, fn, a1, a2) {
+	function bindingOn(ev, fn, a1, a2, a3, a4, a5) {
 		if (typeof fn == "string") {
 			var _fn = fn
 			fn = function(e) {
-				Mediator.emit(_fn, e, this, a1, a2)
+				Mediator.emit(_fn, e, this, a1, a2, a3, a4, a5)
 			}
 		}
 		this.on(ev, fn)
