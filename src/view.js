@@ -159,7 +159,13 @@
 	View.def = function(str) {
 		for (var match, re = /(\S+) (\S+)/g; match = re.exec(str);) {
 			match[1].split(",").map(function(route) {
-				View(route).file = match[2]
+				var view = View(route)
+				view.file = (
+					view.file ? view.file + "," : ""
+				) +
+				match[2].replace(/[^,]+/g, function(file) {
+					return views[file] ? views[file].file : file
+				})
 			})
 		}
 	}
