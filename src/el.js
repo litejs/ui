@@ -417,28 +417,109 @@
 		this.style[key.camelCase()] = val || ""
 	}
 
+	// The addEventListener is supported in Internet Explorer from version 9.
+	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
+	// - IE8 always prevents the default of the mousewheel event.
+
+	var wheelDiff = 120
+	, addEv = "addEventListener"
+	, remEv = "removeEventListener"
+	, prefix = window[addEv] ? "" : (addEv = "attachEvent", remEv = "detachEvent", "on")
+	, fixEv = Event.fixEv = {
+		wheel:
+			"onwheel" in document      ? "wheel" :      // Modern browsers
+			"onmousewheel" in document ? "mousewheel" : // Webkit and IE
+			"DOMMouseScroll"                            // older Firefox
+	}
+	, fixFn = Event.fixFn = {
+		wheel: function(el, _fn) {
+			return function(e) {
+				var delta = (e.wheelDelta || -e.detail || -e.deltaY) / wheelDiff
+				if (delta) {
+					if (delta < 1 && delta > -1) {
+						var diff = (delta < 0 ? -1 : 1)/delta
+						delta *= diff
+						wheelDiff /= diff
+					}
+					//TODO: fix event
+					// e.deltaY =
+					// e.deltaX = - 1/40 * e.wheelDeltaX|0
+					// e.target = e.target || e.srcElement
+					_fn.call(el, e, delta)
+				}
+			}
+		}
+	}
+
+	Event.add = addEvent
+	Event.remove = rmEvent
+
+	function addEvent(el, ev, _fn) {
+		var fn = fixFn[ev] && fixFn[ev](el, _fn) || _fn
+		, fix = prefix ? function() {
+			var e = window.event
+			if (e) {
+				e.target = e.srcElement
+				e.preventDefault = preventDefault
+				e.stopPropagation = stopPropagation
+			}
+			fn.call(el, e)
+		} : fn
+
+		el[addEv](prefix + (fixEv[ev] || ev), fix, false)
+
+		Event.Emitter.on.call(el, ev, fix, el, _fn)
+	}
+
+	function rmEvent(el, ev, fn) {
+		var evs = el._e && el._e[ev]
+		, id = evs && evs.indexOf(fn)
+		if (id) {
+			el[remEv](prefix + (fixEv[ev] || ev), evs[id + 1])
+			evs.splice(id - 1, 3)
+		}
+	}
+
+	function preventDefault() {
+		this.returnValue = false
+	}
+	function stopPropagation() {
+		this.cancelBubble = this.cancel = true
+	}
+
+	Event.stop = function(e) {
+		if (e.preventDefault) {
+			e.stopPropagation()
+			e.preventDefault()
+		}
+		return false
+	}
+
+	Event.removeAll = function(el, ev, key) {
+		if (el._e) for (key in el._e) {
+			if (!ev || key === ev) rmEvent(el, key)
+		}
+	}
 	proto.on = function(ev, fn) {
 		// element.setCapture(retargetToElement)
-		Event.add(this, ev, fn)
+		addEvent(this, ev, fn)
 		return this
 	}
 
 	proto.one = function(ev, fn) {
 		var el = this
 		function remove() {
-			el.non(ev, fn).non(ev, remove)
+			el.off(ev, fn).off(ev, remove)
 		}
 		return el.on(ev, fn).on(ev, remove)
 	}
 
-	proto.non = function(ev, fn) {
-		Event.remove(this, ev, fn)
+	proto.off = function(ev, fn) {
+		rmEvent(this, ev, fn)
 		return this
 	}
 
-	proto.emit = function() {
-		Event.Emitter.emit.apply(this, arguments)
-	}
+	proto.emit = Event.Emitter.emit
 
 	proto.empty = function() {
 		for (var node, el = this; node = el.firstChild; ) {
@@ -848,9 +929,9 @@
 
 	setBreakpointsRated()
 
-	Event.add(window, "resize", setBreakpointsRated)
-	Event.add(window, "orientationchange", setBreakpointsRated)
-	Event.add(window, "load", setBreakpointsRated)
+	addEvent(window, "resize", setBreakpointsRated)
+	addEvent(window, "orientationchange", setBreakpointsRated)
+	addEvent(window, "load", setBreakpointsRated)
 	//*/
 
 

@@ -5,6 +5,7 @@
 @def test-grid test-grid.tpl
 @def test-svg ../../svg.js,tooltip.tpl,test-svg.view
 @def testman,testman/lcov,testman/lcov/{file} testman.tpl
+@def events events.view
 @def test-material-ui components/Slider.tpl,components/material.css,components/material.js,components/material.tpl,test-material-ui.view
 
 
@@ -138,6 +139,7 @@
 	h2 Test
 	ul
 		li>a[href="#testman"] Testman
+		li>a[href="#events"] Events
 		li>a[href="#broken-link"] Test broken link
 		li>a[href="#test-view-link"] Test View link
 		li>a[href="#test-form1"] Test form
