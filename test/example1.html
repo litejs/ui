@@ -2,24 +2,26 @@
 <html><body>
 <link rel="stylesheet" href="app.css">
 <script id="index" type="text/tpl">
-/ An end-of-line comment starts with slash
-/  +------------------ plugins starts with `@`
-/  |   +-------------- route, this view is accessible from #main url
-/  |   |    +--------- parent view route
-/  |   |    |
+// An end-of-line comment starts with a slash
+//  +------------------ plugins starts with `@`
+//  |    +------------- route, this view is accessible from #main url
+//  |    |    +-------- parent view route
+//  |    |    |
 @view main body
-  / selector declares an element, you can leave off the tag to get a div
+  // CSS selector declares an element, you can leave off the tag to get a div
   .App.max-height
-    .App-row.bg-1.top.t-1 LiteJS Minimal Example
+    .App-row.bg-1.top.t-1>a[href="https://www.litejs.com/"] LiteJS Minimal Example
     .App-row.bg-2
-      .Menu
-        / Custom elements can be defined inline
+      .Menu.js-viewHook
+        // Custom elements can be defined inline with 'el' plugin
         @el Menu-item
           a.Menu-item
+            &class: "selected", View(this.href.split("#")[1]).open
         Menu-item[href="#home"] Home
         Menu-item[href="#users"] Users
         Menu-item[href="#settings"] Settings
     .App-row
+      // Subviews will be mounted here
       @child
     .Footer-spacer
   .App-row.Footer.bg-1
@@ -38,6 +40,7 @@
 @view users main
   .page
     h2 Users
+    // In real application here would be data from api, not hardcoded array
     ul &each: userId in ["1", "2", "3", "4", "5"]
       li
         a User {userId}
@@ -57,11 +60,23 @@ El.tpl(index.innerHTML)
 
 // You must define at least one language
 El.i18n.def({
-	"en":"In English",
-	"et":"Eesti keeles",
-	"fi":"Suomeksi"
+	"en":"In English"
 })
 
+// Make View accessible in templates
+El.data.View = View
+
+View.on("show", function() {
+        // Blur focused link when View completes
+        try {
+                // IE8 can throw an exception for accessing document.activeElement
+                var el = document.activeElement
+                , tag = el && el.tagName
+                if (tag == "A" || tag == "BUTTON") el.blur()
+        } catch(e) {}
+        // Re-render all .js-viewHook elements on each View change
+        document.body.findAll(".js-viewHook").render()
+})
 // Start a router to showing views
 history.start(View.show)
 </script>
