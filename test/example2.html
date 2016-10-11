@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html><body>
+<script id="index" type="text/tpl">
+@el menu
+	ul
+		@el row
+			li.my-row
+				i.icon
+				b
+					@child
+		row.first
+			a[href="#home"] Home
+		row.last
+			a[href="#page/about"] About
+	hr
+
+@el footer
+	.footer
+		hr
+		i Bye
+
+@view home #body
+	menu
+	h1 Home
+	section Welcome
+	footer
+
+@view page/{pageName} #body
+	menu
+	h1 Welcome to {route.pageName} page!
+	section Hello World!
+	footer
+</script>
+<script src="../dist/litejs.js"></script>
+<script>
+// Add `#body` view
+View("#body", document.body)
+
+// Read in templates from element with id=index
+El.tpl(index.innerHTML)
+
+// You must define at least one language
+El.i18n.def({
+	"en":"In English"
+})
+
+// Start a router to showing views
+history.start(View.show)
+</script>
+<noscript><h1>Error</h1>This application requires JavaScript</noscript>
+</body></html>
+
+
