@@ -122,6 +122,8 @@ h6 {
 .c0 { color: #000; }
 .c1 { color: #fff; }
 .c2 { color: #789; }
+.c3 { color: green; }
+.c4 { color: red; }
 
 .p0, .p00, .p01, .p02, .p03, .p04 { padding-top:    0; padding-bottom:    0; }
 .p1, .p10, .p11, .p12, .p13, .p14 { padding-top:  4px; padding-bottom:  4px; }

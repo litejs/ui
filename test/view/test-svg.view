@@ -36,17 +36,31 @@
 	.grid-2
 		h3 tooltip
 			&data: "tooltip", "Hello"
-		svg[viewBox="0 0 60 60"][width=128]
-			path.arc &arc:0,30,12
-			path.arc &arc:30,90,12
-			path.arc &arc:90,100,12
-			path.arc &arc:0,40,25
-				&data: "tooltip", "Option C 40%"
-			path.arc &arc:40,70,25
-				&data: "tooltip", "Option B 30%"
-			path.arc
-				&arc:70,100,25
-				&data: "tooltip", "Option A 30%"
+		.col-12
+			svg[viewBox="0 0 60 60"][width=128]
+				path.arc &arc:0,30,12
+				path.arc &arc:30,90,12
+				path.arc &arc:90,100,12
+				path.arc &arc:0,40,25
+					&data: "tooltip", "Option C 40%\nSome more text"
+				path.arc &arc:40,70,25
+					&data: "tooltip", "Option B 30%"
+				path.arc
+					&arc:70,100,25
+					&data: "tooltip", "Option A 30%"
+		.col-12
+			Chart[height=300]
+				&ref: "chart"
+				Chart-axes
+				Chart-legend
+				Chart-line.c3
+					&with: {name: "Line 1", points: [80, 230, 15, 225, 40, 255], radius: 8}
+				Chart-line.c4
+					&with: {name: "Line 2", points: [110, 230, 15, 225, 40, 255]}
+				Chart-line.c2
+					&with: {name: "Line 3", points: [10, 24, 15, 25, 0, 90], radius: 6}
+				Chart-area.c5
+				Chart-bar.c1
 
 
 
