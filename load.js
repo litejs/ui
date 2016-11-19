@@ -269,5 +269,5 @@
 	 * (Works in all major browsers)
 	 */
 
-}(this,[])
+}(this, [/*!{loadFiles}*/])
 
