@@ -214,7 +214,7 @@
 	function load(files, next, raw) {
 		if (typeof files == "string") files = [files]
 		var file
-		, len = files.length
+		, len = files && files.length
 		, i = 0
 		, pending = 0
 		, res = []
