@@ -30,49 +30,63 @@
 				delete schema.allOf
 			}
 
-			var fieldset = El("fieldset.grid-1", El("legend", schema.title || _link.title)).to(form)
+			var fieldset = El("fieldset.grid-1", El("legend", schema.title || _link.title))
 
-			drawSchema(schema, null, fieldset, model.data || {})
+			drawSchema(schema, null, fieldset, model.data || {}, null, scope)
+
+			fieldset.to(form)
 
 			form.on("submit", function() {
 				var data = JSON.serializeForm(this)
+				, _scope = JSON.merge({}, scope.route, model.data)
 				applySchema(schema, data)
 
 				xhr.makeReq(
 					_link.method || "POST",
-					_link.href.format(model.data),
+					_link.href.format(_scope),
 					data,
-					function() {
-						Mediator.emit("up")
+					function(err, res, xhr) {
+						if (err) {
+							Mediator.emit("error", err)
+						} else {
+							Mediator.emit("response:" + link, err, res, xhr)
+						}
 					}
 				)
 			})
 
-			El("input[type=submit][value=Ok]").to(form)
 		})
 
-		function drawSchema(schema, key, fieldset, data, namePrefix) {
+		function drawSchema(schema, key, fieldset, data, namePrefix, scope) {
 			var alternatives, keys, i, root, tmp
 			, alSelected
 			, count = 0
 
-			if (schema.properties) {
+			if (schema.properties || schema.anyOf) {
 				if (key !== null) {
 					namePrefix = namePrefix ? namePrefix + "[" + key + "]" : key
+					if (schema.title) {
+						fieldset.append(El(template + "-subheader", schema.title))
+					}
 				}
+			}
+
+			if (schema.properties) {
 				Object.each(schema.properties, function(schema, _key) {
 					drawSchema(
 						schema,
 						_key,
 						fieldset,
-						schema.type == "object" ? data[_key] : data,
-						namePrefix
+						(schema.type == "object" || schema.properties || schema.anyOf ? data[_key] : data) || {},
+						namePrefix,
+						scope
 					)
 				})
 				if (!schema.anyOf) return
 			}
 
-			if (schema.anyOf || key == "anyOf") {
+			if (schema.anyOf) {
+				var title
 				schema = schema.anyOf || schema
 				key = []
 
@@ -86,31 +100,39 @@
 				}
 
 				for (i = 0; tmp = schema[i++]; ) {
-					root = new El.wrap([])
-					tmp = Object.clone(tmp)
+					root = El(".row")
+					tmp = JSON.clone(tmp)
 					keys.each(function(val) {
+						title = title || tmp.properties[val].title
 						tmp.properties[val]["enum"].each(function(val) {
 							key.push(val)
 							alternatives[val] = root
 						})
 						delete tmp.properties[val]
 					})
-					drawSchema(tmp, null, root, data, namePrefix)
+					drawSchema(tmp, null, root, data, namePrefix, scope)
 				}
 
-				schema = {"enum": key}
+				schema = {
+					title: title,
+					"enum": key
+				}
 				key = keys[0]
 			}
 
+
 			var row = El(template + (
-				schema.resourceCollection ? "-list" :
+				schema["ui:el"] ? "-" + schema["ui:el"] :
 				schema["enum"] ? "-enum" :
 				schema.type == "boolean" || schema.type == "array" ? "-" + schema.type :
+				schema.resourceCollection ? "-list" :
 				"" ))
 			, sc = El.scope(row, scope)
-			, val = data[key] || schema["default"]
+			, val = (key == null ? data : data[key])
 
-			sc.name = schema.title || key
+			if (val == null) val = schema["default"]
+
+			sc.name = _(schema.title || key || "")
 			sc.value = val
 			sc.add = add
 			sc.del = del
@@ -123,12 +145,17 @@
 				var content = row.find(".js-items")
 				, hidden = El("input[type=hidden]").to(content)
 
-				hidden.attr("name", namePrefix ? namePrefix + "[" + key + "]" : key)
+				key = namePrefix ? namePrefix + "[" + key + "]" : key
+
+				hidden.attr("name", key)
 
 				if (Array.isArray(schema.items)) {
 					throw "Not implemented"
 					schema.items.each(function(val, i) {
 					})
+				} else if (schema.resourceCollection) {
+					var _scope = JSON.merge({}, scope.route, data)
+					api(schema.resourceCollection.format(_scope)).each(add2)
 				} else if (Array.isArray(val) && val.length) {
 					val.each(add)
 				} else if (schema.minItems) {
@@ -137,6 +164,18 @@
 					}
 				}
 				return
+			}
+
+			function add2(val, i) {
+
+				drawSchema(
+					{ type: "boolean", title: val.data.name },
+					"" + i,
+					content,
+					{ [i]:sc.value && sc.value.indexOf(val.data.id) != -1 || null },
+					key,
+					scope
+				)
 			}
 
 			function add(val) {
@@ -152,12 +191,13 @@
 					null,
 					root,
 					val || {},
-					key + "[" + (count++) + "]"
+					key + "[" + (count++) + "]",
+					scope
 				)
 			}
 
 			var field = row.find(".field")
-			field.attr("name", namePrefix ? namePrefix + "[" + key + "]" : key)
+			field.attr("name", namePrefix && key ? namePrefix + "[" + key + "]" : namePrefix || key)
 
 			if (val !== void 0) {
 				field.val(val)
@@ -188,59 +228,82 @@
 		this.closest(".js-del").kill()
 	}
 
-	function applySchema(schema, data) {
+	JSON.applySchema = applySchema
+
+	function applySchema(schema, data, _required) {
+		var tmp
+		, type = schema.type
+		, required = _required || schema.required
+
 		if (schema.anyOf) {
 			schema.anyOf.each(function(schema) {
-				var i, tmp
+				var i, tmp, tmp2
 				, keys = Object.keys(schema.properties)
 
 				for (i = 0; tmp = keys[i++]; ) {
-					if (schema.properties[tmp]["enum"] && schema.properties[tmp]["enum"].indexOf(data[tmp]) == -1) {
+					tmp2 = schema.properties[tmp]["enum"]
+					if (tmp2 && tmp2.indexOf(data[tmp]) == -1) {
 						return
 					}
 				}
 				applySchema(schema, data)
 			})
-		} else Object.each(schema.properties, function(val, key) {
-			fixType(data, key, val)
-		})
-	}
-
-	function fixType(data, key, schema) {
-		var val = data[key]
-
-		if (val !== void 0) {
-			if (typeof val !== schema.type) {
-				if (schema.type == "number") {
-					data[key] = parseFloat( (val + "").replace(",", ".") )
-				}
-				if (schema.type == "integer") {
-					data[key] |= 0
-				}
-				if (schema.type == "boolean" ) {
-					data[key] = val ? true : schema.required ? false : null
-				}
-				if (schema.type == "date-time") {
-					data[key] = val.date()
-				}
-				if (schema.type == "array" ) {
-					if (Array.isArray(schema.items)) {
-						throw "Not implemented"
+		}
+		if (Array.isArray(schema.enum)) {
+			if (schema.enum.indexOf(data) === -1) {
+				for (var i = schema.enum.length; i--; ) {
+					if (schema.enum[i] == data) {
+						data = schema.enum[i]
+						break
 					}
-
-					data[key] = Array.isArray(data[key]) ?
-						data[key].reduce(function(memo, item) {
-							if (item !== void null) {
-								applySchema(schema.items, item)
-								memo.push(item)
-							}
-							return memo
-						}, []) :
-						null
 				}
-			} else if (schema.type == "object" ) {
-				applySchema(schema, data[key])
+			}
+		} else if (type == "number") {
+			data = parseFloat( (data + "").replace(",", ".") )
+		} else if (type == "integer") {
+			data |= 0
+		} else if (type == "boolean" ) {
+			data = data ? true : required ? false : null
+		} else if (type == "date-time") {
+			data = data.date()
+		} else if (schema.type == "array" ) {
+			if (Array.isArray(schema.items)) {
+				throw "Not implemented"
+			}
+
+			data = Array.isArray(data) ?
+				data.reduce(function(memo, item) {
+					if (item !== void null) {
+						item = applySchema(schema.items, item)
+						memo.push(item)
+					}
+					return memo
+				}, []) :
+				null
+		} else {
+			var reqArr = Array.isArray(schema.required) && schema.required
+			Object.each(schema.properties, function(propSchema, prop) {
+				if (data[prop] !== void 0) {
+					data[prop] = applySchema(
+						propSchema,
+						data[prop],
+						reqArr && reqArr.indexOf(prop) > -1
+					)
+				}
+			})
+		}
+
+		if (type == "number" || type == "integer") {
+			tmp = schema.minimum
+			if (typeof tmp == "number" && data < tmp) {
+				data = tmp
+			}
+			tmp = schema.maximum
+			if (typeof tmp == "number" && data > tmp) {
+				data = tmp
 			}
 		}
+
+		return data
 	}
 }()
