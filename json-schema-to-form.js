@@ -134,7 +134,7 @@
 
 			sc.name = _(schema.title || key || "")
 			sc.value = val
-			sc.add = add
+			sc.add = function(e) { add() }
 			sc.del = del
 
 			JSON.merge(sc, schema)
