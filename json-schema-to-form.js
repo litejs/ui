@@ -167,12 +167,14 @@
 			}
 
 			function add2(val, i) {
+				var map = {}
+				map[i] = sc.value && sc.value.indexOf(val.data.id) != -1 || null
 
 				drawSchema(
 					{ type: "boolean", title: val.data.name },
 					"" + i,
 					content,
-					{ [i]:sc.value && sc.value.indexOf(val.data.id) != -1 || null },
+					map,
 					key,
 					scope
 				)
