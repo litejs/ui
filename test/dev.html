@@ -7,7 +7,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 
 <html manifest="cache.manifest">
 -->
-<html>
+<html data-manifest="cache.manifest">
 	<head>
 		<!--
 		  1. https://blog.whatwg.org/the-road-to-html-5-character-encoding
@@ -81,15 +81,26 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<link rel="shortcut icon" href="favicon.ico">
 		<link rel="apple-touch-icon" href="apple-touch-icon.png">
 		-->
-		<link rel="stylesheet" href="app.css">
+		<link rel="stylesheet" squash="m.css" href="app.css">
 		<link rel="stylesheet" title="Default look" href="css/theme/blue.css">
 		<link rel="alternate stylesheet" title="New look" href="css/theme/new.css">
 	</head>
 	<body>
 		<script inline src="../load.js"></script>
-		<script src="../dist/up-min.js" data-if="!Function.prototype.bind"></script>
-		<script squash="0.js?h={hash}" src="../dist/litejs.js"></script>
-		<script squash src="../node_modules/browser-event-lite/lib/touch-as-mouse.js"></script>
+		<script
+			squash="../dist/up-min.js"
+			src="../dist/up.js"
+			banner="litejs.com/MIT-LICENSE.txt"
+			build="browser-upgrade-lite"
+			data-if="!Function.prototype.bind"
+		></script>
+		<script
+			squash="../dist/litejs-min.js"
+			src="../dist/litejs.js"
+			banner="litejs.com/MIT-LICENSE.txt"
+			build="fn.js,date-format-lite,json-util,events.js,format.js,timing.js,src/el.js,src/history.js,src/keymap.js,src/view.js,src/bindings.js"
+		></script>
+		<script squash="0.js" src="../node_modules/browser-event-lite/lib/touch-as-mouse.js"></script>
 		<script squash src="js/mediator.js"></script>
 		<script squash src="../src/xhr-getschema.js"></script>
 		<script squash src="../src/json-schema-to-form.js"></script>
