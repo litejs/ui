@@ -1,7 +1,7 @@
 
 
 
-!function(window, document, Event, protoStr) {
+!function(window, document, Object, Event, protoStr) {
 	var currentLang, styleNode
 	, hasOwn = Object[protoStr].hasOwnProperty
 	, wrapProto = []
@@ -979,6 +979,6 @@
 	// i18nUse("en")
 	//*/
 
-}(window, document, Event, "prototype")
+}(window, document, Object, Event, "prototype")
 
 
