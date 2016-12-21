@@ -1,7 +1,7 @@
 require("browser-upgrade-lite")
 global.Fn = require("../fn.js").Fn
 
-global.Event = require("browser-event-lite").Event
+global.Event = require("../events").Event
 
 require("../format.js")
 require("../timing.js")
