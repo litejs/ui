@@ -7,21 +7,18 @@
 	, wrapProto = []
 	, body = document.body
 	, root = document.documentElement
-	, createElement = document.createElement
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
 	, elCache = El.cache = {}
-	, scopeSeq = 0
-	, childSeq = 0
-	, scopeData = El.data = { _: i18n }
-	, proto = (window.Element || El)[protoStr]
+	, seq = 0
+	, scopeData = El.data = { _: i18n, El: El }
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w\:.#\[\]=])*)[ \t]*(.*?)$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*\:((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, bindings = El.bindings = {
 		"class": function(name, fn) {
-			toggleClass.call(this, name, arguments.length < 2 || fn)
+			;(arguments.length < 2 || fn ? addClass : rmClass)(this, name)
 		},
 		data: function(key, val) {
-			this.attr("data-" + key, val)
+			setAttr(this, "data-" + key, val)
 		},
 		html: function(html) {
 			this.innerHTML = html
@@ -34,20 +31,24 @@
 	, ie678 = !+"\v1"
 	, ie67 = ie678 && /* istanbul ignore next: IE fix */ (document.documentMode|0) < 8
 
-	// Element.matches is supported from Chrome 34, Firefox 34
-	, matches = proto.matches = proto.matches || function(selector) {
-		return !!selectorFn(selector)(this)
-	}
-	// Element.closest is supported from Chrome 41, Firefox 35
-	, closest = proto.closest = proto.closest || function(selector) {
-		for (var el = this; el && el.nodeType == 1; el = el.parentNode) {
-			if (matches.call(el, selector)) return el
+	, matches = El.matches = body.matches ?
+		function(el, sel) {
+			return el.matches(sel)
+		} :
+		function(el, sel) {
+			return !!selectorFn(sel)(el)
 		}
-		return null
-	}
+	, closest = El.closest = body.closest ?
+		function(el, sel) {
+			return el.closest(sel)
+		} :
+		function(el, sel) {
+			return walk("parentNode", 1, el, sel)
+		}
+
 
 	, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
-	, selectorLastRe = /([\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
+	, selectorLastRe = /([~\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
 	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
 	, selectorCache = {}
 	, selectorMap = {
@@ -65,7 +66,7 @@
 	function selectorFn(str) {
 		// jshint evil:true
 		return selectorCache[str] ||
-		(selectorCache[str] = Function("_,v,a,b", "return " +
+		(selectorCache[str] = Function("m,c,n,p", "return function(_,v,a,b){return " +
 			str.split(selectorSplitRe).map(function(sel) {
 				var relation, from
 				, rules = ["_&&_.nodeType==1"]
@@ -87,54 +88,47 @@
 					return ""
 				})
 
-				if (tag && tag != "*") rules[0] += "&&_.nodeName=='" + tag.toUpperCase() + "'"
-				if (parentSel) rules.push(
-					relation == "+" ? "(a=_.previousSibling)" : "(a=_.parentNode)",
-					( relation ? "a.matches&&a.matches('" : "a.closest&&a.closest('" ) + parentSel + "')"
-				)
+				if (tag && tag != "*") rules[0] += "&&_.tagName=='" + tag.toUpperCase() + "'"
+				if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
 				return rules.join("&&")
-			}).join("||")
-		))
+			}).join("||") + "}"
+		)(matches, closest, next, prev))
 	}
 
-	// Note: querySelector in IE8 supports only CSS 2.1 selectors
-	proto.find = !ie678 && proto.querySelector || function(sel) {
-		return findEl(this, selectorFn(sel), true)
-	}
-
-	proto.findAll = proto.querySelectorAll ?
-		function(sel) {
-			return new ElWrap(this.querySelectorAll(sel))
-		} :
-		function(sel) {
-			return new ElWrap(findEl(this, selectorFn(sel)))
-		}
-	/*/
-	, closest = proto.closest
-
-	proto.find = proto.querySelector
-	proto.findAll = function(sel) {
-		return new ElWrap(this.querySelectorAll(sel))
-	}
-	//*/
-
-	function findEl(node, fn, first) {
-		var el
-		, i = 0
-		, out = []
-		, next = node.firstChild
-
-		for (; (el = next); ) {
-			if (fn(el)) {
-				if (first) return el
-				out.push(el)
-			}
-			next = el.firstChild || el.nextSibling
-			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
+	function walk(next, first, el, sel, nextFn) {
+		var out = []
+		if (typeof sel !== "function") sel = selectorFn(sel)
+		for (; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
+			if (first) return el
+			out.push(el)
 		}
 		return first ? null : out
 	}
 
+	function find(node, sel, first) {
+		return walk("firstChild", first, node.firstChild, sel, function(el) {
+			var next = el.nextSibling
+			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
+			return next
+		})
+	}
+
+	// Note: querySelector in IE8 supports only CSS 2.1 selectors
+	if (!ie678 && body.querySelector) {
+		El.find = function(el, sel) {
+			return el.querySelector(sel)
+		}
+		El.findAll = function(el, sel) {
+			return new ElWrap(el.querySelectorAll(sel))
+		}
+	} else {
+		El.find = function(el, sel) {
+			return find(el, sel, true)
+		}
+		El.findAll = function(el, sel) {
+			return new ElWrap(find(el, sel))
+		}
+	}
 
 	/**
 	 * Turns CSS selector like syntax to DOM Node
@@ -169,22 +163,28 @@
 		el = (elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true)
 
 		if (pres) {
-			attr.call(el, pre)
+			setAttr(el, pre)
 		}
 
 		return silence || !args ? el :
-		(args.constructor == Object ? attr : append).call(el, args)
+		(args.constructor == Object ? setAttr : append)(el, args)
 	}
 	window.El = El
 
-	proto.attr = attr
-	function attr(key, val) {
+	El.attr = function(el, key, val) {
+		return arguments.length < 3 && key.constructor != Object ? getAttr(el, key) : setAttr(el, key, val)
+	}
+
+	function getAttr(el, key) {
+		return el.getAttribute && el.getAttribute(key)
+	}
+
+	function setAttr(el, key, val) {
 		var current
-		, el = this
 
 		if (key && key.constructor == Object) {
 			for (current in key) {
-				attr.call(el, current, key[current])
+				setAttr(el, current, key[current])
 			}
 			return el
 		}
@@ -204,9 +204,6 @@
 
 		current = el.getAttribute(key)
 
-		if (arguments.length == 1) {
-			return current
-		}
 		// Note: IE5-7 doesn't set styles and removes events when you try to set them.
 		//
 		// in IE6, a label with a for attribute linked to a select list
@@ -222,11 +219,11 @@
 		//** modernBrowser
 		// istanbul ignore next: IE fix
 		if (ie67 && (key == "id" || key == "name" || key == "checked")) {
-			el.mergeAttributes(createElement('<INPUT '+key+'="' + val + '">'), false)
+			el.mergeAttributes(document.createElement('<INPUT '+key+'="' + val + '">'), false)
 		} else
 		//*/
 		if (key == "class") {
-			addClass.call(el, val)
+			addClass(el, val)
 		} else if (val || val === 0) {
 			if (current != val) {
 				el.setAttribute(key, val)
@@ -244,23 +241,22 @@
 	// textContent is suported from IE9
 	// Opera 9-10 have Node.text so we use Node.txt
 
-	proto.txt = bindings.txt = function(newText) {
-		return arguments.length && this[txtAttr] != newText ? (
+	El.txt = function(el, newText) {
+		return arguments.length && el[txtAttr] != newText ? (
 			//** modernBrowser
 			// Fix for IE5-7
-			//(ie67 && this.tagName == "OPTION" && (this.label = newText)),
+			//(ie67 && el.tagName == "OPTION" && (el.label = newText)),
 			//*/
-			this[txtAttr] = newText
-		) : this[txtAttr]
+			el[txtAttr] = newText
+		) : el[txtAttr]
 	}
 
-	proto.val = bindings.val = function(val) {
-		var el = this
-		, type = el.type
+	El.val = function(el, val) {
+		var type = el.type
 		, opts = el.options
 		, checkbox = type == "checkbox" || type == "radio"
 
-		if (arguments.length) {
+		if (arguments.length > 1) {
 			if (opts) {
 				val = (Array.isArray(val) ? val : [ val ]).map(String)
 				for (type = 0; el = opts[type++]; ) {
@@ -293,10 +289,12 @@
 		el.valObject || el.value
 	}
 
-	proto.append = append
-	function append(child, before) {
+	El.append = append
+	function append(el, child, before) {
+		if (!el.nodeType) {
+			return el.append ? el.append(child, before) : el
+		}
 		var fragment
-		, el = this
 		, i = 0
 		, tmp = typeof child
 		if (child) {
@@ -307,14 +305,14 @@
 				for (
 					tmp = child.length
 					, fragment = document.createDocumentFragment();
-					i < tmp; ) append.call(fragment, child[i++])
+					i < tmp; ) append(fragment, child[i++])
 				child = fragment
 			}
 
 			if (child.nodeType) {
 				tmp = el.insertBefore ? el : el[el.length - 1]
-				if (i = tmp.attr && tmp.attr("data-child")) {
-					before = findEl(tmp, Fn("v->n->n.nodeType===8&&n.nodeValue==v")(i), 1) || tmp
+				if (i = getAttr(tmp, "data-child")) {
+					before = find(tmp, Fn("v->n->n.nodeType===8&&n.nodeValue==v")(i), 1) || tmp
 					tmp = before.parentNode
 					// TODO:2016-07-05:lauri:handle numeric befores
 				}
@@ -329,25 +327,24 @@
 		return el
 	}
 
-	proto.after = function(silbing, before) {
+	El.after = function(el, silbing, before) {
 		// call append so it works with DocumentFragment
-		append.call(silbing.parentNode, this, before ? silbing : silbing.nextSibling)
-		return this
+		append(silbing.parentNode, el, before ? silbing : silbing.nextSibling)
+		return el
 	}
 
-	proto.to = to
-	function to(parent, before) {
-		append.call(parent, this, before)
-		return this
+	El.to = to
+	function to(el, parent, before) {
+		append(parent, el, before)
+		return el
 	}
 
 	// setAttribute("class") is broken in IE7
 	// className is object in SVGElements
 
-	proto.hasClass = hasClass
-	function hasClass(name) {
-		var el = this
-		, current = el.className || ""
+	El.hasClass = hasClass
+	function hasClass(el, name) {
+		var current = el.className || ""
 		, useAttr = typeof current != "string"
 
 		if (useAttr) {
@@ -357,10 +354,9 @@
 		return !!current && current.split(/\s+/).indexOf(name) > -1
 	}
 
-	proto.addClass = addClass
-	function addClass(name) {
-		var el = this
-		, current = el.className || ""
+	El.addClass = addClass
+	function addClass(el, name) {
+		var current = el.className || ""
 		, useAttr = typeof current != "string"
 
 		if (useAttr) {
@@ -381,10 +377,9 @@
 		return el
 	}
 
-	proto.rmClass = rmClass
-	function rmClass(name) {
-		var el = this
-		, current = el.className || ""
+	El.rmClass = rmClass
+	function rmClass(el, name) {
+		var current = el.className || ""
 		, useAttr = typeof current != "string"
 
 		if (useAttr) {
@@ -405,16 +400,8 @@
 		return el
 	}
 
-	proto.toggleClass = toggleClass
-	function toggleClass(name, force) {
-		if (arguments.length === 1) {
-			force = !hasClass.call(this, name)
-		}
-		return ( force ? addClass : rmClass ).call(this, name), force
-	}
-
-	proto.css = bindings.css = function(key, val) {
-		this.style[key.camelCase()] = val || ""
+	El.css = function(el, key, val) {
+		el.style[key.camelCase()] = val || ""
 	}
 
 	// The addEventListener is supported in Internet Explorer from version 9.
@@ -450,9 +437,6 @@
 			}
 		}
 	}
-
-	Event.add = addEvent
-	Event.remove = rmEvent
 
 	function addEvent(el, ev, _fn) {
 		var fn = fixFn[ev] && fixFn[ev](el, _fn) || _fn
@@ -495,48 +479,52 @@
 		return false
 	}
 
-	Event.removeAll = function(el, ev, key) {
-		if (el._e) for (key in el._e) {
-			if (!ev || key === ev) rmEvent(el, key)
-		}
-	}
-	proto.on = function(ev, fn) {
+	El.on = function(el, ev, fn) {
 		// element.setCapture(retargetToElement)
-		addEvent(this, ev, fn)
-		return this
+		addEvent(el, ev, fn)
+		return el
 	}
 
-	proto.one = function(ev, fn) {
-		var el = this
+	El.one = function(el, ev, fn) {
 		function remove() {
-			el.off(ev, fn).off(ev, remove)
+			rmEvent(el, ev, fn)
+			rmEvent(el, ev, remove)
 		}
-		return el.on(ev, fn).on(ev, remove)
+		addEvent(el, ev, fn)
+		addEvent(el, ev, remove)
+		return el
 	}
 
-	proto.off = function(ev, fn) {
-		rmEvent(this, ev, fn)
-		return this
+	El.off = function(el, ev, fn) {
+		rmEvent(el, ev, fn)
+		return el
 	}
 
-	proto.emit = Event.Emitter.emit
+	El.emit = function(el, ev) {
+		Event.Emitter.emit.call(el, ev)
+	}
 
-	proto.empty = function() {
-		for (var node, el = this; node = el.firstChild; ) {
-			kill.call(node)
+	El.empty = empty
+	function empty(el) {
+		for (var node; node = el.firstChild; ) {
+			kill(node)
 		}
 		return el
 	}
 
-	proto.kill = kill
-	function kill() {
+	El.kill = kill
+	function kill(el) {
 		var id
-		, el = this
-		if (el.emit) el.emit("kill")
+		if (el._e) {
+			Event.Emitter.emit.call(el, "kill")
+			for (id in el._e) rmEvent(el, id)
+		}
 		if (el.parentNode) el.parentNode.removeChild(el)
-		if (Event.removeAll) Event.removeAll(el)
-		if (el.empty) el.empty()
-		if (id = el.attr && el.attr("data-scope")) {
+		if (el.nodeType != 1) {
+			return el.kill && el.kill()
+		}
+		empty(el)
+		if (id = getAttr(el, "data-scope")) {
 			delete elScope[id]
 		}
 		if (el.valObject) el.valObject = null
@@ -545,52 +533,51 @@
 
 	El.scope = elScope
 	function elScope(node, parent, _scope) {
-		if (_scope = elScope[attr.call(node, "data-scope")]) {
+		if (_scope = elScope[getAttr(node, "data-scope")]) {
 			return _scope
 		}
 		if (!parent || parent === true) {
-			_scope = closest.call(node, "[data-scope]")
-			_scope = _scope && elScope[attr.call(_scope, "data-scope")] || scopeData
+			_scope = closest(node, "[data-scope]")
+			_scope = _scope && elScope[getAttr(_scope, "data-scope")] || scopeData
 		}
 		if (parent) {
-			attr.call(node, "data-scope", ++scopeSeq)
-			_scope = elScope[scopeSeq] = Object.create(parent = (_scope || parent))
+			setAttr(node, "data-scope", ++seq)
+			_scope = elScope[seq] = Object.create(parent = (_scope || parent))
 			_scope._super = parent
 		}
 		return _scope
 	}
 
-	proto.render = render
-	function render(scope, skipSelf) {
+	El.render = render
+	function render(node, scope, skipSelf) {
 		var bind, newBind, fn
-		, node = this
 
 		if (node.nodeType != 1) {
-			return node
+			return node.render ? node.render(scope) : node
 		}
 
 		// TODO:2015-05-25:lauri:Use elScope
-		scope = elScope[attr.call(node, "data-scope")]
+		scope = elScope[getAttr(node, "data-scope")]
 		|| scope
-		|| (bind = closest.call(node, "[data-scope]")) && elScope[attr.call(bind, "data-scope")]
+		|| (bind = closest(node, "[data-scope]")) && elScope[getAttr(bind, "data-scope")]
 		|| scopeData
 
-		if (bind = !skipSelf && attr.call(node, "data-bind")) {
+		if (bind = !skipSelf && getAttr(node, "data-bind")) {
 			newBind = bind
 			// i18n(bind, lang).format(scope)
 			// document.documentElement.lang
 			// document.getElementsByTagName('html')[0].getAttribute('lang')
 
-			fn = "data b r->data&&(" + bind.replace(renderRe, function(match, name, args) {
+			fn = "data b s r->data&&(" + bind.replace(renderRe, function(match, name, args) {
 				return bindings[name] ?
 				(hasOwn.call(bindings[name], "once") && (newBind = newBind.replace(match, "")),
 					"(r=b['" + name + "'].call(this" + (bindings[name].raw ? ",data,'" + args + "'" : args ? "," + args : "") + ")||r),") :
-				"this.attr('" + name + "'," + args + "),"
+				"s(this,'" + name + "'," + args + "),"
 			}) + "r)"
-			if (bind != newBind) attr.call(node, "data-bind", newBind)
+			if (bind != newBind) setAttr(node, "data-bind", newBind)
 
 			try {
-				if (Fn(fn, node, scope)(scope, bindings)) {
+				if (Fn(fn, node, scope)(scope, bindings, setAttr)) {
 					return node
 				}
 			} catch (e) {
@@ -605,7 +592,7 @@
 
 		for (bind = node.firstChild; bind; bind = newBind) {
 			newBind = bind.nextSibling
-			render.call(bind, scope)
+			render(bind, scope)
 		}
 		//** modernBrowser
 		if (ie678 && node.nodeName == "SELECT") {
@@ -628,27 +615,37 @@
 
 	ElWrap[protoStr] = wrapProto
 
-	Object.keys(proto).each(addWrapProto)
-
 	function addWrapProto(key) {
 		var first = key == "closest" || key == "find"
 
 		wrapProto[key] = wrap
-		function wrap() {
-			for (var val, i = 0, len = this.length; i < len; ) {
-				val = proto[key].apply(this[i++], arguments)
-				if (first && val) return val
+		function wrap(a, b, c) {
+			var i = 0
+			, self = this
+			, len = self.length
+			, argi = arguments.length
+			, fn = El[key]
+
+			if (argi === 0) for (; i < len; ) fn(self[i++])
+			else if (argi === 1) for (; i < len; ) fn(self[i++], a)
+			else if (argi === 2) for (; i < len; ) fn(self[i++], a, b)
+			else if (argi === 3) for (; i < len; ) fn(self[i++], a, b, c)
+			else {
+				var arr = wrapProto.slice.call(arguments)
+				arr.unshift(1)
+				for (; i < len; ) {
+					arr[0] = self[i++]
+					fn.apply(null, arr)
+				}
 			}
-			return first ? null : this
+			return self
 		}
 	}
-
-	addWrapProto("closest")
 
 	wrapProto.append = function(el) {
 		var elWrap = this
 		if (elWrap._childId != void 0) {
-			elWrap[elWrap._childId].append(el)
+			append(elWrap[elWrap._childId], el)
 		} else {
 			this.push(el)
 		}
@@ -663,29 +660,16 @@
 		return clone
 	}
 
-	//** modernBrowser
-	// IE 6-7
-	if (proto == El[protoStr]) {
-		document.createElement = function(name) {
-			return JSON.merge(createElement(name), proto)
+	Object.keys(El).each(function(key) {
+		if (!bindings[key]) {
+			bindings[key] = function() {
+				var arr = wrapProto.slice.call(arguments)
+				arr.unshift(this)
+				El[key].apply(null, arr)
+			}
 		}
-
-		// NOTE: document.body will not get extended with later added extensions
-		JSON.merge(body, proto)
-	}
-	//*/
-
-	El[protoStr] = proto
-
-	El.css = function(str) {
-		if (!styleNode) {
-			// Safari and IE6-8 requires dynamically created
-			// <style> elements to be inserted into the <head>
-			styleNode = El("style").to(document.getElementsByTagName("head")[0])
-		}
-		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
-		else styleNode.appendChild(document.createTextNode(str))
-	}
+		if (!wrapProto[key]) addWrapProto(key)
+	})
 
 	//** templates
 
@@ -713,13 +697,13 @@
 					stack.unshift(q)
 					parent = (new El.plugins[name](parent, text)).el
 				} else {
-					parent.append(all)
+					append(parent, all)
 				}
 			} else {
 				if (name) {
 					parentStack.push(parent)
 					stack.unshift(q)
-					parent = to.call(El(name, 0, 1), parent)
+					parent = to(El(name, 0, 1), parent)
 				}
 				if (text) {
 					q = text.charAt(0)
@@ -727,14 +711,14 @@
 					if (q == ">") {
 						(indent + " " + name).replace(templateRe, work)
 					} else if (q == "|" || q == "\\") {
-						parent.append(name) // + "\n")
+						append(parent, name) // + "\n")
 					} else if (q != "/") {
 						if (q != "&") {
 							name = (parent.tagName == "INPUT" ? "val" : "txt")
 							+ ":_('" + text.replace(/'/g, "\\'") + "').format(data)"
 						}
-						q = attr.call(parent, "data-bind")
-						attr.call(parent, "data-bind", (q ? q + ";" : "") + name)
+						q = getAttr(parent, "data-bind")
+						setAttr(parent, "data-bind", (q ? q + ";" : "") + name)
 					}
 				}
 			}
@@ -762,7 +746,7 @@
 				el = childNodes[i]
 				if (el._childKey) {
 					childId = i
-					el.attr("data-child", el._childKey)
+					setAttr(el, "data-child", el._childKey)
 					break
 				}
 			}
@@ -803,17 +787,17 @@
 		}),
 		child: plugin.extend({
 			done: function() {
-				var key = "@child-" + (++childSeq)
+				var key = "@child-" + (++seq)
 				, root = this.parent
 				for (; root.parentNode.parentNode; ) {
 					root = root.parentNode
 				}
 				root._childKey = key
-				this.parent.append(document.createComment(key))
+				append(this.parent, document.createComment(key))
 			}
 		}),
 		css: js.extend({
-			done: Fn("El.css(this.txt)")
+			done: Fn("xhr.load.adapter.css(this.txt)")
 		}),
 		def: js.extend({
 			done: Fn("View.def(this.params)")
@@ -839,7 +823,7 @@
 				var fn
 				, t = this
 				, arr = t.name.split(/\s+/)
-				, bind = t.el.attr("data-bind")
+				, bind = getAttr(t.el, "data-bind")
 				, view = View(arr[0], t._done(), arr[1], arr[2])
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, name, args) {
@@ -865,7 +849,17 @@
 		})
 	}
 
-	El.view = El.tpl = parseTemplate
+	xhr.load.adapter.view = xhr.load.adapter.tpl = El.tpl = parseTemplate
+	xhr.load.adapter.css = function(str) {
+		if (!styleNode) {
+			// Safari and IE6-8 requires dynamically created
+			// <style> elements to be inserted into the <head>
+			styleNode = to(El("style"), document.getElementsByTagName("head")[0])
+		}
+		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
+		else append(styleNode, str)
+	}
+
 	//*/
 
 	El.scrollLeft = scrollLeft
@@ -911,15 +905,15 @@
 		}
 
 		if ( next != lastSize ) {
-			rmClass.call(root, lastSize)
-			addClass.call(root, lastSize = next)
+			rmClass(root, lastSize)
+			addClass(root, lastSize = next)
 		}
 
 		next = width > root.offsetHeight ? "landscape" : "portrait"
 
 		if ( next != lastOrient) {
-			rmClass.call(root, lastOrient)
-			addClass.call(root, lastOrient = next)
+			rmClass(root, lastOrient)
+			addClass(root, lastOrient = next)
 		}
 
 		next = window.Mediator || window.M

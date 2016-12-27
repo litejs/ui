@@ -75,7 +75,7 @@ View.on("show", function() {
                 if (tag == "A" || tag == "BUTTON") el.blur()
         } catch(e) {}
         // Re-render all .js-viewHook elements on each View change
-        document.body.findAll(".js-viewHook").render()
+        El.findAll(document.body, ".js-viewHook").render()
 })
 // Start a router to showing views
 history.start(View.show)

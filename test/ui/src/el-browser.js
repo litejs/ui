@@ -119,14 +119,14 @@ testman
 .htmlSimilar(El('a[href="http://example.com/"][title="link to site"]'), '<a href="http://example.com/" title="link to site"></a>')
 
 .it ("shoult set attributes")
-.equal(input.attr({id: "set_id", title:"set title"}), input)
+.equal(El.attr(input, {id: "set_id", title:"set title"}), input)
 .equal(input.id, "set_id")
 .equal(input.title, "set title")
-.equal(input.attr({title:"change title", name:"new name", id: "new_id"}), input)
+.equal(El.attr(input, {title:"change title", name:"new name", id: "new_id"}), input)
 .equal(input.title, "change title")
 .equal(input.name, "new name")
 .equal(input.id, "new_id")
-.equal(input.attr({title: null}), input)
+.equal(El.attr(input, {title: null}), input)
 .ok(!input.title)
 
 .it ("has kill() and empty() methods")

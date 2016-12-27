@@ -53,7 +53,7 @@
 		, track = el.firstChild
 		, fill = track.firstChild
 		, knob = fill.lastChild
-		, value = el.attr("valu") || 0
+		, value = El.attr(el, "valu") || 0
 		function load(e) {
 			min = el.min || 0
 			max = el.max || 100
@@ -81,14 +81,15 @@
 		}
 		function start(e) {
 			load(e)
-			fill.rmClass("anim")
-			knob.addClass("is-active")
+			El.rmClass(fill, "anim")
+			El.addClass(knob, "is-active")
 			drag = true
 			move(e)
 			if (el.onDragStart) {
 				el.onDragStart()
 			}
-			document.body.on("mouseup", stop).on("mousemove", move)
+			El.on(document.body, "mouseup", stop)
+			El.on(document.body, "mousemove", move)
 		}
 		function move(e) {
 			var diff = El.mouseLeft(e) - offset
@@ -102,10 +103,11 @@
 		}
 		function stop(e) {
 			if (!drag) return
-			fill.addClass("anim")
-			knob.rmClass("is-active")
+			El.addClass(fill, "anim")
+			El.rmClass(knob, "is-active")
 			drag = false
-			document.body.non("mouseup", stop).non("mousemove", move)
+			El.off(document.body, "mouseup", stop)
+			El.off(document.body, "mousemove", move)
 			el.set(value)
 			if (el.onDragStop) {
 				el.onDragStop()
@@ -122,7 +124,8 @@
 				fill.style.width = ((pos || value*px)+knobLen) + "px"
 			}
 		}
-		el.on("mousedown", start).on("wheel", function(e, delta) {
+		El.on(el, "mousedown", start)
+		El.on(el, "wheel", function(e, delta) {
 			load(e)
 			el.set( 1*value + delta*step, 0, 1 )
 		})

@@ -85,9 +85,9 @@
 	var svgToLastActive
 	bindings.initChart = function() {
 		var node = this
-		node.on("mouseout", function(e) {
+		El.on(node, "mouseout", function(e) {
 			if (svgToLastActive && e.target == node) {
-				svgToLastActive.rmClass("is-active")
+				El.rmClass(svgToLastActive, "is-active")
 				svgToLastActive = null
 			}
 		})
@@ -95,11 +95,11 @@
 	// riseOnHover
 	bindings.svgToLast = function() {
 		var node = this
-		node.on("mouseover", function() {
+		El.on(node, "mouseover", function() {
 			if (!svgToLastActive || node != node.parentNode.lastChild) {
-				if (svgToLastActive) svgToLastActive.rmClass("line-active")
-				node.after(node.parentNode.lastChild)
-				node.addClass("is-active")
+				if (svgToLastActive) El.rmClass(svgToLastActive, "line-active")
+				El.after(node, node.parentNode.lastChild)
+				El.addClass(node, "is-active")
 				svgToLastActive = node
 			}
 		})

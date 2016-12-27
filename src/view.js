@@ -72,7 +72,7 @@
 			if (view.open) {
 				view.emit("close")
 				if (view.child) view.child.close()
-				view.open.kill()
+				El.kill(view.open)
 				view.open = view.parent.child = null
 			}
 		},
@@ -116,8 +116,8 @@
 				if (parent && !view.open) {
 					view.open = view.el.cloneNode(true)
 					parent.emit("beforeChild", params)
-					;(parent.open || parent.el).append(view.open)
-					view.open.render()
+					El.append(parent.open || parent.el, view.open)
+					El.render(view.open)
 					view.emit("open", params)
 					View.emit("open", view.route, params)
 				}

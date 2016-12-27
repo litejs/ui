@@ -26,7 +26,7 @@
 
 	bindings["if"] = bindingIf
 	function bindingIf(enabled) {
-		if (!enabled) return this.kill()
+		if (!enabled) return El.kill(this)
 	}
 
 	bindings.on = bindingOn
@@ -37,17 +37,17 @@
 				Mediator.emit(_fn, e, this, a1, a2, a3, a4, a5)
 			}
 		}
-		this.on(ev, fn)
+		El.on(this, ev, fn)
 	}
 
 	bindings["with"] = bindingWith
 	function bindingWith(map) {
-		return this.render(JSON.merge(El.scope(this, true), map))
+		return El.render(this, JSON.merge(El.scope(this, true), map))
 	}
 
 	bindings.emitForm = emitForm
 	function emitForm(ev, a1, a2, a3, a4) {
-		this.on("submit", function(e) {
+		El.on(this, "submit", function(e) {
 			var data = JSON.serializeForm(this)
 			Mediator.emit(ev, e, data, a1, a2, a3, a4)
 			return false
@@ -87,7 +87,8 @@
 
 		var childs = Function("hasOwn,el,data", fn)(hasOwn, child, data)
 
-		node.empty().append(childs).render()
+		El.append(El.empty(node), childs)
+		El.render(node)
 		return node
 	}
 }(El.bindings)

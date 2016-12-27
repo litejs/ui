@@ -55,7 +55,7 @@ _.setLang = function(lang) {
 		String.plural = _("__plural")
 		JSON.merge(Date.masks, _("__dateMasks"))
 
-		document.body.render()
+		El.render(document.body)
 	})
 }
 
@@ -77,9 +77,9 @@ El.bindings.list = function(list, extra) {
 
 	node._list = data.list = list
 
-	node.on("kill", clear)
+	El.on(node, "kill", clear)
 
-	node.addClass("loading")
+	El.addClass(node, "loading")
 
 	if (extra) {
 		extra.each(clone)
@@ -90,7 +90,7 @@ El.bindings.list = function(list, extra) {
 	.each(clone)
 	.on("add", clone).on("remove", remove)
 	.then(function() {
-		node.rmClass("loading")
+		El.rmClass(node, "loading")
 	})
 
 	// Do not render childs when list initialized
@@ -102,24 +102,24 @@ El.bindings.list = function(list, extra) {
 		scope.item = item.data || item
 		scope.model = item
 		function up() {
-			clone.render(scope)
+			El.render(clone, scope)
 		}
 		if (item.on) {
 			item.on("change", up)
-			clone.on("kill", function(){
+			El.on(clone, "kill", function(){
 				item.off("change", up)
 			})
 		}
-		return clone.to(node, extraLen + pos).render(scope)
+		return El.render(El.to(clone, node, extraLen + pos), scope)
 	}
 
 	function remove(item, pos) {
-		node.childNodes[extraLen + pos].kill()
+		El.kill(node.childNodes[extraLen + pos])
 	}
 
 	function clear() {
 		var list = node._list
-		node.empty()
+		El.empty(node)
 		if (list) {
 			node._list = null
 			list.off("add", clone).off("remove", remove)
@@ -136,7 +136,8 @@ El.bindings.fixReadonlyCheckbox = function() {
 			return false
 		}
 	}
-	el.on("click", False).on("mousedown", False)
+	El.on(el, "click", False)
+	El.on(el, "mousedown", False)
 }
 El.bindings.fixReadonlyCheckbox.once = 1
 
@@ -164,11 +165,11 @@ El.bindings.run = function() {}
 
 	Mediator.logForm = function(e) {
 		var data = JSON.serializeForm(this)
-		, matches = this.attr("data-expect") == JSON.stringify(data)
+		, matches = El.attr(this, "data-expect") == JSON.stringify(data)
 		if (matches) {
 			console.log("logForm", matches, JSON.stringify(data), data)
 		} else {
-			console.error("logForm", matches, JSON.stringify(data),"!==",this.attr("data-expect"), data)
+			console.error("logForm", matches, JSON.stringify(data),"!==",El.attr(this, "data-expect"), data)
 		}
 	}
 
@@ -186,7 +187,7 @@ El.bindings.run = function() {}
 	View("#body", document.body)
 	.on("ping", function() {
 		El.data.user = user
-		document.body.findAll(".Menu,.lang").render()
+		El.findAll(document.body, ".Menu,.lang").render()
 	})
 
 	View("#private")
@@ -210,7 +211,7 @@ El.bindings.run = function() {}
 
 	View.base = "views/"
 
-	document.body.on("click", function(e) {
+	El.on(document.body, "click", function(e) {
 		var target = e.target
 		, fastLink = target.tagName == "A" && target.href.split("#")
 
@@ -227,7 +228,7 @@ El.bindings.run = function() {}
 			, tag = el && el.tagName
 			if (tag == "A" || tag == "BUTTON") el.blur()
 		} catch(e) {}
-		document.body.findAll(".js-viewRender").render()
+		El.findAll(document.body, ".js-viewRender").render()
 	})
 
 	var intlLang, intlZone, opts
@@ -270,7 +271,7 @@ El.bindings.run = function() {}
 		history.start(View.show, base)
 	}
 
-	if (base && history.pushState) document.body.on("click", function(e) {
+	if (base && history.pushState) El.on(document.body, "click", function(e) {
 		var target = e.target
 		if (target.tagName == "A") {
 			history.setUrl(target.href.split("#")[1])

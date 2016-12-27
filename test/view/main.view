@@ -90,27 +90,27 @@
 	div _welcome
 		&on: "click", Fn("this.style.fontStyle = this.style.fontStyle == 'italic' ? '' : 'italic'")
 	div &txt: _("_welcome")
-		&on: "mouseover", Fn("this.addClass('bg3'),this.txt(this.txt() == _('_welcome') ? 'Over!' : _('_welcome'))")
-		&on: "mouseout", Fn("this.rmClass('bg3'),this.txt(_('_welcome'))")
+		&on: "mouseover", Fn("El.addClass(this,'bg3'),El.txt(this, El.txt(this) == _('_welcome') ? 'Over!' : _('_welcome'))")
+		&on: "mouseout", Fn("El.rmClass(this,'bg3'),El.txt(this, _('_welcome'))")
 	div &txt: _(welcomeText)
 	div &txt: _(nonExistingWelcomeText)
 	.time
-		&txt: started.format()
+		&txt: "Init " + started.format()
 	.time
-		&txt: new Date().format()
+		&txt: "Load " + new Date().format()
 
 @view login #public
 	form[action="javascript:"][method=POST] &emitForm:"login"
 		fieldset.grid-2.login
 			legend Login
 			.error {route.error||""}
-			label.col-12
+			label.row
 				.col-12.col-md-4.login__label Username
 				.col-12.col-md-8>input[name=name]
-			label.col-12
+			label.row
 				.col-12.col-md-4.login__label Password
 				.col-12.col-md-8>input[name=pass][type=password]
-			.col-12
+			.row
 				.col-12.col-md-4
 				.col-12.col-md-8>input.btn[type=submit] Log In
 
@@ -137,18 +137,19 @@
 @view-link test-view-link ok
 
 @view test #public
-	h2 Test
-	ul
-		li>a[href="#testman"] Testman
-		li>a[href="#events"] Events
-		li>a[href="#broken-link"] Test broken link
-		li>a[href="#test-view-link"] Test View link
-		li>a[href="#test-form1"] Test form
-		li>a[href="#test-svg"] Test SVG
-		li>a[href="#test-grid"] Test grid
-		li>a[href="#test-material-ui"] Test Material-UI
-	@rel user home vnd.app.home
-		.home {home.name}
-	@rel user home vnd.app.home.v2
-		.home {home.homeName}
+	div
+		h2 Test
+		ul
+			li>a[href="#testman"] Testman
+			li>a[href="#events"] Events
+			li>a[href="#broken-link"] Test broken link
+			li>a[href="#test-view-link"] Test View link
+			li>a[href="#test-form1"] Test form
+			li>a[href="#test-svg"] Test SVG
+			li>a[href="#test-grid"] Test grid
+			li>a[href="#test-material-ui"] Test Material-UI
+		@rel user home vnd.app.home
+			.home {home.name}
+		@rel user home vnd.app.home.v2
+			.home {home.homeName}
 

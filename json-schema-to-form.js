@@ -34,7 +34,7 @@
 
 			drawSchema(schema, null, fieldset, model.data || {}, null, scope)
 
-			fieldset.to(form)
+			El.to(fieldset, form)
 
 			form.on("submit", function() {
 				var data = JSON.serializeForm(this)
@@ -66,7 +66,7 @@
 				if (key !== null) {
 					namePrefix = namePrefix ? namePrefix + "[" + key + "]" : key
 					if (schema.title) {
-						fieldset.append(El(template + "-subheader", schema.title))
+						El.append(fieldset, El(template + "-subheader", schema.title))
 					}
 				}
 			}
@@ -139,15 +139,15 @@
 
 			JSON.merge(sc, schema)
 
-			fieldset.append(row.render(sc))
+			El.append(fieldset, El.render(row, sc))
 
 			if (schema.type == "array") {
-				var content = row.find(".js-items")
-				, hidden = El("input[type=hidden]").to(content)
+				var content = El.find(row, ".js-items")
+				, hidden = El.to(El("input[type=hidden]"), content)
 
 				key = namePrefix ? namePrefix + "[" + key + "]" : key
 
-				hidden.attr("name", key)
+				El.attr(hidden, "name", key)
 
 				if (Array.isArray(schema.items)) {
 					throw "Not implemented"
@@ -181,12 +181,12 @@
 			}
 
 			function add(val) {
-				var root = El(template + "-array-item").to(content)
+				var root = El.to(El(template + "-array-item"), content)
 				, rootScope = El.scope(root, sc)
 
-				root.render(rootScope)
+				El.render(root, rootScope)
 
-				root = root.find(".js-item") || root
+				root = El.find(root, ".js-item") || root
 
 				drawSchema(
 					schema.items,
@@ -198,11 +198,11 @@
 				)
 			}
 
-			var field = row.find(".field")
-			field.attr("name", namePrefix && key ? namePrefix + "[" + key + "]" : namePrefix || key)
+			var field = El.find(row, ".field")
+			El.attr(field, "name", namePrefix && key ? namePrefix + "[" + key + "]" : namePrefix || key)
 
 			if (val !== void 0) {
-				field.val(val)
+				El.val(field, val)
 			}
 
 			if (schema.readonly) {
@@ -215,19 +215,19 @@
 			}
 
 			function alUp() {
-				var val = field.val()
+				var val = El.val(field)
 				if (alSelected != alternatives[val]) {
 					if (alSelected) {
-						alSelected.to(dummy)
+						El.to(alSelected, dummy)
 					}
-					fieldset.append((alSelected = alternatives[val]), row.nextSibling)
+					El.append(fieldset, (alSelected = alternatives[val]), row.nextSibling)
 				}
 			}
 		}
 	}
 
 	function del() {
-		this.closest(".js-del").kill()
+		El.kill(this.closest(".js-del"))
 	}
 
 	JSON.applySchema = applySchema

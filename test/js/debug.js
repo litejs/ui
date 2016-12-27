@@ -30,6 +30,7 @@ xhr.load = function(files, next, raw) {
 	})
 	return xhr._load(files, next, raw)
 }
+xhr.load.adapter = xhr._load.adapter
 
 El.path = function(node) {
 	var parent
@@ -59,7 +60,7 @@ El.path = function(node) {
 }
 
 /*
-document.body.on("click", function(e) {
+El.on(document.body, "click", function(e) {
 	var target = e.target || e.srcElement
 	, path = El.path(target)
 	console.log("click", target.find.call(document.documentElement, path) == target, path)
