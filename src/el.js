@@ -142,6 +142,8 @@
 	 * <input id="12" class="nice class" type="checkbox" checked="checked" disabled="disabled" data-lang="en">
 	 */
 
+	window.El = El
+
 	function El(name, args, silence) {
 		if (typeof name != "string") {
 			return new ElWrap(name)
@@ -175,7 +177,45 @@
 		return silence || !args ? el :
 		(args.constructor == Object ? setAttr : append)(el, args)
 	}
-	window.El = El
+
+	function ElWrap(nodes) {
+		var wrap = this
+		, i = nodes.length
+		/**
+		 *  1. Extended array size will not updated
+		 *     when array elements set directly in Android 2.2.
+		 */
+		if (i) {
+			wrap.length = i /* 1 */
+			for (; i--; ) {
+				wrap[i] = nodes[i]
+			}
+		} else if (i == null) {
+			wrap.length = 1 /* 1 */
+			wrap[0] = nodes
+		}
+	}
+
+	ElWrap[protoStr] = wrapProto
+
+	wrapProto.append = function(el) {
+		var elWrap = this
+		if (elWrap._childId != void 0) {
+			append(elWrap[elWrap._childId], el)
+		} else {
+			this.push(el)
+		}
+		return this
+	}
+
+	wrapProto.cloneNode = function(deep) {
+		var clone = new ElWrap(this.map(function(el) {
+			return el.cloneNode(deep)
+		}))
+		clone._childId = this._childId
+		return clone
+	}
+
 
 	El.attr = function(el, key, val) {
 		return arguments.length < 3 && key.constructor != Object ? getAttr(el, key) : setAttr(el, key, val)
@@ -247,6 +287,10 @@
 	// textContent is suported from IE9
 	// Opera 9-10 have Node.text so we use Node.txt
 
+	El.css = function(el, key, val) {
+		el.style[key.camelCase()] = val || ""
+	}
+
 	El.txt = function(el, newText) {
 		return arguments.length && el[txtAttr] != newText ? (
 			//** modernBrowser
@@ -295,7 +339,6 @@
 		el.valObject || el.value
 	}
 
-	El.append = append
 	function append(el, child, before) {
 		if (!el.nodeType) {
 			return el.append ? el.append(child, before) : el
@@ -333,7 +376,6 @@
 		return el
 	}
 
-	El.to = to
 	function to(el, parent, before) {
 		append(parent, el, before)
 		return el
@@ -342,7 +384,6 @@
 	// setAttribute("class") is broken in IE7
 	// className is object in SVGElements
 
-	El.hasClass = hasClass
 	function hasClass(el, name) {
 		var current = el.className || ""
 		, useAttr = typeof current != "string"
@@ -354,7 +395,6 @@
 		return !!current && current.split(/\s+/).indexOf(name) > -1
 	}
 
-	El.addClass = addClass
 	function addClass(el, name) {
 		var current = el.className || ""
 		, useAttr = typeof current != "string"
@@ -377,7 +417,6 @@
 		return el
 	}
 
-	El.rmClass = rmClass
 	function rmClass(el, name) {
 		var current = el.className || ""
 		, useAttr = typeof current != "string"
@@ -398,10 +437,6 @@
 		}
 
 		return el
-	}
-
-	El.css = function(el, key, val) {
-		el.style[key.camelCase()] = val || ""
 	}
 
 	// The addEventListener is supported in Internet Explorer from version 9.
@@ -504,7 +539,6 @@
 		Event.Emitter.emit.call(el, ev)
 	}
 
-	El.empty = empty
 	function empty(el) {
 		for (var node; node = el.firstChild; ) {
 			kill(node)
@@ -512,7 +546,6 @@
 		return el
 	}
 
-	El.kill = kill
 	function kill(el) {
 		var id
 		if (el._e) {
@@ -531,7 +564,6 @@
 		return el
 	}
 
-	El.scope = elScope
 	function elScope(node, parent, _scope) {
 		if (_scope = elScope[getAttr(node, "data-scope")]) {
 			return _scope
@@ -548,7 +580,6 @@
 		return _scope
 	}
 
-	El.render = render
 	function render(node, scope, skipSelf) {
 		var bind, newBind, fn
 
@@ -602,26 +633,6 @@
 		return node
 	}
 
-	function ElWrap(nodes) {
-		var wrap = this
-		, i = nodes.length
-		/**
-		 *  1. Extended array size will not updated
-		 *     when array elements set directly in Android 2.2.
-		 */
-		if (i) {
-			wrap.length = i /* 1 */
-			for (; i--; ) {
-				wrap[i] = nodes[i]
-			}
-		} else if (i == null) {
-			wrap.length = 1 /* 1 */
-			wrap[0] = nodes
-		}
-	}
-
-	ElWrap[protoStr] = wrapProto
-
 	function addWrapProto(key) {
 		var first = key == "closest" || key == "find"
 
@@ -649,23 +660,9 @@
 		}
 	}
 
-	wrapProto.append = function(el) {
-		var elWrap = this
-		if (elWrap._childId != void 0) {
-			append(elWrap[elWrap._childId], el)
-		} else {
-			this.push(el)
-		}
-		return this
-	}
-
-	wrapProto.cloneNode = function(deep) {
-		var clone = new ElWrap(this.map(function(el) {
-			return el.cloneNode(deep)
-		}))
-		clone._childId = this._childId
-		return clone
-	}
+	El.empty = empty
+	El.kill = kill
+	El.render = render
 
 	Object.keys(El).each(function(key) {
 		if (!bindings[key]) {
@@ -677,6 +674,13 @@
 		}
 		if (!wrapProto[key]) addWrapProto(key)
 	})
+
+	El.hasClass = hasClass
+	El.addClass = addClass
+	El.rmClass = rmClass
+	El.append = append
+	El.to = to
+	El.scope = elScope
 
 	//** templates
 
