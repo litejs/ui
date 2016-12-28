@@ -22,6 +22,9 @@
 		},
 		html: function(html) {
 			this.innerHTML = html
+		},
+		ref: function(name) {
+			elScope(this)[name] = this
 		}
 	}
 

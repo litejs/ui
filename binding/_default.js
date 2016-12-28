@@ -5,7 +5,6 @@
 	var hasOwn = Object.prototype.hasOwnProperty
 	, slice = Array.prototype.slice
 
-	bindingRef.once =
 	bindingFn.once =
 	bindingIf.once =
 	bindingWith.once =
@@ -13,11 +12,6 @@
 	emitForm.once =
 	bindingsEach.raw = bindingsEach.once =
 	true
-
-	bindings.ref = bindingRef
-	function bindingRef(name) {
-		El.scope(this)[name] = this
-	}
 
 	bindings.fn = bindingFn
 	function bindingFn(fn) {
