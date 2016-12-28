@@ -333,12 +333,6 @@
 		return el
 	}
 
-	El.after = function(el, silbing, before) {
-		// call append so it works with DocumentFragment
-		append(silbing.parentNode, el, before ? silbing : silbing.nextSibling)
-		return el
-	}
-
 	El.to = to
 	function to(el, parent, before) {
 		append(parent, el, before)
