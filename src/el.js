@@ -143,6 +143,9 @@
 	 */
 
 	function El(name, args, silence) {
+		if (typeof name != "string") {
+			return new ElWrap(name)
+		}
 		var el, pres
 		, pre = {}
 		name = name.replace(selectorRe, function(_, op, key, _sub, fn, val, quotation) {
@@ -606,15 +609,22 @@
 	}
 
 	function ElWrap(nodes) {
+		var wrap = this
+		, i = nodes.length
 		/**
 		 *  1. Extended array size will not updated
 		 *     when array elements set directly in Android 2.2.
 		 */
-		for (var pos = this.length /* 1 */ = nodes.length; pos--; ) {
-			this[pos] = nodes[pos]
+		if (i) {
+			wrap.length = i /* 1 */
+			for (; i--; ) {
+				wrap[i] = nodes[i]
+			}
+		} else if (i == null) {
+			wrap.length = 1 /* 1 */
+			wrap[0] = nodes
 		}
 	}
-	El.wrap = ElWrap
 
 	ElWrap[protoStr] = wrapProto
 
