@@ -69,7 +69,7 @@
 	function selectorFn(str) {
 		// jshint evil:true
 		return selectorCache[str] ||
-		(selectorCache[str] = Function("m,c,n,p", "return function(_,v,a,b){return " +
+		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
 			str.split(selectorSplitRe).map(function(sel) {
 				var relation, from
 				, rules = ["_&&_.nodeType==1"]
@@ -95,7 +95,7 @@
 				if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
 				return rules.join("&&")
 			}).join("||") + "}"
-		)(matches, closest, next, prev))
+		)(matches, closest))
 	}
 
 	function walk(next, first, el, sel, nextFn) {
@@ -800,7 +800,7 @@
 			done: function() {
 				var key = "@child-" + (++seq)
 				, root = this.parent
-				for (; root.parentNode.parentNode; ) {
+				for (; (root.parentNode.parentNode || key).nodeType == 1; ) {
 					root = root.parentNode
 				}
 				root._childKey = key

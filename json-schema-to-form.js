@@ -251,11 +251,12 @@
 				applySchema(schema, data)
 			})
 		}
-		if (Array.isArray(schema.enum)) {
-			if (schema.enum.indexOf(data) === -1) {
-				for (var i = schema.enum.length; i--; ) {
-					if (schema.enum[i] == data) {
-						data = schema.enum[i]
+		var _enum = schema["enum"]
+		if (Array.isArray(_enum)) {
+			if (_enum.indexOf(data) === -1) {
+				for (var i = _enum.length; i--; ) {
+					if (_enum[i] == data) {
+						data = _enum[i]
 						break
 					}
 				}
