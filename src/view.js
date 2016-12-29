@@ -2,7 +2,7 @@
 
 
 !function(exports) {
-	var fn, lastView, lastParams, lastUrl
+	var fn, lastView, lastParams, lastStr, lastUrl
 	, fnStr = ""
 	, reStr = ""
 	, views = View.views = {}
@@ -158,18 +158,23 @@
 
 	View.def = function(str) {
 		for (var match, re = /(\S+) (\S+)/g; match = re.exec(str);) {
-			match[1].split(",").map(function(route) {
-				var view = View(route)
-				view.file = (
-					view.file ? view.file + "," : ""
-				) +
-				match[2].replace(/[^,]+/g, function(file) {
-					return views[file] ? views[file].file : file
+			match[1].split(",").map(function(view) {
+				view = View(defMap(view))
+				view.file = (view.file ? view.file + "," : "") +
+				match[2].split(",").map(function(file) {
+					return views[file] ? views[file].file : defMap(file)
 				})
 			})
 		}
 	}
 
+	function defMap(str) {
+		var chr = str.charAt(0)
+		, slice = str.slice(1)
+		return chr == "+" ? lastStr + slice :
+		chr == "%" ? ((chr = lastStr.lastIndexOf(slice.charAt(0))), (chr > 0 ? lastStr.slice(0, chr) : lastStr)) + slice :
+		(lastStr = str)
+	}
 	exports.View = View
 
 }(this)

@@ -1,12 +1,10 @@
 
-@def #mat components/material.css,components/material.js,components/material.tpl
+@def #mat components/material.css,%.js,%.tpl
 
-@def settings settings.tpl,settings.css
-@def test-form1 test-form1.tpl
-@def test-grid test-grid.tpl
+@def settings %.view,%.css
+@def events,test-form1,test-grid %.view
 @def test-svg #mat,../../svg.js,components/Pie.tpl,test-svg.view
-@def testman,testman/lcov,testman/lcov/{file} testman.tpl
-@def events events.view
+@def testman,+/lcov,+/lcov/{file} %.view
 @def test-material-ui #mat,components/Slider.tpl,test-material-ui.view
 
 
