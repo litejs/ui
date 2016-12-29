@@ -173,7 +173,7 @@ El.bindings.run = function() {}
 		}
 	}
 
-	Event.setKeyMap({
+	El.addKb({
 		H: history.setUrl.bind(null, "home"),
 		U: history.setUrl.bind(null, "users"),
 		S: history.setUrl.bind(null, "settings"),

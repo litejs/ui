@@ -893,6 +893,74 @@
 		return e.pageY || e.clientY + scrollTop()
 	}
 
+	//** kb
+	var kbMaps = []
+	, kbKeys = {
+		8:"backspace", 9:"tab",
+		13:"enter", 16:"shift", 17:"ctrl", 18:"alt", 19:"pause",
+		20:"caps", 27:"esc",
+		33:"pgup", 34:"pgdown",
+		35:"end", 36:"home",
+		37:"left", 38:"up", 39:"right", 40:"down",
+		45:"ins", 46:"del",
+		91:"cmd",
+		112:"f1", 113:"f2", 114:"f3", 115:"f4", 116:"f5", 117:"f6", 118:"f7", 119:"f8",
+		120:"f9", 121:"f10", 122:"f11", 123:"f12"
+	}
+	, kbMod = /Mac|iPod|iPhone|iPad|Pike/.test(navigator.platform) ? "metaKey" : "ctrlKey"
+
+	function kbRun(e, code, chr) {
+		var fn, map
+		, i = 0
+		, el = e.target || e.srcElement
+		, input = /INPUT|TEXTAREA|SELECT/i.test((el.nodeType == 3 ? el.parentNode : el).tagName)
+
+		for (; map = kbMaps[i++]; ) {
+			if (!input || map.enable_input) {
+				fn = map[code] ||
+				map[chr] ||
+				map.num && code > 47 && code < 58 && (chr|=0, map.num) ||
+				map.all
+			}
+			if (fn || !map.bubble) break
+		}
+		if (fn) fn(e, chr, el)
+	}
+
+	function kbDown(e) {
+		if (kbMaps[0]) {
+			var code = e.keyCode || e.which
+			// Otherwise IE backspace navigates back
+			if (code == 8 && kbMaps[0].backspace) {
+				Event.stop(e)
+			}
+		}
+	}
+
+	function kbUp(e) {
+		var code = e.keyCode || e.which
+		if (kbMaps[0]) {
+			if (code > 95 && code < 106) code -= 48
+			var key = kbKeys[code] || String.fromCharCode(code) || code
+			kbRun(e, code, key)
+			if (e.shiftKey && code != 16) kbRun(e, code, "shift+" + key)
+			if (e.ctrlKey && code != 17) kbRun(e, code, "ctrl+" + key)
+			if (e.altKey && code != 18) kbRun(e, code, "alt+" + key)
+			if (e[kbMod] && code != 17 && code != 91) kbRun(e, code, "mod+" + key)
+		}
+	}
+
+	El.addKb = kbMaps.unshift.bind(kbMaps)
+	El.rmKb = function(map) {
+		var i = kbMaps.indexOf(map||kbMaps[0])
+		if (i > -1) kbMaps.splice(i, 1)
+	}
+
+	addEvent(document, "keydown", kbDown)
+	addEvent(document, "keyup", kbUp)
+	//*/
+
+
 	//** responsive
 	var lastSize, lastOrient
 	, breakpoints = {

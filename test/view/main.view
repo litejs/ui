@@ -116,8 +116,8 @@
 @view users #public
 	&keyMap: {Q: Fn('document.title="Qsers!"')}
 	&on: "show", Fn('document.title="Users!"')
-	&on: "open", Fn('Event.setKeyMap(this.keyMap)')
-	&on: "close", Fn('Event.rmKeyMap(this.keyMap)')
+	&on: "open", Fn('El.addKb(this.keyMap)')
+	&on: "close", Fn('El.rmKb(this.keyMap)')
 	h2 Users
 	ul.users &list: Data("users")
 		li
