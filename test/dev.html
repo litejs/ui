@@ -88,15 +88,15 @@ but you'll need the mime-type to work in older browsers and IE11.
 	<body>
 		<script inline src="../load.js"></script>
 		<script
-			min="../dist/up-min.js"
 			src="../dist/up.js"
+			min="%.min.js"
 			banner="litejs.com/MIT-LICENSE.txt"
 			build="polyfill/es5.js"
 			if="!Function.prototype.bind"
 		></script>
 		<script
-			min="../dist/litejs-min.js"
 			src="../dist/litejs.js"
+			min="%.min.js"
 			banner="litejs.com/MIT-LICENSE.txt"
 			build="fn.js,date-format-lite,json-util,events.js,format.js,timing.js,src/el.js,%/history.js,%/view.js,%/bindings.js"
 		></script>
