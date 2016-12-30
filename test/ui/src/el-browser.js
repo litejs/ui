@@ -1,4 +1,3 @@
-require("browser-upgrade-lite")
 global.Fn = require("../fn.js").Fn
 
 global.Event = require("../events").Event
@@ -82,8 +81,8 @@ testman
 .run(function(){
 	el = El("div")
 	select = El("select#id2.cl2:disabled")
-	input = El("input").to(document.body)
-	radio = El("input[type=radio]").to(document.body)
+	input = El.to(El("input"), document.body)
+	radio = El.to(El("input[type=radio]"), document.body)
 	h1 = El("h1")
 	h2 = El("h2")
 	h3 = El("h3")
@@ -130,86 +129,86 @@ testman
 .ok(!input.title)
 
 .it ("has kill() and empty() methods")
-.equal(select.kill(), select)
+.equal(El.kill(select), select)
 .equal(h2.innerHTML, "")
-.equal(el.empty(), el)
+.equal(El.empty(el), el)
 .equal(el.innerHTML, "")
 
 .it ("set childs")
-.htmlSimilar(el.to(document.body), "<div></div>")
-.htmlSimilar(el.append(h2), "<div><h2></h2></div>")
-.htmlSimilar(el.append(h1, h2), "<div><h1></h1><h2></h2></div>")
-.htmlSimilar(h4.after(h2), "<h4></h4>")
+.htmlSimilar(El.to(el, document.body), "<div></div>")
+.htmlSimilar(El.append(el, h2), "<div><h2></h2></div>")
+.htmlSimilar(El.append(el, h1, h2), "<div><h1></h1><h2></h2></div>")
+.htmlSimilar(El.to(h4, el), "<h4></h4>")
 .htmlSimilar(el, "<div><h1></h1><h2></h2><h4></h4></div>")
-.htmlSimilar(h3.after(h4, true), "<h3></h3>")
+.htmlSimilar(El.to(h3, el,  h4), "<h3></h3>")
 .htmlSimilar(el, "<div><h1></h1><h2></h2><h3></h3><h4></h4></div>")
-.htmlSimilar(h3.to(el, h4), "<h3></h3>")
+.htmlSimilar(El.to(h3, el, h4), "<h3></h3>")
 .htmlSimilar(el, "<div><h1></h1><h2></h2><h3></h3><h4></h4></div>")
 
-.htmlSimilar(h1.append([h2, h3]), "<h1><h2></h2><h3></h3></h1>")
+.htmlSimilar(El.append(h1, [h2, h3]), "<h1><h2></h2><h3></h3></h1>")
 .htmlSimilar(el, "<div><h1><h2></h2><h3></h3></h1><h4></h4></div>")
 
-.htmlSimilar(select.to(h2), '<select id="id2" disabled="disabled" class="cl2"></select>')
+.htmlSimilar(El.to(select, h2), '<select id="id2" disabled="disabled" class="cl2"></select>')
 
 .it ("should get element by id")
 .equal(El.get("id2"), select)
 
 .it ("find childs")
-.equal(el.find("#id2"), select)
-.equal(el.find(".cl2"), select)
-.equal(el.find("#id2.cl2"), select)
-.equal(el.find(".cl2#id2"), select)
-.equal(el.find("select"), select)
-.equal(el.find("select#id2"), select)
-.equal(el.find("select.cl2"), select)
-.equal(el.find("select#id2.cl2"), select)
-.equal(el.find("select.cl2#id2"), select)
-.equal(el.find("SELECT"), select)
-.equal(el.find("SELECT#id2"), select)
-.equal(el.find("SELECT.cl2"), select)
-.equal(el.find("SELECT#id2.cl2"), select)
-.equal(el.find("SELECT.cl2#id2"), select)
+.equal(El.find(el, "#id2"), select)
+.equal(El.find(el, ".cl2"), select)
+.equal(El.find(el, "#id2.cl2"), select)
+.equal(El.find(el, ".cl2#id2"), select)
+.equal(El.find(el, "select"), select)
+.equal(El.find(el, "select#id2"), select)
+.equal(El.find(el, "select.cl2"), select)
+.equal(El.find(el, "select#id2.cl2"), select)
+.equal(El.find(el, "select.cl2#id2"), select)
+.equal(El.find(el, "SELECT"), select)
+.equal(El.find(el, "SELECT#id2"), select)
+.equal(El.find(el, "SELECT.cl2"), select)
+.equal(El.find(el, "SELECT#id2.cl2"), select)
+.equal(El.find(el, "SELECT.cl2#id2"), select)
 
-.equal(el.find("h2"), h2)
-.equal(!!el.find(".cl3"), false)
-.equal(document.body.findAll("input").length, 2)
-.equal(document.body.findAll("input")[0], input)
-.equal(document.body.findAll("input")[1], radio)
+.equal(El.find(el, "h2"), h2)
+.equal(!!El.find(el, ".cl3"), false)
+.equal(El.findAll(document.body, "input").length, 2)
+.equal(El.findAll(document.body, "input")[0], input)
+.equal(El.findAll(document.body, "input")[1], radio)
 
 
 .it ("supports boolean attributes")
 .htmlSimilar(El("input:selected"), '<input selected="selected">')
 
 .it ("has txt() method")
-.equal(el.txt(), "")
-.equal(el.txt(""), "")
-.equal(el.txt("hello"), "hello")
-.equal(el.txt("hello"), "hello")
-.equal(el.txt(), "hello")
-.equal(el.txt(""), "")
-.equal(el.txt(), "")
+.equal(El.txt(el), "")
+.equal(El.txt(el, ""), "")
+.equal(El.txt(el, "hello"), "hello")
+.equal(El.txt(el, "hello"), "hello")
+.equal(El.txt(el), "hello")
+.equal(El.txt(el, ""), "")
+.equal(El.txt(el), "")
 
 .it ("has val() method")
-.anyOf(input.val(), ["", undef])
-.equal(input.val("xx"), "xx")
-.anyOf(select.val(), ["", undef])
-.equal(radio.val(), null)
+.anyOf(El.val(input), ["", undef])
+.equal(El.val(input, "xx"), "xx")
+.anyOf(El.val(select), ["", undef])
+.equal(El.val(radio), null)
 .run(function() {
 	input.valObject = map1
 	select.valObject = map2
 })
-.equal(input.val(), map1)
-.equal(select.val(), map2)
+.equal(El.val(input), map1)
+.equal(El.val(select), map2)
 .run(function() {
 	select1 = El("select")
 	select2 = El("select:multiple")
-	select1.append([
+	El.append(select1, [
 		El("option[value=1]"),
 		El("option[value=2]:selected"),
 		El("option[value=o1]"),
 		El("option[value=o2]:selected"),
 	])
-	select2.append([
+	El.append(select2, [
 		El("option[value=1]"),
 		El("option[value=2]:selected"),
 		El("option[value=o1]"),
@@ -220,73 +219,61 @@ testman
 	select2.type = "select-multiple"
 	select2.options = select2.childNodes
 
-	return "2,o2" == select2.val()
+	return "2,o2" == El.val(select2)
 })
 //equal(select1.val(), "o2")
-.equal("" + select2.val(), "2,o2")
+.equal("" + El.val(select2), "2,o2")
 .equal(select2.options.length, 4)
 
 
 .it ("has class methods")
 .equal(el.className, "")
-.equal(el.hasClass("c1"), false)
-.equal(el.hasClass("c2"), false)
-.equal(el.hasClass("c3"), false)
+.equal(El.hasClass(el, "c1"), false)
+.equal(El.hasClass(el, "c2"), false)
+.equal(El.hasClass(el, "c3"), false)
 
-.equal(el.addClass("c1"), el)
-.equal(el.hasClass("c1"), true)
-.equal(el.hasClass("c2"), false)
-.equal(el.hasClass("c3"), false)
+.equal(El.addClass(el, "c1"), el)
+.equal(El.hasClass(el, "c1"), true)
+.equal(El.hasClass(el, "c2"), false)
+.equal(El.hasClass(el, "c3"), false)
 
-.equal(el.addClass("c2"), el)
-.equal(el.hasClass("c1"), true)
-.equal(el.hasClass("c2"), true)
-.equal(el.hasClass("c3"), false)
+.equal(El.addClass(el, "c2"), el)
+.equal(El.hasClass(el, "c1"), true)
+.equal(El.hasClass(el, "c2"), true)
+.equal(El.hasClass(el, "c3"), false)
 
-.equal(el.addClass("c3"), el)
-.equal(el.hasClass("c1"), true)
-.equal(el.hasClass("c2"), true)
-.equal(el.hasClass("c3"), true)
+.equal(El.addClass(el, "c3"), el)
+.equal(El.hasClass(el, "c1"), true)
+.equal(El.hasClass(el, "c2"), true)
+.equal(El.hasClass(el, "c3"), true)
 
-.equal(el.rmClass("c2"), el)
-.equal(el.hasClass("c1"), true)
-.equal(el.hasClass("c2"), false)
-.equal(el.hasClass("c3"), true)
+.equal(El.rmClass(el, "c2"), el)
+.equal(El.hasClass(el, "c1"), true)
+.equal(El.hasClass(el, "c2"), false)
+.equal(El.hasClass(el, "c3"), true)
 
-.equal(el.rmClass("c3"), el)
-.equal(el.hasClass("c1"), true)
-.equal(el.hasClass("c2"), false)
-.equal(el.hasClass("c3"), false)
+.equal(El.rmClass(el, "c3"), el)
+.equal(El.hasClass(el, "c1"), true)
+.equal(El.hasClass(el, "c2"), false)
+.equal(El.hasClass(el, "c3"), false)
 
-.equal(el.rmClass("c3"), el)
-.equal(el.hasClass("c1"), true)
-.equal(el.hasClass("c2"), false)
-.equal(el.hasClass("c3"), false)
+.equal(El.rmClass(el, "c3"), el)
+.equal(El.hasClass(el, "c1"), true)
+.equal(El.hasClass(el, "c2"), false)
+.equal(El.hasClass(el, "c3"), false)
 
-.equal(el.rmClass("c1"), el)
-.equal(el.hasClass("c1"), false)
-.equal(el.hasClass("c2"), false)
-.equal(el.hasClass("c3"), false)
-
-.equal(el.className, "")
-
-.equal(el.toggleClass("c1"), true)
-.equal(el.hasClass("c1"), true)
-.equal(el.toggleClass("c1", true), true)
-.equal(el.hasClass("c1"), true)
-.equal(el.toggleClass("c1"), false)
-.equal(el.hasClass("c1"), false)
-.equal(el.toggleClass("c1", false), false)
-.equal(el.hasClass("c1"), false)
+.equal(El.rmClass(el, "c1"), el)
+.equal(El.hasClass(el, "c1"), false)
+.equal(El.hasClass(el, "c2"), false)
+.equal(El.hasClass(el, "c3"), false)
 
 .equal(el.className, "")
-
 
 
 .describe( "Templates" )
 .it ("supports templates")
 .run(function() {
-	El.view([
+	xhr.load.adapter.view([
 		"@el test1",
 		" a",
 		"  b",
@@ -336,9 +323,9 @@ testman
 .it ( "should render bindings" )
 .htmlSimilar(t1 = El("test10"),
 	"<a><b data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\"></i></b></a>")
-.htmlSimilar(t1.render({i:1,name:"world"}),
+.htmlSimilar(El.render(t1, {i:1,name:"world"}),
 	"<a><b data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\">world</i></b></a>")
-.htmlSimilar(t1.render({i:2,name:"moon"}),
+.htmlSimilar(El.render(t1, {i:2,name:"moon"}),
 	"<a><b class=\"red\" data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\">moon</i></b></a>")
 /*
 	htmlSimilar(El.tpl("div &css: 'margin-top', '1px'").render(),

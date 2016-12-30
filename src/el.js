@@ -292,7 +292,7 @@
 	}
 
 	El.txt = function(el, newText) {
-		return arguments.length && el[txtAttr] != newText ? (
+		return arguments.length > 1 && el[txtAttr] != newText ? (
 			//** modernBrowser
 			// Fix for IE5-7
 			//(ie67 && el.tagName == "OPTION" && (el.label = newText)),
