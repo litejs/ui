@@ -59,6 +59,42 @@ El.path = function(node) {
 	return str
 }
 
+
+function reloadCSS(file, arr) {
+	arr = arr || document.styleSheets
+	for (var i = 0, el, tmp; tmp = arr[i]; i++) {
+		if (tmp.href && tmp.href.indexOf(file) >- 1) {
+			console.log("reloadCSS", tmp.href)
+			if (el = tmp.ownerNode) {
+				tmp = El("link[rel=stylesheet]")
+				tmp.href = el.href.replace(/\?+\d+$/,"") + "?" + (+new Date)
+				El.on(tmp, "load", function() {
+					el.disabled = true
+					El.kill(el)
+				})
+				El.append(el.parentNode, tmp, el)
+			} else if (el = tmp.parentStyleSheet) {
+				tmp = el.cssRules[i].cssText.replace(/(\?+\d+)?"\)/, "?" + (+new Date) + '")')
+				el.insertRule(tmp, i + 1)
+				killRule()
+			}
+			return 2
+		}
+		tmp = (tmp.styleSheet || tmp).cssRules
+		if (tmp && reloadCSS(file, tmp)) return 1
+	}
+	function killRule() {
+		try {
+			if (el.cssRules[i + 1].styleSheet.cssRules.length) {
+				el.cssRules[i].styleSheet.disabled = true
+				el.deleteRule(i)
+			} else throw 1
+		} catch (e) {
+			setTimeout(killRule, 20)
+		}
+	}
+}
+
 /*
 El.on(document.body, "click", function(e) {
 	var target = e.target || e.srcElement
