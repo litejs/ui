@@ -19,7 +19,10 @@
 	, loaded = {}
 	, seq = 0
 	, ie678 = !+"\v1"
-
+	, execScript = window.execScript ||
+		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
+		Function("d,Date", "return(1,eval)('(Date)')==d&&eval")(Date, 1) ||
+		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(c,b.firstChild))")
 
 	//** error
 	, lastError
@@ -72,14 +75,6 @@
 	// MSXML version 3.0 was the last version of MSXML to support version-independent ProgIDs.
 	lazy(window, "XMLHttpRequest", "return new ActiveXObject('MSXML2.XMLHTTP')", ie678)
 
-
-	// eval in a global context for non-IE & non-Chrome (removed form v8 on 2011-05-23: Version 3.3.9)
-	// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
-	if (!window.execScript) {
-		Function("d,Date,w", "w.execScript=(1,eval)('(Date)')==d&&eval")(Date, 1, window)
-	}
-
-	lazy(window, "execScript", "d=document;b=d.body;c=d.createElement('script');c.text=a;b.removeChild(b.insertBefore(c,b.firstChild))")
 
 	// next === true is for sync call
 	//
