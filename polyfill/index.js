@@ -6,7 +6,7 @@
 	, P = "prototype"
 	, F = Function
 	, esc = escape
-	, patched = exports._patched = []
+	, patched = (exports.xhr || exports)._patched = []
 
 
 	function add(key, src) {
