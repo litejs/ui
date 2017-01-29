@@ -245,7 +245,7 @@
 				}
 			}
 			if (!--pending) {
-				if (!raw) execScript( res.join("/**/;") )
+				if (!raw) execScript( res.join("/**/;") || ";" )
 				if (next) next(files, res, raw)
 			}
 		}
