@@ -854,7 +854,7 @@
 				, arr = t.name.split(/\s+/)
 				View(arr[0], null, arr[2])
 				.on("ping", function() {
-					View.show(arr[1])
+					View.show(arr[1].format(opts))
 				})
 			}
 		})
