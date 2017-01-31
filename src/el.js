@@ -853,7 +853,7 @@
 				var t = this
 				, arr = t.name.split(/\s+/)
 				View(arr[0], null, arr[2])
-				.on("ping", function() {
+				.on("ping", function(opts) {
 					View.show(arr[1].format(opts))
 				})
 			}
