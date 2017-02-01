@@ -95,6 +95,27 @@ function reloadCSS(file, arr) {
 	}
 }
 
+function leakedVariables(_ignore) {
+	var key
+	, hasOwn = Object.prototype.hasOwnProperty
+	, vars = []
+	, iframe = El("iframe[src='about:blank']")
+	, ignore = [ "addEventListener", "removeEventListener", "dispatchEvent" ].concat(_ignore)
+
+	iframe.style.display = "none"
+	document.body.appendChild(iframe)
+
+	var clean = iframe.contentWindow || iframe.contentDocument
+
+	for (key in window) if (
+		window[key] !== clean &&
+		!hasOwn.call(clean, key) &&
+		ignore.indexOf(key) === -1
+	) vars.push(key)
+	document.body.removeChild(iframe)
+	return vars
+}
+
 /*
 El.on(document.body, "click", function(e) {
 	var target = e.target || e.srcElement
