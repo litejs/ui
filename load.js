@@ -240,7 +240,7 @@
 				err = file.split("?")[0].split(".").pop()
 				if (!raw && err != "js") {
 					xhr[++seq] = str
-					res[i] = "xhr.load.adapter." + err + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
+					res[i] = "xhr." + err + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
 				}
 			}
 			if (!--pending) {
@@ -254,7 +254,6 @@
 	// http://kangax.github.io/es5-compat-table/
 
 	xhr.load = load
-	xhr.load.adapter = {}
 
 	load(scripts, next)
 

@@ -808,7 +808,7 @@
 			}
 		}),
 		css: js.extend({
-			done: Fn("xhr.load.adapter.css(this.txt)")
+			done: Fn("xhr.css(this.txt)")
 		}),
 		def: js.extend({
 			done: Fn("View.def(this.params)")
@@ -860,8 +860,8 @@
 		})
 	}
 
-	xhr.load.adapter.view = xhr.load.adapter.tpl = El.tpl = parseTemplate
-	xhr.load.adapter.css = function(str) {
+	xhr.view = xhr.tpl = El.tpl = parseTemplate
+	xhr.css = function(str) {
 		if (!styleNode) {
 			// Safari and IE6-8 requires dynamically created
 			// <style> elements to be inserted into the <head>
