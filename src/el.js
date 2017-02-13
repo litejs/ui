@@ -904,8 +904,8 @@
 		37:"left", 38:"up", 39:"right", 40:"down",
 		45:"ins", 46:"del",
 		91:"cmd",
-		112:"f1", 113:"f2", 114:"f3", 115:"f4", 116:"f5", 117:"f6", 118:"f7", 119:"f8",
-		120:"f9", 121:"f10", 122:"f11", 123:"f12"
+		112:"f1", 113:"f2", 114:"f3", 115:"f4", 116:"f5", 117:"f6",
+		118:"f7", 119:"f8", 120:"f9", 121:"f10", 122:"f11", 123:"f12"
 	}
 	, kbMod = /Mac|iPod|iPhone|iPad|Pike/.test(navigator.platform) ? "metaKey" : "ctrlKey"
 
@@ -929,19 +929,14 @@
 
 	function kbDown(e) {
 		if (kbMaps[0]) {
-			var code = e.keyCode || e.which
+			var c = e.keyCode || e.which
+			, code = c > 95 && c < 106 ? c - 48 : c
+			, key = kbKeys[code] || String.fromCharCode(code) || code
+
 			// Otherwise IE backspace navigates back
 			if (code == 8 && kbMaps[0].backspace) {
 				Event.stop(e)
 			}
-		}
-	}
-
-	function kbUp(e) {
-		var code = e.keyCode || e.which
-		if (kbMaps[0]) {
-			if (code > 95 && code < 106) code -= 48
-			var key = kbKeys[code] || String.fromCharCode(code) || code
 			kbRun(e, code, key)
 			if (e.shiftKey && code != 16) kbRun(e, code, "shift+" + key)
 			if (e.ctrlKey && code != 17) kbRun(e, code, "ctrl+" + key)
@@ -957,7 +952,6 @@
 	}
 
 	addEvent(document, "keydown", kbDown)
-	addEvent(document, "keyup", kbUp)
 	//*/
 
 
