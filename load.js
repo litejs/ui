@@ -176,8 +176,7 @@
 	//** require
 	var modules = {}
 	, process = {
-		env: {},
-		nextTick: window.setImmediate || window.requestAnimationFrame || window.setTimeout
+		env: {}
 	}
 
 	//process.memoryUsage = function() {
