@@ -273,7 +273,7 @@ testman
 .describe( "Templates" )
 .it ("supports templates")
 .run(function() {
-	xhr.load.adapter.view([
+	El.tpl([
 		"@el test1",
 		" a",
 		"  b",
