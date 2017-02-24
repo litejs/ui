@@ -17,7 +17,7 @@
 			.right
 				@child
 			.right.lang &each: lng in _.list
-				a.hand - {lng|upper} -
+				a.hand - {lng.upper()} -
 					&on:"click", _.setLang.bind(null, lng)
 					&class:"selected", lng == _.current
 					&class:"lang-" + lng
