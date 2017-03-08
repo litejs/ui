@@ -28,27 +28,27 @@
 	, lastError
 	, unsentErrors = []
 
-	window.onerror = function(message, file, line, col, error) {
+	window.onerror = onerror
+	function onerror(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
 		if (lastError !== (lastError =
 			[ file
 			, line
-			, col || (window.event || {}).errorCharacter || "?"
+			, col || (window.event || unsentErrors).errorCharacter || "?"
 			, message
 			].join(":")
 		) && 1 == unsentErrors.push(
 			[ lastError
 			, error && (error.stack || error.backtrace || error.stacktrace) || "-"
 			, +new Date()
-			, window.location
-			].join("\n")
+			, "" + location
+			]
 		)) setTimeout(sendErrors, 307)
 	}
 
 	function sendErrors() {
 		if (xhr.logErrors) {
 			xhr.logErrors(unsentErrors)
-			unsentErrors.length = 0
 		} else {
 			setTimeout(sendErrors, 1307)
 		}
@@ -234,8 +234,10 @@
 
 		function cb(err, str, file, i) {
 			loaded[file] = file
-			res[i] = ""
-			if (!err) {
+			if (err) {
+				res[i] = ""
+				onerror(err, file)
+			} else {
 				res[i] = str
 				err = file.split("?")[0].split(".").pop()
 				if (!raw && err != "js") {

@@ -16,6 +16,10 @@ if (this.console && console.log) {
 	// also disable javascript: links
 }
 
+xhr.logErrors = function(unsentErrors) {
+	xhr("POST", "/errlog").send(JSON.stringify(unsentErrors))
+	unsentErrors.length = 0
+}
 
 
 var Mediator = Object.create(Event.Emitter)
