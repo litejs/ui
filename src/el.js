@@ -3,7 +3,6 @@
 
 !function(window, document, Object, Event, protoStr) {
 	var currentLang, styleNode
-	, hasOwn = Object[protoStr].hasOwnProperty
 	, wrapProto = []
 	, body = document.body
 	, root = document.documentElement
@@ -27,6 +26,7 @@
 			elScope(this)[name] = this
 		}
 	}
+	, hasOwn = elCache.hasOwnProperty
 
 	//** modernBrowser
 
