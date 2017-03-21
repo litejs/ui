@@ -215,15 +215,6 @@ El.bindings.run = function() {}
 
 	View.base = "views/"
 
-	El.on(document.body, "click", function(e) {
-		var target = e.target
-		, fastLink = target.tagName == "A" && target.href.split("#")
-
-		if (fastLink && fastLink[0] == location.href.split("#")[0]) {
-			View.show(fastLink[1])
-		}
-	})
-
 	View.on("show", function() {
 		// When a View completes, blur focused link
 		// IE8 can throw an exception for document.activeElement.
@@ -235,19 +226,43 @@ El.bindings.run = function() {}
 		El.findAll(document.body, ".js-viewRender").render()
 	})
 
-	var intlLang, intlZone, opts
+
+	var timezone
+
+	// Detect first available language
+	, lang = _.use([].concat(
+		navigator.languages, navigator.language, navigator.userLanguage, "en"
+	).filter(_.get)[0])
+
+	// Search href from HTML <base> element
+	, base = (document.documentElement.getElementsByTagName("base")[0] || init).href
 
 	try {
-		opts = Intl.DateTimeFormat().resolvedOptions()
-		intlLang = opts.locale
-		intlZone = opts.timezone
-	} catch(e) { }
+		timezone = Intl.DateTimeFormat().resolvedOptions().timezone
+	} catch(e) {}
 
-	var lang = [].concat(
-		navigator.languages, navigator.language, navigator.userLanguage, "en"
-	).filter(_.get)[0]
+	// Preload lang and views
+	xhr.load(["lang/" + lang + ".js", "views/Form1.tpl", "views/main.view"], init)
 
-	xhr.load(["lang/" + _.use(lang) + ".js", "views/Form1.tpl", "views/main.view"], init)
+	function init() {
+		_.setLang(lang)
+		// Start a router to show views
+		history.start(View.show, base && base.replace(/.*:\/\/[^/]*|[^\/]*$/g, ""))
+	}
+
+	El.on(document.body, "click", function(e) {
+		var target = e.target
+		, fastLink = target.tagName == "A" && target.href.split("#")
+
+		if (fastLink && fastLink[0] == (base || location.href.split("#")[0])) {
+			history.setUrl(fastLink[1])
+			Event.stop(e)
+		}
+	})
+
+
+
+
 
 	/*
 
@@ -266,22 +281,7 @@ El.bindings.run = function() {}
 	// Read in templates from element with id=index
 	//El.include("index")
 
-	var base = document.documentElement.getElementsByTagName("base")[0]
-	base = base && base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
 
-	function init() {
-		_.setLang(lang)
-		// Start a router to showing views
-		history.start(View.show, base)
-	}
-
-	if (base && history.pushState) El.on(document.body, "click", function(e) {
-		var target = e.target
-		if (target.tagName == "A") {
-			history.setUrl(target.href.split("#")[1])
-			Event.stop(e)
-		}
-	})
 
 }(View, Mediator, navigator)
 
