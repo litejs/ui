@@ -83,6 +83,8 @@
 	//
 
 	function xhr(method, url, next, attr1, attr2) {
+		// encodeURI("A + B").replace(/%5[BD]/g, decodeURI).replace(/\+/g, "%2B").replace(/%20/g, "+")
+		// unescape("A+%2B+B".replace(/\+/g, " "))
 		var xhr = xhrs.shift() || new XMLHttpRequest()
 
 		// To be able to reuse the XHR object properly,
