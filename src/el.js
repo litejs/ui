@@ -10,8 +10,8 @@
 	, elCache = El.cache = {}
 	, seq = 0
 	, scopeData = El.data = { _: i18n, El: El }
-	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w\:.#\[\]=])*)[ \t]*(.*?)$/gm
-	, renderRe = /[;\s]*(\w+)(?:\s*\:((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
+	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(.*?)$/gm
+	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, bindings = El.bindings = {
 		"class": function(name, fn) {
 			;(arguments.length < 2 || fn ? addClass : rmClass)(this, name)
@@ -599,9 +599,9 @@
 			// document.documentElement.lang
 			// document.getElementsByTagName('html')[0].getAttribute('lang')
 
-			fn = "data b s r->data&&(" + bind.replace(renderRe, function(match, name, args) {
+			fn = "data b s r->data&&(" + bind.replace(renderRe, function(match, name, op, args) {
 				return bindings[name] ?
-				(hasOwn.call(bindings[name], "once") && (newBind = newBind.replace(match, "")),
+				(op == ":" || hasOwn.call(bindings[name], "once") && (newBind = newBind.replace(match, "")),
 					"(r=b['" + name + "'].call(this" + (bindings[name].raw ? ",data,'" + args + "'" : args ? "," + args : "") + ")||r),") :
 				"s(this,'" + name + "'," + args + "),"
 			}) + "r)"
@@ -837,7 +837,7 @@
 				, bind = getAttr(t.el, "data-bind")
 				, view = View(arr[0], t._done(), arr[1], arr[2])
 				if (bind) {
-					fn = bind.replace(renderRe, function(match, name, args) {
+					fn = bind.replace(renderRe, function(match, name, op, args) {
 						return "(this['" + name + "']" + (
 							typeof view[name] == "function" ?
 							"(" + (args || "") + "))," :
