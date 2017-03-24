@@ -600,9 +600,11 @@
 			// document.getElementsByTagName('html')[0].getAttribute('lang')
 
 			fn = "data b s r->data&&(" + bind.replace(renderRe, function(match, name, op, args) {
-				return bindings[name] ?
-				(op == ":" || hasOwn.call(bindings[name], "once") && (newBind = newBind.replace(match, "")),
-					"(r=b['" + name + "'].call(this" + (bindings[name].raw ? ",data,'" + args + "'" : args ? "," + args : "") + ")||r),") :
+				var fn = bindings[name]
+				if (op == ":" || fn && hasOwn.call(fn, "once")) newBind = newBind.replace(match, "")
+				return fn ? (
+					"(r=b['" + name + "'].call(this" + (fn.raw ? ",data,'" + args + "'" : args ? "," + args : "") + ")||r),"
+				) :
 				"s(this,'" + name + "'," + args + "),"
 			}) + "r)"
 			if (bind != newBind) setAttr(node, "data-bind", newBind)
