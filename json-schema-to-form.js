@@ -5,10 +5,18 @@
 	El.bindings.schemaToForm = schemaToForm
 	schemaToForm.once = 1
 
+	function allOf(schema) {
+		return Array.isArray(schema.allOf) ?
+		schema.allOf.reduce(function(memo, item) {
+			return JSON.mergePatch(memo, item)
+		}, {}):
+		schema
+	}
+
 	function schemaToForm(schema, link, template) {
 		var form = this
 		, scope = El.scope(form)
-		, model = scope.model || { get: function(){return ""}, data:{} }
+		, model = scope.model || null
 
 		link = link || "self"
 
@@ -23,23 +31,18 @@
 				}
 			}
 
-			if (Array.isArray(schema.allOf)) {
-				schema.allOf.each(function(x) {
-					JSON.mergePatch(schema, x)
-				})
-				delete schema.allOf
-			}
-
 			var fieldset = El("fieldset.grid-1", El("legend", schema.title || _link.title))
 
-			drawSchema(schema, null, fieldset, model.data || {}, null, scope)
+			drawSchema(schema, null, fieldset, model && model.data || null, null, scope)
 
 			El.to(fieldset, form)
 
-			form.on("submit", function() {
+			El.on(form, "submit", function() {
 				var data = JSON.serializeForm(this)
-				, _scope = JSON.merge({}, scope.route, model.data)
+				, _scope = JSON.merge({}, scope.route, model && model.data)
 				applySchema(schema, data)
+
+				try { document.activeElement.blur() } catch(e) {}
 
 				xhr.makeReq(
 					_link.method || "POST",
@@ -47,7 +50,7 @@
 					data,
 					function(err, res, xhr) {
 						if (err) {
-							Mediator.emit("error", err)
+							Mediator.emit("error", err, res)
 						} else {
 							Mediator.emit("response:" + link, err, res, xhr)
 						}
@@ -57,10 +60,12 @@
 
 		})
 
-		function drawSchema(schema, key, fieldset, data, namePrefix, scope) {
+		function drawSchema(schema, key, fieldset, data, namePrefix, scope, def) {
 			var alternatives, keys, i, root, tmp
 			, alSelected
 			, count = 0
+
+			schema = allOf(schema)
 
 			if (schema.properties || schema.anyOf) {
 				if (key !== null) {
@@ -77,9 +82,10 @@
 						schema,
 						_key,
 						fieldset,
-						(schema.type == "object" || schema.properties || schema.anyOf ? data[_key] : data) || {},
+						data === null ? null : (schema.type == "object" || schema.properties || schema.anyOf ? data[_key] : data) || {},
 						namePrefix,
-						scope
+						scope,
+						def
 					)
 				})
 				if (!schema.anyOf) return
@@ -87,7 +93,7 @@
 
 			if (schema.anyOf) {
 				var title
-				schema = schema.anyOf || schema
+				schema = schema.anyOf.map(allOf)
 				key = []
 
 				alternatives = {}
@@ -110,7 +116,7 @@
 						})
 						delete tmp.properties[val]
 					})
-					drawSchema(tmp, null, root, data, namePrefix, scope)
+					root._draw = [tmp, null, root, data, namePrefix, scope]
 				}
 
 				schema = {
@@ -128,9 +134,7 @@
 				schema.resourceCollection ? "-list" :
 				"" ))
 			, sc = El.scope(row, scope)
-			, val = (key == null ? data : data[key])
-
-			if (val == null) val = schema["default"]
+			, val = data === null ? (def && def[key] || schema["default"]) : (key == null ? data : data[key])
 
 			sc.name = _(schema.title || key || "")
 			sc.value = val
@@ -138,8 +142,6 @@
 			sc.del = del
 
 			JSON.merge(sc, schema)
-
-			El.append(fieldset, El.render(row, sc))
 
 			if (schema.type == "array") {
 				var content = El.find(row, ".js-items")
@@ -150,21 +152,26 @@
 				El.attr(hidden, "name", key)
 
 				if (Array.isArray(schema.items)) {
-					throw "Not implemented"
-					schema.items.each(function(val, i) {
+					sc.noAdd = true
+					schema.items.each(function(item, i) {
+						add(val && val[i], item)
 					})
 				} else if (schema.resourceCollection) {
 					var _scope = JSON.merge({}, scope.route, data)
 					api(schema.resourceCollection.format(_scope)).each(add2)
 				} else if (Array.isArray(val) && val.length) {
-					val.each(add)
+					val.each(function(v) { add(v) })
 				} else if (schema.minItems) {
 					for (i = schema.minItems; i--; ) {
 						add()
 					}
 				}
+				El.render(row, sc)
+				El.append(fieldset, row)
 				return
 			}
+			El.render(row, sc)
+			El.append(fieldset, row)
 
 			function add2(val, i) {
 				var map = {}
@@ -174,13 +181,13 @@
 					{ type: "boolean", title: val.data.name },
 					"" + i,
 					content,
-					map,
+					data === null ? null : map,
 					key,
 					scope
 				)
 			}
 
-			function add(val) {
+			function add(val, itemSchema) {
 				var root = El.to(El(template + "-array-item"), content)
 				, rootScope = El.scope(root, sc)
 
@@ -189,12 +196,13 @@
 				root = El.find(root, ".js-item") || root
 
 				drawSchema(
-					schema.items,
+					itemSchema || schema.items,
 					null,
 					root,
-					val || {},
+					data === null ? null : val || {},
 					key + "[" + (count++) + "]",
-					scope
+					scope,
+					val
 				)
 			}
 
@@ -210,7 +218,7 @@
 			}
 
 			if (alternatives) {
-				field.on("change", alUp)
+				El.on(field, "change", alUp)
 				alUp()
 			}
 
@@ -220,6 +228,11 @@
 					if (alSelected) {
 						El.to(alSelected, dummy)
 					}
+					alSelected = alternatives[val]
+					if (alSelected._draw) {
+						drawSchema.apply(null, alSelected._draw)
+						alSelected._draw = null
+					}
 					El.append(fieldset, (alSelected = alternatives[val]), row.nextSibling)
 				}
 			}
@@ -227,7 +240,7 @@
 	}
 
 	function del() {
-		El.kill(this.closest(".js-del"))
+		El.kill(El.closest(this, ".js-del"))
 	}
 
 	JSON.applySchema = applySchema
@@ -237,8 +250,10 @@
 		, type = schema.type
 		, required = _required || schema.required
 
+		schema = allOf(schema)
+
 		if (schema.anyOf) {
-			schema.anyOf.each(function(schema) {
+			schema.anyOf.map(allOf).each(function(schema) {
 				var i, tmp, tmp2
 				, keys = Object.keys(schema.properties)
 
@@ -251,12 +266,11 @@
 				applySchema(schema, data)
 			})
 		}
-		var _enum = schema["enum"]
-		if (Array.isArray(_enum)) {
-			if (_enum.indexOf(data) === -1) {
-				for (var i = _enum.length; i--; ) {
-					if (_enum[i] == data) {
-						data = _enum[i]
+		if (Array.isArray(tmp = schema["enum"])) {
+			if (tmp.indexOf(data) === -1) {
+				for (var i = tmp.length; i--; ) {
+					if (tmp[i] == data) {
+						data = tmp[i]
 						break
 					}
 				}
@@ -270,14 +284,13 @@
 		} else if (type == "date-time") {
 			data = data.date()
 		} else if (schema.type == "array" ) {
-			if (Array.isArray(schema.items)) {
-				throw "Not implemented"
-			}
+			var itemSchema = Array.isArray(schema.items) && schema.items
 
 			data = Array.isArray(data) ?
-				data.reduce(function(memo, item) {
-					if (item !== void null) {
-						item = applySchema(schema.items, item)
+				data.reduce(function(memo, item, idx) {
+					var sc = itemSchema ? itemSchema[idx] : schema.items
+					if (item !== void null && sc) {
+						item = applySchema(sc, item)
 						memo.push(item)
 					}
 					return memo
