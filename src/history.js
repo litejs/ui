@@ -17,7 +17,7 @@
 	// In earlier versions, the expression "\v" === "v" returns true.
 	// In Internet Explorer 9 standards mode, Internet Explorer 10 standards mode,
 	// and win8_appname_long apps, the expression returns false.
-	, ie6_7 = !+"\v1" && (document.documentMode || 1) < 8
+	, ie6_7 = !+"\v1" && (document.documentMode | 0) < 8
 
 	function getUrl(_loc) {
 		var url

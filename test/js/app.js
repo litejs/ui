@@ -254,7 +254,11 @@ El.bindings.run = function() {}
 		var target = e.target
 		, fastLink = target.tagName == "A" && target.href.split("#")
 
-		if (fastLink && fastLink[0] == (base || location.href.split("#")[0])) {
+		if (
+			fastLink &&
+			!(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) &&
+			fastLink[0] == (base || location.href.split("#")[0])
+		) {
 			history.setUrl(fastLink[1])
 			Event.stop(e)
 		}
