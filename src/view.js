@@ -106,7 +106,7 @@
 
 			if (!silent) {
 				view.emit("ping", params)
-				View.emit("ping", view.route, params)
+				View.emit("ping", params, view)
 			}
 
 			if (lastParams == params && !params._p) {
@@ -119,7 +119,7 @@
 					El.append(parent.open || parent.el, view.open)
 					El.render(view.open)
 					view.emit("open", params)
-					View.emit("open", view.route, params)
+					View.emit("open", params, view)
 				}
 				if (child) {
 					child.ping(params)
@@ -128,7 +128,7 @@
 
 			if (lastParams == params && lastView == view && !params._p) {
 				view.emit("show", params)
-				View.emit("show", view.route, params)
+				View.emit("show", params, view)
 			}
 		}
 	}
