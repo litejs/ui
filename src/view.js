@@ -106,7 +106,9 @@
 
 			if (!silent) {
 				view.emit("ping", params)
-				View.emit("ping", params, view)
+				if (lastParams == params) {
+					View.emit("ping", params, view)
+				}
 			}
 
 			if (lastParams == params && !params._p) {
