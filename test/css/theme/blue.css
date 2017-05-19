@@ -16,6 +16,15 @@ body {
 	font: 2em/1.62 "Georgia", "Times New Roman", serif;
 }
 
+/**
+ * Do not remove focus retangle,
+ * do it more visible when needed.
+ *
+ *  - for IE8
+ *    :focus { outline: 5px solid red; }
+ */
+
+
 ::-moz-selection {             /* 1 */
 	text-shadow: none;     /* 2 */
 	background: #b3d4fc;
@@ -40,6 +49,28 @@ h5,
 h6 {
 	margin: 0;
 	padding: 1em 0 .5em;
+}
+
+/*
+ * Most browsers don't print background images by default.
+ * Use foreground images as sprites
+ */
+
+/**
+ * Mobile Safari respect the EXIF orientation tag by default in HTML documents.
+ *
+ * image-orientation property is supported by Firefox 26.
+ * When the style image-orientation: from-image is applied to a JPEG image, the browser will take its EXIF orientation tag into account when performing layout and rendering.
+ *
+ * image-orientation: 270deg flip;
+ *
+ * When you specify an orientation manually, image-orientation gives CSS the same capabilities as the EXIF orientation tag.
+ * You can use this to manually correct JPEGs lacking EXIF data, or to reorient PNGs and other types of images that can’t include orientation information.
+ * @see http://sethfowler.org/blog/2013/09/13/new-in-firefox-26-css-image-orientation/
+ *
+ */
+img {
+	image-orientation: from-image; /* 1 */
 }
 
 .bg-1 {
