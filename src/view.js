@@ -15,11 +15,12 @@
 	}
 
 	function View(route, el, parent) {
-		var view = this
-		if (views[route]) {
-			if (el) views[route].init(el, parent)
-			return views[route]
+		var view = views[route]
+		if (view) {
+			if (el) view.init(el, parent)
+			return view
 		}
+		view = this
 		if (!(view instanceof View)) return new View(route, el, parent)
 		views[view.route = route] = view
 		view.init(el, parent)
@@ -34,7 +35,7 @@
 			})
 
 			fnStr += "u[" + startLen + "]?(" + params.slice(1) + "'" + route + "'):"
-			reStr += (reStr ? "|" : "") + "(" + _re + ")"
+			reStr += (reStr ? "|(" : "(") + _re + ")"
 
 			fn = new Function(
 				"u,o,r",
@@ -45,94 +46,88 @@
 
 	View.prototype = {
 		init: function(el, parent) {
-			var view = this
-			view.el = el
-			view.parent = typeof parent == "string" ? View(parent) : parent
+			this.el = el
+			this.parent = parent && View(parent)
 		},
 		show: function(params) {
-			var child
-			, view = lastView = this
-			params = params || {}
+			var view = lastView = this
+			params = lastParams = params || {}
 			View.active = view.route
-			if (view.open) {
+			if (view.isOpen) {
 				view.close()
 			}
-			for (; view; child = view, view = view.parent) {
-				if (view.child && view.child != child) {
-					view.child.close()
-				}
-				view.child = child
+			bubbleUp(view, params, view.wait())
+		},
+		open: function(params) {
+			var view = this
+			, parent = view.parent
+			, child = view.child
+			if (parent && !view.isOpen) {
+				view.isOpen = view.el.cloneNode(true)
+				parent.emit("beforeChild", params)
+				El.append(parent.isOpen || parent.el, view.isOpen)
+				El.render(view.isOpen)
+				view.emit("open", params)
+				View.emit("open", params, view)
 			}
-			// child is now the root view
-			child.ping(lastParams = params)
+			if (child) {
+				child.open(params)
+			}
+			if (lastView == view) {
+				view.emit("show", params)
+				View.emit("show", params, view)
+			}
 		},
 		close: function() {
 			var view = this
 
-			if (view.open) {
+			if (view.isOpen) {
 				view.emit("close")
 				if (view.child) view.child.close()
-				El.kill(view.open)
-				view.open = view.parent.child = null
+				El.kill(view.isOpen)
+				view.isOpen = view.parent.child = null
 			}
 		},
-		wait: function(params, emit) {
+		wait: function() {
 			var view = this
-			, parent = view.parent
+			, params = lastParams
 			params._p = 1 + (params._p | 0)
 			return function() {
 				if (--params._p || lastParams != params) return
-				lastParams = JSON.merge({}, params)
-				if (view.el && view.parent == parent) {
-					view.ping(lastParams, !emit)
-				} else {
-					;(view.el ? lastView : View("404")).show(lastParams)
+				for (view = lastView; view.parent; view = view.parent) {
+					if (!view.el) return View("404").show(JSON.merge({}, params))
 				}
+				view.open(params)
 			}
-		},
-		ping: function(params, silent) {
-			var view = this
-			, parent = view.parent
-			, child = view.child
+		}
+	}
 
+	function bubbleUp(view, params, next) {
+		var child
+		for (; view; child = view, view = view.parent) {
+			if (view.child && view.child != child) {
+				view.child.close()
+			}
 			if (!view.el && view.file) {
 				return xhr.load(
 					view.file
 					.replace(/^|,/g, "$&" + (View.base || ""))
 					.split(","),
-					view.wait(params, 1)
+					bubbleUp.bind(view, view, params, next)
 				)
 			}
-
-			if (!silent) {
-				view.emit("ping", params)
-				if (lastParams == params) {
-					View.emit("ping", params, view)
-				}
-			}
-
-			if (lastParams == params && !params._p) {
-				var type = typeof view.el
-				if (type == "function") view.el = view.el()
-				else if (type == "string") view.el = El.tpl(view.el)
-				if (parent && !view.open) {
-					view.open = view.el.cloneNode(true)
-					parent.emit("beforeChild", params)
-					El.append(parent.open || parent.el, view.open)
-					El.render(view.open)
-					view.emit("open", params)
-					View.emit("open", params, view)
-				}
-				if (child) {
-					child.ping(params)
-				}
-			}
-
-			if (lastParams == params && lastView == view && !params._p) {
-				view.emit("show", params)
-				View.emit("show", params, view)
-			}
+			view.child = child
+			view.emit("ping", params)
+			if (lastParams != params) return
+			View.emit("ping", params, view)
 		}
+		// child is now the root view
+		Object.each(params, function(value, name) {
+			if (value = param[name] || param["*"]) {
+				value.call(child, params[name], name, params)
+			}
+		})
+		next()
 	}
 
 	JSON.merge(View, Event.Emitter)
@@ -152,10 +147,17 @@
 		}
 		var params = _params || {}
 		, view = get(url, params)
-		if (!view.open || lastUrl != url) {
+		if (!view.isOpen || lastUrl != url) {
 			params._u = lastUrl = url
 			view.show(El.data.route = params)
 		}
+	}
+
+	View.param = param
+	function param(name, cb) {
+		[].concat(name).forEach(function(n) {
+			param[n] = cb
+		})
 	}
 
 	View.def = function(str) {

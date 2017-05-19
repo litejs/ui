@@ -195,22 +195,33 @@ El.bindings.run = function() {}
 	})
 
 	View("#private")
-	.on("ping", function(opts) {
-		var url = history.getUrl()
+	.on("ping", function() {
 		if (!user && View.active != "login") {
 			View("login").show()
 		}
 	})
 
-	View("users/{id}")
-	.on("ping", function(opts) {
-		setTimeout(this.wait(opts), 2000)
-		setTimeout(this.wait(opts), 1000)
+	View.param(["userId","pageId"], function(value, name, params) {
+		var key = name.slice(0, -2)
+		, list = Data(key + "s")
+
+		list.get(value, function(err, item) {
+			if (err) return View("404").show()
+			console.log("set", key, item)
+			El.data[key] = item
+		})
+		.then(this.wait())
+	})
+
+	View("users/{userId}")
+	.on("ping", function() {
+		setTimeout(this.wait(), 2000)
+		setTimeout(this.wait(), 1000)
 	})
 
 	View("users")
-	.on("ping", function(opts) {
-		this.wait(opts)()
+	.on("ping", function() {
+		this.wait()()
 	})
 
 	View.base = "views/"

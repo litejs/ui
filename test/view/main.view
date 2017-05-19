@@ -28,7 +28,7 @@
 		.Menu.App-row.js-viewRender
 			@el nav-row
 				a.Menu-item.waves
-					&class: "selected", View(this.href.split("#")[1]).open
+					&class: "selected", (route._u || View.home).indexOf(this.href.split("#")[1]) == 0
 			nav-row[href="#home"] Home
 			nav-row[href="#users"] Users
 			nav-row[href="#settings"] Settings
@@ -125,9 +125,13 @@
 				&txt: item.name
 				&href: "#users/" + item.id
 
-@view users/{id} #public
+@view users/{userId} #public
 	form-js
 		&schemaToForm: "schema/user.json", "edit", "Form1"
+
+@view users/{userId}/{pageId} #public
+	div
+		h3 {page.get("name")}
 
 @view ok #public
 	h1 Ok!
