@@ -36,11 +36,7 @@
 
 			fnStr += "u[" + startLen + "]?(" + params.slice(1) + "'" + route + "'):"
 			reStr += (reStr ? "|(" : "(") + _re + ")"
-
-			fn = new Function(
-				"u,o,r",
-				"return (u=/^\\/?(?:" + reStr + ")[\\/\\s]*$/.exec(u))?(" + fnStr + "r):r"
-			)
+			fn = 0
 		}
 	}
 
@@ -137,6 +133,12 @@
 
 	View.get = get
 	function get(url, params) {
+		if (!fn) {
+			fn = new Function(
+				"u,o,r",
+				"return (u=/^\\/?(?:" + reStr + ")[\\/\\s]*$/.exec(u))?(" + fnStr + "r):r"
+			)
+		}
 		return View(fn(url || View.home, params || {}, "404"))
 	}
 
