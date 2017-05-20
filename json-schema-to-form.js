@@ -13,7 +13,7 @@
 		schema
 	}
 
-	function schemaToForm(schema, link, template) {
+	function schemaToForm(schema, link, template, event) {
 		var form = this
 		, scope = El.scope(form)
 		, model = scope.model || null
@@ -21,10 +21,13 @@
 		link = link || "self"
 
 		xhr.getSchema(schema, function(err, schema) {
-			var i
+			var i, selfHref
 			, _link = schema
 
 			if (schema.links) for (i = 0; _link = schema.links[i++]; ) {
+				if (_link.rel == "self") {
+					selfHref = _link.href
+				}
 				if (_link.rel == link) {
 					schema = _link.schema || schema
 					break
@@ -40,22 +43,12 @@
 			El.on(form, "submit", function() {
 				var data = JSON.serializeForm(this)
 				, _scope = JSON.merge({}, scope.route, model && model.data)
+				, href = (_link.href || selfHref).format(_scope)
 				applySchema(schema, data)
 
 				try { document.activeElement.blur() } catch(e) {}
 
-				xhr.makeReq(
-					_link.method || "POST",
-					_link.href.format(_scope),
-					data,
-					function(err, res, xhr) {
-						if (err) {
-							Mediator.emit("error", err, res)
-						} else {
-							Mediator.emit("response:" + link, err, res, xhr)
-						}
-					}
-				)
+				Mediator.emit(event || "makeReq", _link, href, data)
 			})
 
 		})
@@ -128,7 +121,7 @@
 
 
 			var row = El(template + (
-				schema["ui:el"] ? "-" + schema["ui:el"] :
+				schema["ui:el"] && El.cache[template + "-" + schema["ui:el"]] ? "-" + schema["ui:el"] :
 				schema["enum"] ? "-enum" :
 				schema.type == "boolean" || schema.type == "array" ? "-" + schema.type :
 				schema.resourceCollection ? "-list" :
