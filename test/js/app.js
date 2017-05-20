@@ -114,7 +114,8 @@ El.bindings.list = function(list, extra) {
 				item.off("change", up)
 			})
 		}
-		return El.render(El.to(clone, node, extraLen + pos), scope)
+		El.append(node, clone, extraLen + pos)
+		return El.render(clone, scope)
 	}
 
 	function remove(item, pos) {

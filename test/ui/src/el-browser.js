@@ -20,6 +20,11 @@ function getString(node) {
 	return div.innerHTML
 }
 
+function to(el, parent, before) {
+	El.append(parent, el, before)
+	return el
+}
+
 i18n.def({ "et":"Eesti keeles"
 	, "en":"In English"
 	, "ru":"На русском"
@@ -81,8 +86,8 @@ testman
 .run(function(){
 	el = El("div")
 	select = El("select#id2.cl2:disabled")
-	input = El.to(El("input"), document.body)
-	radio = El.to(El("input[type=radio]"), document.body)
+	input = to(El("input"), document.body)
+	radio = to(El("input[type=radio]"), document.body)
 	h1 = El("h1")
 	h2 = El("h2")
 	h3 = El("h3")
@@ -135,20 +140,20 @@ testman
 .equal(el.innerHTML, "")
 
 .it ("set childs")
-.htmlSimilar(El.to(el, document.body), "<div></div>")
+.htmlSimilar(to(el, document.body), "<div></div>")
 .htmlSimilar(El.append(el, h2), "<div><h2></h2></div>")
 .htmlSimilar(El.append(el, h1, h2), "<div><h1></h1><h2></h2></div>")
-.htmlSimilar(El.to(h4, el), "<h4></h4>")
+.htmlSimilar(to(h4, el), "<h4></h4>")
 .htmlSimilar(el, "<div><h1></h1><h2></h2><h4></h4></div>")
-.htmlSimilar(El.to(h3, el,  h4), "<h3></h3>")
+.htmlSimilar(to(h3, el,  h4), "<h3></h3>")
 .htmlSimilar(el, "<div><h1></h1><h2></h2><h3></h3><h4></h4></div>")
-.htmlSimilar(El.to(h3, el, h4), "<h3></h3>")
+.htmlSimilar(to(h3, el, h4), "<h3></h3>")
 .htmlSimilar(el, "<div><h1></h1><h2></h2><h3></h3><h4></h4></div>")
 
 .htmlSimilar(El.append(h1, [h2, h3]), "<h1><h2></h2><h3></h3></h1>")
 .htmlSimilar(el, "<div><h1><h2></h2><h3></h3></h1><h4></h4></div>")
 
-.htmlSimilar(El.to(select, h2), '<select id="id2" disabled="disabled" class="cl2"></select>')
+.htmlSimilar(to(select, h2), '<select id="id2" disabled="disabled" class="cl2"></select>')
 
 .it ("should get element by id")
 .equal(El.get("id2"), select)

@@ -98,7 +98,7 @@
 		El.on(node, "mouseover", function() {
 			if (!svgToLastActive || node != node.parentNode.lastChild) {
 				if (svgToLastActive) El.rmClass(svgToLastActive, "line-active")
-				El.after(node, node.parentNode.lastChild)
+				El.append(node.parentNode, node)
 				El.addClass(node, "is-active")
 				svgToLastActive = node
 			}

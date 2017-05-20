@@ -38,7 +38,7 @@
 
 			drawSchema(schema, null, fieldset, model && model.data || null, null, scope)
 
-			El.to(fieldset, form)
+			El.append(form, fieldset)
 
 			El.on(form, "submit", function() {
 				var data = JSON.serializeForm(this)
@@ -138,7 +138,9 @@
 
 			if (schema.type == "array") {
 				var content = El.find(row, ".js-items")
-				, hidden = El.to(El("input[type=hidden]"), content)
+				, hidden = El("input[type=hidden]")
+
+				El.append(content, hidden)
 
 				key = namePrefix ? namePrefix + "[" + key + "]" : key
 
@@ -181,9 +183,9 @@
 			}
 
 			function add(val, itemSchema) {
-				var root = El.to(El(template + "-array-item"), content)
+				var root = El(template + "-array-item")
 				, rootScope = El.scope(root, sc)
-
+				El.append(content, root)
 				El.render(root, rootScope)
 
 				root = El.find(root, ".js-item") || root
@@ -219,7 +221,7 @@
 				var val = El.val(field)
 				if (alSelected != alternatives[val]) {
 					if (alSelected) {
-						El.to(alSelected, dummy)
+						El.append(dummy, alSelected)
 					}
 					alSelected = alternatives[val]
 					if (alSelected._draw) {

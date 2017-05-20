@@ -376,11 +376,6 @@
 		return el
 	}
 
-	function to(el, parent, before) {
-		append(parent, el, before)
-		return el
-	}
-
 	// setAttribute("class") is broken in IE7
 	// className is object in SVGElements
 
@@ -681,7 +676,6 @@
 	El.addClass = addClass
 	El.rmClass = rmClass
 	El.append = append
-	El.to = to
 	El.scope = elScope
 
 	//** templates
@@ -716,7 +710,9 @@
 				if (name) {
 					parentStack.push(parent)
 					stack.unshift(q)
-					parent = to(El(name, 0, 1), parent)
+					q = El(name, 0, 1)
+					append(parent, q)
+					parent = q
 				}
 				if (text) {
 					q = text.charAt(0)
@@ -867,7 +863,7 @@
 		if (!styleNode) {
 			// Safari and IE6-8 requires dynamically created
 			// <style> elements to be inserted into the <head>
-			styleNode = to(El("style"), document.getElementsByTagName("head")[0])
+			append(document.getElementsByTagName("head")[0], styleNode = El("style"))
 		}
 		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
 		else append(styleNode, str)
