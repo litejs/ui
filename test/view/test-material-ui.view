@@ -25,10 +25,10 @@
 		.col-9
 			Fab.tooltip--top>\+
 				&data: "tooltip", "Hello1"
-				&on: "click", emit("showMenu", this, "Fab-menu1", "rightEdge", "bottom", 0, 1)
+				&on: "click", "showMenu", "Fab-menu1", "rightEdge", "bottom", 0, 1
 			Fab.Fab--red.tooltip--left>\—
 				&data: "tooltip", "World\n2"
-				&on: "click", emit("showMenu", this, "Fab-menu2", "leftEdge", "bottom", 0, 1)
+				&on: "click", "showMenu", "Fab-menu2", "leftEdge", "bottom", 0, 1
 			Fab.tooltip--right>\+
 				&data: "tooltip", "Hello2"
 			Fab>\+
