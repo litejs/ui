@@ -1004,8 +1004,8 @@
 	function i18n(text, lang) {
 		lang = i18n[i18nGet(lang) || currentLang]
 		return lang[text] ||
-		lang[text = text.slice(text.indexOf(":") + 1) || text] ||
-		text
+		text && lang[text = text.slice(text.indexOf(":") + 1) || text] ||
+		text || ""
 	}
 	El.i18n = i18n
 
