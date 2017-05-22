@@ -90,8 +90,13 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<script
 			src="../dist/up.js"
 			min="%.min.js"
-			banner="litejs.com/MIT-LICENSE.txt"
-			build="polyfill/es5.js"
+			banner="
+litejs.com/MIT-LICENSE.txt
+"
+			build="
+				polyfill/es5.js
+				polyfill/promise.js
+			"
 			if="!Function.prototype.bind"
 		></script>
 		<script
