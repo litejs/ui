@@ -41,7 +41,7 @@
 			El.append(form, fieldset)
 
 			El.on(form, "submit", function() {
-				var data = JSON.serializeForm(this)
+				var data = El.val(this)
 				, _scope = JSON.merge({}, scope.route, model && model.data)
 				, href = (_link.href || selfHref).format(_scope)
 				applySchema(schema, data)

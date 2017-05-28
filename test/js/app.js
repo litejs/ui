@@ -99,7 +99,7 @@ El.bindings.run = function() {}
 	})
 
 	Mediator.logForm = function(e) {
-		var data = JSON.serializeForm(this)
+		var data = El.val(this)
 		, matches = El.attr(this, "data-expect") == JSON.stringify(data)
 		if (matches) {
 			console.log("logForm", matches, JSON.stringify(data), data)

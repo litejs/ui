@@ -301,10 +301,40 @@
 		) : el[txtAttr]
 	}
 
-	El.val = function(el, val) {
-		var type = el.type
+	El.val = valFn
+	function valFn(el, val) {
+		var input, step, key, value
+		, i = 0
+		, type = el.type
 		, opts = el.options
 		, checkbox = type == "checkbox" || type == "radio"
+
+		if (el.tagName === "FORM") {
+			opts = {}
+
+			// Disabled controls do not receive focus,
+			// are skipped in tabbing navigation, cannot be successfully posted.
+			//
+			// Read-only elements receive focus but cannot be modified by the user,
+			// are included in tabbing navigation, are successfully posted.
+			//
+			// Read-only checkboxes can be changed by the user
+
+			for (; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
+				value = valFn(input)
+				if (value !== void 0) {
+					step = opts
+					key.replace(/\[(.*?)\]/g, function(_, _key, offset) {
+						if (step == opts) key = key.slice(0, offset)
+						step = step[key] || (step[key] = _key && +_key != _key ? {} : [])
+						key = _key
+					})
+					step[key || step.length] = value
+				}
+			}
+
+			return opts
+		}
 
 		if (arguments.length > 1) {
 			if (opts) {

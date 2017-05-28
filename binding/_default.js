@@ -42,7 +42,7 @@
 	bindings.emitForm = emitForm
 	function emitForm(ev, a1, a2, a3, a4) {
 		El.on(this, "submit", function(e) {
-			var data = JSON.serializeForm(this)
+			var data = El.val(this)
 			Mediator.emit(ev, e, data, a1, a2, a3, a4)
 			return false
 		})
