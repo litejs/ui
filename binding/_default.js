@@ -7,7 +7,6 @@
 
 	bindingFn.once =
 	bindingIf.once =
-	bindingWith.once =
 	bindingOn.once =
 	emitForm.once =
 	bindingsEach.raw = bindingsEach.once =
@@ -32,11 +31,6 @@
 			}
 		}
 		El.on(this, ev, fn)
-	}
-
-	bindings["with"] = bindingWith
-	function bindingWith(map) {
-		return El.render(this, JSON.merge(El.scope(this, true), map))
 	}
 
 	bindings.emitForm = emitForm

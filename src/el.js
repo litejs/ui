@@ -24,6 +24,9 @@
 		},
 		ref: function(name) {
 			elScope(this)[name] = this
+		},
+		"with": function(map) {
+			return render(this, JSON.merge(elScope(this, true), map))
 		}
 	}
 	, hasOwn = elCache.hasOwnProperty
@@ -141,6 +144,8 @@
 	 * El("input#12.nice[type=checkbox]:checked:disabled[data-lang=en].class")
 	 * <input id="12" class="nice class" type="checkbox" checked="checked" disabled="disabled" data-lang="en">
 	 */
+
+	bindings["with"].once = 1
 
 	window.El = El
 
