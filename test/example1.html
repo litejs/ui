@@ -16,7 +16,7 @@
         // Custom elements can be defined inline with 'el' plugin
         @el Menu-item
           a.Menu-item
-            &class: "selected", View(this.href.split("#")[1]).open
+            &class: "selected", View(this.href.split("#")[1]).isOpen
         Menu-item[href="#home"] Home
         Menu-item[href="#users"] Users
         Menu-item[href="#settings"] Settings
