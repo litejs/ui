@@ -57,26 +57,15 @@
 		open: function(params) {
 			var view = this
 			, parent = view.parent
-			, child = view.child
 			if (parent && !view.isOpen) {
 				view.isOpen = view.el.cloneNode(true)
 				parent.emit("beforeChild", params)
 				El.append(parent.isOpen || parent.el, view.isOpen)
 				El.render(view.isOpen)
-				view.emit("open", params)
-				View.emit("open", params, view)
-			}
-			if (child) {
-				child.open(params)
-			}
-			if (lastView == view) {
-				view.emit("show", params)
-				View.emit("show", params, view)
 			}
 		},
 		close: function() {
 			var view = this
-
 			if (view.isOpen) {
 				view.emit("close")
 				if (view.child) view.child.close()
@@ -93,7 +82,7 @@
 				for (view = lastView; view.parent; view = view.parent) {
 					if (!view.el) return View("404").show(JSON.merge({}, params))
 				}
-				view.open(params)
+				bubbleDown(view, params)
 			}
 		}
 	}
@@ -123,7 +112,23 @@
 				value.call(child, params[name], name, params)
 			}
 		})
-		next()
+		next(view, params)
+	}
+
+	function bubbleDown(view, params) {
+		var child = view.child
+		if (view.parent && !view.isOpen) {
+			view.open(params)
+			view.emit("open", params)
+			View.emit("open", params, view)
+		}
+		if (child) {
+			bubbleDown(child, params)
+		}
+		if (lastView == view) {
+			view.emit("show", params)
+			View.emit("show", params, view)
+		}
 	}
 
 	JSON.merge(View, Event.Emitter)
