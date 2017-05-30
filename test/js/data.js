@@ -11,7 +11,6 @@ var Data = List.extend({
 			otherList = cache[otherList]
 			if (list.isSubsetFrom(otherList)) {
 				break
-				return list
 			}
 		}
 

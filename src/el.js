@@ -666,8 +666,6 @@
 	}
 
 	function addWrapProto(key) {
-		var first = key == "closest" || key == "find"
-
 		wrapProto[key] = wrap
 		function wrap(a, b, c) {
 			var i = 0
@@ -781,7 +779,7 @@
 
 	plugin[protoStr] = {
 		_done: function() {
-			var i, el, childId
+			var el, childId
 			, t = this
 			, childNodes = t.el.childNodes
 			, i = childNodes.length
@@ -1001,7 +999,7 @@
 
 	function setBreakpoints(_breakpoints) {
 		// document.documentElement.clientWidth is 0 in IE5
-		var key, val, next
+		var key, next
 		, width = root.offsetWidth
 		, map = breakpoints = _breakpoints || breakpoints
 
