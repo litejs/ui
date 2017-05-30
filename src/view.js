@@ -10,10 +10,6 @@
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 
-	function escapeRegExp(string) {
-		return string.replace(escapeRe, "\\$&")
-	}
-
 	function View(route, el, parent) {
 		var view = views[route]
 		if (view) {
@@ -31,7 +27,7 @@
 			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
 					(params += "o['" + key + "']=u[" + (groupsCount++) + "],") && "([^/]+?)" :
-					escapeRegExp(_)
+					_.replace(escapeRe, "\\$&")
 			})
 
 			fnStr += "u[" + startLen + "]?(" + params.slice(1) + "'" + route + "'):"
