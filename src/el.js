@@ -4,6 +4,7 @@
 !function(window, document, Object, Event, protoStr) {
 	var currentLang, styleNode
 	, wrapProto = []
+	, slice = wrapProto.slice
 	, body = document.body
 	, root = document.documentElement
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
@@ -566,7 +567,7 @@
 	}
 
 	El.emit = function(el, ev) {
-		Event.Emitter.emit.call(el, ev)
+		Event.Emitter.emit.apply(el, slice.call(arguments, 1))
 	}
 
 	function empty(el) {
@@ -679,7 +680,7 @@
 			else if (argi === 2) for (; i < len; ) fn(self[i++], a, b)
 			else if (argi === 3) for (; i < len; ) fn(self[i++], a, b, c)
 			else {
-				var arr = wrapProto.slice.call(arguments)
+				var arr = slice.call(arguments)
 				arr.unshift(1)
 				for (; i < len; ) {
 					arr[0] = self[i++]
@@ -697,7 +698,7 @@
 	Object.keys(El).each(function(key) {
 		if (!bindings[key]) {
 			bindings[key] = function() {
-				var arr = wrapProto.slice.call(arguments)
+				var arr = slice.call(arguments)
 				arr.unshift(this)
 				El[key].apply(null, arr)
 			}
