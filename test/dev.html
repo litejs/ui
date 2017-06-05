@@ -80,7 +80,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<link rel="shortcut icon" href="favicon.ico">
 		<link rel="apple-touch-icon" href="apple-touch-icon.png">
 		-->
-		<link rel="stylesheet" min="m.css" href="app.css">
+		<link rel="stylesheet" min="m.css?{hash}" href="app.css">
 		<link rel="stylesheet" title="Default look" href="css/theme/blue.css">
 		<link rel="alternate stylesheet" title="New look" href="css/theme/new.css">
 	</head>
@@ -88,7 +88,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<script inline src="../load.js"></script>
 		<script
 			src="../dist/up.js"
-			min="%.min.js"
+			min="%.min.js?{hash}"
 			banner="
 litejs.com/MIT-LICENSE.txt
 @date date
@@ -101,7 +101,7 @@ litejs.com/MIT-LICENSE.txt
 		></script>
 		<script
 			src="../dist/litejs.js"
-			min="%.min.js"
+			min="%.min.js?{hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
 			build="date-format-lite"
 		></script>
@@ -116,13 +116,13 @@ litejs.com/MIT-LICENSE.txt
 		<script min src="../src/bindings.js"></script>
 		<script min src="../src/bindings/list.js"></script>
 		<script exclude src="js/debug.js"></script>
-		<script min="0.js" src="../src/touch-as-mouse.js"></script>
+		<script min="0.js?{hash}" src="../src/touch-as-mouse.js"></script>
 		<script min src="js/mediator.js"></script>
 		<script min src="../src/xhr-getschema.js"></script>
 		<script min src="../src/json-schema-to-form.js"></script>
 		<script min src="../src/appcache.js" type="disabled/javascript"></script>
 		<script min src="js/xhr.js"></script>
-		<script min="1.js" src="../model/index.js"></script>
+		<script min="1.js?{hash}" src="../model/index.js"></script>
 		<script min src="js/data.js"></script>
 		<script min src="js/app.js"></script>
 		<script exclude src="//www.litejs.com/pub/testman.js"></script>
