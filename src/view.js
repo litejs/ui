@@ -48,7 +48,7 @@
 			if (view.isOpen) {
 				view.close()
 			}
-			bubbleUp(view, params, view.wait())
+			bubbleUp(view, params, bubbleDown)
 		},
 		open: function(params) {
 			var view = this
@@ -78,7 +78,7 @@
 				for (view = lastView; view.parent; view = view.parent) {
 					if (!view.el) return View("404").show(JSON.merge({}, params))
 				}
-				bubbleDown(view, params)
+				if (params._v) bubbleDown(params._v, params)
 			}
 		}
 	}
@@ -104,15 +104,19 @@
 		}
 		// child is now the root view
 		Object.each(params, function(value, name) {
+			if (name.charAt(0) == "_") return
 			if (value = param[name] || param["*"]) {
 				value.call(child, params[name], name, params)
 			}
 		})
-		next(view, params)
+		next(child, params)
 	}
 
 	function bubbleDown(view, params) {
 		var child = view.child
+		if (params._p && /{/.test(view.route)) {
+			return params._v = view
+		}
 		if (view.parent && !view.isOpen) {
 			view.open(params)
 			view.emit("open", params)
