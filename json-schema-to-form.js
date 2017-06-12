@@ -13,10 +13,8 @@
 		schema
 	}
 
-	function schemaToForm(schema, link, template, event) {
-		var form = this
-		, scope = El.scope(form)
-		, model = scope.model || null
+	function schemaToForm(form, scope, schema, link, template, event) {
+		var model = scope.model || null
 
 		link = link || "self"
 

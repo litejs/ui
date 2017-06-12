@@ -353,7 +353,7 @@ it ( "should show set DOM propperty when plugin not found" , {skip: "Browsers do
 
 	var a = El("a")
 	, b = El("b")
-	, aScope = El.scope(a, true)
+	, aScope = El.scope(a)
 	, bScope = El.scope(b)
 
 	El.scope(a).x = 1

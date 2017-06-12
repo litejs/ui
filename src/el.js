@@ -14,20 +14,20 @@
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(.*?)$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, bindings = El.bindings = {
-		"class": function(name, fn) {
-			;(arguments.length < 2 || fn ? addClass : rmClass)(this, name)
+		"class": function(el, scope, name, fn) {
+			;(arguments.length < 4 || fn ? addClass : rmClass)(el, name)
 		},
-		data: function(key, val) {
-			setAttr(this, "data-" + key, val)
+		data: function(el, scope, key, val) {
+			setAttr(el, "data-" + key, val)
 		},
-		html: function(html) {
-			this.innerHTML = html
+		html: function(el, scope, html) {
+			el.innerHTML = html
 		},
-		ref: function(name) {
-			elScope(this)[name] = this
+		ref: function(el, scope, name) {
+			scope[name] = this
 		},
-		"with": function(map) {
-			return render(this, JSON.merge(elScope(this, true), map))
+		"with": function(el, scope, map) {
+			return render(el, JSON.merge(elScope(el, scope), map))
 		}
 	}
 	, hasOwn = elCache.hasOwnProperty
@@ -47,7 +47,7 @@
 		}
 	, closest = El.closest = body.closest ?
 		function(el, sel) {
-			return el.closest(sel)
+			return (el.closest ? el : el.parentNode).closest(sel)
 		} :
 		function(el, sel) {
 			return walk("parentNode", 1, el, sel)
@@ -228,7 +228,7 @@
 	}
 
 	function getAttr(el, key) {
-		return el.getAttribute && el.getAttribute(key)
+		return el && el.getAttribute && el.getAttribute(key)
 	}
 
 	function setAttr(el, key, val) {
@@ -588,27 +588,28 @@
 			return el.kill && el.kill()
 		}
 		empty(el)
-		if (id = getAttr(el, "data-scope")) {
+		if (id = el._scope) {
 			delete elScope[id]
 		}
 		if (el.valObject) el.valObject = null
 		return el
 	}
 
-	function elScope(node, parent, _scope) {
-		if (_scope = elScope[getAttr(node, "data-scope")]) {
-			return _scope
+	function elScope(node, parent, fb) {
+		return elScope[node._scope] ||
+		fb ||
+		(parent ?
+			(((fb = elScope[node._scope = ++seq] = Object.create(parent))._super = parent), fb) :
+			closestScope(node)
+		) ||
+		scopeData
+
+	}
+
+	function closestScope(node) {
+		for (; node = node.parentNode; ) {
+			if (node._scope) return elScope[node._scope]
 		}
-		if (!parent || parent === true) {
-			_scope = closest(node, "[data-scope]")
-			_scope = _scope && elScope[getAttr(_scope, "data-scope")] || scopeData
-		}
-		if (parent) {
-			setAttr(node, "data-scope", ++seq)
-			_scope = elScope[seq] = Object.create(parent = (_scope || parent))
-			_scope._super = parent
-		}
-		return _scope
 	}
 
 	function render(node, scope, skipSelf) {
@@ -618,13 +619,9 @@
 			return node.render ? node.render(scope) : node
 		}
 
-		// TODO:2015-05-25:lauri:Use elScope
-		scope = elScope[getAttr(node, "data-scope")]
-		|| scope
-		|| (bind = closest(node, "[data-scope]")) && elScope[getAttr(bind, "data-scope")]
-		|| scopeData
+		scope = elScope(node, 0, scope)
 
-		if (bind = !skipSelf && getAttr(node, "data-bind")) {
+		if (bind = !skipSelf && (getAttr(node, "data-bind") || node._bind)) {
 			newBind = bind
 			// i18n(bind, lang).format(scope)
 			// document.documentElement.lang
@@ -634,7 +631,7 @@
 				var fn = bindings[name]
 				if (op == ":" || fn && hasOwn.call(fn, "once")) newBind = newBind.replace(match, "")
 				return fn ? (
-					"(r=b['" + name + "'].call(this" + (fn.raw ? ",data,'" + args + "'" : args ? "," + args : "") + ")||r),"
+					"(r=b['" + name + "'](this,data" + (fn.raw ? ",'" + args + "'" : args ? "," + args : "") + ")||r),"
 				) :
 				"s(this,'" + name + "'," + args + "),"
 			}) + "r)"
@@ -647,7 +644,7 @@
 			} catch (e) {
 				//** debug
 				e.message += " in binding: " + bind
-				console.error(e)
+				console.error(e, node)
 				if (window.onerror) window.onerror(e.message, e.fileName, e.lineNumber)
 				//*/
 				return node
@@ -697,10 +694,10 @@
 
 	Object.keys(El).each(function(key) {
 		if (!bindings[key]) {
-			bindings[key] = function() {
-				var arr = slice.call(arguments)
-				arr.unshift(this)
-				El[key].apply(null, arr)
+			bindings[key] = function(el, scope) {
+				var arr = slice.call(arguments, 2)
+				arr.unshift(el)
+				El[key].apply(scope, arr)
 			}
 		}
 		if (!wrapProto[key]) addWrapProto(key)

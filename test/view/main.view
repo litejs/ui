@@ -92,6 +92,9 @@
 		&on: "mouseout", Fn("El.rmClass(this,'bg3'),El.txt(this, _('_welcome'))")
 	div &txt: _(welcomeText)
 	div &txt: _(nonExistingWelcomeText)
+	div
+		&if: Math.random() > .5
+		&txt: "If"
 	.time
 		&txt: "Init " + started.format()
 	.time
@@ -123,6 +126,7 @@
 		li
 			a
 				&txt: item.name
+				&title: _("_welcome")
 				&href: "#users/" + item.id
 
 @view users/{userId} #public

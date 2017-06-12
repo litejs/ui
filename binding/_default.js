@@ -6,36 +6,49 @@
 	, slice = Array.prototype.slice
 
 	bindingFn.once =
-	bindingIf.once =
 	bindingOn.once =
 	emitForm.once =
 	bindingsEach.raw = bindingsEach.once =
 	true
 
 	bindings.fn = bindingFn
-	function bindingFn(fn) {
-		return fn.apply(this, slice.call(arguments, 1))
+	function bindingFn(el, scope, fn) {
+		return fn.apply(el, slice.call(arguments, 3))
 	}
 
 	bindings["if"] = bindingIf
-	function bindingIf(enabled) {
-		if (!enabled) return El.kill(this)
+	function bindingIf(el, scope, enabled) {
+		var parent = el.parentNode
+		if (enabled) {
+			parent || el._ifComm.parentNode.replaceChild(el, el._ifComm)
+		} else {
+			if (parent) {
+				if (!el._ifComm) {
+					el._ifComm = document.createComment("if")
+					el._ifComm.render = function() {
+						El.render(el, scope)
+					}
+				}
+				parent.replaceChild(el._ifComm, el)
+			}
+			return 1
+		}
 	}
 
 	bindings.on = bindingOn
-	function bindingOn(ev, fn, a1, a2, a3, a4, a5) {
+	function bindingOn(el, scope, ev, fn, a1, a2, a3, a4, a5) {
 		if (typeof fn == "string") {
 			var _fn = fn
 			fn = function(e) {
 				Mediator.emit(_fn, e, this, a1, a2, a3, a4, a5)
 			}
 		}
-		El.on(this, ev, fn)
+		El.on(el, ev, fn)
 	}
 
 	bindings.emitForm = emitForm
-	function emitForm(ev, a1, a2, a3, a4) {
-		El.on(this, "submit", function(e) {
+	function emitForm(el, scope, ev, a1, a2, a3, a4) {
+		El.on(el, "submit", function(e) {
 			var data = El.val(this)
 			Mediator.emit(ev, e, data, a1, a2, a3, a4)
 			return false
@@ -56,8 +69,8 @@
 
 	bindings.each = bindingsEach
 
-	function bindingsEach(data, expr) {
-		var node = this
+	function bindingsEach(el, data, expr) {
+		var node = el
 		, child = getChilds(node)[0]
 		, match = /^\s*(\w+) in (\w*)(.*)/.exec(expr)
 		, fn = "with(data){var out=[],loop={i:0,offset:0},_1,_2=" + match[2]

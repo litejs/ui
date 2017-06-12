@@ -47,9 +47,8 @@
 	}
 
 @js
-	El.bindings.SliderInit = function() {
+	El.bindings.SliderInit = function(el) {
 		var knobLen, offset, px, drag, min, max, step, minPx, maxPx
-		, el = this
 		, track = el.firstChild
 		, fill = track.firstChild
 		, knob = fill.lastChild

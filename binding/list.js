@@ -1,8 +1,6 @@
 
-El.bindings.list = function(list, extra, val) {
-	var node = this
-	, data = El.scope(node)
-	, child = node._child
+El.bindings.list = function(node, data, list, extra, val) {
+	var child = node._child
 	, extraLen = 0
 
 	if (!child) {

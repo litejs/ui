@@ -11,7 +11,7 @@
 		return
 	}
 
-	"svg circle clipPath defs g path rect text stop use linearGradient".replace(/\w+/g, c)
+	"svg circle clipPath defs g path rect text stop use linearGradient".replace(/\w+/g, populateSvgElements)
 	//http://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
 	function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 		var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
@@ -30,10 +30,10 @@
 		].join(" ")
 		return d
 	}
-	bindings.arc = function(startAngle, endAngle, radius, x, y) {
-		var center = (y && x && radius) || this.viewportElement.viewBox.baseVal.width >> 1
+	bindings.arc = function(el, scope, startAngle, endAngle, radius, x, y) {
+		var center = (y && x && radius) || el.viewportElement.viewBox.baseVal.width >> 1
 		// var length = path.getTotalLength();
-		this.setAttribute("d", describeArc(
+		el.setAttribute("d", describeArc(
 			x || center,
 			y || center,
 			radius || center,
@@ -41,9 +41,9 @@
 			3.6 * endAngle
 		))
 	}
-	bindings.xlink = function(href) {
+	bindings.xlink = function(el, scope, href) {
 		// https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2
-		this.setAttributeNS(xlinkNs, "xlink:href", href)
+		el.setAttributeNS(xlinkNs, "xlink:href", href)
 	}
 	bindings.xlink.once=1
 
@@ -60,7 +60,7 @@
 	}
 	var arch1 = "a? ? 0 1 0 ? -?".split("?")
 	, arch2 = "a? ? 0 1 0 ? ?".split("?")
-	bindings.svgLine = function(points, opts) {
+	bindings.svgLine = function(el, scope, points, opts) {
 		opts = opts || {}
 		var i = 0
 		, dataPoints = []
@@ -78,35 +78,33 @@
 			}
 			//dataPoints.push(El("circle[r=3][cx=" + (i * 100 + 100) + "][cy=" + points[i] + "]"))
 		}
-		this.setAttribute("d", d.join(" "))
-		drawLine(this)
-		this.parentNode.append(dataPoints)
+		el.setAttribute("d", d.join(" "))
+		drawLine(el)
+		el.parentNode.append(dataPoints)
 	}
 	var svgToLastActive
-	bindings.initChart = function() {
-		var node = this
-		El.on(node, "mouseout", function(e) {
-			if (svgToLastActive && e.target == node) {
+	bindings.initChart = function(el) {
+		El.on(el, "mouseout", function(e) {
+			if (svgToLastActive && e.target == el) {
 				El.rmClass(svgToLastActive, "is-active")
 				svgToLastActive = null
 			}
 		})
 	}
 	// riseOnHover
-	bindings.svgToLast = function() {
-		var node = this
-		El.on(node, "mouseover", function() {
-			if (!svgToLastActive || node != node.parentNode.lastChild) {
+	bindings.svgToLast = function(el) {
+		El.on(el, "mouseover", function() {
+			if (!svgToLastActive || el != el.parentNode.lastChild) {
 				if (svgToLastActive) El.rmClass(svgToLastActive, "line-active")
-				El.append(node.parentNode, node)
-				El.addClass(node, "is-active")
-				svgToLastActive = node
+				El.append(el.parentNode, el)
+				El.addClass(el, "is-active")
+				svgToLastActive = el
 			}
 		})
 	}
 	bindings.svgToLast.once =
 	bindings.initChart.once = 1
-	function c(name) {
+	function populateSvgElements(name) {
 		El.cache[name] = document.createElementNS(ns, name)
 		El.cache["svg|"+name] = document.createElementNS(ns, name)
 	}

@@ -62,8 +62,7 @@ _.setLang = function(lang) {
 
 
 
-El.bindings.fixReadonlyCheckbox = function() {
-	var el = this
+El.bindings.fixReadonlyCheckbox = function(el) {
 	function False(e) {
 		console.log(this.readOnly)
 		if (this.readOnly) {
