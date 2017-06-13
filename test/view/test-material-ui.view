@@ -1,6 +1,6 @@
 
 
-@view test-material-ui #public
+@view test-material-ui public
 	h2 Material UI
 	.grid-2
 		.col-3 Buttons

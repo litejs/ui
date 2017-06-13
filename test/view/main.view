@@ -55,7 +55,7 @@
 			.col-6>.btn Cancel
 			.col-6>.btn Ok
 
-@view #public #body
+@view public #body
 	.App.max-height
 		top
 		Menu
@@ -77,12 +77,12 @@
 		.Footer-spacer
 	Footer
 
-@view 404 #public
+@view 404 public
 	h2 Error 404
 	\ Page not found.
 	\ Maybe you want to look something else?
 
-@view home #public
+@view home public
 	&on: "show", Fn('document.title="Home!"')
 	h2 Home
 	div _welcome
@@ -100,7 +100,7 @@
 	.time
 		&txt: "Load " + new Date().format()
 
-@view login #public
+@view login public
 	form[action="javascript:"][method=POST] &emitForm:"login"
 		fieldset.grid-2.login
 			legend Login
@@ -116,7 +116,7 @@
 				.col-12.col-md-8>input.btn[type=submit] Log In
 
 
-@view users #public
+@view users public
 	&keyMap: {Q: Fn('document.title="Qsers!"')}
 	&on: "show", Fn('document.title="Users!"')
 	&on: "open", Fn('El.addKb(this.keyMap)')
@@ -129,20 +129,20 @@
 				&title: _("_welcome")
 				&href: "#users/" + item.id
 
-@view users/{userId} #public
+@view users/{userId} public
 	form-js
 		&schemaToForm: "schema/user.json", "edit", "Form1"
 
-@view users/{userId}/{pageId} #public
+@view users/{userId}/{pageId} public
 	div
 		h3 {page.get("name")}
 
-@view ok #public
+@view ok public
 	h1 Ok!
 
 @view-link test-view-link ok
 
-@view test #public
+@view test public
 	div
 		h2 Test
 		ul

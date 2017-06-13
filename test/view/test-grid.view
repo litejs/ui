@@ -1,4 +1,4 @@
-@view test-grid #public
+@view test-grid public
 	h2 Main in the middle grid
 	.grid-2.bg3
 		.col-12.col-lg-6.col-lg-push-3 > .bg1 main

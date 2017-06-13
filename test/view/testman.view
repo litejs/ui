@@ -1,6 +1,6 @@
 
 
-@view testman #public
+@view testman public
 	h2 Testman
 	div
 		&class: "hidden", !describe.result
@@ -31,7 +31,7 @@
 		line-height: 15px;
 	}
 
-@view testman/lcov #public
+@view testman/lcov public
 	h2 Code coverage report
 		&init: coverageUtils.addDerivedInfo(__coverage__)
 	table.code
@@ -63,7 +63,7 @@
 				th &txt: "{pct}% ({covered}/{total})".format(sum.functions)
 				th &txt: "{pct}% ({covered}/{total})".format(sum.lines)
 
-@view testman/lcov/{file} #public
+@view testman/lcov/{file} public
 	h2 Testman coverage
 		&nop: coverageUtils.addDerivedInfo(__coverage__)
 	div

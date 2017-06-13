@@ -3,16 +3,17 @@
 
 !function(window, document, Object, Event, protoStr) {
 	var currentLang, styleNode
+	, seq = 0
+	, elCache = El.cache = {}
 	, wrapProto = []
 	, slice = wrapProto.slice
+	, hasOwn = elCache.hasOwnProperty
 	, body = document.body
 	, root = document.documentElement
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
-	, elCache = El.cache = {}
-	, seq = 0
-	, scopeData = El.data = { _: i18n, El: El }
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(.*?)$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
+	, scopeData = El.data = { _: i18n, El: El }
 	, bindings = El.bindings = {
 		"class": function(el, scope, name, fn) {
 			;(arguments.length < 4 || fn ? addClass : rmClass)(el, name)
@@ -24,13 +25,12 @@
 			el.innerHTML = html
 		},
 		ref: function(el, scope, name) {
-			scope[name] = this
+			scope[name] = el
 		},
 		"with": function(el, scope, map) {
 			return render(el, JSON.merge(elScope(el, scope), map))
 		}
 	}
-	, hasOwn = elCache.hasOwnProperty
 
 	//** modernBrowser
 
@@ -209,9 +209,9 @@
 		if (elWrap._childId != void 0) {
 			append(elWrap[elWrap._childId], el)
 		} else {
-			this.push(el)
+			elWrap.push(el)
 		}
-		return this
+		return elWrap
 	}
 
 	wrapProto.cloneNode = function(deep) {
@@ -271,7 +271,7 @@
 		//** modernBrowser
 		// istanbul ignore next: IE fix
 		if (ie67 && (key == "id" || key == "name" || key == "checked")) {
-			el.mergeAttributes(document.createElement('<INPUT '+key+'="' + val + '">'), false)
+			el.mergeAttributes(document.createElement('<INPUT ' + key + '="' + val + '">'), false)
 		} else
 		//*/
 		if (key == "class") {
@@ -524,7 +524,7 @@
 	function rmEvent(el, ev, fn) {
 		var evs = el._e && el._e[ev]
 		, id = evs && evs.indexOf(fn)
-		if (id) {
+		if (id > -1) {
 			el[remEv](prefix + (fixEv[ev] || ev), evs[id + 1])
 			evs.splice(id - 1, 3)
 		}
@@ -621,7 +621,7 @@
 
 		scope = elScope(node, 0, scope)
 
-		if (bind = !skipSelf && (getAttr(node, "data-bind") || node._bind)) {
+		if (bind = !skipSelf && getAttr(node, "data-bind")) {
 			newBind = bind
 			// i18n(bind, lang).format(scope)
 			// document.documentElement.lang
@@ -665,24 +665,16 @@
 
 	function addWrapProto(key) {
 		wrapProto[key] = wrap
-		function wrap(a, b, c) {
+		function wrap() {
 			var i = 0
 			, self = this
 			, len = self.length
-			, argi = arguments.length
 			, fn = El[key]
-
-			if (argi === 0) for (; i < len; ) fn(self[i++])
-			else if (argi === 1) for (; i < len; ) fn(self[i++], a)
-			else if (argi === 2) for (; i < len; ) fn(self[i++], a, b)
-			else if (argi === 3) for (; i < len; ) fn(self[i++], a, b, c)
-			else {
-				var arr = slice.call(arguments)
-				arr.unshift(1)
-				for (; i < len; ) {
-					arr[0] = self[i++]
-					fn.apply(null, arr)
-				}
+			, arr = slice.call(arguments)
+			arr.unshift(1)
+			for (; i < len; ) {
+				arr[0] = self[i++]
+				fn.apply(null, arr)
 			}
 			return self
 		}
@@ -691,6 +683,8 @@
 	El.empty = empty
 	El.kill = kill
 	El.render = render
+	El.addClass = addClass
+	El.rmClass = rmClass
 
 	Object.keys(El).each(function(key) {
 		if (!bindings[key]) {
@@ -704,8 +698,6 @@
 	})
 
 	El.hasClass = hasClass
-	El.addClass = addClass
-	El.rmClass = rmClass
 	El.append = append
 	El.scope = elScope
 
@@ -758,7 +750,7 @@
 							+ ":_('" + text.replace(/'/g, "\\'") + "').format(data)"
 						}
 						q = getAttr(parent, "data-bind")
-						setAttr(parent, "data-bind", (q ? q + ";" : "") + name)
+						setAttr(parent, "data-bind", (q ? q + ";" + name : name))
 					}
 				}
 			}
@@ -1076,5 +1068,4 @@
 	//*/
 
 }(window, document, Object, Event, "prototype")
-
 

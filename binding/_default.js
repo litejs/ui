@@ -37,13 +37,9 @@
 
 	bindings.on = bindingOn
 	function bindingOn(el, scope, ev, fn, a1, a2, a3, a4, a5) {
-		if (typeof fn == "string") {
-			var _fn = fn
-			fn = function(e) {
-				Mediator.emit(_fn, e, this, a1, a2, a3, a4, a5)
-			}
-		}
-		El.on(el, ev, fn)
+		El.on(el, ev, typeof fn == "string" ? function(e) {
+			Mediator.emit(fn, e, el, a1, a2, a3, a4, a5)
+		} : fn)
 	}
 
 	bindings.emitForm = emitForm

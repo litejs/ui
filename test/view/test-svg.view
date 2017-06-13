@@ -20,7 +20,7 @@
 	}
 
 
-@view test-svg #public
+@view test-svg public
 	h2 SVG
 	svg[viewBox="0 0 60 60"][height=128][width=128].hidden
 		def
