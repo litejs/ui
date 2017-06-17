@@ -24,7 +24,7 @@
 		} else {
 			if (parent) {
 				if (!el._ifComm) {
-					el._ifComm = document.createComment("if")
+					El.on(el, "kill", El.kill.bind(el, el._ifComm = document.createComment("if")))
 					el._ifComm.render = function() {
 						El.render(el, scope)
 					}
