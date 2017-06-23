@@ -14,7 +14,7 @@ window.addEventListener = document.addEventListener = function(){}
 
 global.xhr = {load: {adapter: {}}}
 
-JSON.merge = require("json-util").merge
+JSON.merge = require("../lib/json").merge
 
 require("./el-browser.js")
 
