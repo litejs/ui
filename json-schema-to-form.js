@@ -42,7 +42,7 @@
 				var data = El.val(this)
 				, _scope = JSON.merge({}, scope.route, model && model.data)
 				, href = (_link.href || selfHref).format(_scope)
-				applySchema(schema, data)
+				JSON.schemaApply(schema, data)
 
 				try { document.activeElement.blur() } catch(e) {}
 
@@ -234,85 +234,5 @@
 
 	function del() {
 		El.kill(El.closest(this, ".js-del"))
-	}
-
-	JSON.applySchema = applySchema
-
-	function applySchema(schema, data, _required) {
-		var tmp
-		, type = schema.type
-		, required = _required || schema.required
-
-		schema = allOf(schema)
-
-		if (schema.anyOf) {
-			schema.anyOf.map(allOf).each(function(schema) {
-				var i, tmp, tmp2
-				, keys = Object.keys(schema.properties)
-
-				for (i = 0; tmp = keys[i++]; ) {
-					tmp2 = schema.properties[tmp]["enum"]
-					if (tmp2 && tmp2.indexOf(data[tmp]) == -1) {
-						return
-					}
-				}
-				applySchema(schema, data)
-			})
-		}
-		if (Array.isArray(tmp = schema["enum"])) {
-			if (tmp.indexOf(data) === -1) {
-				for (var i = tmp.length; i--; ) {
-					if (tmp[i] == data) {
-						data = tmp[i]
-						break
-					}
-				}
-			}
-		} else if (type == "number") {
-			data = parseFloat( (data + "").replace(",", ".") )
-		} else if (type == "integer") {
-			data |= 0
-		} else if (type == "boolean" ) {
-			data = data ? true : required ? false : null
-		} else if (type == "date-time") {
-			data = data.date()
-		} else if (schema.type == "array" ) {
-			var itemSchema = Array.isArray(schema.items) && schema.items
-
-			data = Array.isArray(data) ?
-				data.reduce(function(memo, item, idx) {
-					var sc = itemSchema ? itemSchema[idx] : schema.items
-					if (item !== void null && sc) {
-						item = applySchema(sc, item)
-						memo.push(item)
-					}
-					return memo
-				}, []) :
-				null
-		} else {
-			var reqArr = Array.isArray(schema.required) && schema.required
-			Object.each(schema.properties, function(propSchema, prop) {
-				if (data[prop] !== void 0) {
-					data[prop] = applySchema(
-						propSchema,
-						data[prop],
-						reqArr && reqArr.indexOf(prop) > -1
-					)
-				}
-			})
-		}
-
-		if (type == "number" || type == "integer") {
-			tmp = schema.minimum
-			if (typeof tmp == "number" && data < tmp) {
-				data = tmp
-			}
-			tmp = schema.maximum
-			if (typeof tmp == "number" && data > tmp) {
-				data = tmp
-			}
-		}
-
-		return data
 	}
 }()
