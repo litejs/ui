@@ -166,6 +166,11 @@
 		border-radius: 50%;
 		font-size: 1.8em;
 	}
+	.seg {
+		height: 1em;
+		font-size: 140px;
+		color: rgba(0,0,0,0.6);
+	}
 
 @view test public
 	div
@@ -185,4 +190,16 @@
 			.home {home.homeName}
 		.tip
 			@rel is not implemented
+		h2 Seven-segment display
+		.seg
+			Segment7[data-value=1]
+			Segment7[data-value=2]
+			Segment7[data-value=3]
+			Segment7[data-value=4]
+			Segment7[data-value=5]
+			Segment7[data-value=6]
+			Segment7[data-value=7]
+			Segment7[data-value=8]
+			Segment7[data-value=9]
+			Segment7[data-value=0]
 

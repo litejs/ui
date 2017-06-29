@@ -183,7 +183,12 @@ El.bindings.run = function() {}
 	} catch(e) {}
 
 	// Preload lang and views
-	xhr.load(["lang/" + lang + ".js", "views/Form1.tpl", "views/main.view"], init)
+	xhr.load([
+		"lang/" + lang + ".js",
+		"views/Form1.tpl",
+		"views/components/Segment7.tpl",
+		"views/main.view"
+	], init)
 
 	function init() {
 		_.setLang(lang)
