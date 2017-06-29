@@ -142,6 +142,31 @@
 
 @view-link test-view-link ok
 
+@css
+	.tip {
+		position: relative;
+		margin: 1.5em 0;
+		padding: .75em 1.5em .75em;
+		background-color: rgba(255, 255, 255, .8);
+		border: 1px solid #f55;
+		border-left-width: .4em;
+		border-radius: .4em;
+	}
+	.tip:before {
+		position: absolute;
+		top: .4em;
+		left: -.6em;
+		width: 1em;
+		height: 1em;
+		line-height: 1em;
+		color: #fff;
+		text-align: center;
+		content: "!";
+		background-color: #f55;
+		border-radius: 50%;
+		font-size: 1.8em;
+	}
+
 @view test public
 	div
 		h2 Test
@@ -158,4 +183,6 @@
 			.home {home.name}
 		@rel user home vnd.app.home.v2
 			.home {home.homeName}
+		.tip
+			@rel is not implemented
 
