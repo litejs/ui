@@ -4,7 +4,7 @@ global.Event = require("../events").Event
 
 require("../format.js")
 require("../timing.js")
-require("../src/el.js")
+require("../public/src/el.js")
 global.i18n = window.El.i18n
 
 El.get = function(id) {

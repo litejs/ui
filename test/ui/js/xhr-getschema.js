@@ -14,7 +14,7 @@ global.xhr = {
 	}
 }
 
-require("../src/xhr-getschema.js")
+require("../public/js/xhr-getschema.js")
 
 require("testman")
 .describe("xhr.getSchema")
