@@ -1,5 +1,5 @@
 
-var schemaApply = require("../public/js/schema-apply").schemaApply
+var schemaApply = require("../ui/js/schema-apply").schemaApply
 
 global.Fn = require("../fn").Fn
 
