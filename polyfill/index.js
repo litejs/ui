@@ -85,11 +85,11 @@
 	add("now", a)
 
 	/*
-	* `Date.prototype.format` is implemented in `date-format-lite` module.
+	* `Date.prototype.date` is implemented in `litejs/date`.
 	*/
 
 	O = O[P]
-	add("toJSON", "return this.format('iso')")
+	add("toJSON", "return this.date('iso')")
 
 
 	if (!exports.JSON) {
