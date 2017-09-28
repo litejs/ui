@@ -504,6 +504,8 @@
 		}
 	}
 
+	var emitter = new Event.Emitter
+
 	function addEvent(el, ev, _fn) {
 		var fn = fixFn[ev] && fixFn[ev](el, _fn) || _fn
 		, fix = prefix ? function() {
@@ -518,7 +520,7 @@
 
 		el[addEv](prefix + (fixEv[ev] || ev), fix, false)
 
-		Event.Emitter.on.call(el, ev, fix, el, _fn)
+		emitter.on.call(el, ev, fix, el, _fn)
 	}
 
 	function rmEvent(el, ev, fn) {
@@ -567,7 +569,7 @@
 	}
 
 	El.emit = function(el, ev) {
-		Event.Emitter.emit.apply(el, slice.call(arguments, 1))
+		emitter.emit.apply(el, slice.call(arguments, 1))
 	}
 
 	function empty(el) {
@@ -580,7 +582,7 @@
 	function kill(el) {
 		var id
 		if (el._e) {
-			Event.Emitter.emit.call(el, "kill")
+			emitter.emit.call(el, "kill")
 			for (id in el._e) rmEvent(el, id)
 		}
 		if (el.parentNode) el.parentNode.removeChild(el)

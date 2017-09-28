@@ -1,9 +1,4 @@
-global.Fn = require("../fn.js").Fn
 
-global.Event = require("../events").Event
-
-require("../format.js")
-require("../timing.js")
 require("../ui/src/el.js")
 global.i18n = window.El.i18n
 

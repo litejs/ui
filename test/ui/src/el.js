@@ -4,6 +4,8 @@ dom.HTMLElement.prototype.querySelector = dom.HTMLElement.prototype.querySelecto
 dom.HTMLElement.prototype.matches = dom.HTMLElement.prototype.closest = null
 dom.document.documentElement = {}
 
+require("./_setup")
+
 global.document = dom.document
 global.Element = dom.HTMLElement
 global.window = global
@@ -13,8 +15,6 @@ global.navigator = {language: "en-US"}
 window.addEventListener = document.addEventListener = function(){}
 
 global.xhr = {load: {adapter: {}}}
-
-JSON.merge = require("../lib/json").merge
 
 require("./el-browser.js")
 

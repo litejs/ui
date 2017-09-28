@@ -22,10 +22,10 @@ xhr.logErrors = function(unsentErrors) {
 }
 
 
-var Mediator = Object.create(Event.Emitter)
-, _ = El.i18n
+var _ = El.i18n
 
 El.data.history = history
+El.data.El = El
 El.data.Fn = Fn
 El.data.Mediator = Mediator
 El.data.Date = Date

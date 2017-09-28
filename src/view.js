@@ -131,8 +131,8 @@
 		}
 	}
 
-	JSON.merge(View, Event.Emitter)
-	JSON.merge(View.prototype, Event.Emitter)
+	Event.asEmitter(View)
+	Event.asEmitter(View.prototype)
 
 	View.home = "home"
 
