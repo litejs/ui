@@ -76,7 +76,7 @@
 			}
 			if (val = val.$ref) {
 				if (val.charAt(0) == "#") {
-					obj[key] = JSON.pointer(schema, val)
+					obj[key] = JSON.pointer(schema, val.slice(1))
 				} else if (val.charAt(0) != "/") {
 					val = id.replace(/[^\/]*$/, val)
 					refs.push(val, obj, key)
