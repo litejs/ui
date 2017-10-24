@@ -85,6 +85,10 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<link rel="alternate stylesheet" title="New look" href="css/theme/new.css">
 	</head>
 	<body>
+		<!--
+		Include scripts in the end of the body,
+		so there is no need for waiting DOMContentLoaded
+		-->
 		<script inline src="../load.js"></script>
 		<script
 			src="up.js"
