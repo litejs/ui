@@ -22,15 +22,14 @@
 		view.init(el, parent)
 
 		if (route.charAt(0) != "#") {
-			var startLen = groupsCount++
-			, params = ","
+			var params = "u[" + (groupsCount++) + "]?("
 			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
 					(params += "o['" + key + "']=u[" + (groupsCount++) + "],") && "([^/]+?)" :
 					_.replace(escapeRe, "\\$&")
 			})
 
-			fnStr += "u[" + startLen + "]?(" + params.slice(1) + "'" + route + "'):"
+			fnStr += params + "'" + route + "'):"
 			reStr += (reStr ? "|(" : "(") + _re + ")"
 			fn = 0
 		}
