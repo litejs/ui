@@ -191,7 +191,9 @@
 		if (typeof mod == "string") {
 			var exports = modules[name] = {}
 			, module = { id: name, filename: name, exports: exports }
-			new Function("exports,module,process,require,global", mod).call(exports, exports, module, process, require, window)
+			new Function("exports,require,module,process,global", mod).call(
+				exports, exports, require, module, process, window
+			)
 			mod = modules[name] = module.exports
 		}
 		return mod
