@@ -3,11 +3,13 @@
 // site should break out of the site that is framing it.
 // If the user’s browser has Javascript turned off,
 // the site will not display at all.
-if (this != top) throw top.location = this.location
+if (this !== top) throw top.location = this.location
 
 if (this.console && console.log) {
 	var link = /./
-	link.toString = function() { return location.href.split("#")[0] + "#selfxss" }
+	link.toString = function() {
+		return "https://en.wikipedia.org/wiki/Self-XSS"
+	}
 	console.log(
 		"%cStop!\n%cThis developer tool lets you hack and give others access only to your own account.\nSee %s for more information.",
 		"font:bold 50px monospace;color:red;text-shadow:3px 3px #000,-1px -1px #fff",
