@@ -1,8 +1,7 @@
 
 
 
-// Say you have an initial congestion window set to 2
-// and you can fit 1452 bytes of data in a segment.
+// With initial congestion window set to 2 and 1452 bytes of data in a segment.
 //
 // 1 round trip to get 2904 bytes, Initial Window (IW) = 2
 // 2 round trips to get 8712 bytes, Congestion Window (CW)=4
@@ -14,17 +13,29 @@
 // HTML5 declared that browsers shouldn’t download scripts with an unrecognised type
 
 
+// IE9 and below allows up to 32 stylesheets, this was increased to 4095 in IE10.
+
+// You can invalidate a URL in the browser's cache by sending a PUT method xmlhttprequest to it:
+// xhr("PUT", url).send(null) Works in all major browsers
+
+// XMLHttpRequest was unsupported in IE 5-6 and PATCH is not supported in IE7-8.
+// IE does not allow to add arbitrary properties to ActiveX objects.
+// IE does not allow to assign or read the readystatechange after the send().
+// Last version-independent ProgID with 3.0 is good enough (MSXML2 is supported from IE4.01).
+// MSXML 6.0 has improved XSD, deprecated several legacy features
+// What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
+
 !function(window, scripts, next) {
-	var xhrs = []
+	var seq = 0
+	, xhrs = []
 	, loaded = {}
-	, seq = 0
-	, ie678 = !+"\v1"
+	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('MSXML2.XMLHTTP')")
 	, execScript = window.execScript ||
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
 		Function("d,Date", "return(1,eval)('(Date)')==d&&eval")(Date, 1) ||
 		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(c,b.firstChild))")
 
-	//** error
+	//** errorLog
 	, lastError
 	, unsentErrors = []
 
@@ -55,33 +66,13 @@
 	}
 	//*/
 
-	function nop() {}
-
-	function lazy(obj, name, str, force) {
-		if (force || !obj[name]) {
-			obj[name] = new Function("a,b,c,d", str)
-		}
-	}
-	// function lazy(obj, name, str) {
-	// 	if (!obj[name]) obj[name] = function() {
-	// 		return (obj[name] = new Function("a,b,c,d", str)).apply(this, arguments)
-	// 	}
-	// }
-
-	// XMLHttpRequest was unsupported in IE 5-6
-	// IE7-8 XMLHttpRequest PATCH is not supported, use ActiveXObject there.
-	// IE does not allow to add arbitrary properties to ActiveX objects.
-	// IE does not allow to assign or read the readystatechange after the send().
-	// MSXML version 3.0 was the last version of MSXML to support version-independent ProgIDs.
-	lazy(window, "XMLHttpRequest", "return new ActiveXObject('MSXML2.XMLHTTP')", ie678)
-
-
 	// next === true is for sync call
 	//
 	// Hypertext Transfer Protocol (HTTP) Status Code Registry
 	// http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 	//
 
+	window.xhr = xhr
 	function xhr(method, url, next, attr1, attr2) {
 		// encodeURI("A + B").replace(/%5[BD]/g, decodeURI).replace(/\+/g, "%2B").replace(/%20/g, "+")
 		// unescape("A+%2B+B".replace(/\+/g, " "))
@@ -91,6 +82,7 @@
 		// use the open method first and set onreadystatechange later.
 		// This happens because IE resets the object implicitly
 		// in the open method if the status is 'completed'.
+		// MSXML 6.0 fixed that
 		//
 		// The downside to calling the open method after setting the callback
 		// is a loss of cross-browser support for readystates.
@@ -171,8 +163,6 @@
 		}
 		return xhr
 	}
-	window.xhr = xhr
-
 
 
 	//** require
@@ -185,30 +175,32 @@
 	//	return (window.performance || {}).memory || {}
 	//}
 
+	window.require = require
 	function require(name) {
 		var mod = modules[name]
-		if (!mod) throw new Error("Module not found: " + name)
+		if (!mod) throw Error("Module not found: " + name)
 		if (typeof mod == "string") {
 			var exports = modules[name] = {}
 			, module = { id: name, filename: name, exports: exports }
-			new Function("exports,require,module,process,global", mod).call(
+			Function("exports,require,module,process,global", mod).call(
 				exports, exports, require, module, process, window
 			)
 			mod = modules[name] = module.exports
 		}
 		return mod
 	}
-	window.require = require
 
 	require.def = function(map, key) {
 		for (key in map) modules[key] = map[key]
 	}
 	//*/
 
+	/**
+	 *  1. FireFox 3.0 and below throws on `xhr.send()` without arguments.
+	 *     You can work around this by explicitly setting the message body to null.
+	 */
 
-	// IE9 and below allows up to 32 stylesheets.
-	// The number was increased to 4095 in IE10.
-
+	xhr.load = load
 	function load(files, next, raw) {
 		if (typeof files == "string") files = [files]
 		var file
@@ -229,7 +221,7 @@
 				loaded[file] = cb
 				xhr("GET", file, function(err, str, file, i) {
 					loaded[file](err, str, file, i)
-				}, pending).send()
+				}, pending).send(null)                            /* 1 */
 			}
 			pending += 1
 		}
@@ -256,18 +248,8 @@
 		}
 	}
 
-	// Function.prototype.bind is most missing fn
-	// http://kangax.github.io/es5-compat-table/
-
-	xhr.load = load
-
 	load(scripts, next)
 
-	/*
-	 * You can invalidate a URL in the browser's cache by sending a PUT method xmlhttprequest to it:
-	 * xhr("PUT", url).send()
-	 * (Works in all major browsers)
-	 */
-
+	function nop() {}
 }(this, [/*!{loadFiles}*/])
 

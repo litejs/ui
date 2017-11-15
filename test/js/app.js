@@ -1,9 +1,19 @@
 
-// Clickjacking defense,
-// site should break out of the site that is framing it.
-// If the user’s browser has Javascript turned off,
-// the site will not display at all.
-if (this !== top) throw top.location = this.location
+
+
+xhr.logErrors = function(unsentErrors) {
+	xhr("POST", "/errlog").send(JSON.stringify(unsentErrors))
+	unsentErrors.length = 0
+}
+
+
+// Clickjacking defense, break out of the site that is framing it.
+// If the Javascript has turned off, the site will not display at all.
+if (self !== top) {
+	xhr.logErrors(["Framed in " + top.location])
+	throw top.location = self.location
+}
+
 
 if (this.console && console.log) {
 	var link = /./
@@ -18,10 +28,6 @@ if (this.console && console.log) {
 	)
 }
 
-xhr.logErrors = function(unsentErrors) {
-	xhr("POST", "/errlog").send(JSON.stringify(unsentErrors))
-	unsentErrors.length = 0
-}
 
 
 var _ = El.i18n

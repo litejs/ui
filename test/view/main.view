@@ -184,6 +184,8 @@
 			li>a[href="#test-svg"] Test SVG
 			li>a[href="#test-grid"] Test grid
 			li>a[href="#test-material-ui"] Test Material-UI
+			li>a[href="iframe.html#test1"] Iframe
+			li>a[href="//localhost:81/litejs/litejs/ui/iframe.html#test2"] Iframe 81
 		@rel user home vnd.app.home
 			.home {home.name}
 		@rel user home vnd.app.home.v2

@@ -131,7 +131,14 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<script exclude src="//www.litejs.com/pub/testman.js"></script>
 		<script exclude src="lib/object-utils.js"></script>
 		<script exclude src="js/test.js"></script>
-		<noscript><h1>Error</h1>This application requires JavaScript</noscript>
+		<noscript>
+			<h1>Error</h1>This application requires JavaScript
+			<!--
+			Redirect to no-JavaScript version of the site
+			or provide a link to give a chance to turn JavaScript on before redirect.
+			<meta http-equiv="refresh" content="0;url=no-js.html">
+			-->
+		</noscript>
 	</body>
 </html>
 

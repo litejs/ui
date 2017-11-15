@@ -91,6 +91,8 @@
 	O = O[P]
 	add("toJSON", "return this.date('iso')")
 
+	if (!exports.Event) exports.Event = {}
+
 
 	if (!exports.JSON) {
 		patched.push("JSON")
