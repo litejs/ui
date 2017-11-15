@@ -2,7 +2,7 @@
 
 
 var Data = List.extend({
-	syncMethods: List.prototype.syncMethods.concat("isSubsetFrom"),
+	//syncMethods: List.prototype.syncMethods.concat("isSubsetFrom"),
 	init: function (name) {
 		var list = this
 		, cache = Data.cached
