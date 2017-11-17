@@ -194,7 +194,7 @@ El.bindings.run = function() {}
 	xhr.load([
 		"lang/" + lang + ".js",
 		"views/Form1.tpl",
-		"views/components/Segment7.tpl",
+		"components/Segment7.tpl",
 		"views/main.view"
 	], init)
 
