@@ -218,12 +218,18 @@ button,
 .left {
 	float: left;
 }
+[dir="rtl"] .left {
+	float: right;
+}
 
 .sm .sm-right,
 .md .md-right,
 .lg .lg-right,
 .right {
 	float: right;
+}
+[dir="rtl"] .right {
+	float: left;
 }
 
 .t-left {

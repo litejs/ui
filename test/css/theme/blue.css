@@ -120,6 +120,9 @@ img {
 	display: block;
 	float: left;
 }
+[dir="rtl"] .Menu-item {
+	float: right;
+}
 
 .Menu-item:hover, .Menu-item.selected {
 	background-image: linear-gradient(#fff, rgba(255,255,255,0));
@@ -145,6 +148,10 @@ img {
 	background: #eee;
 
 }
+[dir="rtl"] .nav a {
+	float: right;
+}
+
 
 .content {
 	padding: 1em 1em 3em;

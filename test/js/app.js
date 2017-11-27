@@ -48,6 +48,7 @@ _.def(  { "en": "In English"
 	, "ru": "На русском"
 	, "fi": "Suomeksi"
 	, "sv": "På Svenska"
+	, "ar": "Arabic"
 	//, "lt": "Lietuviškai"
 	//, "lv": "Latviski"
 	//, "pl": "Polski"
@@ -56,13 +57,15 @@ _.def(  { "en": "In English"
 })
 
 _.setLang = function(lang) {
-	document.documentElement.lang = lang = _.use(lang)
+	var html = document.documentElement
+	html.lang = lang = _.use(lang)
 	xhr.load("lang/" + lang + ".js", function() {
 		Date.names = _("__date").split(" ")
 		String.alphabet = _("__alphabet")
 		String.ordinal = _("__ordinal")
 		String.plural = _("__plural")
 		JSON.merge(Date.masks, _("__dateMasks"))
+		document.body.dir = _("dir")
 
 		El.render(document.body)
 	})
@@ -165,18 +168,21 @@ El.bindings.run = function() {}
 	View.base = "views/"
 
 	View.on("show", function() {
-		// When a View completes, blur focused link
-		// IE8 can throw an exception for document.activeElement.
+		// Blur focused link on every view change.
+		// IE8 can throw when getting document.activeElement.
 		try {
-			var el = document.activeElement
-			, tag = el && el.tagName
+			var tag = document.activeElement.tagName
 			if (tag == "A" || tag == "BUTTON") el.blur()
 		} catch(e) {}
+		// Rerender nodes on every view change.
 		El.findAll(document.body, ".js-viewRender").render()
 	})
 
 
 	var timezone
+	, standalone = "standalone" in navigator ?
+		navigator.standalone :
+		window.matchMedia && window.matchMedia("(display-mode:standalone)").matches
 
 	// Detect first available language
 	, lang = _.use([].concat(
@@ -184,7 +190,7 @@ El.bindings.run = function() {}
 	).filter(_.get)[0])
 
 	// Search href from HTML <base> element
-	, base = (document.documentElement.getElementsByTagName("base")[0] || init).href
+	, base = (document.documentElement.getElementsByTagName("base")[0] || lang).href
 
 	try {
 		timezone = Intl.DateTimeFormat().resolvedOptions().timezone

@@ -1,5 +1,6 @@
 
 _.add("et", {
+	"dir": "ltr",
 	__alphabet: "ABDEFGHIJKLMNOPRSŠZŽTUVÕÄÖÜXYabdefghijklmnoprsšzžtuvõäöüxy",
 	__date: "Jaan Veeb Märts Apr Mai Juuni Juuli Aug Sept Okt Nov Dets " +
 		"jaanuar veebruar märts aprill mai juuni juuli august september oktoober november detsember " +

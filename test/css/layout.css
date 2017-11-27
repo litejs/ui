@@ -26,6 +26,9 @@ body {
 	text-align: left;      /* 2 */
 	padding: 0 8px;
 }
+[dir="rtl"] .App-row {
+	text-align: right;
+}
 
 .lg .App-row {
 	width: 990px;
