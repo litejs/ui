@@ -171,7 +171,8 @@ El.bindings.run = function() {}
 		// Blur focused link on every view change.
 		// IE8 can throw when getting document.activeElement.
 		try {
-			var tag = document.activeElement.tagName
+			var el = document.activeElement
+			, tag = el.tagName
 			if (tag == "A" || tag == "BUTTON") el.blur()
 		} catch(e) {}
 		// Rerender nodes on every view change.
