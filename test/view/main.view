@@ -46,15 +46,6 @@
 				dd>a[href="mailto:mail@to.com"] email
 				dd>a[href="https://fb.com/LiteJS#info"] Fb
 
-@el confirm
-	.modal.abs.max.fix
-		.abs.max.modal__background
-		.grid-1.modal__content
-			.col-12 {title}
-			.col-12 {body}
-			.col-6>.btn Cancel
-			.col-6>.btn Ok
-
 @view public #body
 	.App.max-height
 		top

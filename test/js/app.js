@@ -31,9 +31,11 @@ if (this.console && console.log) {
 
 
 var _ = El.i18n
+, Mediator = new Event.Emitter
 
 El.data.history = history
 El.data.El = El
+El.data._ = _
 El.data.Fn = Fn
 El.data.Mediator = Mediator
 El.data.Date = Date
@@ -108,6 +110,18 @@ El.bindings.run = function() {}
 		View.show(true)
 	})
 
+	Mediator.on("reload", function() {
+		location.reload(true)
+	})
+	Mediator.on("updateready", function(e) {
+		Mediator.emit("confirm", "Update is ready, load?", function(confirmed) {
+			if (confirmed) {
+				Mediator.emit("up")
+			}
+		})
+	})
+
+
 	Mediator.logForm = function(e) {
 		var data = El.val(this)
 		, matches = El.attr(this, "data-expect") == JSON.stringify(data)
@@ -172,7 +186,7 @@ El.bindings.run = function() {}
 		// IE8 can throw when getting document.activeElement.
 		try {
 			var el = document.activeElement
-			, tag = el.tagName
+			, tag = el && el.tagName
 			if (tag == "A" || tag == "BUTTON") el.blur()
 		} catch(e) {}
 		// Rerender nodes on every view change.
@@ -201,6 +215,7 @@ El.bindings.run = function() {}
 	xhr.load([
 		"lang/" + lang + ".js",
 		"views/Form1.tpl",
+		"components/confirm.tpl",
 		"components/Segment7.tpl",
 		"views/main.view"
 	], init)

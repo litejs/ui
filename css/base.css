@@ -61,6 +61,10 @@ img,
  *     and it does not render well with some fonts (Helvetica Neue on macs for example).
  */
 
+.no-events {
+	pointer-events: none;
+}
+
 a[href],
 button,
 label,
@@ -68,6 +72,7 @@ label,
 .hand {
 	cursor: pointer;
 	*cursor: hand;       /* 1 */
+	pointer-events: auto;
 }
 
 button {
@@ -158,6 +163,8 @@ button,
 	filter: alpha(opacity=0) !important;
 }
 .max {
+	top: 0px;
+	left: 0px;
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
