@@ -4,7 +4,7 @@ var mock = {
 
 }
 
-global.Fn = require("../fn.js").Fn
+global.Fn = require("../lib/fn.js").Fn
 JSON.pointer = require("../lib/json").pointer
 global.xhr = {
 	get: function(url, cb) {

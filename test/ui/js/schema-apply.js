@@ -1,7 +1,7 @@
 
 var schemaApply = require("../ui/js/schema-apply").schemaApply
 
-global.Fn = require("../fn").Fn
+global.Fn = require("../lib/fn").Fn
 
 require("testman")
 .describe ("schema-apply")
