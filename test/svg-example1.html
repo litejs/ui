@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><body>
+<html><head><meta charset="UTF-8"></head><body>
 <link rel="stylesheet" href="svg-example1.css">
 <script id="index" type="text/tpl">
 @view main body
@@ -34,24 +34,26 @@
 View("body", document.body)
 
 
-// Populate cache with svg namespace nodes
-// In html-svg mixed page you should prefix svg elements,
-// e.g. El.cache["svg-" + name] = document.createElementNS(ns, name)
-
 var ns = "http://www.w3.org/2000/svg"
 , xlinkNs = "http://www.w3.org/1999/xlink"
 , noSvg = !document.createElementNS || !document.createElementNS(ns, "svg").createSVGRect
-function c(name) {
-	El.cache[name] = document.createElementNS(ns, name)
-}
+
 if (noSvg) {
 	alert("SVG not supported")
 }
-El.bindings.xlink = function(href) {
-	this.setAttributeNS(xlinkNs, "xlink:href", href)
+
+El.bindings.xlink = function(el, scope, href) {
+	el.setAttributeNS(xlinkNs, "xlink:href", href)
 }
 El.bindings.xlink.once = 1
-"svg a circle clipPath defs g path rect text stop use linearGradient".replace(/\w+/g, c)
+
+// Populate cache with svg namespace nodes
+// In html-svg mixed page you should prefix svg elements,
+// e.g. El.cache["svg-" + name] = document.createElementNS(ns, name)
+"svg a circle clipPath defs g path rect text stop use linearGradient".replace(/\w+/g, function(name){
+	El.cache[name] = document.createElementNS(ns, name)
+})
+
 // Read in templates from element with id=index
 El.tpl(index.innerHTML)
 
