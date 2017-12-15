@@ -581,20 +581,25 @@
 
 	function kill(el) {
 		var id
-		if (el._e) {
-			emitter.emit.call(el, "kill")
-			for (id in el._e) rmEvent(el, id)
+		if (el) {
+			if (el._e) {
+				emitter.emit.call(el, "kill")
+				for (id in el._e) rmEvent(el, id)
+			}
+			if (el.parentNode) {
+				el.parentNode.removeChild(el)
+			}
+			if (el.nodeType != 1) {
+				return el.kill && el.kill()
+			}
+			empty(el)
+			if (id = el._scope) {
+				delete elScope[id]
+			}
+			if (el.valObject) {
+				el.valObject = null
+			}
 		}
-		if (el.parentNode) el.parentNode.removeChild(el)
-		if (el.nodeType != 1) {
-			return el.kill && el.kill()
-		}
-		empty(el)
-		if (id = el._scope) {
-			delete elScope[id]
-		}
-		if (el.valObject) el.valObject = null
-		return el
 	}
 
 	function elScope(node, parent, fb) {
