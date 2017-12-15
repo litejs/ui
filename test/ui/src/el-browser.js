@@ -129,7 +129,7 @@ testman
 .ok(!input.title)
 
 .it ("has kill() and empty() methods")
-.equal(El.kill(select), select)
+.equal(El.kill(select), null)
 .equal(h2.innerHTML, "")
 .equal(El.empty(el), el)
 .equal(el.innerHTML, "")

@@ -163,7 +163,7 @@ El.bindings.run = function() {}
 		list.get(value, function(err, item) {
 			if (err) return View("404").show()
 			console.log("set", key, item)
-			El.data[key] = item
+			El.data.model = item
 		})
 		.then(this.wait())
 	})
