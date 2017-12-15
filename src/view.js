@@ -2,7 +2,7 @@
 
 
 !function(exports) {
-	var fn, lastView, lastParams, lastStr, lastUrl
+	var fn, lastView, lastParams, lastStr, lastUrl, syncResume
 	, fnStr = ""
 	, reStr = ""
 	, views = View.views = {}
@@ -41,88 +41,100 @@
 			this.parent = parent && View(parent)
 		},
 		show: function(params) {
-			var view = lastView = this
 			params = lastParams = params || {}
+			var parent
+			, view = lastView = this
+			, tmp = params._v || view
+			, close = view.isOpen && view
+
 			View.active = view.route
-			if (view.isOpen) {
-				view.close()
+
+			for (; tmp; tmp = parent) {
+				syncResume = params._v = tmp
+				tmp.emit("ping", params)
+				View.emit("ping", params, tmp)
+				syncResume = null
+				if (lastParams != params) return
+				if (parent = tmp.parent) {
+					if (parent.child && parent.child != tmp) {
+						close = parent.child
+					}
+					parent.child = tmp
+				}
+				if (!tmp.el) {
+					if (tmp.file) {
+						xhr.load(
+							tmp.file
+							.replace(/^|,/g, "$&" + (View.base || ""))
+							.split(","),
+							view.wait()
+						)
+						tmp.file = null
+					} else {
+						View("404").show(JSON.merge({}, params))
+					}
+					return
+				}
 			}
-			bubbleUp(view, params, bubbleDown)
+
+			if (close) {
+				close.close()
+			}
+
+			for (tmp in params) if (tmp.charAt(0) != "_") {
+				if (syncResume = param[tmp] || param["*"]) {
+					syncResume.call(view, params[tmp], tmp, params)
+					syncResume = null
+				}
+			}
+			bubbleDown(params)
 		},
 		open: function(params) {
 			var view = this
 			, parent = view.parent
 			if (parent && !view.isOpen) {
 				view.isOpen = view.el.cloneNode(true)
-				parent.emit("beforeChild", params)
 				El.append(parent.isOpen || parent.el, view.isOpen)
 				El.render(view.isOpen)
+				parent.emit("openChild", view)
+				view.emit("open", params)
+				View.emit("open", params, view)
 			}
 		},
 		close: function() {
 			var view = this
 			if (view.isOpen) {
-				view.emit("close")
+				view.parent.emit("closeChild", view)
 				if (view.child) view.child.close()
 				El.kill(view.isOpen)
-				view.isOpen = view.parent.child = null
+				view.emit("close")
+				view.isOpen = null
 			}
 		},
 		wait: function() {
-			var view = this
-			, params = lastParams
+			var params = lastParams
 			params._p = 1 + (params._p | 0)
 			return function() {
-				if (--params._p || lastParams != params) return
-				for (view = lastView; view.parent; view = view.parent) {
-					if (!view.el) return View("404").show(JSON.merge({}, params))
+				if (--params._p || lastParams != params || syncResume) return
+				if (params._d) {
+					bubbleDown(params)
+				} else if (params._v) {
+					lastView.show(params)
 				}
-				if (params._v) bubbleDown(params._v, params)
 			}
 		}
 	}
 
-	function bubbleUp(view, params, next) {
-		var child
-		for (; view; child = view, view = view.parent) {
-			if (view.child && view.child != child) {
-				view.child.close()
-			}
-			if (!view.el && view.file) {
-				return xhr.load(
-					view.file
-					.replace(/^|,/g, "$&" + (View.base || ""))
-					.split(","),
-					bubbleUp.bind(view, view, params, next)
-				)
-			}
-			view.child = child
-			view.emit("ping", params)
-			if (lastParams != params) return
-			View.emit("ping", params, view)
-		}
-		// child is now the root view
-		Object.each(params, function(value, name) {
-			if (name.charAt(0) == "_") return
-			if (value = param[name] || param["*"]) {
-				value.call(child, params[name], name, params)
-			}
-		})
-		next(child, params)
-	}
-
-	function bubbleDown(view, params) {
-		var child = view.child
-		if (params._p && /{/.test(view.route)) {
-			return params._v = view
+	function bubbleDown(params) {
+		var view = params._v
+		if (!view || params._p && /{/.test(view.route)) {
+			return
 		}
 		if (view.parent && !view.isOpen) {
 			view.open(params)
-			view.emit("open", params)
-			View.emit("open", params, view)
 		}
-		if (child) {
-			bubbleDown(child, params)
+		if (params._d = params._v = view.child) {
+			bubbleDown(params)
 		}
 		if (lastView == view) {
 			view.emit("show", params)
