@@ -115,8 +115,8 @@
 		el.set = function(val, pos, scroll) {
 			px || load()
 			val = (val < min ? min : val > max ? max : val).step(step)
-			if (el.onChange && (drag || scroll) && value !== val) {
-				el.onChange(val)
+			if ((drag || scroll) && value !== val) {
+				El.emit(el, "change", val)
 			}
 			value = el.valu = val
 			if (!drag || pos !== void 0) {
