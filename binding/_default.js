@@ -38,7 +38,7 @@
 	bindings.on = bindingOn
 	function bindingOn(el, scope, ev, fn, a1, a2, a3, a4, a5) {
 		El.on(el, ev, typeof fn == "string" ? function(e) {
-			Mediator.emit(fn, e, el, a1, a2, a3, a4, a5)
+			View.emit(fn, e, el, a1, a2, a3, a4, a5)
 		} : fn)
 	}
 
@@ -46,7 +46,7 @@
 	function emitForm(el, scope, ev, a1, a2, a3, a4) {
 		El.on(el, "submit", function(e) {
 			var data = El.val(this)
-			Mediator.emit(ev, e, data, a1, a2, a3, a4)
+			View.emit(ev, e, data, a1, a2, a3, a4)
 			return false
 		})
 	}

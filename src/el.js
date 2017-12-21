@@ -1017,7 +1017,7 @@
 			addClass(root, lastOrient = next)
 		}
 
-		next = window.Mediator || window.M
+		next = window.View
 		if (next) next.emit("resize")
 	}
 	El.setBreakpoints = setBreakpoints

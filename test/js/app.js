@@ -31,13 +31,11 @@ if (this.console && console.log) {
 
 
 var _ = El.i18n
-, Mediator = new Event.Emitter
 
 El.data.history = history
 El.data.El = El
 El.data._ = _
 El.data.Fn = Fn
-El.data.Mediator = Mediator
 El.data.Date = Date
 El.data.Math = Math
 El.data.View = View
@@ -92,10 +90,10 @@ El.bindings.init = function() {}
 El.bindings.init.once = 1
 El.bindings.run = function() {}
 
-!function(View, Mediator, navigator) {
+!function(View, navigator) {
 	var user
 
-	Mediator.on("login", function(e, data) {
+	View.on("login", function(e, data) {
 		var err
 		if (data.name != "a") {
 			err = "Login fail. Try name: a"
@@ -105,32 +103,32 @@ El.bindings.run = function() {}
 		View.show(true, {error: err})
 	})
 
-	Mediator.on("logout", function() {
+	View.on("logout", function() {
 		user = El.data.user = null
 		View.show(true)
 	})
 
-	Mediator.on("reload", function() {
+	View.on("reload", function() {
 		location.reload(true)
 	})
-	Mediator.on("updateready", function(e) {
-		Mediator.emit("confirm", "Update is ready, load?", function(confirmed) {
+	View.on("updateready", function(e) {
+		View.emit("confirm", "Update is ready, load?", function(confirmed) {
 			if (confirmed) {
-				Mediator.emit("up")
+				View.emit("up")
 			}
 		})
 	})
 
-
-	Mediator.logForm = function(e) {
-		var data = El.val(this)
-		, matches = El.attr(this, "data-expect") == JSON.stringify(data)
+	View.on("logForm", function(e, el) {
+		var data = El.val(el)
+		, matches = El.attr(el, "data-expect") == JSON.stringify(data)
 		if (matches) {
 			console.log("logForm", matches, JSON.stringify(data), data)
 		} else {
-			console.error("logForm", matches, JSON.stringify(data),"!==",El.attr(this, "data-expect"), data)
+			console.error("logForm", matches, JSON.stringify(data),"!==",El.attr(el, "data-expect"), data)
 		}
-	}
+	})
+
 
 	El.addKb({
 		H: history.setUrl.bind(null, "home"),
@@ -263,7 +261,7 @@ El.bindings.run = function() {}
 
 
 
-}(View, Mediator, navigator)
+}(View, navigator)
 
 
 

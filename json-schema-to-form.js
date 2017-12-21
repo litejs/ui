@@ -46,7 +46,7 @@
 
 				try { document.activeElement.blur() } catch(e) {}
 
-				Mediator.emit(event || "makeReq", _link, href, data)
+				View.emit(event || "makeReq", _link, href, data)
 			})
 
 		})

@@ -29,7 +29,7 @@
 //   ]
 // }
 @js
-	Mediator.on("confirm", function(title, opts, next) {
+	View.on("confirm", function(title, opts, next) {
 		if (!next && typeof opts === "function") {
 			next = opts
 			opts = null
@@ -54,7 +54,7 @@
 		El.on(el, "wheel", Event.stop)
 		El.on(el, "click", resolve)
 		El.on(el.lastChild, "click", Event.stop)
-		Mediator.one("navigation", resolve)
+		View.one("navigation", resolve)
 		function resolve(e, key) {
 			if (el) {
 				El.rmKb(kbMap)
