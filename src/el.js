@@ -839,7 +839,7 @@
 			done: Fn("xhr.css(this.txt)")
 		}),
 		def: js.extend({
-			done: Fn("View.def(this.params)")
+			done: Fn("View.def(this.params||this.txt)")
 		}),
 		each: js.extend({
 			done: function() {
