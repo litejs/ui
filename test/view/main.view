@@ -4,6 +4,7 @@
 @def
 	settings %.view,%.css
 	events,test-form1,test-grid %.view
+	test-form1 %.view,../bindings/persist.js
 	test-svg #mat,../svg.js,../components/Pie.tpl,test-svg.view
 	testman,+/lcov,+/lcov/{file} %.view
 	test-material-ui #mat,../components/Slider.tpl,test-material-ui.view
