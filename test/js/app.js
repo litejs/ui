@@ -204,7 +204,7 @@ El.bindings.run = function() {}
 		navigator.languages, navigator.language, navigator.userLanguage, "en"
 	).filter(_.get)[0])
 
-	// Search href from HTML <base> element
+	// Detect base from HTML <base> element
 	, base = (document.documentElement.getElementsByTagName("base")[0] || lang).href
 
 	try {
