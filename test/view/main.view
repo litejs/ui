@@ -1,14 +1,8 @@
 
 @def #mat ../components/material.css,%.js,%.tpl
 
-@def
-	settings %.view,%.css
-	events,test-form1,test-grid %.view
-	test-form1 %.view,../bindings/persist.js
-	test-svg #mat,../svg.js,../components/Pie.tpl,test-svg.view
-	testman,+/lcov,+/lcov/{file} %.view
-	test-material-ui #mat,../components/Slider.tpl,test-material-ui.view
-
+@el anim-page
+	.content.loader.abs
 
 @el form-js
 	form[action="javascript:"][method=POST]
@@ -52,7 +46,7 @@
 	.App.max-height
 		top
 		Menu
-		.content.loader.App-row
+		.rel.App-row
 			@child
 		.Footer-spacer
 	Footer
@@ -65,48 +59,34 @@
 				button.c0 Logout
 					&on:"click", "logout"
 		Menu
-		.content.loader.App-row
 			@child
 		.Footer-spacer
 	Footer
 
 @view 404 public
-	h2 Error 404
-	\ Page not found.
-	\ Maybe you want to look something else?
+	anim-page
+		h2 Error 404
+		\ Page not found.
+		\ Maybe you want to look something else?
 
 @view home public
 	&on: "show", Fn('document.title="Home!"')
-	h2 Home
-	div _welcome
-		&on: "click", Fn("this.style.fontStyle = this.style.fontStyle == 'italic' ? '' : 'italic'")
-	div &txt: _("_welcome")
-		&on: "mouseover", Fn("El.addClass(this,'bg3'),El.txt(this, El.txt(this) == _('_welcome') ? 'Over!' : _('_welcome'))")
-		&on: "mouseout", Fn("El.rmClass(this,'bg3'),El.txt(this, _('_welcome'))")
-	div &txt: _(welcomeText)
-	div &txt: _(nonExistingWelcomeText)
-	div
-		&if: Math.random() > .5
-		&txt: "If"
-	.time
-		&txt: "Init " + started.date()
-	.time
-		&txt: "Load " + new Date().date()
-
-@view login public
-	form[action="javascript:"][method=POST] &emitForm:"login"
-		fieldset.grid-2.login
-			legend Login
-			.error {route.error||""}
-			label.row
-				.col-12.col-md-4.login__label Username
-				.col-12.col-md-8>input[name=name]
-			label.row
-				.col-12.col-md-4.login__label Password
-				.col-12.col-md-8>input[name=pass][type=password]
-			.row
-				.col-12.col-md-4
-				.col-12.col-md-8>input.btn[type=submit] Log In
+	anim-page
+		h2 Home
+		div _welcome
+			&on: "click", Fn("this.style.fontStyle = this.style.fontStyle == 'italic' ? '' : 'italic'")
+		div &txt: _("_welcome")
+			&on: "mouseover", Fn("El.addClass(this,'bg3'),El.txt(this, El.txt(this) == _('_welcome') ? 'Over!' : _('_welcome'))")
+			&on: "mouseout", Fn("El.rmClass(this,'bg3'),El.txt(this, _('_welcome'))")
+		div &txt: _(welcomeText)
+		div &txt: _(nonExistingWelcomeText)
+		div
+			&if: Math.random() > .5
+			&txt: "If"
+		.time
+			&txt: "Init " + started.date()
+		.time
+			&txt: "Load " + new Date().date()
 
 
 @view users public
@@ -114,24 +94,52 @@
 	&on: "show", Fn('document.title="Users!"')
 	&on: "open", Fn('El.addKb(this.keyMap)')
 	&on: "close", Fn('El.rmKb(this.keyMap)')
-	h2 Users
-	ul.users &list: Data("users")
-		li
-			a
-				&txt: item.name
-				&title: _("_welcome")
-				&href: "#users/" + item.id
+	anim-page
+		h2 Users
+		ul.users &list: Data("users")
+			li
+				a
+					&txt: item.name
+					&title: _("_welcome")
+					&href: "#users/" + item.id
 
 @view users/{userId} public
-	form-js
-		&schemaToForm: "schema/user.json", "edit", "Form1"
+	anim-page
+		form-js
+			&schemaToForm: "schema/user.json", "edit", "Form1"
 
 @view users/{userId}/{pageId} public
-	div
+	anim-page
 		h3 {page.get("name")}
 
+@view login public
+	anim-page
+		form[action="javascript:"][method=POST]
+			&emitForm:"login"
+			fieldset.grid-2.login
+				legend Login
+				.error {route.error||""}
+				label.row
+					.col-12.col-md-4.login__label Username
+					.col-12.col-md-8>input[name=name]
+				label.row
+					.col-12.col-md-4.login__label Password
+					.col-12.col-md-8>input[name=pass][type=password]
+				.row
+					.col-12.col-md-4
+					.col-12.col-md-8>input.btn[type=submit] Log In
+
+@def
+	settings %.view,%.css
+	events,test-form1,test-grid %.view
+	test-form1 %.view,../bindings/persist.js
+	test-svg #mat,../svg.js,../components/Pie.tpl,test-svg.view
+	testman,+/lcov,+/lcov/{file} %.view
+	test-material-ui #mat,../components/Slider.tpl,test-material-ui.view
+
 @view ok public
-	h1 Ok!
+	anim-page
+		h1 Ok!
 
 @view-link test-view-link ok
 
@@ -166,7 +174,7 @@
 	}
 
 @view test public
-	div
+	anim-page
 		h2 Test
 		ul
 			li>a[href="#testman"] Testman

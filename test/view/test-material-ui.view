@@ -1,49 +1,50 @@
 
 
 @view test-material-ui public
-	h2 Material UI
-	.grid-2
-		.col-3 Buttons
-		.col-9
-			Button Default
-			Button.raised Primary
-			Button:disabled Disabled
-			Button.raised.is-warning Warn
-		@el Fab-menu1
-			ul.mat-Menu.shadow-1
-				li.mat-Menu-item.waves Some Action
-				li.mat-Menu-item.waves.is-divider Another Action
-				li.mat-Menu-item.waves:disabled Disabled Action
-				li.mat-Menu-item.waves Yet Another Action
-		@el Fab-menu2
-			ul.mat-Menu.shadow-1
-				li.mat-Menu-item.waves Some Action
-				li.mat-Menu-item.waves.is-divider Another Action
-				li.mat-Menu-item.waves:disabled Disabled Action
-				li.mat-Menu-item.waves Yet Another Action
-		.col-3 Fab buttons
-		.col-9
-			Fab.tooltip--top>\+
-				&data: "tooltip", "Hello1"
-				&on: "click", "showMenu", "Fab-menu1", "rightEdge", "bottom", 0, 1
-			Fab.Fab--red.tooltip--left>\—
-				&data: "tooltip", "World\n2"
-				&on: "click", "showMenu", "Fab-menu2", "leftEdge", "bottom", 0, 1
-			Fab.tooltip--right>\+
-				&data: "tooltip", "Hello2"
-			Fab>\+
-				&data: "tooltip", "Hello3"
-			Fab.tooltip--bottom>\+
-				&data: "tooltip", "Hello4"
-		.col-3 Checkboxes
-		.col-9
-			Checkbox
-				\ Default
-		.col-3 Sliders
-		.col-9
-			Slider[valu=33]
-			br
-			Slider2.no-first[valu=100][style="width:400px"]
-			br
-			Slider3.color[valu=33][style="width:400px"]
+	anim-page
+		h2 Material UI
+		.grid-2
+			.col-3 Buttons
+			.col-9
+				Button Default
+				Button.raised Primary
+				Button:disabled Disabled
+				Button.raised.is-warning Warn
+			@el Fab-menu1
+				ul.mat-Menu.shadow-1
+					li.mat-Menu-item.waves Some Action
+					li.mat-Menu-item.waves.is-divider Another Action
+					li.mat-Menu-item.waves:disabled Disabled Action
+					li.mat-Menu-item.waves Yet Another Action
+			@el Fab-menu2
+				ul.mat-Menu.shadow-1
+					li.mat-Menu-item.waves Some Action
+					li.mat-Menu-item.waves.is-divider Another Action
+					li.mat-Menu-item.waves:disabled Disabled Action
+					li.mat-Menu-item.waves Yet Another Action
+			.col-3 Fab buttons
+			.col-9
+				Fab.tooltip--top>\+
+					&data: "tooltip", "Hello1"
+					&on: "click", "showMenu", "Fab-menu1", "rightEdge", "bottom", 0, 1
+				Fab.Fab--red.tooltip--left>\—
+					&data: "tooltip", "World\n2"
+					&on: "click", "showMenu", "Fab-menu2", "leftEdge", "bottom", 0, 1
+				Fab.tooltip--right>\+
+					&data: "tooltip", "Hello2"
+				Fab>\+
+					&data: "tooltip", "Hello3"
+				Fab.tooltip--bottom>\+
+					&data: "tooltip", "Hello4"
+			.col-3 Checkboxes
+			.col-9
+				Checkbox
+					\ Default
+			.col-3 Sliders
+			.col-9
+				Slider[valu=33]
+				br
+				Slider2.no-first[valu=100][style="width:400px"]
+				br
+				Slider3.color[valu=33][style="width:400px"]
 

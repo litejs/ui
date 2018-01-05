@@ -47,7 +47,7 @@
 		El.on(el, "submit", function(e) {
 			var data = El.val(this)
 			View.emit(ev, e, data, a1, a2, a3, a4)
-			return false
+			return Event.stop(e)
 		})
 	}
 

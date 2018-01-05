@@ -29,9 +29,6 @@
 
 
 
-
-
-
 /*
 @font-face {
 	font-family: '<font-family>';
@@ -48,6 +45,36 @@
 	src: url("/files/2468/VeraSeBd.ttf");
 }
 
+left-pitch-right
+forward-roll-back
+up-yaw-down
 */
+
+.fromLeft    { animation: .5s ease both fromLeft;    }
+.fromRight   { animation: .5s ease both fromRight;   }
+.fromUp      { animation: .5s ease both fromUp;      }
+.fromDown    { animation: .5s ease both fromDown;    }
+.fromBack    { animation: .5s ease both fromBack;    }
+.fromForward { animation: .5s ease both fromForward; }
+
+.toLeft      { pointer-events: none; animation: .3s ease both toLeft;    }
+.toRight     { pointer-events: none; animation: .3s ease both toRight;   }
+.toUp        { pointer-events: none; animation: .3s ease both toUp;      }
+.toDown      { pointer-events: none; animation: .3s ease both toDown;    }
+.toBack      { pointer-events: none; animation: .3s ease both toBack;    }
+.toForward   { pointer-events: none; animation: .3s ease both toForward; }
+
+@keyframes fromLeft    { from { transform: translateX(-100%); } }
+@keyframes toLeft      { to   { transform: translateX(-100%); opacity: 0; } }
+@keyframes fromRight   { from { transform: translateX(100%); } }
+@keyframes toRight     { to   { transform: translateX(100%); opacity: 0; } }
+@keyframes fromUp      { from { transform: translateY(-100%); } }
+@keyframes toUp        { to   { transform: translateY(-100%); opacity: 0; } }
+@keyframes fromDown    { from { transform: translateY(100%); } }
+@keyframes toDown      { to   { transform: translateY(100%); opacity: 0; } }
+@keyframes fromBack    { from { transform: scale(.4); opacity: 0; } }
+@keyframes toBack      { to   { transform: scale(.4); opacity: 0; } }
+@keyframes fromForward { from { transform: scale(2); opacity: 0; } }
+@keyframes toForward   { to   { transform: scale(2); opacity: 0; } }
 
 

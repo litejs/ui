@@ -154,6 +154,24 @@ El.bindings.run = function() {}
 		}
 	})
 
+	//var lower = "Back", upper = "Forward"
+	var lower = "Left", upper = "Right"
+
+	View("public")
+	.on("openChild", function(open, close) {
+		if (close) El.addClass(open.isOpen, close.seq < open.seq ? "from" + upper : "from" + lower)
+	})
+
+	View("public")
+	.on("closeChild", function(close, open) {
+		var isOpen = close.isOpen
+		close.isOpen = null
+		El.addClass(isOpen, open && open.seq < close.seq ? "to" + upper : "to" + lower)
+		setTimeout(function() {
+			El.kill(isOpen)
+		}, 600)
+	})
+
 	View.param(["userId","pageId"], function(value, name, params) {
 		var key = name.slice(0, -2)
 		, list = Data(key + "s")

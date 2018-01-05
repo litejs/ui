@@ -22,7 +22,7 @@
 		view.init(el, parent)
 
 		if (route.charAt(0) != "#") {
-			var params = "u[" + (groupsCount++) + "]?("
+			var params = "u[" + (view.seq = groupsCount++) + "]?("
 			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
 					(params += "o['" + key + "']=u[" + (groupsCount++) + "],") && "([^/]+?)" :
@@ -77,39 +77,14 @@
 				}
 			}
 
-			if (close) {
-				close.close()
-			}
-
 			for (tmp in params) if (tmp.charAt(0) != "_") {
 				if (syncResume = param[tmp] || param["*"]) {
 					syncResume.call(view, params[tmp], tmp, params)
 					syncResume = null
 				}
 			}
-			bubbleDown(params)
-		},
-		open: function(params) {
-			var view = this
-			, parent = view.parent
-			if (parent && !view.isOpen) {
-				view.isOpen = view.el.cloneNode(true)
-				El.append(parent.isOpen || parent.el, view.isOpen)
-				El.render(view.isOpen)
-				parent.emit("openChild", view)
-				view.emit("open", params)
-				View.emit("open", params, view)
-			}
-		},
-		close: function() {
-			var view = this
-			if (view.isOpen) {
-				view.parent.emit("closeChild", view)
-				if (view.child) view.child.close()
-				El.kill(view.isOpen)
-				view.emit("close")
-				view.isOpen = null
-			}
+
+			bubbleDown(params, close)
 		},
 		wait: function() {
 			var params = lastParams
@@ -125,20 +100,38 @@
 		}
 	}
 
-	function bubbleDown(params) {
+	function bubbleDown(params, close) {
 		var view = params._v
+		, parent = view && view.parent
 		if (!view || params._p && /{/.test(view.route)) {
-			return
+			return closeView(close)
 		}
-		if (view.parent && !view.isOpen) {
-			view.open(params)
+		if (parent && !view.isOpen || view === close) {
+			closeView(close, view)
+			view.isOpen = view.el.cloneNode(true)
+			El.append(parent.isOpen || parent.el, view.isOpen)
+			El.render(view.isOpen)
+			parent.emit("openChild", view, close)
+			view.emit("open", params)
+			View.emit("open", params, view)
+			close = null
 		}
 		if (params._d = params._v = view.child) {
-			bubbleDown(params)
+			bubbleDown(params, close)
 		}
 		if (lastView == view) {
 			view.emit("show", params)
 			View.emit("show", params, view)
+		}
+	}
+
+	function closeView(view, open) {
+		if (view && view.isOpen) {
+			view.parent.emit("closeChild", view, open)
+			closeView(view.child)
+			El.kill(view.isOpen)
+			view.isOpen = null
+			view.emit("close")
 		}
 	}
 

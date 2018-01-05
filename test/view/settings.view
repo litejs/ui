@@ -1,6 +1,6 @@
 
-@view settings #private
-	.page
+@view settings public
+	anim-page
 		h2.settings Settings for {user.name}
 		.h | Settings
 		| Lot of settings
