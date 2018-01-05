@@ -143,7 +143,7 @@
 	View.get = get
 	function get(url, params) {
 		if (!fn) {
-			fn = new Function(
+			fn = Function(
 				"u,o,r",
 				"return (u=/^\\/?(?:" + reStr + ")[\\/\\s]*$/.exec(u))?(" + fnStr + "r):r"
 			)
