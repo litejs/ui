@@ -26,7 +26,13 @@ El.bindings.list = function(node, data, list, extra, val) {
 	.each(clone)
 	.on("add", clone).on("remove", remove)
 	.then(function() {
-		if (val !== void 0) El.val(node, val)
+		if (val !== void 0) {
+			if (!this.get(val)) {
+				clone({id:val,name:val}, extraLen)
+				extraLen++
+			}
+			El.val(node, val)
+		}
 		El.rmClass(node, "loading")
 	})
 
