@@ -6,6 +6,7 @@
     {
       "properties": {
         "contacts": {
+          "type": "array",
           "description": "Contacts",
           "items": {
             "$ref": "#/contacts"
@@ -16,8 +17,9 @@
       }
     }
   ],
-  "contacts": [
+  "contacts": { "anyOf": [
     {
+      "properties": {
       "address": {
         "type": "string"
       },
@@ -26,8 +28,10 @@
           "email"
         ]
       }
+      }
     },
     {
+      "properties": {
       "number": {
         "type": "string"
       },
@@ -36,8 +40,9 @@
           "phone"
         ]
       }
+      }
     }
-  ],
+  ]},
   "links": [
     {
       "href": "/{id}/comments",

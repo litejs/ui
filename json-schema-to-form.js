@@ -44,9 +44,21 @@
 				, href = (_link.href || selfHref).format(_scope)
 				JSON.schemaApply(schema, data)
 
+				if (model) {
+					var changed = []
+					, clone = JSON.clone(model.data)
+					JSON.mergePatch(clone, data, changed)
+
+					if (changed.length) {
+						data = Item.assign({}, clone, changed)
+					} else {
+						data = null
+					}
+				}
+
 				try { document.activeElement.blur() } catch(e) {}
 
-				View.emit(event || "makeReq", _link, href, data)
+				if (data) View.emit(event || "makeReq", _link, href, data)
 			})
 
 		})
