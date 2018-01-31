@@ -40,6 +40,10 @@
 			.col-9
 				Checkbox
 					\ Default
+				MenuBtn.MenuBtn--back
+					&on: "click", "toggleClass", "MenuBtn--back"
+				MenuBtn.MenuBtn--close
+					&on: "click", "toggleClass", "MenuBtn--close"
 			.col-3 Sliders
 			.col-9
 				Slider[valu=33]

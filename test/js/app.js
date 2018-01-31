@@ -103,6 +103,10 @@ El.bindings.run = function() {}
 		View.show(true, {error: err})
 	})
 
+	View.on("toggleClass", function(e, el, clName, target) {
+		El[El.hasClass(el, clName) ? "rmClass" : "addClass"](el, clName)
+	})
+
 	View.on("logout", function() {
 		user = El.data.user = null
 		View.show(true)
