@@ -29,7 +29,7 @@
 		, path = decodeURIComponent((parts[1] || "").replace(/\+/g, " "))
 
 		if (schema && schema !== 1) {
-			return next && next(null, JSON.pointer(schema, path))
+			return next && next(null, path ? Item.get(schema, path) : schema)
 		}
 
 		pending.push(arguments)
@@ -76,7 +76,8 @@
 			}
 			if (val = val.$ref) {
 				if (val.charAt(0) == "#") {
-					obj[key] = JSON.pointer(schema, val.slice(1))
+					val = val.slice(1)
+					obj[key] = val ? Item.get(schema, val) : schema
 				} else if (val.charAt(0) != "/") {
 					val = id.replace(/[^\/]*$/, val)
 					refs.push(val, obj, key)

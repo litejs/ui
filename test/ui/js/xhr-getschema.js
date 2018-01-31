@@ -5,7 +5,6 @@ var mock = {
 }
 
 global.Fn = require("../lib/fn.js").Fn
-JSON.pointer = require("../lib/json").pointer
 global.xhr = {
 	get: function(url, cb) {
 		setTimeout(function() {
