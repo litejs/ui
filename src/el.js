@@ -28,7 +28,8 @@
 			scope[name] = el
 		},
 		"with": function(el, scope, map) {
-			return render(el, JSON.merge(elScope(el, scope), map))
+			// Extend existing scope, each item from list will come with its own scope
+			return render(el, Object.assign(scope, map))
 		}
 	}
 
@@ -650,7 +651,7 @@
 				}
 			} catch (e) {
 				//** debug
-				e.message += " in binding: " + bind
+				e.message += "\nBINDING: " + bind
 				console.error(e, node)
 				if (window.onerror) window.onerror(e.message, e.fileName, e.lineNumber)
 				//*/
@@ -693,12 +694,12 @@
 	El.addClass = addClass
 	El.rmClass = rmClass
 
-	Object.keys(El).each(function(key) {
+	Object.each(El, function(fn, key) {
 		if (!bindings[key]) {
 			bindings[key] = function(el, scope) {
 				var arr = slice.call(arguments, 2)
 				arr.unshift(el)
-				El[key].apply(scope, arr)
+				fn.apply(scope, arr)
 			}
 		}
 		if (!wrapProto[key]) addWrapProto(key)
@@ -846,7 +847,7 @@
 				var txt = this.txt
 
 				JSON.parse(this.params)
-				.forEach(function(val) {
+				.each(function(val) {
 					if (!val || val.constructor != Object) {
 						val = { item: val }
 					}
