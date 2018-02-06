@@ -61,10 +61,6 @@ img,
  *     and it does not render well with some fonts (Helvetica Neue on macs for example).
  */
 
-.no-events {
-	pointer-events: none;
-}
-
 a[href],
 button,
 label,
@@ -73,6 +69,10 @@ label,
 	cursor: pointer;
 	*cursor: hand;       /* 1 */
 	pointer-events: auto;
+}
+
+.no-events {
+	pointer-events: none;
 }
 
 button {

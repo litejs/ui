@@ -1,10 +1,7 @@
 
 /**
- * @see http://smacss.com/book/categorizing
- * Theme rules describe how modules or layouts might look.
- * Without theme site must work but look more like a wireframe.
- *
- * base and components should be reusable across projects.
+ * Categorizing CSS Rules
+ * ----------------------
  *
  *  1. Base rules are almost exclusively single element selectors.
  *  2. Layout rules divide the page into sections.
@@ -17,6 +14,10 @@
  *     They are also about describing how a module might look in different views like the home page or the inside page.
  *  5. Theme rules are similar to state rules in that they describe how modules or layouts might look.
  *     Most sites don’t require a layer of theming but it is good to be aware of it.
+ * Theme rules describe how modules or layouts might look.
+ * Without theme site must work but look more like a wireframe.
+ *
+ * @see http://smacss.com/book/categorizing
  */
 
 @import url("css/base.css");             /* 1 */

@@ -29,26 +29,13 @@ if (this.console && console.log) {
 }
 
 
-
-var _ = El.i18n
-
-El.data.history = history
-El.data.El = El
-El.data._ = _
-El.data.Fn = Fn
-El.data.Date = Date
-El.data.Math = Math
-El.data.View = View
-El.data.started = new Date()
-El.data.welcomeText = "_welcome"
-
-
-_.def(  { "en": "In English"
-	, "et": "Eesti keeles"
-	, "ru": "На русском"
-	, "fi": "Suomeksi"
-	, "sv": "På Svenska"
-	, "ar": "Arabic"
+El.i18n.def({
+	"en": "In English",
+	"et": "Eesti keeles",
+	"ru": "На русском",
+	"fi": "Suomeksi",
+	"sv": "På Svenska",
+	"ar": "Arabic"
 	//, "lt": "Lietuviškai"
 	//, "lv": "Latviski"
 	//, "pl": "Polski"
@@ -56,9 +43,8 @@ _.def(  { "en": "In English"
 	//, "fr": "Français"
 })
 
-_.setLang = function(lang) {
-	var html = document.documentElement
-	html.lang = lang = _.use(lang)
+El.i18n.setLang = function(lang) {
+	document.documentElement.lang = lang = _.use(lang)
 	xhr.load("lang/" + lang + ".js", function() {
 		Date.names = _("__date").split(" ")
 		String.alphabet = _("__alphabet")
@@ -71,6 +57,35 @@ _.setLang = function(lang) {
 	})
 }
 
+View.base = "views/"
+View("#body", document.body)
+
+View.on("show", function() {
+        // Blur focused link when View completes
+        try {
+                // IE8 can throw an exception for accessing document.activeElement
+                var el = document.activeElement
+                , tag = el && el.tagName
+                if (tag == "A" || tag == "BUTTON") el.blur()
+        } catch(e) {}
+        // Re-render all .js-viewHook elements on each View change
+        El.findAll(document.body, ".js-viewRender").render()
+})
+
+
+
+
+var _ = El.i18n
+
+El.data.history = history
+El.data.El = El
+El.data._ = _
+El.data.Fn = Fn
+El.data.Date = Date
+El.data.Math = Math
+El.data.View = View
+El.data.started = new Date()
+El.data.welcomeText = "_welcome"
 
 
 El.bindings.fixReadonlyCheckbox = function(el) {
@@ -197,20 +212,6 @@ El.bindings.run = function() {}
 	View("users")
 	.on("ping", function() {
 		this.wait()()
-	})
-
-	View.base = "views/"
-
-	View.on("show", function() {
-		// Blur focused link on every view change.
-		// IE8 can throw when getting document.activeElement.
-		try {
-			var el = document.activeElement
-			, tag = el && el.tagName
-			if (tag == "A" || tag == "BUTTON") el.blur()
-		} catch(e) {}
-		// Rerender nodes on every view change.
-		El.findAll(document.body, ".js-viewRender").render()
 	})
 
 

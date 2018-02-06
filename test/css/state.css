@@ -1,4 +1,10 @@
 
+
+/**
+ * State rules should be prefixed with `is-`
+ */
+
+
 @keyframes loader {
 	0%  { opacity: 0; }
 	33% { opacity: 0; }
