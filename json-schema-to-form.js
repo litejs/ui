@@ -50,7 +50,7 @@
 					JSON.mergePatch(clone, data, changed)
 
 					if (changed.length) {
-						data = Item.copy({}, clone, changed)
+						data = Item.copy({}, data, changed)
 					} else {
 						data = null
 					}
