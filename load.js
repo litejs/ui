@@ -167,7 +167,7 @@
 
 	//** require
 	var modules = {}
-	, process = {
+	, process = window.process = {
 		env: {}
 	}
 
