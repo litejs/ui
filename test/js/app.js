@@ -57,7 +57,7 @@ El.i18n.setLang = function(lang) {
 	})
 }
 
-View.base = "views/"
+View.base = "view/"
 View("#body", document.body)
 
 View.on("show", function() {
@@ -235,10 +235,10 @@ El.bindings.run = function() {}
 	// Preload lang and views
 	xhr.load([
 		"lang/" + lang + ".js",
-		"components/form1.tpl",
-		"components/confirm.tpl",
-		"components/Segment7.tpl",
-		"views/main.view"
+		"component/form1.tpl",
+		"component/confirm.tpl",
+		"component/Segment7.tpl",
+		"view/main.view"
 	], init)
 
 	function init() {
