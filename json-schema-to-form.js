@@ -32,7 +32,7 @@
 				}
 			}
 
-			var fieldset = El("fieldset.grid-1", El("legend", schema.title || _link.title))
+			var fieldset = El(template + "-fieldset")
 
 			drawSchema(schema, null, fieldset, model && model.data || null, null, scope)
 

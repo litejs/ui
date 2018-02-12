@@ -235,7 +235,7 @@ El.bindings.run = function() {}
 	// Preload lang and views
 	xhr.load([
 		"lang/" + lang + ".js",
-		"views/Form1.tpl",
+		"components/form1.tpl",
 		"components/confirm.tpl",
 		"components/Segment7.tpl",
 		"views/main.view"
