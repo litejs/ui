@@ -1,4 +1,309 @@
 
+@css
+	.mat-Menu,
+	.tooltip {
+		font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+		border-radius: 2px;
+		position: absolute;
+		margin: 0;
+		opacity: 0;
+		transform: scale(0);
+	}
+	.tooltip {
+		padding: 8px;
+		color: #fff;
+		background: #666;
+		font-size: 10px;
+		font-weight: 500;
+		line-height: 14px;
+		max-width: 170px;
+		text-align: center;
+		pointer-events: none;
+		z-index: 9;
+	}
+	.mat-Menu {
+		padding: 8px 0;
+		color: #000;
+		background: #fff;
+		font-size: 14px;
+		font-weight: 400;
+		letter-spacing: 0;
+		list-style: none;
+		min-width: 124px;
+		z-index: 8;
+		text-align: left;
+		transition: opacity .4s cubic-bezier(0, 0, .2, 1) .2s, transform .2s cubic-bezier(0, 0, .2, 1) .2s;
+	}
+	.mat-Menu-item {
+		padding: 0 16px;
+		display: block;
+		border: none;
+		margin: 0;
+		outline-color: #bdbdbd;
+		position: relative;
+		overflow: hidden;
+		text-decoration: none;
+		cursor: pointer;
+		height: 48px;
+		line-height: 48px;
+		white-space: nowrap;
+	}
+	.mat-Menu-item:hover {
+		background-color: #eee;
+	}
+	.mat-Menu-item[disabled] {
+		color: #bdbdbd;
+		background-color: transparent;
+		cursor: auto;
+	}
+	.mat-Menu-item.is-divider {
+		border-bottom: 1px solid #ddd;
+	}
+	.mat-Menu.is-visible,
+	.tooltip.is-visible {
+		transform: scale(1);
+		opacity: 1;
+		transition: opacity .4s cubic-bezier(0, 0, .2, 1) 0s, transform .2s cubic-bezier(0, 0, .2, 1) 0s;
+	}
+	.waves {
+		position: relative;
+		overflow: hidden;
+	}
+	.waves-ripple {
+		position: absolute;
+		border-radius: 50%;
+		background-color: #000;
+		opacity: 0;
+		transform: scale(0);
+		transition: opacity .6s cubic-bezier(0, 0, .2, 1) 0s, transform 0s cubic-bezier(0, 0, .2, 1) .6s;
+		pointer-events: none;
+	}
+	.waves.is-active > .waves-ripple,
+	.waves-ripple--play {
+		opacity: .4;
+		transform: scale(1);
+		transition: opacity 1s cubic-bezier(0, 0, .2, 1) 0ms, transform .4s cubic-bezier(0, 0, .2, 1) 0ms;
+	}
+	.shadow-1 {
+		box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+	}
+	/**
+	 *  1. Fix Webkit border-radius cropping for children.
+	 */
+	.Button,
+	.Checkbox,
+	.Fab,
+	.material {
+		font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+		font-size: 14px;
+		font-weight: 500;
+		position: relative;
+		text-transform: uppercase;
+		transition: all .2s cubic-bezier(.4,0,.2,1);
+		perspective: 1px;                                         /* 1 */
+	}
+	.Button:focus,
+	.Fab:focus {
+		outline: none;
+	}
+	.Button,
+	.Button:disabled:hover {
+		background: transparent;
+		border: none;
+		min-width: 64px;
+		height: 36px;
+		line-height: 36px;
+		border-radius: 2px;
+		padding: 0 16px;
+		letter-spacing: 0;
+		text-align: center;
+	}
+	.Button.raised,
+	.Button:hover {
+		background-color: rgba(158,158,158, 0.20);
+	}
+	.Button:focus {
+		background-color: #ddd;
+	}
+	.raised:focus:not(:active) {
+		box-shadow: 0 0 8px rgba(0,0,0,.18),0 8px 16px rgba(0,0,0,.36);
+	}
+	.Button:disabled {
+		color: #aaa;
+		background: transparent;
+	}
+	.Fab {
+		border: none;
+		border-radius: 50%;
+		font-size: 24px;
+		height: 56px;
+		line-height: 56px;
+		width: 56px;
+		padding: 0;
+		background: rgba(158,158,158,.2);
+	}
+	.Button.is-warning,
+	.Fab--red {
+		color: #fff;
+		background-color: #f40;
+	}
+	.Button.is-warning>.waves-ripple,
+	.Fab--red>.waves-ripple {
+		background-color: #fff;
+	}
+	.Fab--red>.waves-ripple--play {
+		opacity: .6;
+	}
+	.raised {
+		box-shadow: 0 1px 1.5px 0 rgba(0,0,0,.12),0 1px 1px 0 rgba(0,0,0,.24);
+	}
+	.Checkbox {
+		display: block;
+		height: 56px;
+		line-height: 56px;
+		width: 56px;
+	}
+	.Checkbox-icon {
+		overflow: visible;
+		display: block;
+		height: 50%;
+		width: 50%;
+		top: 25%;
+		left: 25%;
+	}
+
+@js
+	!function(View) {
+		var openMenu, lastMenuTarget
+		, tooltip = El("pre.tooltip")
+		, tick, wait
+		, ripple = El(".waves-ripple")
+		El.append(document.body, tooltip)
+		El.near = near
+		function near(source, target, x, y, margin) {
+			var top, left
+			, rect = target.getBoundingClientRect()
+			// svg elements dont have offsetWidth, IE8 does not have rect.width
+			, width = rect.width || target.offsetWidth || 0
+			, height = rect.height || target.offsetHeight || 0
+			if (x == "left") {
+				left = rect.left - source.offsetWidth - margin
+				x = "150%"
+			} else if (x == "leftEdge") {
+				left = rect.left - margin
+				x = "0%"
+			} else if (x == "right") {
+				left = rect.left + width + margin
+				x = "-50%"
+			} else if (x == "rightEdge") {
+				left = rect.left - source.offsetWidth + width + margin
+				x = "100%"
+			} else {
+				left = rect.left + (width / 2) - (source.offsetWidth/2)
+				x = "50%"
+			}
+			if (y == "top") {
+				top = rect.top - source.offsetHeight - margin
+				y = " 150%"
+			} else if (y == "bottom") {
+				top = rect.top + height + margin
+				y = " -50%"
+			} else {
+				top = rect.top + (height / 2) - (source.offsetHeight/2)
+				y = " 50%"
+			}
+			left += El.scrollLeft()
+			top += El.scrollTop()
+			El.css(source, "transform-origin", x + y)
+			El.css(source, "top", (top < 0 ? 0 : top) + "px")
+			El.css(source, "left", (left < 0 ? 0 : left) + "px")
+		}
+		El.on(document.body, "mouseover", function(e) {
+			var x, y
+			, target = e.target
+			, text = target.getAttribute("data-tooltip")
+			, relTarg = e.relatedTarget || e.fromElement
+			// without relTarg is event on click
+			if (!relTarg) return
+			El.rmClass(tooltip, "is-visible")
+			if (!text) return
+			El.append(El.empty(tooltip), text)
+			if (El.hasClass(target, "tooltip--left")) {
+				x = "left"
+			} else if (El.hasClass(target, "tooltip--right")) {
+				x = "right"
+			} else if (El.hasClass(target, "tooltip--top")) {
+				y = "top"
+			} else {
+				y = "bottom"
+			}
+			near(tooltip, target, x, y, 4)
+			setTimeout(function() {
+				El.addClass(tooltip, "is-visible")
+			}, 0)
+		})
+		function closeMenu(e) {
+			if (e && e.target == lastMenuTarget) return
+			var menu = openMenu
+			if (menu) {
+				El.rmClass(menu, "is-visible")
+				setTimeout(El.kill.bind(null, menu), 800)
+			}
+			if (lastMenuTarget) {
+				El.rmClass(lastMenuTarget, "is-active")
+			}
+			openMenu = null
+		}
+		View.on("resize", closeMenu)
+		View.on("showMenu", function(e, target, menu, x, y, margin) {
+			Event.stop(e)
+			var close = openMenu && lastMenuTarget == target
+			closeMenu()
+			if (close) return
+			lastMenuTarget = target
+			openMenu = El(menu)
+			El.append(document.body, openMenu)
+			El.render(openMenu)
+			near(openMenu, target, x, y, 4)
+			El.addClass(target, "is-active")
+			setTimeout(function() {
+				El.addClass(openMenu, "is-visible")
+			}, 0)
+		})
+		El.on(document.body, "mouseup", closeMenu)
+		El.on(document.body, "mousedown", mousedown)
+		function mousedown(e) {
+			var target = e.target
+			if (!El.hasClass(target, "waves") || target.disabled) return
+			var rect = target.getBoundingClientRect()
+			, fromMouse = !El.hasClass(target, "Checkbox-icon")
+			, top = fromMouse ? e.clientY - rect.top : rect.height
+			, left = fromMouse ? e.clientX - rect.left : rect.width
+			, maxH = Math.max(top, target.offsetHeight - top)
+			, maxW = Math.max(left, target.offsetWidth - left)
+			, max = Math.sqrt(maxH * maxH + maxW * maxW)
+			, size = (fromMouse ? 2 * max : max) + "px"
+			El.css(ripple, "top", (top - max) + "px")
+			El.css(ripple, "left", (left - max) + "px")
+			El.css(ripple, "width", size)
+			El.css(ripple, "height", size)
+			El.append(target, ripple)
+			clearTimeout(tick)
+			end()
+			wait = 1
+			tick = setTimeout(end, 800)
+			El.one(document.body, "mouseup", end)
+			setTimeout(function() {
+				El.addClass(ripple, "waves-ripple--play")
+			}, 0)
+		}
+		function end() {
+			if (!(wait--)) {
+				El.rmClass(ripple, "waves-ripple--play")
+			}
+		}
+	}(View)
+
 
 @el Checkbox
 	label.Checkbox

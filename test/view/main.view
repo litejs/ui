@@ -1,5 +1,5 @@
 
-@def #mat ../component/material.css,%.js,%.tpl
+@def #mat ../component/material.tpl
 
 @el anim-page
 	.content.loader.abs
@@ -106,7 +106,7 @@
 @view users/{userId} public
 	anim-page
 		form-js
-			&schemaToForm: "schema/user.json", "edit", "Form1"
+			&schemaToForm: "schema/user.json", "edit", "form1"
 
 @view users/{userId}/{pageId} public
 	anim-page
