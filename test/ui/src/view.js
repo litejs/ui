@@ -3,17 +3,16 @@ require("../../_setup")
 var View = require("../../../ui/src/view").View
 , globalEl = global.El
 
-require("testman")
+function Nop() {}
+global.El = {
+	data: {},
+	append: Nop,
+	kill: Nop,
+	render: Nop
+}
+
+require("../..")
 .describe("View")
-.test("mock global El", function() {
-	function Nop() {}
-	global.El = {
-		data: {},
-		append: Nop,
-		kill: Nop,
-		render: Nop
-	}
-})
 .test("it should match views", function(assert) {
 	var tmp, lastParams
 	, el = {}
@@ -53,6 +52,7 @@ require("testman")
 	View.show("hello/world")
 	assert.equal(View.active, "hello/{attr}")
 	assert.notStrictEqual(tmp, lastParams)
+	assert.end()
 })
 .test("it should define views with View.def", function(assert) {
 	assert.notOk(View.views.a1)
@@ -64,11 +64,12 @@ require("testman")
 
 	View.def("a1 a2,x.js,+.map")
 	assert.equal(View("a1").file, "a1.js,a1.css,a2.js,a2.js-map,x.js,x.js.map")
+	assert.end()
 
 })
 .test("restore global El", function(assert) {
-	global.El = globalEl
+	assert.ok(global.El = globalEl)
+	assert.end()
 })
-.done()
 
 

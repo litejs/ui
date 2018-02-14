@@ -15,7 +15,7 @@ global.xhr = {
 
 require("../ui/js/xhr-getschema.js")
 
-require("testman")
+require(".")
 .describe("xhr.getSchema")
 .test("getSchema", function(assert) {
 	assert.plan(1)

@@ -63,31 +63,30 @@ i18n.use("en")
 var undef
 , el, h1, h2, h3, h4, input, radio, select, t1
 , select1, select2
-, testman = require("testman")
+, testman = require(".")
 , map1 = {"map1": 1}
 , map2 = {"map2": 2}
 
-testman.describe.it.htmlSimilar = function(actual, expected) {
+testman.defineAssert("htmlSimilar", function(actual, expected) {
 	var re = /[^\s"'=]+(=("|')(?:\\?.)*?\2)?/g
 	, str1 = getString(actual).replace(/=(\w+)/g, '="$1"').match(re).sort().join(" ")
 	, str2 = expected.replace(/=(\w+)/g, '="$1"').match(re).sort().join(" ")
 
 	return this.equal(str1, str2)
-}
+})
+
+el = El("div")
+select = El("select#id2.cl2:disabled")
+input = to(El("input"), document.body)
+radio = to(El("input[type=radio]"), document.body)
+h1 = El("h1")
+h2 = El("h2")
+h3 = El("h3")
+h4 = El("h4")
 
 testman
 .describe("El")
 .it ("should build elements")
-.run(function(){
-	el = El("div")
-	select = El("select#id2.cl2:disabled")
-	input = to(El("input"), document.body)
-	radio = to(El("input[type=radio]"), document.body)
-	h1 = El("h1")
-	h2 = El("h2")
-	h3 = El("h3")
-	h4 = El("h4")
-})
 .htmlSimilar(el, "<div></div>")
 .htmlSimilar(h1, "<h1></h1>")
 .htmlSimilar(h2, "<h2></h2>")
@@ -193,13 +192,13 @@ testman
 .equal(El.val(input, "xx"), "xx")
 .anyOf(El.val(select), ["", undef])
 .equal(El.val(radio), null)
-.run(function() {
+.notOk(function() {
 	input.valObject = map1
 	select.valObject = map2
-})
+}())
 .equal(El.val(input), map1)
 .equal(El.val(select), map2)
-.run(function() {
+.ok(function() {
 	select1 = El("select")
 	select2 = El("select:multiple")
 	El.append(select1, [
@@ -220,7 +219,7 @@ testman
 	select2.options = select2.childNodes
 
 	return "2,o2" == El.val(select2)
-})
+}())
 //equal(select1.val(), "o2")
 .equal("" + El.val(select2), "2,o2")
 .equal(select2.options.length, 4)
@@ -272,7 +271,7 @@ testman
 
 .describe( "Templates" )
 .it ("supports templates")
-.run(function() {
+.notOk(function() {
 	El.tpl([
 		"@el test1",
 		" a",
@@ -307,7 +306,7 @@ testman
 		"@el test10",
 		" a>b[data-bind=\"class:'red',i>1\"]>i &txt:name"
 	].join("\n"))
-})
+}())
 .htmlSimilar(El("test1"), '<a><b><i></i></b></a>')
 .htmlSimilar(El("test2"), '<a><b><i></i></b></a>')
 .htmlSimilar(El("test3"), '<a><b><i>link</i></b></a>')

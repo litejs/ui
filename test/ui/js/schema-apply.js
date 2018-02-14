@@ -3,7 +3,7 @@ var schemaApply = require("../ui/js/schema-apply").schemaApply
 
 global.Fn = require("../lib/fn").Fn
 
-require("testman")
+require(".")
 .describe ("schema-apply")
 
 .test ( "it should apply", function(assert) {
@@ -24,6 +24,7 @@ require("testman")
 	}
 
 	assert.deepEqual(schemaApply(schema, input), expected)
+	assert.end()
 
 
 })
