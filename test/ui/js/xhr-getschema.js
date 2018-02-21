@@ -1,10 +1,11 @@
 
+require("../../_setup")
+
 var mock = {
 	"a.json": {type: "object"}
 
 }
 
-global.Fn = require("../lib/fn.js").Fn
 global.xhr = {
 	get: function(url, cb) {
 		setTimeout(function() {
@@ -13,9 +14,9 @@ global.xhr = {
 	}
 }
 
-require("../ui/js/xhr-getschema.js")
+require("../../../ui/js/xhr-getschema.js")
 
-require(".")
+require("../..")
 .describe("xhr.getSchema")
 .test("getSchema", function(assert) {
 	assert.plan(1)
@@ -23,8 +24,6 @@ require(".")
 	xhr.getSchema("a.json", function(err, json) {
 		assert.equal(json, {type: "object"})
 	})
-
-
 })
 
 

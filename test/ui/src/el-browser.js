@@ -1,5 +1,5 @@
 
-require("../ui/src/el.js")
+require("../../../ui/src/el.js")
 global.i18n = window.El.i18n
 
 El.get = function(id) {
@@ -63,7 +63,7 @@ i18n.use("en")
 var undef
 , el, h1, h2, h3, h4, input, radio, select, t1
 , select1, select2
-, testman = require(".")
+, testman = require("../..")
 , map1 = {"map1": 1}
 , map2 = {"map2": 2}
 
@@ -72,7 +72,8 @@ testman.defineAssert("htmlSimilar", function(actual, expected) {
 	, str1 = getString(actual).replace(/=(\w+)/g, '="$1"').match(re).sort().join(" ")
 	, str2 = expected.replace(/=(\w+)/g, '="$1"').match(re).sort().join(" ")
 
-	return this.equal(str1, str2)
+	this.equal(str1, str2)
+	return this
 })
 
 el = El("div")

@@ -1,9 +1,10 @@
 
-var schemaApply = require("../ui/js/schema-apply").schemaApply
+require("../../_setup")
 
-global.Fn = require("../lib/fn").Fn
+var schemaApply = require("../../../ui/js/schema-apply").schemaApply
 
-require(".")
+
+require("../..")
 .describe ("schema-apply")
 
 .test ( "it should apply", function(assert) {
@@ -25,8 +26,6 @@ require(".")
 
 	assert.deepEqual(schemaApply(schema, input), expected)
 	assert.end()
-
-
 })
 
 
