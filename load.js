@@ -29,6 +29,7 @@
 	var seq = 0
 	, xhrs = []
 	, loaded = {}
+	, urlEscRe = /[+#\s]+/g
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('MSXML2.XMLHTTP')")
 	, execScript = window.execScript ||
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
@@ -104,7 +105,7 @@
 		// if (xhr.getResponseHeader("Set-Cookie")) sessionID = xhr.getResponseHeader("Set-Cookie");
 
 
-		xhr.open(method, url, next !== true)
+		xhr.open(method, url.replace(urlEscRe, encodeURIComponent).replace(/%20/g, "+"), next !== true)
 
 
 		// With IE 8 XMLHttpRequest gains the timeout property.
