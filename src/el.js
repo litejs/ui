@@ -925,16 +925,16 @@
 	//** kb
 	var kbMaps = []
 	, kbKeys = {
-		8:"backspace", 9:"tab",
-		13:"enter", 16:"shift", 17:"ctrl", 18:"alt", 19:"pause",
-		20:"caps", 27:"esc",
-		33:"pgup", 34:"pgdown",
-		35:"end", 36:"home",
-		37:"left", 38:"up", 39:"right", 40:"down",
-		45:"ins", 46:"del",
-		91:"cmd",
-		112:"f1", 113:"f2", 114:"f3", 115:"f4", 116:"f5", 117:"f6",
-		118:"f7", 119:"f8", 120:"f9", 121:"f10", 122:"f11", 123:"f12"
+		  8: "backspace", 9: "tab",
+		 13: "enter",    16: "shift", 17: "ctrl",  18: "alt",  19: "pause",
+		 20: "caps",     27: "esc",
+		 33: "pgup",     34: "pgdown",
+		 35: "end",      36: "home",
+		 37: "left",     38: "up",    39: "right", 40: "down",
+		 45: "ins",      46: "del",
+		 91: "cmd",
+		112: "f1",      113: "f2",   114: "f3",   115: "f4",  116: "f5",  117: "f6",
+		118: "f7",      119: "f8",   120: "f9",   121: "f10", 122: "f11", 123: "f12"
 	}
 	, kbMod = /Mac|iPod|iPhone|iPad|Pike/.test(navigator.platform) ? "metaKey" : "ctrlKey"
 
@@ -945,7 +945,7 @@
 		, input = /INPUT|TEXTAREA|SELECT/i.test((el.nodeType == 3 ? el.parentNode : el).tagName)
 
 		for (; map = kbMaps[i++]; ) {
-			if (!input || map.enable_input) {
+			if (!input || map.input) {
 				fn = map[code] ||
 				map[chr] ||
 				map.num && code > 47 && code < 58 && (chr|=0, map.num) ||
@@ -953,14 +953,17 @@
 			}
 			if (fn || !map.bubble) break
 		}
-		if (fn) fn(e, chr, el)
+		if (fn) {
+			typeof fn === "string" ? View.emit(fn, e, chr, el) : fn(e, chr, el)
+		}
 	}
 
 	function kbDown(e) {
 		if (kbMaps[0]) {
 			var c = e.keyCode || e.which
-			, code = c > 95 && c < 106 ? c - 48 : c
-			, key = kbKeys[code] || String.fromCharCode(code) || code
+			, numpad = c > 95 && c < 106
+			, code = numpad ? c - 48 : c
+			, key = kbKeys[code] || String.fromCharCode(code).toLowerCase() || code
 
 			// Otherwise IE backspace navigates back
 			if (code == 8 && kbMaps[0].backspace) {

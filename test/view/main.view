@@ -43,6 +43,7 @@
 				dd>a[href="https://fb.com/LiteJS#info"] Fb
 
 @view public #body
+	&kb: {h: history.setUrl.bind(null, "home"), u: history.setUrl.bind(null, "users"), "shift+s": history.setUrl.bind(null, "settings")}
 	.App.max-height
 		top
 		Menu
@@ -90,10 +91,8 @@
 
 
 @view users public
-	&keyMap: {Q: Fn('document.title="Qsers!"')}
+	&kb: {q: Fn('document.title="Qsers!"')}
 	&on: "show", Fn('document.title="Users!"')
-	&on: "open", Fn('El.addKb(this.keyMap)')
-	&on: "close", Fn('El.rmKb(this.keyMap)')
 	anim-page
 		h2 Users
 		ul.users &list: Data("users")

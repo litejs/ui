@@ -114,6 +114,7 @@
 			parent.emit("openChild", view, close)
 			view.emit("open", params)
 			View.emit("open", params, view)
+			if (view.kb) El.addKb(view.kb)
 			close = null
 		}
 		if (params._d = params._v = view.child) {
@@ -131,6 +132,7 @@
 			closeView(view.child)
 			El.kill(view.isOpen)
 			view.isOpen = null
+			if (view.kb) El.rmKb(view.kb)
 			view.emit("close")
 		}
 	}
