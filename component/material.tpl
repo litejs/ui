@@ -262,6 +262,7 @@
 			if (close) return
 			lastMenuTarget = target
 			openMenu = El(menu)
+			El.scope(openMenu, El.scope(target))
 			El.append(document.body, openMenu)
 			El.render(openMenu)
 			near(openMenu, target, x, y, 4)
