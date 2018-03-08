@@ -1,6 +1,5 @@
 
 
-
 xhr.logErrors = function(unsentErrors) {
 	xhr("POST", "/errlog").send(JSON.stringify(unsentErrors))
 	unsentErrors.length = 0
@@ -57,7 +56,6 @@ El.i18n.setLang = function(lang) {
 	})
 }
 
-View.base = "view/"
 View("#body", document.body)
 
 View.on("show", function() {
