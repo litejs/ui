@@ -59,13 +59,6 @@ El.i18n.setLang = function(lang) {
 View("#body", document.body)
 
 View.on("show", function() {
-        // Blur focused link when View completes
-        try {
-                // IE8 can throw an exception for accessing document.activeElement
-                var el = document.activeElement
-                , tag = el && el.tagName
-                if (tag == "A" || tag == "BUTTON") el.blur()
-        } catch(e) {}
         // Re-render all .js-viewHook elements on each View change
         El.findAll(document.body, ".js-viewRender").render()
 })

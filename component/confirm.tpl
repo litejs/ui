@@ -32,6 +32,7 @@
 // }
 @js
 	View.on("confirm", function(title, opts, next) {
+		View.blur()
 		if (!next && typeof opts === "function") {
 			next = opts
 			opts = null

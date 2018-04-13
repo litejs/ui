@@ -123,6 +123,7 @@
 		if (lastView == view) {
 			view.emit("show", params)
 			View.emit("show", params, view)
+			blur()
 		}
 	}
 
@@ -183,6 +184,17 @@
 				})
 			})
 		}
+	}
+
+	View.blur = blur
+	function blur() {
+		// When a View completes, blur focused link
+		// IE8 can throw an exception for document.activeElement.
+		try {
+			var el = document.activeElement
+			, tag = el && el.tagName
+			if (tag === "A" || tag === "BUTTON") el.blur()
+		} catch(e) {}
 	}
 
 	function defMap(str) {
