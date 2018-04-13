@@ -33,7 +33,6 @@
 		overflow: auto;
 	}
 	.btn,
-	button,
 	input,
 	select,
 	textarea {
@@ -47,6 +46,9 @@
 		width: 100%;
 		padding: 0 8px;
 		margin: 0;
+	}
+	input[type=checkbox] {
+		height: auto;
 	}
 	textarea {
 		height: 64px;
@@ -67,15 +69,18 @@
 		display: inline;
 	}
 	.btn,
-	button,
 	input[type=submit] {                /* 1 */
 		-webkit-appearance: none;   /* 1 */
+		position: relative;
 		width: auto;
+		margin-bottom: 4px;
 		padding: 0px 14px;
 		text-align: center;
+		text-decoration: none;
 		/* default look */
 		background-color: #ddd;
 		color: #444;
+		cursor: pointer;
 	}
 	option[disabled],
 	.btn.disabled,
@@ -85,6 +90,18 @@
 		font-style: italic;
 		opacity: .6;
 		pointer-events: none;
+	}
+	.group > .btn {
+		border-radius: 0;
+		margin-left: -1px;
+	}
+	.group > .btn:first-child {
+		border-top-left-radius: 4px;
+		border-bottom-left-radius: 4px;
+	}
+	.group > .btn:last-child {
+		border-top-right-radius: 4px;
+		border-bottom-right-radius: 4px;
 	}
 	.btn--narrow {
 		line-height: 1.6;
@@ -109,7 +126,10 @@
 	textarea:active, textarea:focus {
 		border-color: #257;
 		outline: 0 none;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) inset, 0 0 2px 2px #6ae;
+		box-shadow:
+			0 2px 5px rgba(0, 0, 0, .5) inset,
+			0 0 2px 2px #6ae;
+		z-index: 1;
 	}
 	.btn:hover,
 	.btn:focus {
@@ -120,7 +140,7 @@
 	.btn:active,
 	.btn.is-active {
 		background-color: #ccc;
-		box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.2);
+		box-shadow: inset 0 0 8px rgba(0, 0, 0, .5);
 	}
 
 

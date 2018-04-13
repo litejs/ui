@@ -141,6 +141,7 @@
 	Event.asEmitter(View)
 	Event.asEmitter(View.prototype)
 
+	View.base = "view/"
 	View.home = "home"
 
 	View.get = get
