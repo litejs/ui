@@ -63,7 +63,7 @@
 			px = maxPx / (max - min)
 			offset = el.getBoundingClientRect().left + knobLen
 			if (e && track.childNodes.length > 1) {
-				var diff = El.mouseLeft(e) - offset
+				var diff = El.mouse(e).left - offset
 				diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
 				fill = track.firstChild
 				for (var next, x = maxPx, tmp = fill; tmp; tmp = tmp.nextSibling) {
@@ -74,8 +74,14 @@
 						x = next
 					}
 				}
-				if (fill.previousSibling) maxPx = fill.previousSibling.offsetWidth - knobLen - knobLen
-				if (fill.nextSibling) minPx = fill.nextSibling.offsetWidth
+				if (fill.previousSibling) {
+					maxPx = fill.previousSibling.offsetWidth - knobLen - knobLen
+					max = maxPx / px
+				}
+				if (fill.nextSibling) {
+					minPx = fill.nextSibling.offsetWidth
+					min = minPx / px
+				}
 			}
 		}
 		function start(e) {
@@ -91,7 +97,7 @@
 			El.on(document.body, "mousemove", move)
 		}
 		function move(e) {
-			var diff = El.mouseLeft(e) - offset
+			var diff = El.mouse(e).left - offset
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
 			el.set( diff / px, diff )
 			if (el.onMove) {

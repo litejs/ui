@@ -912,14 +912,12 @@
 		return window.pageYOffset || root.scrollTop || body.scrollTop || 0
 	}
 
-	El.mouseLeft = function(e) {
+	El.mouse = function(e) {
 		if (e.changedTouches) e = e.changedTouches[0]
-		return e.pageX || e.clientX + scrollLeft()
-	}
-
-	El.mouseTop = function(e) {
-		if (e.changedTouches) e = e.changedTouches[0]
-		return e.pageY || e.clientY + scrollTop()
+		return {
+			left: e.pageX || e.clientX + scrollLeft(),
+			top: e.pageY || e.clientY + scrollTop()
+		}
 	}
 
 	//** kb
