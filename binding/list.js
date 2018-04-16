@@ -44,6 +44,7 @@ El.bindings.list = function(node, data, list, extra, val) {
 		, scope = El.scope(clone, data)
 		scope.item = item.data || item
 		scope.model = item
+		scope.pos = pos
 		function up() {
 			El.render(clone, scope)
 		}
