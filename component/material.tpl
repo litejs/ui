@@ -218,13 +218,15 @@
 			El.css(source, "top", (top < 0 ? 0 : top) + "px")
 			El.css(source, "left", (left < 0 ? 0 : left) + "px")
 		}
-		El.on(document.body, "mouseover", function(e) {
+		El.on(document.body, "mouseover", onOver)
+		El.on(window, "focusin", onOver)
+		function onOver(e) {
 			var x, y
 			, target = e.target
 			, text = target.getAttribute("data-tooltip")
 			, relTarg = e.relatedTarget || e.fromElement
 			// without relTarg is event on click
-			if (!relTarg) return
+			if (!relTarg && e.type !== "focusin") return
 			El.rmClass(tooltip, "is-visible")
 			if (!text) return
 			El.append(El.empty(tooltip), text)
@@ -241,7 +243,7 @@
 			setTimeout(function() {
 				El.addClass(tooltip, "is-visible")
 			}, 0)
-		})
+		}
 		function closeMenu(e) {
 			if (e && e.target == lastMenuTarget) return
 			var menu = openMenu
