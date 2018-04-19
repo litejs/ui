@@ -21,6 +21,40 @@
 		pointer-events: none;
 		z-index: 9;
 	}
+	.tooltip[data-pos]:before {
+		content: "";
+		position: absolute;
+		display: block;
+		width: .4em;
+		height: .4em;
+		border: .4em solid transparent;
+		border-left-color: #666;
+		border-top-color: #666;
+	}
+	.tooltip[data-pos=top]:before {
+		bottom: -.3em;
+		left: -.3em;
+		margin-left: 50%;
+		transform: rotate(225deg);
+	}
+	.tooltip[data-pos=bottom]:before {
+		top: -.3em;
+		left: -.3em;
+		margin-left: 50%;
+		transform: rotate(45deg);
+	}
+	.tooltip[data-pos=right]:before {
+		top: 50%;
+		left: -.3em;
+		margin-top: -.4em;
+		transform: rotate(315deg);
+	}
+	.tooltip[data-pos=left]:before {
+		top: -.3em;
+		right: -.3em;
+		margin-top: 50%;
+		transform: rotate(135deg);
+	}
 	.mat-Menu {
 		padding: 8px 0;
 		color: #000;
@@ -220,7 +254,7 @@
 		El.on(document.body, "mouseover", onOver)
 		El.on(window, "focusin", onOver)
 		function onOver(e) {
-			var x, y
+			var x, y, pos
 			, target = e.target
 			, text = target.getAttribute("data-tooltip")
 			, relTarg = e.relatedTarget || e.fromElement
@@ -235,17 +269,15 @@
 			tipOpen = null
 			if (!text) return
 			tipOpen = target
+			pos = El.attr(target, "data-tooltip-pos") || "top"
 			El.txt(tooltip, text)
-			if (El.hasClass(target, "tooltip--left")) {
-				x = "left"
-			} else if (El.hasClass(target, "tooltip--right")) {
-				x = "right"
-			} else if (El.hasClass(target, "tooltip--top")) {
-				y = "top"
+			if (pos === "left" || pos === "right") {
+				x = pos
 			} else {
-				y = "bottom"
+				y = pos
 			}
-			near(tooltip, target, x, y, 4)
+			El.attr(tooltip, "data-pos", pos)
+			near(tooltip, target, x, y, 6)
 			tooltip.offsetTop // force repaint
 			El.addClass(tooltip, "is-visible")
 		}
