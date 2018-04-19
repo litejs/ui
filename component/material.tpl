@@ -214,35 +214,36 @@
 		El.append(document.body, tooltip)
 		El.near = near
 		function near(source, target, x, y, margin) {
-			var top, left
-			, rect = target.getBoundingClientRect()
+			var rect = target.getBoundingClientRect()
+			, top  = rect.top
+			, left = rect.left
 			// svg elements dont have offsetWidth, IE8 does not have rect.width
 			, width = rect.width || target.offsetWidth || 0
 			, height = rect.height || target.offsetHeight || 0
 			if (x == "left") {
-				left = rect.left - source.offsetWidth - margin
+				left -= source.offsetWidth + margin
 				x = "150%"
-			} else if (x == "leftEdge") {
-				left = rect.left - margin
+			} else if (x == "left-start") {
+				left -= margin
 				x = "0%"
 			} else if (x == "right") {
-				left = rect.left + width + margin
+				left += width + margin
 				x = "-50%"
-			} else if (x == "rightEdge") {
-				left = rect.left - source.offsetWidth + width + margin
+			} else if (x == "right-end") {
+				left += width + margin - source.offsetWidth
 				x = "100%"
 			} else {
-				left = rect.left + (width / 2) - (source.offsetWidth/2)
+				left += (width / 2) - (source.offsetWidth/2)
 				x = "50%"
 			}
 			if (y == "top") {
-				top = rect.top - source.offsetHeight - margin
+				top -= margin + source.offsetHeight
 				y = " 150%"
 			} else if (y == "bottom") {
-				top = rect.top + height + margin
+				top += height + margin
 				y = " -50%"
 			} else {
-				top = rect.top + (height / 2) - (source.offsetHeight/2)
+				top += (height / 2) - (source.offsetHeight/2)
 				y = " 50%"
 			}
 			left += El.scrollLeft()
@@ -306,9 +307,8 @@
 			El.render(openMenu)
 			near(openMenu, target, x, y, 4)
 			El.addClass(target, "is-active")
-			setTimeout(function() {
-				El.addClass(openMenu, "is-visible")
-			}, 0)
+			openMenu.offsetTop // force repaint
+			El.addClass(openMenu, "is-visible")
 		})
 		El.on(document.body, "mouseup", closeMenu)
 		El.on(document.body, "mousedown", mousedown)
@@ -333,9 +333,8 @@
 			wait = 1
 			tick = setTimeout(end, 800)
 			El.one(document.body, "mouseup", end)
-			setTimeout(function() {
-				El.addClass(ripple, "waves-ripple--play")
-			}, 0)
+			ripple.offsetTop // force repaint
+			El.addClass(ripple, "waves-ripple--play")
 		}
 		function end() {
 			if (!(wait--)) {
