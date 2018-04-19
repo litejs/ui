@@ -174,9 +174,8 @@
 
 @js
 	!function(View) {
-		var openMenu, lastMenuTarget
+		var lastMenuTarget, openMenu, tipOpen, tick, wait
 		, tooltip = El("pre.tooltip")
-		, tick, wait
 		, ripple = El(".waves-ripple")
 		El.append(document.body, tooltip)
 		El.near = near
@@ -226,10 +225,17 @@
 			, text = target.getAttribute("data-tooltip")
 			, relTarg = e.relatedTarget || e.fromElement
 			// without relTarg is event on click
-			if (!relTarg && e.type !== "focusin") return
+			if (!relTarg && e.type !== "focusin" || target === tipOpen) return
+			if (!text && tipOpen) {
+				for (; target = target.parentNode; ) {
+					if (target === tipOpen) return
+				}
+			}
 			El.rmClass(tooltip, "is-visible")
+			tipOpen = null
 			if (!text) return
-			El.append(El.empty(tooltip), text)
+			tipOpen = target
+			El.txt(tooltip, text)
 			if (El.hasClass(target, "tooltip--left")) {
 				x = "left"
 			} else if (El.hasClass(target, "tooltip--right")) {
@@ -240,9 +246,8 @@
 				y = "bottom"
 			}
 			near(tooltip, target, x, y, 4)
-			setTimeout(function() {
-				El.addClass(tooltip, "is-visible")
-			}, 0)
+			tooltip.offsetTop // force repaint
+			El.addClass(tooltip, "is-visible")
 		}
 		function closeMenu(e) {
 			if (e && e.target == lastMenuTarget) return
