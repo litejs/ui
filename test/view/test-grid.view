@@ -1,35 +1,41 @@
 @view test-grid public
+	@css
+		.border-white, .border-white > .col, .border-white > .group > .col {
+			border-color: #fff;
+		}
 	anim-page
 		h2 Main in the middle grid
-		.grid-2.bg3
-			.col-12.col-lg-6.col-lg-push-3 > .bg1 main
-			.col-12.col-md-6.col-lg-3.col-lg-pull-6 > .bg1 A
-			.col-12.col-md-6.col-lg-3 > .bg1 B
+		.grid.gap2.border-white
+			.col.lg-6 main
+			.col.md-6.lg-3 A
+			.col.md-6.lg-3 B
+			.group
+				.col.sm-6 C
+				.col.sm-6 D
+			.col E
 		h2 Test golden grid
-		.grid-2.bg3
-			.col-g2>.bg1 c1
-			.col-g3>.bg1 c2
-			.col-g1.col-md-g2>.bg1 c3
-			.col-g1.col-md-g3>.bg1 c4
-			.col-g1.col-md-g2>.bg1 c5
-			.col-g1.col-md-g4>.bg1 c6
-			.col-g1.col-md-g5>.bg1 c7
-			.col-g1.col-md-g2.col-lg-g3>.bg1 c8
-			.col-g1.col-md-g3.col-lg-g5>.bg1 c9
-			.col-g1.col-md-g2.col-lg-g6>.bg1 c10
-			.col-g1.col-md-g4.col-lg-g4>.bg1 c11
-			.col-g1.col-md-g5.col-lg-g5>.bg1 c12
-		h2 Test 12th grid
-		.grid-2.bg3
-			.col-12>.bg1 c1
-			.col-12>.bg1 c2
-			.col-12.col-md-6>.bg1 c1
-			.col-12.col-md-6>.bg1 c2
-			.col-12.col-md-6>.bg1 c2
-			.col-12.col-md-6>.bg1 c2
-			.col-12.col-md-6.col-lg-3>.bg1 c1
-			.col-12.col-md-6.col-lg-3>.bg1 c2
-			.col-12.col-md-6.col-lg-3>.bg1 c2
-			.col-12.col-md-6.col-lg-3>.bg1 c2
+		.grid.gap2.border-white
+			.col.sm-g2 c1
+			.col.sm-g3 c2
+			.col.sm-g1.md-g2 c3
+			.col.sm-g1.md-g3 c4
+			.col.sm-g1.md-g2 c5
+			.col.sm-g1.md-g4 c6
+			.col.sm-g1.md-g5 c7
+			.col.sm-g1.md-g2.lg-g3 c8
+			.col.sm-g1.md-g3.lg-g5 c9
+			.col.sm-g1.md-g2.lg-g6 c10
+			.col.sm-g1.md-g4.lg-g4 c11
+			.col.sm-g1.md-g5.lg-g5 c12
+		h2 Test tiles
+		.grid.gap2.border-white
+			&css: "height", "300px"
+			.col.sm-4.group.h2of3
+				.col.h1of2 c1
+				.col.h1of2 c2
+			.col.sm-8.h2of3 c3
+			.col.sm-8.h1of3 c6
+			.col.sm-4.h1of3 c7
+
 
 
