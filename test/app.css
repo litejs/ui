@@ -20,10 +20,10 @@
  * @see http://smacss.com/book/categorizing
  */
 
-@import url("css/base.css");             /* 1 */
+@import url("../css/base.css");             /* 1 */
+@import url("../css/grid.css");             /* 3 */
+@import url("../css/media.css");            /* 3 */
 @import url("css/layout.css");           /* 2 */
-@import url("css/grid.css");             /* 3 */
-@import url("css/media.css");            /* 3 */
 @import url("css/state.css");            /* 4 */
 @import url("css/theme/blue.css");       /* 5 */
 
