@@ -1,0 +1,15 @@
+
+.sm [dir="rtl"] .sm-left,
+.md [dir="rtl"] .md-left,
+.lg [dir="rtl"] .lg-left,
+[dir="rtl"] .left {
+	float: right;
+}
+
+.sm [dir="rtl"] .sm-right,
+.md [dir="rtl"] .md-right,
+.lg [dir="rtl"] .lg-right,
+[dir="rtl"] .right {
+	float: left;
+}
+
