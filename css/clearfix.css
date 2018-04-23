@@ -19,7 +19,7 @@
 	content: " ";   /* 1 */
 	display: table; /* 2 */
 }
-
+.cf,
 .cf:after {
 	clear: both;
 }
