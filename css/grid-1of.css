@@ -1,0 +1,25 @@
+
+/* grid-1of2 */
+.w1of1, .md .md-w1of1, .lg .md-w1of1, .lg .lg-w1of1 { width: 100%; }
+.w1of2, .md .md-w1of2, .lg .md-w1of2, .lg .lg-w1of2 { width: 50%; }
+.w1of3, .md .md-w1of3, .lg .md-w1of3, .lg .lg-w1of3 { width: 33.3333%; }
+.w2of3, .md .md-w2of3, .lg .md-w2of3, .lg .lg-w2of3 { width: 66.6667%; }
+.w1of4, .md .md-w1of4, .lg .md-w1of4, .lg .lg-w1of4 { width: 25%; }
+.w3of4, .md .md-w3of4, .lg .md-w3of4, .lg .lg-w3of4 { width: 75%; }
+.w1of5, .md .md-w1of5, .lg .md-w1of5, .lg .lg-w1of5 { width: 20%; }
+.w2of5, .md .md-w2of5, .lg .md-w2of5, .lg .lg-w2of5 { width: 40%; }
+.w3of5, .md .md-w3of5, .lg .md-w3of5, .lg .lg-w3of5 { width: 60%; }
+.w4of5, .md .md-w4of5, .lg .md-w4of5, .lg .lg-w4of5 { width: 80%; }
+
+.h1of1, .md .md-h1of1, .lg .md-h1of1, .lg .lg-h1of1 { height: 100%; }
+.h1of2, .md .md-h1of2, .lg .md-h1of2, .lg .lg-h1of2 { height: 50%; }
+.h1of3, .md .md-h1of3, .lg .md-h1of3, .lg .lg-h1of3 { height: 33.3333%; }
+.h2of3, .md .md-h2of3, .lg .md-h2of3, .lg .lg-h2of3 { height: 66.6667%; }
+.h1of4, .md .md-h1of4, .lg .md-h1of4, .lg .lg-h1of4 { height: 25%; }
+.h3of4, .md .md-h3of4, .lg .md-h3of4, .lg .lg-h3of4 { height: 75%; }
+.h1of5, .md .md-h1of5, .lg .md-h1of5, .lg .lg-h1of5 { height: 20%; }
+.h2of5, .md .md-h2of5, .lg .md-h2of5, .lg .lg-h2of5 { height: 40%; }
+.h3of5, .md .md-h3of5, .lg .md-h3of5, .lg .lg-h3of5 { height: 60%; }
+.h4of5, .md .md-h4of5, .lg .md-h4of5, .lg .lg-h4of5 { height: 80%; }
+/**/
+

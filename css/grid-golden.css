@@ -1,0 +1,17 @@
+
+/* grid-golden */
+.w6g, .md .md-w6g, .lg .md-w6g, .lg .lg-w6g { width: 9%; }
+.w5g, .md .md-w5g, .lg .md-w5g, .lg .lg-w5g { width: 14.6%; }
+.w4g, .md .md-w4g, .lg .md-w4g, .lg .lg-w4g { width: 23.6%; }
+.w3g, .md .md-w3g, .lg .md-w3g, .lg .lg-w3g { width: 38.2%; }
+.w2g, .md .md-w2g, .lg .md-w2g, .lg .lg-w2g { width: 61.8%; }
+.w1g, .md .md-w1g, .lg .md-w1g, .lg .lg-w1g { width: 100%; }
+
+.h6g, .md .md-h6g, .lg .md-h6g, .lg .lg-h6g { height: 9%; }
+.h5g, .md .md-h5g, .lg .md-h5g, .lg .lg-h5g { height: 14.6%; }
+.h4g, .md .md-h4g, .lg .md-h4g, .lg .lg-h4g { height: 23.6%; }
+.h3g, .md .md-h3g, .lg .md-h3g, .lg .lg-h3g { height: 38.2%; }
+.h2g, .md .md-h2g, .lg .md-h2g, .lg .lg-h2g { height: 61.8%; }
+.h1g, .md .md-h1g, .lg .md-h1g, .lg .lg-h1g { height: 100%; }
+/**/
+

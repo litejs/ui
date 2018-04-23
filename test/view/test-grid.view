@@ -1,41 +1,41 @@
 @view test-grid public
 	@css
-		.border-white, .border-white > .col, .border-white > .group > .col {
-			border-color: #fff;
+		.border-white, .border-white > .col, .border-white > .grid > .col {
+			border-color: #fff !important;
 		}
 	anim-page
 		h2 Main in the middle grid
-		.grid.gap2.border-white
-			.col.lg-6 main
-			.col.md-6.lg-3 A
-			.col.md-6.lg-3 B
-			.group
-				.col.sm-6 C
-				.col.sm-6 D
+		.grid.b2.border-white
+			.col.lg-w6 main
+			.col.md-w6.lg-w3 A
+			.col.md-w6.lg-w3 B
+			.grid.w12
+				.col.w6 C
+				.col.w6 D
 			.col E
 		h2 Test golden grid
-		.grid.gap2.border-white
-			.col.sm-g2 c1
-			.col.sm-g3 c2
-			.col.sm-g1.md-g2 c3
-			.col.sm-g1.md-g3 c4
-			.col.sm-g1.md-g2 c5
-			.col.sm-g1.md-g4 c6
-			.col.sm-g1.md-g5 c7
-			.col.sm-g1.md-g2.lg-g3 c8
-			.col.sm-g1.md-g3.lg-g5 c9
-			.col.sm-g1.md-g2.lg-g6 c10
-			.col.sm-g1.md-g4.lg-g4 c11
-			.col.sm-g1.md-g5.lg-g5 c12
+		.grid.b2.border-white
+			.col.w2g c1
+			.col.w3g c2
+			.col.w1g.md-w2g c3
+			.col.w1g.md-w3g c4
+			.col.w1g.md-w2g c5
+			.col.w1g.md-w4g c6
+			.col.w1g.md-w5g c7
+			.col.w1g.md-w2g.lg-w3g c8
+			.col.w1g.md-w3g.lg-w5g c9
+			.col.w1g.md-w2g.lg-w6g c10
+			.col.w1g.md-w4g.lg-w4g c11
+			.col.w1g.md-w5g.lg-w5g c12
 		h2 Test tiles
-		.grid.gap2.border-white
+		.grid.b2.border-white
 			&css: "height", "300px"
-			.col.sm-4.group.h2of3
-				.col.h1of2 c1
-				.col.h1of2 c2
-			.col.sm-8.h2of3 c3
-			.col.sm-8.h1of3 c6
-			.col.sm-4.h1of3 c7
+			.grid.w4.h8
+				.col.h6 c1
+				.col.h6 c2
+			.col.w8.h8 c3
+			.col.w8.h4 c6
+			.col.w4.h4 c7
 
 
 
