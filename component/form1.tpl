@@ -3,7 +3,7 @@
 		border: 0;
 		padding: 0;
 	}
-	.form1__item-del {
+	.Form1-del {
 		display: block;
 		margin: -10px -10px 0 0;
 		font-size: 20px;
@@ -18,7 +18,7 @@
 		text-align: center;
 		border-radius: 4px;
 	}
-	.form1__item-del:hover {
+	.Form1-del:hover {
 		opacity: 1;
 		border: 1px solid #aaa;
 		background-image: linear-gradient(to bottom, #ddd, #888);
@@ -146,17 +146,16 @@
 
 @el form1-row
 	label.row
-		.col-12.col-md-4.input__label {name}
-		.col-12.col-md-8
+		.col.md-w4.input__label {name}
+		.col.md-w8
 			@child
 			.input__hint {description}
 
 @el form1-subheader
-	.row
-		.col-12 {title}
+	.col {title}
 
 @el form1-fieldset
-	fieldset.grid-1
+	fieldset.grid.b2
 		legend {schema.title || _link.title}
 
 @el form1
@@ -193,7 +192,7 @@
 				&txt: item.name
 
 @el form1-array
-	.row
+	.col
 		.input.p13
 			.left {name}
 			.input__hint {description}
@@ -205,8 +204,8 @@
 
 @el form1-array-item
 	.input.p3.m2b.js-del
-		a.right.form1__item-del.hand ×
+		a.right.Form1-del.hand ×
 			&if: !data.noAdd
 			&on: "click", data.del
-		.grid-1.js-item
+		.grid.b2.js-item
 
