@@ -13,6 +13,7 @@
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(.*?)$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
+	, spaceRe = /\s+/
 	, scopeData = El.data = { _: i18n, El: El }
 	, bindings = El.bindings = {
 		"class": function(el, scope, name, fn) {
@@ -32,6 +33,8 @@
 			return render(el, Object.assign(scope, map))
 		}
 	}
+	, addClass = El.addClass = acceptMany(_addClass)
+	, rmClass  = El.rmClass  = acceptMany(_rmClass)
 
 	//** modernBrowser
 
@@ -413,30 +416,46 @@
 		return el
 	}
 
+	function acceptMany(fn) {
+		return function(el, name) {
+			if (typeof name === "string" && name !== "") {
+				var names = name.split(spaceRe)
+				, i = 0
+				, len = names.length
+
+				if (len > 1) {
+					for (; i < len; ) fn(el, names[i++])
+				} else {
+					fn(el, name)
+				}
+			}
+		}
+	}
+
 	// setAttribute("class") is broken in IE7
 	// className is object in SVGElements
 
+	El.hasClass = hasClass
 	function hasClass(el, name) {
 		var current = el.className || ""
-		, useAttr = typeof current != "string"
 
-		if (useAttr) {
+		if (typeof current !== "string") {
 			current = el.getAttribute("class") || ""
 		}
 
-		return !!current && current.split(/\s+/).indexOf(name) > -1
+		return !!current && current.split(spaceRe).indexOf(name) > -1
 	}
 
-	function addClass(el, name) {
+	function _addClass(el, name) {
 		var current = el.className || ""
-		, useAttr = typeof current != "string"
+		, useAttr = typeof current !== "string"
 
 		if (useAttr) {
 			current = el.getAttribute("class") || ""
 		}
 
 		if (current) {
-			name = current.split(/\s+/).indexOf(name) > -1 ? current : current + " " + name
+			name = current.split(spaceRe).indexOf(name) > -1 ? current : current + " " + name
 		}
 
 		if (current != name) {
@@ -446,10 +465,9 @@
 				el.className = name
 			}
 		}
-		return el
 	}
 
-	function rmClass(el, name) {
+	function _rmClass(el, name) {
 		var current = el.className || ""
 		, useAttr = typeof current != "string"
 
@@ -468,7 +486,6 @@
 			}
 		}
 
-		return el
 	}
 
 	// The addEventListener is supported in Internet Explorer from version 9.
@@ -691,8 +708,6 @@
 	El.empty = empty
 	El.kill = kill
 	El.render = render
-	El.addClass = addClass
-	El.rmClass = rmClass
 
 	Object.each(El, function(fn, key) {
 		if (!bindings[key]) {
@@ -705,7 +720,6 @@
 		if (!wrapProto[key]) addWrapProto(key)
 	})
 
-	El.hasClass = hasClass
 	El.append = append
 	El.scope = elScope
 
@@ -862,7 +876,7 @@
 			done: function() {
 				var fn
 				, t = this
-				, arr = t.name.split(/\s+/)
+				, arr = t.name.split(spaceRe)
 				, bind = getAttr(t.el, "data-bind")
 				, view = View(arr[0], t._done(), arr[1], arr[2])
 				if (bind) {
@@ -880,7 +894,7 @@
 		"view-link": plugin.extend({
 			done: function() {
 				var t = this
-				, arr = t.name.split(/\s+/)
+				, arr = t.name.split(spaceRe)
 				View(arr[0], null, arr[2])
 				.on("ping", function(opts) {
 					View.show(arr[1].format(opts))
@@ -1008,15 +1022,15 @@
 		}
 
 		if ( next != lastSize ) {
-			rmClass(root, lastSize)
-			addClass(root, lastSize = next)
+			_rmClass(root, lastSize)
+			_addClass(root, lastSize = next)
 		}
 
 		next = width > root.offsetHeight ? "landscape" : "portrait"
 
 		if ( next != lastOrient) {
-			rmClass(root, lastOrient)
-			addClass(root, lastOrient = next)
+			_rmClass(root, lastOrient)
+			_addClass(root, lastOrient = next)
 		}
 
 		next = window.View
