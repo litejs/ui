@@ -22,7 +22,6 @@
 	-webkit-box-sizing: inherit;          /* 4 */
 	   -moz-box-sizing: inherit;
 	        box-sizing: inherit;
-	touch-action: inherit;
 	-webkit-backface-visibility: inherit;
 	        backface-visibility: inherit;
 }
