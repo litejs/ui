@@ -19,6 +19,7 @@
 	bindings["if"] = bindingIf
 	function bindingIf(el, enabled) {
 		var parent = el.parentNode
+		, scope = this
 		if (enabled) {
 			parent || el._ifComm.parentNode.replaceChild(el, el._ifComm)
 		} else {
@@ -26,7 +27,7 @@
 				if (!el._ifComm) {
 					El.on(el, "kill", El.kill.bind(el, el._ifComm = document.createComment("if")))
 					el._ifComm.render = function() {
-						El.render(el, this)
+						El.render(el, scope)
 					}
 				}
 				parent.replaceChild(el._ifComm, el)
@@ -45,7 +46,7 @@
 	bindings.emitForm = emitForm
 	function emitForm(el, ev, a1, a2, a3, a4) {
 		El.on(el, "submit", function(e) {
-			var data = El.val(this)
+			var data = El.val(el)
 			View.emit(ev, e, data, a1, a2, a3, a4)
 			return Event.stop(e)
 		})

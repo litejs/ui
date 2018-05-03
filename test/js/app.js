@@ -68,13 +68,9 @@ View.on("show", function() {
 
 var _ = El.i18n
 
-El.data.history = history
-El.data.El = El
-El.data._ = _
 El.data.Fn = Fn
 El.data.Date = Date
 El.data.Math = Math
-El.data.View = View
 El.data.started = new Date()
 El.data.welcomeText = "_welcome"
 

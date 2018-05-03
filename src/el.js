@@ -14,13 +14,16 @@
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(.*?)$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, spaceRe = /\s+/
-	, scopeData = El.data = { _: i18n, El: El }
+	, scopeData = El.data = {
+		_: i18n,
+		El: El,
+		history: history,
+		View: View
+	}
 	, bindings = El.bindings = {
-		attr: function(el, key, val) {
-			setAttr(el, key, val)
-		},
-		css: function(el, key, val) {
-			El.css(el, key, val)
+		attr: setAttr,
+		css: El.css = function(el, key, val) {
+			el.style[key.camelCase()] = "" + val || ""
 		},
 		"class": function(el, name, fn) {
 			;(arguments.length < 3 || fn ? addClass : rmClass)(el, name)
@@ -35,7 +38,7 @@
 			this[name] = el
 		},
 		txt: function(el, txt) {
-			El.txt(el, txt)
+			el[txtAttr] = txt
 		},
 		val: function(el, txt) {
 			valFn(el, txt)
@@ -308,10 +311,6 @@
 	//
 	// textContent is suported from IE9
 	// Opera 9-10 have Node.text so we use Node.txt
-
-	El.css = function(el, key, val) {
-		el.style[key.camelCase()] = val || ""
-	}
 
 	El.txt = function(el, newText) {
 		return arguments.length > 1 && el[txtAttr] != newText ? (
