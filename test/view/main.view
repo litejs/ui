@@ -92,7 +92,7 @@
 			&if: Math.random() > .5
 			&txt: "If"
 		.time
-			&txt: "Init " + started.date()
+			&txt: "Init '\" " + started.date()
 		.time
 			&txt: "Load " + new Date().date()
 

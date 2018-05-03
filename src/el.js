@@ -16,6 +16,12 @@
 	, spaceRe = /\s+/
 	, scopeData = El.data = { _: i18n, El: El }
 	, bindings = El.bindings = {
+		attr: function(el, scope, key, val) {
+			setAttr(el, key, val)
+		},
+		css: function(el, scope, key, val) {
+			El.css(el, key, val)
+		},
 		"class": function(el, scope, name, fn) {
 			;(arguments.length < 4 || fn ? addClass : rmClass)(el, name)
 		},
@@ -27,6 +33,12 @@
 		},
 		ref: function(el, scope, name) {
 			scope[name] = el
+		},
+		txt: function(el, scope, txt) {
+			El.txt(el, txt)
+		},
+		val: function(el, scope, txt) {
+			valFn(el, txt)
 		},
 		"with": function(el, scope, map) {
 			// Extend existing scope, each item from list will come with its own scope
@@ -242,7 +254,7 @@
 			for (current in key) {
 				setAttr(el, current, key[current])
 			}
-			return el
+			return
 		}
 
 		/* Accept namespaced arguments
@@ -670,8 +682,10 @@
 				//** debug
 				e.message += "\nBINDING: " + bind
 				console.error(e, node)
-				if (window.onerror) window.onerror(e.message, e.fileName, e.lineNumber)
 				//*/
+				if (window.onerror) {
+					window.onerror(e.message, e.fileName, e.lineNumber)
+				}
 				return node
 			}
 		}
@@ -688,36 +702,25 @@
 		return node
 	}
 
-	function addWrapProto(key) {
-		wrapProto[key] = wrap
-		function wrap() {
-			var i = 0
-			, self = this
-			, len = self.length
-			, fn = El[key]
-			, arr = slice.call(arguments)
-			arr.unshift(1)
-			for (; i < len; ) {
-				arr[0] = self[i++]
-				fn.apply(null, arr)
-			}
-			return self
-		}
-	}
-
 	El.empty = empty
 	El.kill = kill
 	El.render = render
 
 	Object.each(El, function(fn, key) {
-		if (!bindings[key]) {
-			bindings[key] = function(el, scope) {
-				var arr = slice.call(arguments, 2)
-				arr.unshift(el)
-				fn.apply(scope, arr)
+		if (!wrapProto[key]) {
+			wrapProto[key] = function wrap() {
+				var i = 0
+				, self = this
+				, len = self.length
+				, arr = slice.call(arguments)
+				arr.unshift(1)
+				for (; i < len; ) {
+					arr[0] = self[i++]
+					fn.apply(null, arr)
+				}
+				return self
 			}
 		}
-		if (!wrapProto[key]) addWrapProto(key)
 	})
 
 	El.append = append

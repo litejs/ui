@@ -40,9 +40,9 @@
 			this.el = el
 			this.parent = parent && View(parent)
 		},
-		show: function(params) {
-			params = lastParams = params || {}
+		show: function(_params) {
 			var parent
+			, params = lastParams = _params || {}
 			, view = lastView = this
 			, tmp = params._v || view
 			, close = view.isOpen && view
