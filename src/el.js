@@ -16,33 +16,33 @@
 	, spaceRe = /\s+/
 	, scopeData = El.data = { _: i18n, El: El }
 	, bindings = El.bindings = {
-		attr: function(el, scope, key, val) {
+		attr: function(el, key, val) {
 			setAttr(el, key, val)
 		},
-		css: function(el, scope, key, val) {
+		css: function(el, key, val) {
 			El.css(el, key, val)
 		},
-		"class": function(el, scope, name, fn) {
-			;(arguments.length < 4 || fn ? addClass : rmClass)(el, name)
+		"class": function(el, name, fn) {
+			;(arguments.length < 3 || fn ? addClass : rmClass)(el, name)
 		},
-		data: function(el, scope, key, val) {
+		data: function(el, key, val) {
 			setAttr(el, "data-" + key, val)
 		},
-		html: function(el, scope, html) {
+		html: function(el, html) {
 			el.innerHTML = html
 		},
-		ref: function(el, scope, name) {
-			scope[name] = el
+		ref: function(el, name) {
+			this[name] = el
 		},
-		txt: function(el, scope, txt) {
+		txt: function(el, txt) {
 			El.txt(el, txt)
 		},
-		val: function(el, scope, txt) {
+		val: function(el, txt) {
 			valFn(el, txt)
 		},
-		"with": function(el, scope, map) {
+		"with": function(el, map) {
 			// Extend existing scope, each item from list will come with its own scope
-			return render(el, Object.assign(scope, map))
+			return render(el, Object.assign(this, map))
 		}
 	}
 	, addClass = El.addClass = acceptMany(_addClass)
@@ -668,7 +668,7 @@
 				var fn = bindings[name]
 				if (op == ":" || fn && hasOwn.call(fn, "once")) newBind = newBind.replace(match, "")
 				return fn ? (
-					"(r=b['" + name + "'](this,data" + (fn.raw ? ",'" + args + "'" : args ? "," + args : "") + ")||r),"
+					"(r=b['" + name + "'].call(data,this" + (fn.raw ? ",'" + args + "'" : args ? "," + args : "") + ")||r),"
 				) :
 				"s(this,'" + name + "'," + args + "),"
 			}) + "r)"

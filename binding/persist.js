@@ -1,5 +1,5 @@
 
-El.bindings.persist = function(el, scope, _key, surviveReboot) {
+El.bindings.persist = function(el, _key, surviveReboot) {
 	var value, save
 	, key = _key || el.id || el.name
 	, stor = surviveReboot ? "localStorage" : "sessionStorage"

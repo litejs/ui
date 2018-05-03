@@ -30,7 +30,7 @@
 		].join(" ")
 		return d
 	}
-	bindings.arc = function(el, scope, startAngle, endAngle, radius, x, y) {
+	bindings.arc = function(el, startAngle, endAngle, radius, x, y) {
 		var center = (y && x && radius) || el.viewportElement.viewBox.baseVal.width >> 1
 		// var length = path.getTotalLength();
 		el.setAttribute("d", describeArc(
@@ -41,7 +41,7 @@
 			3.6 * endAngle
 		))
 	}
-	bindings.xlink = function(el, scope, href) {
+	bindings.xlink = function(el, href) {
 		// https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2
 		el.setAttributeNS(xlinkNs, "xlink:href", href)
 	}
@@ -60,7 +60,7 @@
 	}
 	var arch1 = "a? ? 0 1 0 ? -?".split("?")
 	, arch2 = "a? ? 0 1 0 ? ?".split("?")
-	bindings.svgLine = function(el, scope, points, opts) {
+	bindings.svgLine = function(el, points, opts) {
 		opts = opts || {}
 		var i = 0
 		, dataPoints = []

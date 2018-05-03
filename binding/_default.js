@@ -12,12 +12,12 @@
 	true
 
 	bindings.fn = bindingFn
-	function bindingFn(el, scope, fn) {
+	function bindingFn(el, fn) {
 		return fn.apply(el, slice.call(arguments, 3))
 	}
 
 	bindings["if"] = bindingIf
-	function bindingIf(el, scope, enabled) {
+	function bindingIf(el, enabled) {
 		var parent = el.parentNode
 		if (enabled) {
 			parent || el._ifComm.parentNode.replaceChild(el, el._ifComm)
@@ -26,7 +26,7 @@
 				if (!el._ifComm) {
 					El.on(el, "kill", El.kill.bind(el, el._ifComm = document.createComment("if")))
 					el._ifComm.render = function() {
-						El.render(el, scope)
+						El.render(el, this)
 					}
 				}
 				parent.replaceChild(el._ifComm, el)
@@ -36,14 +36,14 @@
 	}
 
 	bindings.on = bindingOn
-	function bindingOn(el, scope, ev, fn, a1, a2, a3, a4, a5) {
+	function bindingOn(el, ev, fn, a1, a2, a3, a4, a5) {
 		El.on(el, ev, typeof fn == "string" ? function(e) {
 			View.emit(fn, e, el, a1, a2, a3, a4, a5)
 		} : fn)
 	}
 
 	bindings.emitForm = emitForm
-	function emitForm(el, scope, ev, a1, a2, a3, a4) {
+	function emitForm(el, ev, a1, a2, a3, a4) {
 		El.on(el, "submit", function(e) {
 			var data = El.val(this)
 			View.emit(ev, e, data, a1, a2, a3, a4)
@@ -65,7 +65,7 @@
 
 	bindings.each = bindingsEach
 
-	function bindingsEach(el, data, expr) {
+	function bindingsEach(el, expr) {
 		var node = el
 		, child = getChilds(node)[0]
 		, match = /^\s*(\w+) in (\w*)(.*)/.exec(expr)
@@ -82,7 +82,7 @@
 		+     "out.push(clone);"
 		+ "};return out}"
 
-		var childs = Function("hasOwn,el,data", fn)(hasOwn, child, data)
+		var childs = Function("hasOwn,el,data", fn)(hasOwn, child, this)
 
 		El.append(El.empty(node), childs)
 		El.render(node)

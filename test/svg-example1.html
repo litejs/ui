@@ -42,7 +42,7 @@ if (noSvg) {
 	alert("SVG not supported")
 }
 
-El.bindings.xlink = function(el, scope, href) {
+El.bindings.xlink = function(el, href) {
 	el.setAttributeNS(xlinkNs, "xlink:href", href)
 }
 El.bindings.xlink.once = 1
