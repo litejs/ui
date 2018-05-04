@@ -32,7 +32,7 @@
 				}
 				parent.replaceChild(el._ifComm, el)
 			}
-			return 1
+			return true
 		}
 	}
 

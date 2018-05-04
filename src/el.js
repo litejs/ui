@@ -44,8 +44,12 @@
 			valFn(el, txt)
 		},
 		"with": function(el, map) {
-			// Extend existing scope, each item from list will come with its own scope
-			return render(el, Object.assign(this, map))
+			var scope = elScope(el, this)
+			if (scope !== this) {
+				Object.assign(this, map)
+				render(el)
+				return true
+			}
 		}
 	}
 	, addClass = El.addClass = acceptMany(_addClass)
