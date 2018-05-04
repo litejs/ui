@@ -19,8 +19,13 @@
 
 		link = link || "self"
 
+		form.fill = function(model) {
+			View.blur()
+			form.fillForm(model)
+		}
+
 		xhr.getSchema(schema, function(err, schema) {
-			var i, selfHref
+			var i, selfHref, fieldset
 			, _link = schema
 
 			if (schema.links) for (i = 0; _link = schema.links[i++]; ) {
@@ -33,11 +38,15 @@
 				}
 			}
 
-			var fieldset = El(template + "-fieldset")
+			form.fillForm = fillForm
+			function fillForm(model) {
+				if (fieldset) El.kill(fieldset)
+				fieldset = El(template + "-fieldset")
+				drawSchema(schema, null, fieldset, model && model.data || null, null, scope)
+				El.append(form, fieldset)
+			}
 
-			drawSchema(schema, null, fieldset, model && model.data || null, null, scope)
-
-			El.append(form, fieldset)
+			fillForm(model)
 
 			El.on(form, "submit", function() {
 				var data = El.val(this)

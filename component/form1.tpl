@@ -32,6 +32,9 @@
 		border: 1px solid #aaa;
 		overflow: auto;
 	}
+	.field {
+		width: 100%;
+	}
 	.btn,
 	input,
 	select,
@@ -43,7 +46,6 @@
 		font-weight: 400;
 		line-height: 30px;
 		height: 32px;
-		width: 100%;
 		padding: 0 8px;
 		margin: 0;
 	}
@@ -72,7 +74,6 @@
 	input[type=submit] {                /* 1 */
 		-webkit-appearance: none;   /* 1 */
 		position: relative;
-		width: auto;
 		margin-bottom: 4px;
 		padding: 0px 14px;
 		text-align: center;

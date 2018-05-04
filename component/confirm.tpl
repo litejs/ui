@@ -84,18 +84,18 @@
 @el Confirm
 	.max.fix
 		.Confirm-bg.abs.max
-		.Confirm-content.grid-1
-			.col-12 {title}
-			.col-12.t2 {body}
+		.Confirm-content.grid.p2
+			.col {title}
+			.col.t2 {body}
 			.row.js-numpad
 				&if: code
 				&each: num in [1,2,3,4,5,6,7,8,9,"CLEAR",0]
-				.col-4>.btn {num}
-			.row &each: action in actions
-				div
-					&class:: "col-" + (12/actions.length)
+				.col.w4>.btn {num}
+			.col
+				.group &each: action in actions
 					.btn.js-btn {action.title}
+						&class:: "w" + (12/actions.length)
 						&nop: this.focus()
 						&data: "action", action.action
-						&class: "btn--" + action.action
+						&class:: "is-" + action.action, action.action
 
