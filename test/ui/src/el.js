@@ -6,6 +6,8 @@ dom.document.documentElement = {}
 
 require("../../_setup")
 
+global.history = {}
+global.View = require("../../../ui/src/view.js").View
 global.document = dom.document
 global.Element = dom.HTMLElement
 global.window = global
