@@ -101,15 +101,19 @@
 	}
 
 	function bubbleDown(params, close) {
-		var view = params._v
+		var tmp
+		, view = params._v
 		, parent = view && view.parent
 		if (!view || params._p && /{/.test(view.route)) {
 			return closeView(close)
 		}
 		if (parent && !view.isOpen || view === close) {
 			closeView(close, view)
-			view.isOpen = view.el.cloneNode(true)
-			El.append(parent.isOpen || parent.el, view.isOpen)
+			El.scope(
+				view.isOpen = view.el.cloneNode(true),
+				El.scope(tmp = parent.isOpen || parent.el)
+			)
+			El.append(tmp, view.isOpen)
 			El.render(view.isOpen)
 			parent.emit("openChild", view, close)
 			view.emit("open", params)
