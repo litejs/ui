@@ -187,7 +187,7 @@
 					{ type: "boolean", title: val.data.name },
 					"" + i,
 					content,
-					data === null ? null : map,
+					data && map || null,
 					key,
 					scope
 				)
@@ -205,7 +205,7 @@
 					itemSchema || schema.items,
 					null,
 					root,
-					data === null ? null : val || {},
+					data && val || null,
 					key + "[" + (count++) + "]",
 					scope,
 					val

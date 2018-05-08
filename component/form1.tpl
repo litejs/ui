@@ -157,7 +157,7 @@
 
 @el form1-fieldset
 	fieldset.grid.b2
-		legend {schema.title || _link.title}
+		legend {schema.title || _link.title || ""}
 
 @el form1
 	form1-row
