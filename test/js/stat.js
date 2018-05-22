@@ -13,17 +13,19 @@
 		nameData = {}
 	}
 
+	/*
+	var tab = nameData.i || set("i", Math.random().toString(36).slice(2))
 	function set(key, val) {
 		nameData[key] = val
 		window.name = JSON.stringify(nameData)
 		return val
 	}
+	*/
 
 	function isObject(obj) {
 		return obj && obj.constructor === Object
 	}
 
-	// var tab = nameData.i || set("i", Math.random().toString(36).slice(2))
 
 	View.one("show", function() {
 		// window.outerWidth - Chrome1, Firefox1, IE9, Opera9, Safari3
