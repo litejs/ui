@@ -23,7 +23,7 @@
 		return obj && obj.constructor === Object
 	}
 
-	var tab = nameData.i || set("i", Math.random().toString(36).slice(2))
+	// var tab = nameData.i || set("i", Math.random().toString(36).slice(2))
 
 	View.one("show", function() {
 		// window.outerWidth - Chrome1, Firefox1, IE9, Opera9, Safari3

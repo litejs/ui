@@ -14,85 +14,102 @@ if (self !== top) {
 }
 
 
-if (this.console && console.log) {
-	var link = /./
-	link.toString = function() {
-		return "https://en.wikipedia.org/wiki/Self-XSS"
-	}
-	console.log(
-		"%cStop!\n%cThis developer tool lets you hack and give others access only to your own account.\nSee %s for more information.",
-		"font:bold 50px monospace;color:red;text-shadow:3px 3px #000,-1px -1px #fff",
-		"font:20px sans-serif",
-		link
-	)
-}
-
-
-El.i18n.def({
-	"en": "In English",
-	"et": "Eesti keeles",
-	"ru": "На русском",
-	"fi": "Suomeksi",
-	"sv": "På Svenska",
-	"ar": "Arabic"
-	//, "lt": "Lietuviškai"
-	//, "lv": "Latviski"
-	//, "pl": "Polski"
-	//, "de": "Deutsch"
-	//, "fr": "Français"
-})
-
-El.i18n.setLang = function(lang) {
-	document.documentElement.lang = lang = _.use(lang)
-	xhr.load("lang/" + lang + ".js", function() {
-		Date.names = _("__date").split(" ")
-		String.alphabet = _("__alphabet")
-		String.ordinal = _("__ordinal")
-		String.plural = _("__plural")
-		JSON.merge(Date.masks, _("__dateMasks"))
-		document.body.dir = _("dir")
-
-		El.render(document.body)
+!function(document, navigator, View, i18n) {
+	i18n.def({
+		"ar": "Arabic",
+		"et": "Eesti keeles",
+		"fi": "Suomeksi",
+		"ru": "На русском",
+		"sv": "På Svenska",
+		//, "lt": "Lietuviškai"
+		//, "lv": "Latviski"
+		//, "pl": "Polski"
+		//, "de": "Deutsch"
+		//, "fr": "Français"
+		"en": "In English"
 	})
-}
 
-View("#body", document.body)
+	var timezone
+	, html = document.documentElement
+	, body = document.body
+	, link = /./
+	, standalone = "standalone" in navigator ?
+		navigator.standalone :
+		this.matchMedia && matchMedia("(display-mode:standalone)").matches
 
-View.on("show", function() {
-        // Re-render all .js-viewHook elements on each View change
-        El.findAll(document.body, ".js-viewRender").render()
-})
+	// Detect first available language
+	, lang = i18n.use([].concat(
+		navigator.languages, navigator.language, navigator.userLanguage,
+		"en" // Default language
+	).filter(i18n.get)[0])
 
-
-
-
-var _ = El.i18n
-
-El.data.Fn = Fn
-El.data.Date = Date
-El.data.Math = Math
-El.data.started = new Date()
-El.data.welcomeText = "_welcome"
+	// Detect base from HTML <base> element
+	, base = (html.getElementsByTagName("base")[0] || i18n).href
 
 
-El.bindings.fixReadonlyCheckbox = function(el) {
-	function False(e) {
-		console.log(this.readOnly)
-		if (this.readOnly) {
-			Event.stop(e)
-			return false
-		}
+	history.scrollRestoration = "manual"
+
+	try {
+		timezone = Intl.DateTimeFormat().resolvedOptions().timezone
+	} catch(e) {}
+
+	i18n.setLang = function(lang) {
+		html.lang = lang = i18n.use(lang)
+		xhr.load("lang/" + lang + ".js", function() {
+			Date.names = i18n("__date").split(" ")
+			String.alphabet = i18n("__alphabet")
+			String.ordinal = i18n("__ordinal")
+			String.plural = i18n("__plural")
+			Object.assign(Date.masks, i18n("__dateMasks"))
+			body.dir = i18n("dir")
+
+			El.render(body)
+		})
 	}
-	El.on(el, "click", False)
-	El.on(el, "mousedown", False)
-}
-El.bindings.fixReadonlyCheckbox.once = 1
 
-El.bindings.init = function() {}
-El.bindings.init.once = 1
-El.bindings.run = function() {}
 
-!function(View, navigator) {
+	// Define `#body` view, it is a starting point for us.
+	// It could be any element on page but we want to start from `BODY`.
+	View("#body", body)
+
+	View.on("show", function() {
+		// Re-render all .js-viewHook elements on each View change
+		El.findAll(body, ".js-viewRender").render()
+	})
+
+
+
+
+
+
+	document.title = "Litejs Example"
+
+	window._ = i18n
+
+	El.data.Fn = Fn
+	El.data.Date = Date
+	El.data.Math = Math
+	El.data.started = new Date()
+	El.data.welcomeText = "_welcome"
+
+
+	El.bindings.fixReadonlyCheckbox = function(el) {
+		function False(e) {
+			console.log(this.readOnly)
+			if (this.readOnly) {
+				Event.stop(e)
+				return false
+			}
+		}
+		El.on(el, "click", False)
+		El.on(el, "mousedown", False)
+	}
+	El.bindings.fixReadonlyCheckbox.once = 1
+
+	El.bindings.init = function() {}
+	El.bindings.init.once = 1
+	El.bindings.run = function() {}
+
 	var user
 
 	View.on("login", function(e, data) {
@@ -143,14 +160,11 @@ El.bindings.run = function() {}
 		T: history.setUrl.bind(null, "test")
 	})
 
-	document.title = "Litejs Example"
 
-	// Add `#body` view, it is a starting point for us.
-	// It could be any element on page but we want to start from `BODY`.
-	View("#body", document.body)
+	View("#body")
 	.on("ping", function() {
 		El.data.user = user
-		El.findAll(document.body, ".Menu,.lang").render()
+		El.findAll(body, ".Menu,.lang").render()
 	})
 
 	View("#private")
@@ -202,37 +216,9 @@ El.bindings.run = function() {}
 	})
 
 
-	var timezone
-	, standalone = "standalone" in navigator ?
-		navigator.standalone :
-		window.matchMedia && window.matchMedia("(display-mode:standalone)").matches
 
-	// Detect first available language
-	, lang = _.use([].concat(
-		navigator.languages, navigator.language, navigator.userLanguage, "en"
-	).filter(_.get)[0])
 
-	// Detect base from HTML <base> element
-	, base = (document.documentElement.getElementsByTagName("base")[0] || lang).href
-
-	try {
-		timezone = Intl.DateTimeFormat().resolvedOptions().timezone
-	} catch(e) {}
-
-	// Preload lang and views
-	xhr.load([
-		"lang/" + lang + ".js",
-		"component/form1.tpl",
-		"component/confirm.tpl",
-		"component/Segment7.tpl",
-		"view/main.view"
-	], init)
-
-	function init() {
-		_.setLang(lang)
-		// Start a router to show views
-		history.start(View.show, base && base.replace(/.*:\/\/[^/]*|[^\/]*$/g, ""))
-	}
+	i18n.setLang(lang)
 
 	El.on(document.body, "click", function(e) {
 		var target = e.target
@@ -252,28 +238,27 @@ El.bindings.run = function() {}
 
 
 
-	/*
-
-
-	xhr.load(["js/test-load1.js", "js/test-load1.js", "//www.litejs.com/pub/crypto.js", "js/test-load1.js"], loadDone)
-	xhr.load(["js/test-load1.js", "js/test-load2.js", "js/test-load1.js"], loadDone)
-	xhr.load(["js/test-load1.js", "js/test-load2.js"], loadDone)
-
-	function loadDone(files, res) {
-		window.console && console.log("load done", files, res.map(function(str) {
-			return crypto.sha1 && crypto.sha1("blob " + str.length + "\0" + str)
-		}))
+	if (standalone) {
+		El.addClass(html, "is-app")
 	}
-	*/
-
-	// Read in templates from element with id=index
-	//El.include("index")
 
 
+	xhr.load(El.findAll(body, "script[type='litejs/view']").pluck("src"), function() {
+		// Start a router to show views
+		history.start(View.show, base && base.replace(/.*:\/\/[^/]*|[^\/]*$/g, ""))
+	})
 
-}(View, navigator)
-
-
-
+	if (this.console && console.log) {
+		link.toString = function() {
+			return "https://en.wikipedia.org/wiki/Self-XSS"
+		}
+		console.log(
+			"%cStop!\n%cThis developer tool lets you hack and give others access only to your own account.\nSee %s for more information.",
+			"font:bold 50px monospace;color:red;text-shadow:3px 3px #000,-1px -1px #fff",
+			"font:20px sans-serif",
+			link
+		)
+	}
+}(document, navigator, View, El.i18n)
 
 
