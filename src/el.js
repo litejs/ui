@@ -59,7 +59,7 @@
 
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	, ie678 = !+"\v1"
-	, ie67 = ie678 && /* istanbul ignore next: IE fix */ (document.documentMode|0) < 8
+	, ie67 = ie678 && (document.documentMode | 0) < 8
 
 	, matches = El.matches = body.matches ?
 		function(el, sel) {
@@ -159,6 +159,15 @@
 			return new ElWrap(find(el, sel))
 		}
 	}
+
+	/*/
+	, closest = proto.closest
+
+	proto.find = proto.querySelector
+	proto.findAll = function(sel) {
+		return new ElWrap(this.querySelectorAll(sel))
+	}
+	//*/
 
 	/**
 	 * Turns CSS selector like syntax to DOM Node

@@ -26,7 +26,6 @@
 		return obj && obj.constructor === Object
 	}
 
-
 	View.one("show", function() {
 		// window.outerWidth - Chrome1, Firefox1, IE9, Opera9, Safari3
 		var stat = {
