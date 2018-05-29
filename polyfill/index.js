@@ -43,7 +43,7 @@
 
 	// Object.assign ( target, source ) in ECMAScript 6
 	// Chrome 45, Firefox 34, IE Edge
-	add("assign", "for(P=1;b=arguments[P++];)for(c in b)if(o.call(b,c))a[c]=b[c];return a")
+	add("assign", "var t,k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 
 	// Array extensions
 	// ----------------
