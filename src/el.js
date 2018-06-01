@@ -13,7 +13,7 @@
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(.*?)$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
-	, spaceRe = /\s+/
+	, splitRe = /[,\s]+/
 	, scopeData = El.data = {
 		_: i18n,
 		El: El,
@@ -441,7 +441,7 @@
 	function acceptMany(fn) {
 		return function(el, name) {
 			if (typeof name === "string" && name !== "") {
-				var names = name.split(spaceRe)
+				var names = name.split(splitRe)
 				, i = 0
 				, len = names.length
 
@@ -465,7 +465,7 @@
 			current = el.getAttribute("class") || ""
 		}
 
-		return !!current && current.split(spaceRe).indexOf(name) > -1
+		return !!current && current.split(splitRe).indexOf(name) > -1
 	}
 
 	function _addClass(el, name) {
@@ -477,7 +477,7 @@
 		}
 
 		if (current) {
-			name = current.split(spaceRe).indexOf(name) > -1 ? current : current + " " + name
+			name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
 		}
 
 		if (current != name) {
@@ -889,7 +889,7 @@
 			done: function() {
 				var fn
 				, t = this
-				, arr = t.name.split(spaceRe)
+				, arr = t.name.split(splitRe)
 				, bind = getAttr(t.el, "data-bind")
 				, view = View(arr[0], t._done(), arr[1], arr[2])
 				if (bind) {
@@ -907,7 +907,7 @@
 		"view-link": plugin.extend({
 			done: function() {
 				var t = this
-				, arr = t.name.split(spaceRe)
+				, arr = t.name.split(splitRe)
 				View(arr[0], null, arr[2])
 				.on("ping", function(opts) {
 					View.show(arr[1].format(opts))
