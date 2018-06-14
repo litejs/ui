@@ -153,6 +153,7 @@ button,
 .sm .sm-hidden,
 .md .md-hidden,
 .lg .lg-hidden,
+.empty-hidden:empty,
 .hidden {
 	display: none !important;
 	visibility: hidden;
