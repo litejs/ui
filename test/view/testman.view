@@ -4,11 +4,11 @@
 	anim-page
 		h2 Testman
 		div
-			&class: "hidden", !describe.result
+			&class: "hide", !describe.result
 			div * Refresh to test again
 			a.btn[href="#testman/lcov"] See code coverage
 		div
-			&class: "hidden", !!describe.result
+			&class: "hide", !!describe.result
 			.btn Run
 				&on: "click", Fn("test()")
 		pre.code

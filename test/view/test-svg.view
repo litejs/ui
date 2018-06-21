@@ -23,7 +23,7 @@
 @view test-svg public
 	anim-page
 		h2 SVG
-		svg[viewBox="0 0 60 60"][height=128][width=128].hidden
+		svg[viewBox="0 0 60 60"][height=128][width=128].hide
 			def
 				g#cir
 					circle[cx=30][cy=30][r=30]

@@ -150,11 +150,11 @@ button,
 	min-height: 100%;
 }
 
-.sm .sm-hidden,
-.md .md-hidden,
-.lg .lg-hidden,
-.empty-hidden:empty,
-.hidden {
+.sm .sm-hide,
+.md .md-hide,
+.lg .lg-hide,
+.hide-empty:empty,
+.hide {
 	display: none !important;
 	visibility: hidden;
 }

@@ -346,7 +346,7 @@
 
 @el Checkbox
 	label.Checkbox
-		input[type=checkbox].hidden
+		input[type=checkbox].hide
 		i.Checkbox-icon.waves
 
 @el Button
