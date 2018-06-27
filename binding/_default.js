@@ -21,7 +21,7 @@
 		var parent = el.parentNode
 		, scope = this
 		if (enabled) {
-			parent || el._ifComm.parentNode.replaceChild(el, el._ifComm)
+			parent || el._ifComm && el._ifComm.parentNode.replaceChild(el, el._ifComm)
 		} else {
 			if (parent) {
 				if (!el._ifComm) {

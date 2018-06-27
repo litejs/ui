@@ -8,8 +8,6 @@
 		margin: -10px -10px 0 0;
 		font-size: 20px;
 		font-weight: 700;
-		color: #000;
-		text-shadow: 0 1px 0 #fff;
 		opacity: .2;
 		border: 1px solid transparent;
 		line-height: 16px;
@@ -74,7 +72,6 @@
 	input[type=submit] {                /* 1 */
 		-webkit-appearance: none;   /* 1 */
 		position: relative;
-		margin-bottom: 4px;
 		padding: 0px 14px;
 		text-align: center;
 		text-decoration: none;

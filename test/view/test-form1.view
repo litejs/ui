@@ -8,60 +8,60 @@
 @view test-form1 public
 	anim-page
 		h2 Test form 1
-		form-js.grid-1[data-expect='{"name":"smith","pet":"dog"}'] &on:"submit", "logForm"
-			.col-1of3>input[name="name"][value="smith"]
-			.col-1of3
+		form-js.grid.p1[data-expect='{"name":"smith","pet":"dog"}'] &on:"submit", "logForm"
+			.col.w4>input[name="name"][value="smith"]
+			.col.w4
 				select[name="pet"]
 					option[value=cat] Cat
 					option[value=dog]:selected Dog
 					option Bird
 					option:disabled Snake
 					option
-			.col-1of3>input[type="submit"]
+			.col.w4>input[type="submit"]
 		h2 Test 2
-		form-js.grid-1[data-expect='{"user":{"email":"jsmith@example.com","pets":["cat","dog",null]}}'] &on:"submit", "logForm"
-			.col-1of3>input[name="user[email]"][value="jsmith@example.com"]
-			.col-1of3
+		form-js.grid.p1[data-expect='{"user":{"email":"jsmith@example.com","pets":["cat","dog",null]}}'] &on:"submit", "logForm"
+			.col.w4>input[name="user[email]"][value="jsmith@example.com"]
+			.col.w4
 				input[name="user[pets][]"][type="checkbox"][value="cat"]:checked
 				input[name="user[pets][]"][type="checkbox"][value="dog"]:checked
 				input[name="user[pets][]"][type="checkbox"][value="bird"]:readonly
 				input[name="user[pets][]"][type="checkbox"]:disabled
 				input[name="user[pets][]"][type="checkbox"]:disabled:checked
-			.col-1of3>input[type="submit"]
+			.col.w4>input[type="submit"]
 		h2 Test 3
-		form-js.grid-1[data-expect='{"user":{"email":"jsmith@example.com","pets":{"a":"cat","b":"dog","c":null}}}'] &on:"submit", "logForm"
-			.col-1of3>input[name="user[email]"][value="jsmith@example.com"]
-			.col-1of3
+		form-js.grid.p1[data-expect='{"user":{"email":"jsmith@example.com","pets":{"a":"cat","b":"dog","c":null}}}'] &on:"submit", "logForm"
+			.col.w4>input[name="user[email]"][value="jsmith@example.com"]
+			.col.w4
 				input[name="user[pets][a]"][type="checkbox"][value="cat"]:checked
 				input[name="user[pets][b]"][type="checkbox"][value="dog"]:checked
 				checkbox[name="user[pets][c]"][value="bird"]:readonly
 				input[name="user[pets][d]"][type="checkbox"]:disabled
 				input[name="user[pets][e]"][type="checkbox"]:disabled:checked
-			.col-1of3>input[type="submit"]
+			.col.w4>input[type="submit"]
 		h2 Test 4
-		form-js.grid-1[data-expect='{"user":{"email":"jsmith@example.com","pet":"dog"}}'] &on:"submit", "logForm"
-			.col-1of3>input[name="user[email]"][value="jsmith@example.com"]
-			.col-1of3
+		form-js.grid.p1[data-expect='{"user":{"email":"jsmith@example.com","pet":"dog"}}'] &on:"submit", "logForm"
+			.col.w4>input[name="user[email]"][value="jsmith@example.com"]
+			.col.w4
 				input[name="user[pet]"][type="radio"][value="cat"]
 				input[name="user[pet]"][type="radio"][value="dog"]:checked
 				input[name="user[pet]"][type="radio"][value="bird"]:readonly
 				input[name="user[pet]"][type="radio"]:disabled
-			.col-1of3>input[type="submit"]
+			.col.w4>input[type="submit"]
 		h2 Test 5
-		form-js.grid-1[data-expect='{"name":"smith","pets":["dog"]}'] &on:"submit", "logForm"
-			.col-1of3>input[name="name"][value="smith"]:readonly
-			.col-1of3
+		form-js.grid.p1[data-expect='{"name":"smith","pets":["dog"]}'] &on:"submit", "logForm"
+			.col.w4>input[name="name"][value="smith"]:readonly
+			.col.w4
 				select[name="pets"]:multiple:readonly
 					option[value=cat] Cat
 					option[value=dog]:selected Dog
 					option Bird
 					option:disabled Snake
 					option
-			.col-1of3>input[type="submit"]
+			.col.w4>input[type="submit"]
 		h2 Test 6
-		form-js.grid-1[data-expect='{"name1":"readonly","name3":"Dog","pets":"dog"}'] &on:"submit", "logForm"
-			.col-1of3>input[name="name1"][value="readonly"]:readonly
-			.col-1of3
+		form-js.grid.p1[data-expect='{"name1":"readonly","name3":"Dog","pets":"dog"}'] &on:"submit", "logForm"
+			.col.w4>input[name="name1"][value="readonly"]:readonly
+			.col.w4
 				input[name="name2"][value="disabled"].m1b:disabled
 				input[name="name3"][value="Dog"].m1b
 				select[name="pets"]
@@ -70,11 +70,11 @@
 					option Bird
 					option:disabled Snake
 					option
-			.col-1of3>input[type="submit"]
+			.col.w4>input[type="submit"]
 		h2 Test 7
-		form-js.grid-1[data-expect='{"name1":"readonly"}'] &on:"submit", "logForm"
-			.col-1of3>input[name="name1"]
-			.col-1of3
+		form-js.grid.p1[data-expect='{"name1":"readonly"}'] &on:"submit", "logForm"
+			.col.w4>input[name="name1"]
+			.col.w4
 				textarea[name="name2"] &persist: "name2"
-			.col-1of3>input[type="submit"]
+			.col.w4>input[type="submit"]
 

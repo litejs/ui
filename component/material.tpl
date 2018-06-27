@@ -302,6 +302,12 @@
 			if (close) return
 			lastMenuTarget = target
 			openMenu = El(menu)
+			if (openMenu.style.transform !== void 0) {
+				El.addClass(openMenu, "no-events")
+				El.on(openMenu, "transitionend", function(e) {
+					if (openMenu && e.propertyName === "transform") El.rmClass(openMenu, "no-events")
+				})
+			}
 			El.scope(openMenu, El.scope(target))
 			El.append(document.body, openMenu)
 			El.render(openMenu)
