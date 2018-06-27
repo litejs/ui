@@ -89,5 +89,16 @@
 		El.render(node)
 		return node
 	}
+
+	bindings.focus = function(el) {
+		el.focus()
+	}
+
+	bindings.href = function(el, url) {
+		if (url) {
+			var chr = url.charAt(0)
+			el.href = chr === "+" || chr === "%" ? "#" + View.url(url) : url
+		}
+	}
 }(El.bindings)
 
