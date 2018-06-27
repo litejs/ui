@@ -184,10 +184,10 @@
 	View.def = function(str) {
 		for (var match, re = /(\S+) (\S+)/g; match = re.exec(str);) {
 			match[1].split(",").map(function(view) {
-				view = View(defMap(view))
+				view = View(defMap(view, lastStr))
 				view.file = (view.file ? view.file + "," : "") +
 				match[2].split(",").map(function(file) {
-					return views[file] ? views[file].file : defMap(file)
+					return views[file] ? views[file].file : defMap(file, lastStr)
 				})
 			})
 		}
@@ -204,12 +204,16 @@
 		} catch(e) {}
 	}
 
-	function defMap(str) {
+	View.url = defMap
+	function defMap(str, _last) {
 		var chr = str.charAt(0)
 		, slice = str.slice(1)
-		return chr == "+" ? lastStr + slice :
-		chr == "%" ? ((chr = lastStr.lastIndexOf(slice.charAt(0))), (chr > 0 ? lastStr.slice(0, chr) : lastStr)) + slice :
-		(lastStr = str)
+		, last = _last || lastUrl
+		return (
+			chr === "+" ? last + slice :
+			chr === "%" ? ((chr = last.lastIndexOf(slice.charAt(0))), (chr > 0 ? last.slice(0, chr) : last)) + slice :
+			(lastStr = str)
+		)
 	}
 
 }(this)
