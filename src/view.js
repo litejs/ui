@@ -1,7 +1,7 @@
 
 
 
-!function(exports) {
+!function(window) {
 	var fn, lastView, lastParams, lastStr, lastUrl, syncResume
 	, fnStr = ""
 	, reStr = ""
@@ -10,16 +10,22 @@
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 
+	window.View = View
+
 	function View(route, el, parent) {
 		var view = views[route]
 		if (view) {
-			if (el) view.init(el, parent)
+			if (el) {
+				view.el = el
+				view.parent = parent && View(parent)
+			}
 			return view
 		}
 		view = this
 		if (!(view instanceof View)) return new View(route, el, parent)
 		views[view.route = route] = view
-		view.init(el, parent)
+		view.el = el
+		view.parent = parent && View(parent)
 
 		if (route.charAt(0) != "#") {
 			var params = "u[" + (view.seq = groupsCount++) + "]?("
@@ -36,10 +42,6 @@
 	}
 
 	View.prototype = {
-		init: function(el, parent) {
-			this.el = el
-			this.parent = parent && View(parent)
-		},
 		show: function(_params) {
 			var parent
 			, params = lastParams = _params || {}
@@ -209,7 +211,6 @@
 		chr == "%" ? ((chr = lastStr.lastIndexOf(slice.charAt(0))), (chr > 0 ? lastStr.slice(0, chr) : lastStr)) + slice :
 		(lastStr = str)
 	}
-	exports.View = View
 
 }(this)
 
