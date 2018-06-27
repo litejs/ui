@@ -658,7 +658,7 @@
 		}
 	}
 
-	function render(node, scope, skipSelf) {
+	function render(node, scope) {
 		var bind, newBind, fn
 
 		if (node.nodeType != 1) {
@@ -667,7 +667,7 @@
 
 		scope = elScope(node, 0, scope)
 
-		if (bind = !skipSelf && getAttr(node, "data-bind")) {
+		if (bind = getAttr(node, "data-bind")) {
 			newBind = bind
 			// i18n(bind, lang).format(scope)
 			// document.documentElement.lang
