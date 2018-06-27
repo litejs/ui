@@ -180,7 +180,7 @@
 
 	window.El = El
 
-	function El(name, args, silence) {
+	function El(name) {
 		if (typeof name != "string") {
 			return new ElWrap(name)
 		}
@@ -210,8 +210,7 @@
 			setAttr(el, pre)
 		}
 
-		return silence || !args ? el :
-		(args.constructor == Object ? setAttr : append)(el, args)
+		return el
 	}
 
 	function ElWrap(nodes) {

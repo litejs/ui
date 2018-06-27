@@ -84,7 +84,7 @@
 				if (key !== null) {
 					namePrefix = namePrefix ? namePrefix + "[" + key + "]" : key
 					if (schema.title) {
-						El.append(fieldset, El(template + "-subheader", schema.title))
+						El.append(fieldset, El.append(El(template + "-subheader"), schema.title))
 					}
 				}
 			}
