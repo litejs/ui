@@ -14,12 +14,6 @@
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(.*?)$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, splitRe = /[,\s]+/
-	, scopeData = El.data = {
-		_: i18n,
-		El: El,
-		history: history,
-		View: View
-	}
 	, bindings = El.bindings = {
 		attr: setAttr,
 		css: El.css = function(el, key, val) {
@@ -51,6 +45,14 @@
 				return true
 			}
 		}
+	}
+	, scopeData = El.data = {
+		_: i18n,
+		_b: bindings,
+		_m: [],
+		El: El,
+		history: history,
+		View: View
 	}
 	, addClass = El.addClass = acceptMany(_addClass)
 	, rmClass  = El.rmClass  = acceptMany(_rmClass)
@@ -659,33 +661,39 @@
 	}
 
 	function render(node, scope) {
-		var bind, newBind, fn
+		var bind, fn
+		, i = 0
 
 		if (node.nodeType != 1) {
-			return node.render ? node.render(scope) : node
+			node.render ? node.render(scope) : node
+			return
 		}
 
 		scope = elScope(node, 0, scope)
 
 		if (bind = getAttr(node, "data-bind")) {
-			newBind = bind
+			scope._t = bind
 			// i18n(bind, lang).format(scope)
 			// document.documentElement.lang
 			// document.getElementsByTagName('html')[0].getAttribute('lang')
 
 			fn = "data b s r->data&&(" + bind.replace(renderRe, function(match, name, op, args) {
+				scope._m[i] = match
 				var fn = bindings[name]
-				if (op == ":" || fn && hasOwn.call(fn, "once")) newBind = newBind.replace(match, "")
-				return fn ? (
-					"(r=b['" + name + "'].call(data,this" + (fn.raw ? ",'" + args + "'" : args ? "," + args : "") + ")||r),"
-				) :
-				"s(this,'" + name + "'," + args + "),"
+				return (
+					(op == ":" || fn && hasOwn.call(fn, "once")) ?
+					"s(this,'data-bind',data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
+					""
+				) + (
+					fn ?
+					"b['" + name + "'].call(data,this" + (fn.raw ? ",'" + args + "'" : args ? "," + args : "") + ")||" :
+					"s(this,'" + name + "'," + args + ")||"
+				)
 			}) + "r)"
-			if (bind != newBind) setAttr(node, "data-bind", newBind)
 
 			try {
 				if (Fn(fn, node, scope)(scope, bindings, setAttr)) {
-					return node
+					return
 				}
 			} catch (e) {
 				//** debug
@@ -695,12 +703,11 @@
 				if (window.onerror) {
 					window.onerror(e.message, e.fileName, e.lineNumber)
 				}
-				return node
 			}
 		}
 
-		for (bind = node.firstChild; bind; bind = newBind) {
-			newBind = bind.nextSibling
+		for (bind = node.firstChild; bind; bind = fn) {
+			fn = bind.nextSibling
 			render(bind, scope)
 		}
 		//** modernBrowser
@@ -708,7 +715,6 @@
 			node.parentNode.insertBefore(node, node)
 		}
 		//*/
-		return node
 	}
 
 	El.empty = empty
@@ -1061,9 +1067,11 @@
 	//** i18n
 	function i18n(text, lang) {
 		lang = i18n[i18nGet(lang) || currentLang]
-		return lang[text] ||
-		text && lang[text = text.slice(text.indexOf(":") + 1) || text] ||
-		text || ""
+		return (
+			lang[text] ||
+			typeof text === "string" && lang[text = text.slice(text.indexOf(":") + 1) || text] ||
+			text || ""
+		)
 	}
 	El.i18n = i18n
 

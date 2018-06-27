@@ -39,9 +39,9 @@
 		}
 		var code = ""
 		, el = El("Confirm")
-		, scope = El.scope(el, opts || El.data)
+		, scope = El.scope(el, El.data)
 		, kbMap = { esc: resolve }
-		scope._ = El.i18n
+		Object.assign(scope, opts)
 		scope.title = title || "Confirm?"
 		if (!scope.actions) scope.actions = [
 			{ title: "Cancel" },
