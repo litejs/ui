@@ -5,19 +5,74 @@
 	var hasOwn = Object.prototype.hasOwnProperty
 	, slice = Array.prototype.slice
 
+	bindingEvery.once =
+	emitForm.once =
 	bindingFn.once =
 	bindingOn.once =
-	emitForm.once =
 	bindingsEach.raw = bindingsEach.once =
 	true
+
+	bindings.every = bindingEvery
+	function bindingEvery(el, list, attrName) {
+		var len = 0
+		, data = this
+		, parent = el.parentNode
+		, comm = document.createComment("every " + list)
+
+		parent.replaceChild(comm, el)
+
+		if (list) {
+			if (typeof list === "string") {
+				data.model.on("change:" + list, render)
+				render()
+			} else if (list.eachLive) {
+				list.eachLive(add, remove)
+			} else {
+				comm.render = render
+				render()
+			}
+		}
+		return true
+
+		function render() {
+			for (; len; len--) {
+				El.kill(comm.previousSibling)
+			}
+			Object.each(typeof list === "string" ? data.model.get(list) : list, add)
+		}
+
+		function add(item, i) {
+			len++
+			var up
+			, clone = el.cloneNode(true)
+			, scope = El.scope(clone, data)
+			scope.i = i
+			scope[attrName || "item"] = item
+			El.append(parent, clone, comm)
+			El.render(clone, scope)
+			if (typeof item.on === "function") {
+				item.on("change", up = El.render.bind(clone, clone))
+				El.on(clone, "kill", function() {
+					item.off("change", up)
+				})
+			}
+		}
+
+		function remove(pos) {
+			for (var el = comm, i = pos + 1; i--; ) {
+				el = el.previousSibling
+			}
+			El.kill(el)
+		}
+	}
 
 	bindings.fn = bindingFn
 	function bindingFn(el, fn) {
 		return fn.apply(el, slice.call(arguments, 3))
 	}
 
-	bindings["if"] = bindingIf
-	function bindingIf(el, enabled) {
+	bindings["if"] = bindingsIf
+	function bindingsIf(el, enabled) {
 		var parent = el.parentNode
 		, scope = this
 		if (enabled) {
@@ -33,6 +88,34 @@
 				parent.replaceChild(el._ifComm, el)
 			}
 			return true
+		}
+	}
+
+	bindings.is = function bindingIs(node, model, path, list) {
+		var i, match, key, val
+		, scope = this
+		if (typeof model === "string") {
+			list = path
+			path = model
+			model = scope.model
+		}
+		if (model && path) {
+			match = val = model.get(path)
+			if (list) {
+				if (!Array.isArray(list)) {
+					list = list.split(",")
+				}
+				i = list.length & -2
+
+				for (; i > -1; i -= 2) {
+					if (i == 0 || list[i - 1] == "" + val || +list[i - 1] <= val) {
+						match = list[i]
+						break
+					}
+				}
+			}
+			El.rmClass(node, scope["_is-" + path])
+			El.addClass(node, scope["_is-" + path] = match && "is-" + match)
 		}
 	}
 
