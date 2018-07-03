@@ -96,9 +96,6 @@ testman
 
 .htmlSimilar(El(""),               "<div></div>")
 .htmlSimilar(El("div"),            "<div></div>")
-.htmlSimilar(El("", "element"),    "<div>element</div>")
-.htmlSimilar(El("div", "element"), "<div>element</div>")
-.htmlSimilar(El("p", "element"),   "<p>element</p>")
 .htmlSimilar(El("#123"),           '<div id="123"></div>')
 
 .htmlSimilar(El("div#123"),        '<div id="123"></div>')
@@ -329,13 +326,24 @@ testman
 .htmlSimilar(El("test8"), '<a><b><i></i></b></a>')
 .htmlSimilar(El("test9"), '<a><b><i>link</i></b></a>')
 
-.it ( "should render bindings" )
-.htmlSimilar(t1 = El("test10"),
-	"<a><b data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\"></i></b></a>")
-.htmlSimilar(El.render(t1, {i:1,name:"world"}),
-	"<a><b data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\">world</i></b></a>")
-.htmlSimilar(El.render(t1, {i:2,name:"moon"}),
-	"<a><b class=\"red\" data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\">moon</i></b></a>")
+.it ( "should render bindings" , function(assert) {
+	var el = El("test10")
+
+	assert.htmlSimilar(el,
+		"<a><b data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\"></i></b></a>")
+
+	El.render(el, {i:1,name:"world"})
+
+	assert.htmlSimilar(el,
+		"<a><b data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\">world</i></b></a>")
+
+	El.render(el, {i:2,name:"moon"})
+
+	assert.htmlSimilar(el,
+		"<a><b class=\"red\" data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\">moon</i></b></a>")
+
+	assert.end()
+})
 /*
 	htmlSimilar(El.tpl("div &css: 'margin-top', '1px'").render(),
 		'<div data-bind="css: \'margin-top\', \'1px\'" style="margin-top: 1px"></div>')

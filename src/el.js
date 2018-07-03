@@ -46,10 +46,10 @@
 			}
 		}
 	}
+	, bindMatch = []
 	, scopeData = El.data = {
 		_: i18n,
 		_b: bindings,
-		_m: [],
 		El: El,
 		history: history,
 		View: View
@@ -672,6 +672,7 @@
 		scope = elScope(node, 0, scope)
 
 		if (bind = getAttr(node, "data-bind")) {
+			scope._m = bindMatch
 			scope._t = bind
 			// i18n(bind, lang).format(scope)
 			// document.documentElement.lang
