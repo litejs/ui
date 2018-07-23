@@ -172,6 +172,10 @@
 	form1-row
 		input.field[type=password]
 
+@el form1-new-password
+	form1-row
+		input.field[type=password][autocomplete=new-password]
+
 @el form1-text
 	form1-row
 		textarea.field
