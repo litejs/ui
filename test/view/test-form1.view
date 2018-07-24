@@ -75,6 +75,6 @@
 		form-js.grid.p1[data-expect='{"name1":"","name2":""}'] &on:"submit", "logForm"
 			.col.w4>input[name="name1"]
 			.col.w4
-				textarea[name="name2"] &persist: "name2"
+				textarea[name="name2"] &persist
 			.col.w4>input[type="submit"]
 
