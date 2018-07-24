@@ -92,7 +92,7 @@
 	}
 
 	bindings.is = function bindingIs(node, model, path, list) {
-		var i, match, key, val
+		var i, match, val
 		, scope = this
 		if (typeof model === "string") {
 			list = path

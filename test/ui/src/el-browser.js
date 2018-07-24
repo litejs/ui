@@ -190,7 +190,7 @@ testman
 
 .it ("has val() method")
 .anyOf(El.val(input), ["", undef])
-.equal(El.val(input, "xx"), "xx")
+.equal(El.val(input, "xx"), undef)
 .anyOf(El.val(select), ["", undef])
 .equal(El.val(radio), null)
 .notOk(function() {
