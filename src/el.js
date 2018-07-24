@@ -340,7 +340,7 @@
 		, i = 0
 		, type = el.type
 		, opts = el.options
-		, checkbox = type == "checkbox" || type == "radio"
+		, checkbox = type === "checkbox" || type === "radio"
 
 		if (el.tagName === "FORM") {
 			opts = {}
@@ -371,34 +371,32 @@
 
 		if (arguments.length > 1) {
 			if (opts) {
-				val = (Array.isArray(val) ? val : [ val ]).map(String)
-				for (type = 0; el = opts[type++]; ) {
-					el.selected = val.indexOf(el.value) > -1
+				value = (Array.isArray(val) ? val : [ val ]).map(String)
+				for (; input = opts[i++]; ) {
+					input.selected = value.indexOf(input.value) > -1
 				}
-				return val
+			} else {
+				checkbox ? (el.checked = !!val) : (el.value = val)
 			}
-			return checkbox ?
-			(el.checked = !!val) :
-			(el.value = val)
+			return
 		}
 
 		if (opts) {
-			if (type == "select-multiple") {
-				val = []
-				for (type = 0; el = opts[type++]; ) {
-					if (el.selected && !el.disabled) {
-						val.push(el.valObject || el.value)
+			if (type === "select-multiple") {
+				for (val = []; input = opts[i++]; ) {
+					if (input.selected && !input.disabled) {
+						val.push(input.valObject || input.value)
 					}
 				}
 				return val
 			}
 			// IE8 throws error when accessing to options[-1]
-			val = el.selectedIndex
-			el = val > -1 && opts[val] || el
+			value = el.selectedIndex
+			el = value > -1 && opts[value] || el
 		}
 
 		return checkbox && !el.checked ?
-		(type == "radio" ? void 0 : null) :
+		(type === "radio" ? void 0 : null) :
 		el.valObject || el.value
 	}
 

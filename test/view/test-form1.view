@@ -72,7 +72,7 @@
 					option
 			.col.w4>input[type="submit"]
 		h2 Test 7
-		form-js.grid.p1[data-expect='{"name1":"readonly"}'] &on:"submit", "logForm"
+		form-js.grid.p1[data-expect='{"name1":"","name2":""}'] &on:"submit", "logForm"
 			.col.w4>input[name="name1"]
 			.col.w4
 				textarea[name="name2"] &persist: "name2"

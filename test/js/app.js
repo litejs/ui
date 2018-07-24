@@ -146,9 +146,9 @@ if (self !== top) {
 		var data = El.val(el)
 		, matches = El.attr(el, "data-expect") == JSON.stringify(data)
 		if (matches) {
-			console.log("logForm", matches, JSON.stringify(data), data)
+			console.log("logForm", matches, JSON.stringify(data))
 		} else {
-			console.error("logForm", matches, JSON.stringify(data),"!==",El.attr(el, "data-expect"), data)
+			console.error("logForm", JSON.stringify(data),"!==",El.attr(el, "data-expect"), data)
 		}
 	})
 
