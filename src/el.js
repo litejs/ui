@@ -438,16 +438,16 @@
 	}
 
 	function acceptMany(fn) {
-		return function(el, name) {
+		return function(el, name, val) {
 			if (typeof name === "string" && name !== "") {
 				var names = name.split(splitRe)
 				, i = 0
 				, len = names.length
 
 				if (len > 1) {
-					for (; i < len; ) fn(el, names[i++])
+					for (; i < len; ) fn(el, names[i++], val)
 				} else {
-					fn(el, name)
+					fn(el, name, val)
 				}
 			}
 		}
@@ -586,11 +586,8 @@
 		return false
 	}
 
-	El.on = function(el, ev, fn) {
-		// element.setCapture(retargetToElement)
-		addEvent(el, ev, fn)
-		return el
-	}
+	El.on = acceptMany(addEvent)
+	El.off = acceptMany(rmEvent)
 
 	El.one = function(el, ev, fn) {
 		function remove() {
@@ -599,11 +596,6 @@
 		}
 		addEvent(el, ev, fn)
 		addEvent(el, ev, remove)
-		return el
-	}
-
-	El.off = function(el, ev, fn) {
-		rmEvent(el, ev, fn)
 		return el
 	}
 
