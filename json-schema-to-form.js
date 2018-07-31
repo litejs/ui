@@ -119,7 +119,7 @@
 				}
 
 				for (i = 0; tmp = schema[i++]; ) {
-					root = El(".grid.w12")
+					root = El(".grid.b2.w12")
 					tmp = JSON.clone(tmp)
 					keys.each(function(val) {
 						title = title || tmp.properties[val].title
