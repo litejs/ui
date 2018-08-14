@@ -11,7 +11,7 @@
 		return
 	}
 
-	"svg circle clipPath defs g path rect text stop use linearGradient".replace(/\w+/g, populateSvgElements)
+	"svg circle clipPath defs g path rect text stop use line linearGradient".replace(/\w+/g, populateSvgElements)
 	//http://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
 	function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 		var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
@@ -71,8 +71,11 @@
 		}
 
 		for (; ++i < points.length; ) {
-			d.push("C" + (i * 100 + 50 - radius), points[i-1] + "," + (i * 100 + 50 + radius), points[i] + "," + (i * 100 + 100 - radius), points[i])
-			//d.push("C" + (i * 100 + 50), points[i-1] + "," + (i * 100 + 50), points[i] + "," + (i * 100 + 100 - radius), points[i])
+			if (opts.smooth) {
+				d.push("C" + (i * 100 + 50 - radius), points[i-1] + "," + (i * 100 + 50 + radius), points[i] + "," + (i * 100 + 100 - radius), points[i])
+			} else {
+				d.push("L" + (i * 100 + 100 - radius), points[i])
+			}
 			if (radius) {
 				d.push(arch1.join(radius), arch2.join(radius))
 			}
@@ -106,7 +109,6 @@
 	bindings.initChart.once = 1
 	function populateSvgElements(name) {
 		El.cache[name] = document.createElementNS(ns, name)
-		El.cache["svg|"+name] = document.createElementNS(ns, name)
 	}
 }(this.SVGElement, document, El.bindings)
 
