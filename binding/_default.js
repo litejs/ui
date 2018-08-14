@@ -17,7 +17,7 @@
 		var len = 0
 		, data = this
 		, parent = el.parentNode
-		, comm = document.createComment("every " + list)
+		, comm = document.createComment("every " + (list.name || list.length))
 
 		parent.replaceChild(comm, el)
 
