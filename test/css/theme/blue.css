@@ -10,11 +10,6 @@ html {
 	will-change: transform;
 }
 
-body {
-	color: #333;
-	font: 2em/1.62 "Georgia", "Times New Roman", serif;
-}
-
 /**
  * Do not remove focus retangle,
  * do it more visible when needed.
@@ -90,7 +85,6 @@ img {
 
 .t-1 {
 	color: #def;
-	font-size: 0.75em;
 	text-shadow: 2px 1px 1px #000;
 }
 

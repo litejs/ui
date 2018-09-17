@@ -1,25 +1,23 @@
 
 /**
- *  1. 62.5% brings standard font size so that 1em = 10px.
- *     This is because the default size for ‘medium’ text in all modern browsers is 16px.
- *  2. Do not adjusts the text size automatically.
+ *  1. Do not adjusts the text size automatically.
  *     IE Phone note - If the viewport is set using <meta> element,
  *     the value of the CSS text-size-adjust property is ignored.
  *     Webkit bug - If -webkit-text-size-adjust is explicitely set to none,
  *     Webkit-based desktop browsers, like Chrome or Safari,
  *     instead of ignoring the property, will prevent the user to zoom in or out the Web page.
  *     See Bug 56543, Bug 163359, and Bug 84186.
- *  3. IE for Windows Phone 8.1 supports "-webkit-text-size-adjust" as an alias for "-ms-text-size-adjust".
- *  4. Firefox<29, iOS<4, Android<4 need vendor prefixes.
- *  5. Disable double-tap gestures to remove 350 millisecond delay before single taps.
- *  6. Improve scroll performance by stop the paint on scroll.
+ *  2. IE for Windows Phone 8.1 supports "-webkit-text-size-adjust" as an alias for "-ms-text-size-adjust".
+ *  3. Firefox<29, iOS<4, Android<4 need vendor prefixes.
+ *  4. Disable double-tap gestures to remove 350 millisecond delay before single taps.
+ *  5. Improve scroll performance by stop the paint on scroll.
  *     Fix position: fixed in most Android 2.2–2.3 browsers
  *     http://benfrain.com/easy-css-fix-fixed-positioning-android-2-2-2-3/
  */
 
 *, *:before, *:after {
 	color: inherit;
-	-webkit-box-sizing: inherit;          /* 4 */
+	-webkit-box-sizing: inherit;          /* 3 */
 	   -moz-box-sizing: inherit;
 	        box-sizing: inherit;
 	-webkit-backface-visibility: inherit;
@@ -27,15 +25,14 @@
 }
 
 html {
-	font-size: 62.5%;                     /* 1 */
-	-webkit-text-size-adjust: 100%;       /* 2 */
-	    -ms-text-size-adjust: 100%;       /* 3 */
+	-webkit-text-size-adjust: 100%;       /* 1 */
+	    -ms-text-size-adjust: 100%;       /* 2 */
 	-webkit-font-smoothing: antialiased;
-	-webkit-box-sizing: border-box;       /* 4 */
+	-webkit-box-sizing: border-box;       /* 3 */
 	   -moz-box-sizing: border-box;
 	        box-sizing: border-box;
-	touch-action: manipulation;           /* 5 */
-	-webkit-backface-visibility: hidden;  /* 6 */
+	touch-action: manipulation;           /* 4 */
+	-webkit-backface-visibility: hidden;  /* 5 */
 	        backface-visibility: hidden;
 }
 
@@ -60,7 +57,7 @@ img,
  *     and it does not render well with some fonts (Helvetica Neue on macs for example).
  */
 
-a[href],
+a,
 button,
 label,
 .btn,

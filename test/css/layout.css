@@ -3,8 +3,7 @@
 
 /**
  *  1. Force a vertical scrollbar to prevent a jumpy page.
- *  2. Fix margin 0 auto in IE4-5.5.
- *  3. The bottom margin is the negative value of the footer's height.
+ *  2. The bottom margin is the negative value of the footer's height.
  */
 
 html {
@@ -13,17 +12,11 @@ html {
 	min-width: 300px;
 }
 
-body {
-	height: 100%;
-	text-align: center;    /* 2 */
-}
-
 .App {
-	margin: 0 auto -150px; /* 3 */
+	margin: 0 auto -150px; /* 2 */
 }
 
 .App-row {
-	text-align: left;      /* 2 */
 	padding: 0 8px;
 }
 [dir="rtl"] .App-row {
@@ -39,11 +32,9 @@ body {
 .top {
 	height: 44px;
 	line-height: 43px;
-	font-size: .75em;
 }
 .Menu {
 	height: 56px;
-	font-size: .75em;
 }
 
 .Footer,

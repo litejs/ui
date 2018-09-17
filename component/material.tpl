@@ -13,10 +13,8 @@
 		padding: 8px;
 		color: #fff;
 		background: #666;
-		font-size: 10px;
 		font-weight: 500;
-		line-height: 14px;
-		max-width: 170px;
+		max-width: 90%;
 		text-align: center;
 		pointer-events: none;
 		z-index: 9;
@@ -59,28 +57,17 @@
 		padding: 8px 0;
 		color: #000;
 		background: #fff;
-		font-size: 14px;
-		font-weight: 400;
-		letter-spacing: 0;
-		list-style: none;
 		min-width: 124px;
+		max-width: 100%;
 		z-index: 8;
-		text-align: left;
 		transition: opacity .4s cubic-bezier(0, 0, .2, 1) .2s, transform .2s cubic-bezier(0, 0, .2, 1) .2s;
 	}
 	.mat-Menu-item {
-		padding: 0 16px;
 		display: block;
-		border: none;
-		margin: 0;
-		outline-color: #bdbdbd;
-		position: relative;
-		overflow: hidden;
+		padding: 0 16px;
 		text-decoration: none;
-		cursor: pointer;
-		height: 48px;
 		line-height: 48px;
-		white-space: nowrap;
+		cursor: pointer;
 	}
 	.mat-Menu-item:hover {
 		background-color: #eee;
