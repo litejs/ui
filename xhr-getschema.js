@@ -2,11 +2,11 @@
 
 
 
-!function(exports) {
+!function(xhr) {
 	var pending = []
 	, loaded = getSchema.loaded = {}
 
-	exports.getSchema = getSchema
+	xhr.getSchema = getSchema
 	/**
 	 * JSON Reference
 	 * @see http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
@@ -22,7 +22,6 @@
 	 */
 
 	function getSchema(ref, next) {
-
 		var parts = ref.split("#")
 		, file = parts[0]
 		, schema = loaded[file]
@@ -35,11 +34,12 @@
 		pending.push(arguments)
 		loaded[file] = 1
 
-		if (schema !== 1) xhr.get(file, function(err, schema) {
+		if (schema !== 1) xhr("GET", file, function(err, _schema) {
 			if (err) return next(err)
 
 			var i, ref
 			, refs = []
+			, schema = JSON.parse(_schema)
 			, cb = Fn.wait(function() {
 				loaded[file] = schema
 				if (pending.length) {
@@ -64,22 +64,22 @@
 			}
 			cb()
 
-		})
+		}).send()
 	}
 
-	function resolveRefs(obj, refs, id, schema, key, val) {
+	function resolveRefs(obj, refs, $id, schema, key, val) {
 		for (key in obj) if (val = obj[key]) {
-			if (typeof val.id == "string") {
-				resolveRefs(loaded[val.id] = val, refs, val.id, val)
+			if (typeof val.$id == "string") {
+				resolveRefs(loaded[val.$id] = val, refs, val.$id, val)
 			} else if (typeof val == "object") {
-				resolveRefs(val, refs, id, schema)
+				resolveRefs(val, refs, $id, schema)
 			}
 			if (val = val.$ref) {
 				if (val.charAt(0) == "#") {
 					val = val.slice(1)
 					obj[key] = val ? Item.get(schema, val) : schema
 				} else if (val.charAt(0) != "/") {
-					val = id.replace(/[^\/]*$/, val)
+					val = $id.replace(/[^\/]*$/, val)
 					refs.push(val, obj, key)
 				}
 			}
