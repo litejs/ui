@@ -184,14 +184,15 @@
 	form1-row
 		select.field &each:val in data["enum"]
 			option
-				&val: val
+				&val:: val
 				&txt: _("" + val)
 
 @el form1-list
 	form1-row
-		select.field &list:api(resourceCollection.format(route)),0,value
+		select.field
+			&list: api(resourceCollection.format(data.route, data)),0,value
 			option
-				&val: item.id
+				&val:: item.id
 				&txt: item.name
 
 @el form1-array

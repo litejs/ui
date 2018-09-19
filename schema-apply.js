@@ -43,10 +43,19 @@
 			}
 		} else if (type == "string") {
 			if (type !== actualType) data = "" + data
-		} else if (type == "number") {
-			data = parseFloat( (data + "").replace(",", ".") )
-		} else if (type == "integer") {
-			data |= 0
+		} else if (type === "number" || type == "integer") {
+			data = (data + "").replace(",", ".")
+			data = type === "number" ? parseFloat(data) : parseInt(data, 10)
+
+			if (typeof(tmp = schema.multipleOf) == "number") {
+				data -= data % tmp
+			}
+			if (typeof(tmp = schema.minimum) == "number" && data < tmp) {
+				data = tmp
+			}
+			if (typeof(tmp = schema.maximum) == "number" && data > tmp) {
+				data = tmp
+			}
 		} else if (type == "boolean" ) {
 			data = data ? true : required ? false : null
 		} else if (type == "date-time") {
@@ -75,17 +84,6 @@
 					)
 				}
 			})
-		}
-
-		if (type == "number" || type == "integer") {
-			tmp = schema.minimum
-			if (typeof tmp == "number" && data < tmp) {
-				data = tmp
-			}
-			tmp = schema.maximum
-			if (typeof tmp == "number" && data > tmp) {
-				data = tmp
-			}
 		}
 
 		return data

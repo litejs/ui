@@ -90,12 +90,12 @@
 			}
 
 			if (schema.properties) {
-				Object.each(schema.properties, function(schema, _key) {
+				Object.each(schema.properties, function(sub, _key) {
 					drawSchema(
-						schema,
+						sub,
 						_key,
 						fieldset,
-						data === null ? null : (schema.type == "object" || schema.properties || schema.anyOf ? data[_key] : data) || {},
+						data === null ? null : (sub.type == "object" || sub.properties || sub.anyOf ? data[_key] : data) || {},
 						namePrefix,
 						scope,
 						def
@@ -118,6 +118,7 @@
 					})
 				}
 
+				scope.selected = {}
 				for (i = 0; tmp = schema[i++]; ) {
 					root = El(".grid.b2.w12")
 					tmp = JSON.clone(tmp)
@@ -172,8 +173,7 @@
 						add(val && val[i], item)
 					})
 				} else if (schema.resourceCollection) {
-					var _scope = JSON.merge({}, scope.route, data)
-					api(schema.resourceCollection.format(_scope)).each(add2)
+					api(schema.resourceCollection.format(scope.route, scope)).each(add2)
 				} else if (Array.isArray(val) && val.length) {
 					val.each(function(v) { add(v) })
 				} else if (schema.minItems) {
@@ -239,6 +239,7 @@
 
 			function alUp() {
 				var val = El.val(field)
+				scope["selected"][key] = val
 				if (alSelected != alternatives[val]) {
 					if (alSelected) {
 						El.append(dummy, alSelected)
@@ -249,6 +250,8 @@
 						alSelected._draw = null
 					}
 					El.append(fieldset, (alSelected = alternatives[val]), row.nextSibling)
+				} else {
+					El.render(alSelected, scope)
 				}
 			}
 		}
