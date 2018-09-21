@@ -16,9 +16,9 @@
 	, splitRe = /[,\s]+/
 	, bindings = El.bindings = {
 		attr: setAttr,
-		css: El.css = function(el, key, val) {
+		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.camelCase()] = "" + val || ""
-		},
+		}),
 		"class": function(el, name, fn) {
 			;(arguments.length < 3 || fn ? addClass : rmClass)(el, name)
 		},
@@ -445,7 +445,17 @@
 				, len = names.length
 
 				if (len > 1) {
-					for (; i < len; ) fn(el, names[i++], val)
+					/*
+					if (Array.isArray(val)) {
+						for (; i < len; ) fn(el, names[i], val[i++])
+					} else {
+						for (; i < len; ) fn(el, names[i++], val)
+					}
+					/*/
+					for (; i < len; ) {
+						fn(el, names[i++], Array.isArray(val) ? val[i - 1] : val)
+					}
+					//*/
 				} else {
 					fn(el, name, val)
 				}
