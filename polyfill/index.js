@@ -49,7 +49,7 @@
 	// ----------------
 
 	O = Array
-	add("isArray", "return a instanceof Array")
+	add("isArray", "return Object[P].toString.call(a)==='[object Array]'")
 
 	O = O[P]
 	a = "var t=this,l=t.length,o=[],i=-1;"
