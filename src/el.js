@@ -11,7 +11,7 @@
 	, body = document.body
 	, root = document.documentElement
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
-	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(.*?)$/gm
+	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(([\])}]?).*?([[({]?))$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, splitRe = /[,\s]+/
 	, bindings = El.bindings = {
@@ -749,7 +749,7 @@
 		, stack = [-1]
 		, parentStack = []
 
-		function work(all, indent, plugin, name, q, text, offset) {
+		function work(all, indent, plugin, name, q, text, mapEnd, mapStart, offset) {
 			if (offset && all === indent) return
 
 			for (q = indent.length; q <= stack[0]; ) {
@@ -762,14 +762,16 @@
 
 			if (parent.txtMode) {
 				parent.txt += all + "\n"
-			} else if (plugin) {
+			} else if (plugin || mapStart && (name = "map")) {
 				if (El.plugins[name]) {
 					parentStack.push(parent)
 					stack.unshift(q)
-					parent = (new El.plugins[name](parent, text)).el
+					parent = (new El.plugins[name](parent, text, mapEnd ? "" : ";")).el
 				} else {
 					append(parent, all)
 				}
+			} else if (mapEnd) {
+				appendBind(parent, text, "")
 			} else {
 				if (name) {
 					parentStack.push(parent)
@@ -790,14 +792,18 @@
 							name = (parent.tagName == "INPUT" ? "val" : "txt")
 							+ ":_('" + text.replace(/'/g, "\\'") + "').format(data)"
 						}
-						q = getAttr(parent, "data-bind")
-						setAttr(parent, "data-bind", (q ? q + ";" + name : name))
+						appendBind(parent, name, ";")
 					}
 				}
 			}
 		}
 		str.replace(templateRe, work)
 		work("", "")
+	}
+
+	function appendBind(el, val, sep) {
+		var current = getAttr(el, "data-bind")
+		setAttr(el, "data-bind", (current ? current + sep + val : val))
 	}
 
 	function plugin(parent, name) {
@@ -842,12 +848,13 @@
 		}
 	}
 
-	function js(parent, params) {
+	function js(parent, params, attr1) {
 		var t = this
 		t.txtMode = t.parent = parent
 		t.txt = ""
 		t.plugin = t.el = t
 		t.params = params
+		t.a = attr1
 	}
 
 	js[protoStr].done = Fn("Function(this.txt)()")
@@ -890,6 +897,17 @@
 		}),
 		el: plugin,
 		js: js,
+		map: js.extend({
+			done: function() {
+				var self = this
+				, txt = (self.params + self.txt).replace(/\n+/g, "")
+				appendBind(
+					self.parent,
+					self.a ? txt.slice(1) : txt,
+					self.a
+				)
+			}
+		}),
 		template: plugin,
 		view: plugin.extend({
 			done: function() {
