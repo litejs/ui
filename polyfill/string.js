@@ -1,6 +1,15 @@
 
 !function(exports) {
 	var proto = exports.prototype || exports
+
+	if (!proto.startsWith) proto.startsWith = function(str) {
+		return this.lastIndexOf(str, 0) === 0
+	}
+
+	if (!proto.endsWith) proto.endsWith = function(str) {
+		return this.indexOf(str, this.length - str.length) !== -1
+	}
+
 	if (!proto.codePointAt) proto.codePointAt = function(pos) {
 		var str = this
 		, code = str.charCodeAt(pos)
@@ -11,7 +20,8 @@
 		code === code ? code :
 		void 0
 	}
-	exports.fromCodePoint = function() {
+
+	if (!exports.fromCodePoint) exports.fromCodePoint = function() {
 		var code
 		, arr = arguments
 		, len = arr.length
