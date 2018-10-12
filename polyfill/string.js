@@ -1,16 +1,17 @@
 
 !function(exports) {
-	var proto = exports.prototype || exports
+	var Str = exports.String || exports
+	, Str$ = Str.prototype || exports
 
-	if (!proto.startsWith) proto.startsWith = function(str) {
+	if (!Str$.startsWith) Str$.startsWith = function(str) {
 		return this.lastIndexOf(str, 0) === 0
 	}
 
-	if (!proto.endsWith) proto.endsWith = function(str) {
+	if (!Str$.endsWith) Str$.endsWith = function(str) {
 		return this.indexOf(str, this.length - str.length) !== -1
 	}
 
-	if (!proto.codePointAt) proto.codePointAt = function(pos) {
+	if (!Str$.codePointAt) Str$.codePointAt = function(pos) {
 		var str = this
 		, code = str.charCodeAt(pos)
 
@@ -21,7 +22,7 @@
 		void 0
 	}
 
-	if (!exports.fromCodePoint) exports.fromCodePoint = function() {
+	if (!Str.fromCodePoint) Str.fromCodePoint = function() {
 		var code
 		, arr = arguments
 		, len = arr.length
@@ -48,5 +49,21 @@
 
 		return str
 	}
-}(this.String || this)
+
+	if (!exports.TextEncoder) exports.TextEncoder = TextEncoder
+
+	// Prior to Firefox 48 and Chrome 53 an exception would be thrown for an unknown encoding type
+	function TextEncoder() {
+		this.encoding = "utf-8"
+	}
+	TextEncoder.prototype.encode = function(str) {
+		var s = unescape(encodeURIComponent(str))
+		, len = s.length
+		, arr = new Uint8Array(len)
+		for (; len--; ) {
+			arr[len] = s.charCodeAt(len)
+		}
+		return arr
+	}
+}(this)
 
