@@ -117,7 +117,6 @@
 	.input__hint {
 		text-align: right;
 		color: #444;
-		font-size: 1.4rem;
 	}
 	.btn:active, .btn:focus,
 	input:active, input:focus,
@@ -190,7 +189,7 @@
 @el form1-list
 	form1-row
 		select.field
-			&list: api(resourceCollection.format(data.route, data)),0,value
+			&list: api(resourceCollection.format(data.route, data)), required ? 0 : [""], value
 			option
 				&val:: item.id
 				&txt: item.name
