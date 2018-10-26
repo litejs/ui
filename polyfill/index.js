@@ -119,6 +119,34 @@
 		}
 	}
 
+
+	createStorage("localStorage")      // Chrome5, FF3.5, IE8, Safari4
+	createStorage("sessionStorage")    // Chrome5, FF2, IE8, Safari4
+
+	function createStorage(name) {
+		try {
+			// FF4-beta with dom.storage.enabled=false throws for accessing windows.localStorage
+			// iOS5 private browsing throws for localStorage.setItem()
+			return exports[name].setItem(name, name)
+		} catch(e){}
+		var data = {}
+		exports[name] = {
+			setItem: function(id, val) {
+				return data[id] = String(val)
+			},
+			getItem: function(id) {
+				return data[id]
+			},
+			removeItem: function(id) {
+				delete data[id]
+			},
+			clear: function() {
+				data = {}
+			}
+		}
+		patched.push(name)
+	}
+
 	// Ignore FF3 escape second non-standard argument
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
 	if (esc("a", 0) != "a") {
