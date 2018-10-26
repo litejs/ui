@@ -8,6 +8,9 @@
 	, esc = escape
 	, patched = (exports.xhr || exports)._patched = []
 
+	// The HTML5 document.head DOM tree accessor
+	// doc.head = doc.head || doc.getElementsByTagName("head")[0]
+
 
 	function add(key, src) {
 		if (!O[key]) {
@@ -16,37 +19,22 @@
 		}
 	}
 
-	F.nop = function(){}
 
-	/*
-	* The HTML5 document.head DOM tree accessor
-	*/
-
-	//doc.head = doc.head || doc.getElementsByTagName("head")[0]
-
-	/*
-	* Function.prototype.bind from ECMAScript5
-	* Basic support: Chrome 7 Firefox 4 IE 9 Opera 11.60 Safari 5.1.4
-	*
-	* http://msdn.microsoft.com/en-us/library/s4esdbwz(v=vs.94).aspx
-	*/
 	O = F[P]
+	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4
 	add("bind", "var t=this;b=[].slice.call(arguments,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(b.slice.call(arguments)))};if(t[P])c[P]=t[P];return c")
 
 
-	// Object extensions
-	// -----------------
-
 	O = Object
-	add("create", "b=Function.nop;b[P]=a;a=new b;b[P]=null;return a")
+	O.nop = function(){}
+	// Chrome5, FF4, IE9, Safari5
+	add("create", "b=Object.nop;b[P]=a;a=new b;b[P]=null;return a")
 	add("keys", "c=[];for(b in a)o.call(a,b)&&c.push(b);return c")
 
 	// Object.assign ( target, source ) in ECMAScript 6
-	// Chrome 45, Firefox 34, IE Edge
+	// Chrome45, FF34, IE Edge, Safari9
 	add("assign", "var t,k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 
-	// Array extensions
-	// ----------------
 
 	O = Array
 	add("isArray", "return Object[P].toString.call(a)==='[object Array]'")
@@ -77,18 +65,15 @@
 	O = String[P]
 	add("trim", "return this.replace(/^\\s+|\\s+$/g,'')")
 
-	// Chrome 24, FF 15, IE 10
+	// Chrome24, FF15, IE10
 	O = exports.performance || (exports.performance = {})
 	add("now", (a = "return+new Date"))
 
 	O = Date
 	add("now", a)
 
-	/*
-	* `Date.prototype.date` is implemented in `litejs/date`.
-	*/
-
 	O = O[P]
+	// `Date.prototype.date` is implemented in `litejs/date`.
 	add("toJSON", "return this.date('iso')")
 
 	if (!exports.Event) exports.Event = {}
