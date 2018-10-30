@@ -239,8 +239,13 @@
 			El.css(source, "top", (top < 0 ? 0 : top) + "px")
 			El.css(source, "left", (left < 0 ? 0 : left) + "px")
 		}
+		function closeTooltip() {
+			El.rmClass(tooltip, "is-visible")
+			tipOpen = null
+		}
 		El.on(document.body, "mouseover", onOver)
 		El.on(window, "focusin", onOver)
+		View.on("show", closeTooltip)
 		function onOver(e) {
 			var x, y, pos
 			, target = e.target
@@ -253,8 +258,7 @@
 					if (target === tipOpen) return
 				}
 			}
-			El.rmClass(tooltip, "is-visible")
-			tipOpen = null
+			closeTooltip()
 			if (!text) return
 			tipOpen = target
 			pos = El.attr(target, "data-tooltip-pos") || "top"
