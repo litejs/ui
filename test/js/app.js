@@ -6,8 +6,8 @@ xhr.logErrors = function(unsentErrors) {
 }
 
 
-// Clickjacking defense, break out of the site that is framing it.
-// If the Javascript has turned off, the site will not display at all.
+// Clickjacking defense, break out of frames.
+// If JavaScript is disabled, the site will not display at all.
 if (self !== top) {
 	xhr.logErrors(["Framed in " + top.location])
 	throw top.location = self.location
