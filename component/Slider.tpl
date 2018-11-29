@@ -5,28 +5,49 @@
 		background: transparent;
 	}
 	.Slider-track {
-		position: relative;
 		height: 32px;
 		width: 200px;
 		height: 4px;
 		margin: 14px 0;
-		background: #ddd;
 		overflow: visible;
+		background: #666;
+		border-radius: 2px;
 	}
-	.Slider-fill {
-		height: 4px;
+	.Slider-fill,
+	.Toggle {
+		position: relative;
+		overflow: visible;
+		background: #bdbdbd;
 		width: 8px;
-		background: #999;
-		overflow: visible;
+		height: 4px;
+		border-radius: 2px;
 	}
-	.Slider-knob {
+	.Toggle {
+		display: block;
+		width: 36px;
+		height: 14px;
+		border-radius: 7px;
+	}
+	.Slider-knob,
+	.Toggle-knob {
 		position: relative; /* for IE6 overflow:visible bug */
-		width: 16px;
-		height: 16px;
-		margin: -6px -8px 0 0;
+		width: 20px;
+		height: 20px;
 		border-radius: 50%;
 		background: #666;
-		border: 0px solid #ddd;
+		background-color: rgb(245, 245, 245);
+		box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	}
+	.Slider-knob {
+		margin: -8px -10px 0 0;
+	}
+	.Toggle-knob {
+		top: -3px;
+		left: 0px;
+	}
+	input[type=checkbox]:checked + .Toggle-knob {
+		left: 16px;
 	}
 	.Slider-knob.is-active {
 		width: 24px;
@@ -47,12 +68,35 @@
 	}
 
 @js
+	El.bindings.SliderVal = function(el, model, path) {
+		if (path && path.charAt(0)!=="/") path = "/"+path.replace(/\./g,"/")
+		model.on("change:" + path, set)
+		function set(val) {
+			el.set(parseFloat(val) || 0)
+		}
+		setTimeout(function(){
+			set(model.get(path))
+		},10)
+	}
+	El.bindings.fixReadonlyCheckbox = function(el) {
+		function False(e) {
+			if ((this.firstChild || this).readOnly) {
+				return Event.stop(e)
+			}
+		}
+		El.on(el, "click", False)
+		El.on(el, "mousedown", False)
+	}
 	El.bindings.SliderInit = function(el) {
 		var knobLen, offset, px, drag, min, max, step, minPx, maxPx
 		, track = el.firstChild
 		, fill = track.firstChild
 		, knob = fill.lastChild
-		, value = El.attr(el, "valu") || 0
+		, value
+		, emit = function(val) {
+			El.emit(el, "change", val)
+		}.rate(500, true)
+		El.on(window, "blur", stop)
 		function load(e) {
 			min = el.min || 0
 			max = el.max || 100
@@ -122,22 +166,23 @@
 			px || load()
 			val = (val < min ? min : val > max ? max : val).step(step)
 			if ((drag || scroll) && value !== val) {
-				El.emit(el, "change", val)
+				emit(val)
 			}
-			value = el.valu = val
+			value = val
 			if (!drag || pos !== void 0) {
 				fill.style.width = ((pos || value*px)+knobLen) + "px"
 			}
 		}
 		El.on(el, "mousedown", start)
 		El.on(el, "wheel", function(e, delta) {
+			Event.stop(e)
 			load(e)
 			el.set( 1*value + delta*step, 0, 1 )
 		})
 		Event.touchAsMouse(el)
-		el.set(parseFloat(value))
 	}
-	El.bindings.SliderInit.once = 1
+	El.bindings.fixReadonlyCheckbox.once =
+	El.bindings.SliderInit.once = El.bindings.SliderVal.once = 1
 
 @el Slider
 	button.Slider.reset &SliderInit
@@ -162,4 +207,12 @@
 				.Slider-knob.right.anim
 			.Slider-fill.abs.anim
 				.Slider-knob.right.anim
+
+@el Toggle
+	label.Toggle
+		&fixReadonlyCheckbox
+		input[type=checkbox].hide
+			&readonly: !row.write
+			&checked: model && !!model.get(row.path)
+		.Toggle-knob.anim
 
