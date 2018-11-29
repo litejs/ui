@@ -51,4 +51,6 @@
 				Slider2.no-first[valu=100][style="width:400px"]
 				br
 				Slider3.color[valu=33][style="width:400px"]
+				br
+				Toggle
 

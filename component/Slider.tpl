@@ -5,7 +5,7 @@
 		background: transparent;
 	}
 	.Slider-track {
-		height: 32px;
+		position: relative;
 		width: 200px;
 		height: 4px;
 		margin: 14px 0;
@@ -13,16 +13,20 @@
 		background: #666;
 		border-radius: 2px;
 	}
+	.Slider.no-first .Slider-fill:last-child {
+		background: #666;
+	}
 	.Slider-fill,
 	.Toggle {
-		position: relative;
 		overflow: visible;
-		background: #bdbdbd;
-		width: 8px;
+		background: rgba(255,255,255,.57);
+		width: 10px;
 		height: 4px;
 		border-radius: 2px;
 	}
 	.Toggle {
+		background: #bdbdbd;
+		position: relative;
 		display: block;
 		width: 36px;
 		height: 14px;
@@ -53,9 +57,6 @@
 		width: 24px;
 		height: 24px;
 		margin: -10px -12px 0 0;
-	}
-	.Slider.no-first .Slider-fill:last-child {
-		background: #ddd;
 	}
 	.Slider.color .Slider-fill {
 		background: red;
@@ -212,7 +213,7 @@
 	label.Toggle
 		&fixReadonlyCheckbox
 		input[type=checkbox].hide
-			&readonly: !row.write
+			&readonly: row && !row.write
 			&checked: model && !!model.get(row.path)
 		.Toggle-knob.anim
 
