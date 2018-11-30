@@ -1,10 +1,9 @@
 
 
 
-!function(exports) {
+!function(exports, Function) {
 	var a, b, c, O
 	, P = "prototype"
-	, F = Function
 	, esc = escape
 	, patched = (exports.xhr || exports)._patched = []
 
@@ -16,7 +15,7 @@
 		if (!O[key] || force) {
 			O[key] = (
 				typeof src === "string" ?
-				F("a,b,c", "var P='" + P + "',o=Object[P].hasOwnProperty;" + src) :
+				Function("a,b,c", "var P='" + P + "',o=Object[P].hasOwnProperty;" + src) :
 				src
 			)
 			patched.push(key)
@@ -24,24 +23,28 @@
 	}
 
 
-	O = F[P]
+	O = Function[P]
 	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4
 	add("bind", "var t=this;b=[].slice.call(arguments,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(b.slice.call(arguments)))};if(t[P])c[P]=t[P];return c")
 
 
 	O = Object
 	O.nop = function(){}
+
 	// Chrome5, FF4, IE9, Safari5
 	add("create", "b=Object.nop;b[P]=a;a=new b;b[P]=null;return a")
 	add("keys", "c=[];for(b in a)o.call(a,b)&&c.push(b);return c")
 
 	// Object.assign ( target, source ) in ECMAScript 6
-	// Chrome45, FF34, IE Edge, Safari9
+	// Chrome45, Edge, FF34, Safari9
 	add("assign", "var t,k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 
 
 	O = Array
 	add("isArray", "return Object[P].toString.call(a)==='[object Array]'")
+
+	// Chrome45, Edge, FF32, Safari9
+	add("from", "a=typeof a==='string'?a.split(''):b?a:a.slice();return b?a.map(b,c):a")
 
 	O = O[P]
 	a = "var t=this,l=t.length,o=[],i=-1;"
@@ -86,8 +89,8 @@
 
 	add("JSON", {
 		map: {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t",'"':'\\"',"\\":"\\\\"},
-		parse: F("t", "return Function('return('+t+')')()"),
-		stringify: F("o", ""
+		parse: Function("t", "return Function('return('+t+')')()"),
+		stringify: Function("o", ""
 			+ "var i,s=[],c=typeof o;"
 			+ "if(c=='string'){"
 				+ "for(i=o.length;c=o.charAt(--i);s[i]=JSON.map[c]||(c<' '?'\\\\u00'+((c=c.charCodeAt(0))|4)+(c%16).toString(16):c));"
@@ -152,7 +155,7 @@
 	// You could also use CSS
 	// html { filter: expression(document.execCommand("BackgroundImageCache", false, true)); }
 	eval("/*@cc_on try{document.execCommand('BackgroundImageCache',false,true)}catch(e){}@*/")
-}(this)
+}(this, Function)
 
 
 
