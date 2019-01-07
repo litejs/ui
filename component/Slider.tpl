@@ -38,7 +38,7 @@
 		width: 20px;
 		height: 20px;
 		border-radius: 50%;
-		background: #666;
+		background: #f5f5f5;
 		background-color: rgb(245, 245, 245);
 		box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -47,10 +47,12 @@
 		margin: -8px -10px 0 0;
 	}
 	.Toggle-knob {
+		background-color: #666;
 		top: -3px;
 		left: 0px;
 	}
 	input[type=checkbox]:checked + .Toggle-knob {
+		background-color: rgb(245, 245, 245);
 		left: 16px;
 	}
 	.Slider-knob.is-active {
