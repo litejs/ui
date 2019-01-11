@@ -2,6 +2,7 @@
 !function(exports) {
 	var Str = exports.String || exports
 	, Str$ = Str.prototype || exports
+	, fromCharCode = String.fromCharCode
 
 	if (!Str$.startsWith) Str$.startsWith = function(str) {
 		return this.lastIndexOf(str, 0) === 0
@@ -42,7 +43,7 @@
 				)
 			}
 			if (len === pos || out.length > 8191) {
-				str += String.fromCharCode.apply(null, out)
+				str += fromCharCode.apply(null, out)
 				out.length = 0
 			}
 		}
@@ -50,20 +51,41 @@
 		return str
 	}
 
-	if (!exports.TextEncoder) exports.TextEncoder = TextEncoder
-
-	// Prior to Firefox 48 and Chrome 53 an exception would be thrown for an unknown encoding type
-	function TextEncoder() {
-		this.encoding = "utf-8"
+	if (!exports.TextEncoder) {
+		exports.TextEncoder = exports.TextDecoder = TextEncoder
 	}
-	TextEncoder.prototype.encode = function(str) {
-		var s = unescape(encodeURIComponent(str))
-		, len = s.length
-		, arr = new Uint8Array(len)
-		for (; len--; ) {
-			arr[len] = s.charCodeAt(len)
+
+	// Only utf-8 TextEncoder is supported by spec
+	function TextEncoder(encoding) {
+		this.encoding = encoding || "utf-8"
+	}
+	TextEncoder.prototype = {
+		encode: function(str) {
+			var s = unescape(encodeURIComponent(str))
+			, len = s.length
+			, arr = new Uint8Array(len)
+			for (; len--; ) {
+				arr[len] = s.charCodeAt(len)
+			}
+			return arr
+		},
+		decode: function(arr) {
+			var i, out
+			, map = TextEncoder[this.encoding]
+			if (map) {
+				// Single-byte codec
+				out = []
+				for (i = arr.length; i--; ) {
+					out[i] = (
+						arr[i] > 127 ?
+						map.charCodeAt(arr[i] - 128) :
+						arr[i]
+					)
+				}
+				return fromCharCode.apply(null, out)
+			}
+			return decodeURIComponent(escape(fromCharCode.apply(null, arr)))
 		}
-		return arr
 	}
 }(this)
 
