@@ -192,7 +192,7 @@
 			&list: api(resourceCollection.format(data.route, data)), required ? 0 : [""], value
 			option
 				&val:: item.id
-				&txt: item.name
+				&txt:: _(item.name)
 
 @el form1-array
 	.col
