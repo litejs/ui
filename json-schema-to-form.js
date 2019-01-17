@@ -42,7 +42,7 @@
 			function fillForm(model) {
 				if (fieldset) El.kill(fieldset)
 				fieldset = El(template + "-fieldset")
-				drawSchema(schema, null, fieldset, model && model.data || null, null, scope)
+				drawSchema(schema, null, fieldset, model && model.data || null, null, scope, model)
 				El.append(form, fieldset)
 			}
 
@@ -73,7 +73,7 @@
 
 		})
 
-		function drawSchema(schema, key, fieldset, data, namePrefix, scope, def) {
+		function drawSchema(schema, key, fieldset, data, namePrefix, scope, model, def) {
 			var alternatives, keys, i, root, tmp
 			, alSelected
 			, count = 0
@@ -98,6 +98,7 @@
 						data === null ? null : (sub.type == "object" || sub.properties || sub.anyOf ? data[_key] : data) || {},
 						namePrefix,
 						scope,
+						model,
 						def
 					)
 				})
@@ -130,7 +131,7 @@
 						})
 						delete tmp.properties[val]
 					})
-					root._draw = [tmp, null, root, data, namePrefix, scope]
+					root._draw = [tmp, null, root, data, namePrefix, scope, model]
 				}
 
 				schema = {
@@ -140,13 +141,16 @@
 				key = keys[0]
 			}
 
+			var ro = model && model.acl && !model.acl("write", key) ? "-ro" : ""
+
 
 			var row = El(template + (
 				schema["ui:el"] && El.cache[template + "-" + schema["ui:el"]] ? "-" + schema["ui:el"] :
-				schema["enum"] ? "-enum" :
-				schema.type == "boolean" || schema.type == "array" ? "-" + schema.type :
-				schema.resourceCollection ? "-list" :
-				"" ))
+				schema["enum"] ? "-enum" + ro :
+				schema.type == "boolean" ? "-boolean" + ro :
+				schema.type == "array" ? "-" + schema.type :
+				schema.resourceCollection ? "-list" + ro :
+				ro ))
 			, sc = El.scope(row, scope)
 			, val = data === null ? (def && def[key] || schema["default"]) : (key == null ? data : data[key])
 
@@ -154,6 +158,7 @@
 			sc.value = val
 			sc.add = function(e) { add() }
 			sc.del = del
+			if (ro !== "") sc.noAdd = true
 
 			JSON.merge(sc, schema)
 
@@ -198,7 +203,8 @@
 					content,
 					data && map || null,
 					key,
-					scope
+					scope,
+					model
 				)
 			}
 
@@ -217,14 +223,15 @@
 					data && val || null,
 					key + "[" + (count++) + "]",
 					scope,
+					model,
 					val
 				)
 			}
 
 			var field = El.find(row, ".field")
-			El.attr(field, "name", namePrefix && key ? namePrefix + "[" + key + "]" : namePrefix || key)
+			if (field) El.attr(field, "name", namePrefix && key ? namePrefix + "[" + key + "]" : namePrefix || key)
 
-			if (val !== void 0) {
+			if (val !== void 0 && field) {
 				El.val(field, val)
 			}
 

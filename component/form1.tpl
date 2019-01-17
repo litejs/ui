@@ -160,12 +160,18 @@
 	form1-row
 		input.field
 
+@el form1-ro
+	form1-row>span &txt: value
+
 @el form1-hidden
 	div>input.field[type=hidden]
 
 @el form1-boolean
 	form1-row
 		input.field[type=checkbox] &value: value
+
+@el form1-boolean-ro
+	form1-row>span &txt: _(!!value)
 
 @el form1-password
 	form1-row
@@ -179,12 +185,18 @@
 	form1-row
 		textarea.field
 
+@el form1-text-ro
+	form1-ro
+
 @el form1-enum
 	form1-row
 		select.field &each:val in data["enum"]
 			option
 				&val:: val
 				&txt: _("" + val)
+
+@el form1-enum-ro
+	form1-ro
 
 @el form1-list
 	form1-row
@@ -193,6 +205,9 @@
 			option
 				&val:: item.id
 				&txt:: _(item.name)
+
+@el form1-list-ro
+	form1-row>span &txt: _(item.name)
 
 @el form1-array
 	.col
