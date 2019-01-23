@@ -27,7 +27,7 @@ El.bindings.list = function(node, list, extra, val) {
 	.each(clone)
 	.on("add", clone).on("remove", remove)
 	.then(function() {
-		if (val !== void 0) {
+		if (val !== void 0 && El.val(node) !== val) {
 			if (!this.get(val)) {
 				clone({id:val,name:val}, extraLen)
 				extraLen++
@@ -43,7 +43,7 @@ El.bindings.list = function(node, list, extra, val) {
 	function clone(item, pos) {
 		var clone = child.cloneNode(true)
 		, scope = El.scope(clone, data)
-		scope.item = item.data || item
+		scope.item = item.data || item || {id:item,name:item}
 		scope.model = item
 		scope.pos = pos
 		function up() {
