@@ -5,7 +5,6 @@ xhr.logErrors = function(unsentErrors) {
 	unsentErrors.length = 0
 }
 
-
 // Clickjacking defense, break out of frames.
 // If JavaScript is disabled, the site will not display at all.
 if (self !== top) {
@@ -80,6 +79,17 @@ if (self !== top) {
 		// Re-render all .js-viewHook elements on each View change
 		El.findAll(body, ".js-viewRender").render()
 	})
+
+	View.on("xhr:406", function(body, method, url, data, onResponse, send) {
+		View.emit("confirm", body.title || "Not Acceptable", body, function(action) {
+			if (action) {
+				var req = xhr(method, url, onResponse)
+				req.setRequestHeader("Accept-Confirm", action)
+				send(req, data)
+			}
+		})
+	})
+
 
 
 
