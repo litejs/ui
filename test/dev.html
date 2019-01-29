@@ -7,7 +7,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 
 <html manifest="cache.manifest">
 -->
-<html data-manifest="cache.manifest">
+<html>
 	<head>
 		<!--
 		  1. https://blog.whatwg.org/the-road-to-html-5-character-encoding
@@ -30,7 +30,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<meta charset="UTF-8">                                            <!-- 1 -->
 		<meta name="viewport" content="initial-scale=1,maximum-scale=1">  <!-- 2 -->
 		<meta name="mobile-web-app-capable" content="yes">                <!-- 3 -->
-		<link rel="manifest" href="manifest.json">                        <!-- 4 -->
+		<!-- <link rel="manifest" href="manifest.json">                        4 -->
 
 		<!--
 		<meta name="apple-mobile-web-app-capable" content="yes">
@@ -94,7 +94,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<link rel="shortcut icon" href="favicon.ico">
 		<link rel="apple-touch-icon" href="apple-touch-icon.png">
 		-->
-		<link rel="stylesheet" href="app.css" min toggle="ie7 ie8">
+		<link rel="stylesheet" href="app.css" toggle="ie7 ie8" min="min/0.css">
 		<link rel="stylesheet" title="Default look" href="css/theme/blue.css">
 		<link rel="alternate stylesheet" title="New look" href="css/theme/new.css">
 	</head>
@@ -104,13 +104,13 @@ but you'll need the mime-type to work in older browsers and IE11.
 		so there is no need for waiting DOMContentLoaded
 		-->
 		<script src="load.js" inline></script>
-		<script src="js/up.js" min="0.js?{hash}"
+		<script src="min/up.js" min="min/0.js?{hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
 			if="!Object.assign"
 			require="
 				litejs/ui/polyfill/es5
 		"></script>
-		<script src="index.js" min="1.js?h={hash}"
+		<script src="index.js" min="min/1.js?h={hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
 			require="
 		"></script>
@@ -125,7 +125,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<script src="binding/_default.js" min></script>
 		<script src="binding/list.js" min></script>
 		<script src="js/debug.js" exclude></script>
-		<script src="js/touch.js" min="2.js?{hash}"></script>
+		<script src="js/touch.js" min="min/2.js?{hash}"></script>
 		<script src="js/drag.js" min></script>
 		<script src="js/xhr-getschema.js" min></script>
 		<script src="js/json-schema-to-form.js" min></script>
@@ -135,7 +135,7 @@ but you'll need the mime-type to work in older browsers and IE11.
 		<script src="component/confirm.tpl" type="litejs/view"></script>
 		<script src="component/Segment7.tpl" type="litejs/view"></script>
 		<script src="view/main.view" type="litejs/view"></script>
-		<script src="../model/index.js" min="3.js?{hash}"></script>
+		<script src="../model/index.js" min="min/3.js?{hash}"></script>
 		<script src="js/data.js" min></script>
 		<script src="js/stat.js" min></script>
 		<script src="js/app.js" min></script>

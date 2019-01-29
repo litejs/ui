@@ -78,7 +78,6 @@
 		\ Maybe you want to look something else?
 
 @view home public
-	&on: "show", Fn('document.title="Home!"')
 	anim-page
 		h2 Home
 		div _welcome
@@ -98,8 +97,6 @@
 
 
 @view users public
-	&kb: {q: Fn('document.title="Qsers!"')}
-	&on: "show", Fn('document.title="Users!"')
 	anim-page
 		h2 Users
 		ul.users &list: Data("users")
