@@ -1,4 +1,8 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
+
+
 El.bindings.list = function(node, list, extra, val) {
 	var child = node._child
 	, data = this

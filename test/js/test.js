@@ -1,4 +1,6 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
 
 function test() {
 	El.data.describe = describe

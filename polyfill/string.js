@@ -1,4 +1,8 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
+
+
 !function(exports) {
 	var Str = exports.String || exports
 	, Str$ = Str.prototype || exports

@@ -1,4 +1,8 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
+
+
 !function(process) {
 	var seq = 0
 	, tickQueue = []

@@ -1,4 +1,8 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
+
+
 !function(exports, Array) {
 	var k, t
 	, typed = [

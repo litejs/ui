@@ -1,4 +1,6 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
 
 
 !function(exports, Function) {
@@ -138,7 +140,7 @@
 
 
 	// 20 fps is good enough
-	add("requestAnimationFrame", "return setTimeout(a, 50)")
+	add("requestAnimationFrame", "return setTimeout(a,50)")
 	// exports.mozRequestAnimationFrame    || // Firefox 4-23
 	// exports.webkitRequestAnimationFrame || // Chrome 10-24
 	// exports.msRequestAnimationFrame     || // IE 10 PP2+

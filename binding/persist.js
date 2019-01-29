@@ -1,3 +1,8 @@
+
+/* litejs.com/MIT-LICENSE.txt */
+
+
+
 !function(bindings) {
 	bindings.persist = bindingPersist
 

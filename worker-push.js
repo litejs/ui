@@ -1,4 +1,7 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
+
 console.log('Push service started', self);
 
 self.addEventListener('install', function(event) {

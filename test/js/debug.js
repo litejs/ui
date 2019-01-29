@@ -1,4 +1,6 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
 /**
  * Returns a function identical to this function except that
  * it prints its arguments on entry and its return value on exit.

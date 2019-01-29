@@ -1,4 +1,6 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
 
 
 // With initial congestion window set to 2 and 1452 bytes of data in a segment.

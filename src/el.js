@@ -1,4 +1,6 @@
 
+/* litejs.com/MIT-LICENSE.txt */
+
 
 
 !function(window, document, Object, Event, protoStr) {
