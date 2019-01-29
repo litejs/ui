@@ -109,7 +109,7 @@
 @view users/{userId} public
 	anim-page
 		form-js
-			&schemaToForm: "schema/user.json", "edit", "form1"
+			&schemaToForm: "../test/ui/schema/user.json", "edit", "form1"
 
 @view users/{userId}/{pageId} public
 	anim-page

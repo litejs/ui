@@ -20,7 +20,7 @@ var Data = List.extend({
 		var list = this
 		, resume = list.wait()
 
-		xhr.get("data/" + list.name + ".json", function(err, result) {
+		xhr.get("../test/ui/data/" + list.name + ".json", function(err, result) {
 			list.removeAll()
 			if (!err) result.forEach(list.add, list)
 			resume()
