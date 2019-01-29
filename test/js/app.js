@@ -14,7 +14,7 @@ if (self !== top) {
 }
 
 
-!function(document, navigator, View, i18n) {
+!function(window, document, navigator, View, i18n) {
 	i18n.def({
 		"ar": "Arabic",
 		"et": "Eesti keeles",
@@ -35,7 +35,7 @@ if (self !== top) {
 	, link = /./
 	, standalone = "standalone" in navigator ?
 		navigator.standalone :
-		this.matchMedia && matchMedia("(display-mode:standalone)").matches
+		window.matchMedia && matchMedia("(display-mode:standalone)").matches
 
 	// Detect first available language
 	, lang = i18n.use([].concat(
@@ -48,6 +48,10 @@ if (self !== top) {
 
 
 	history.scrollRestoration = "manual"
+	if (standalone) {
+		El.addClass(html, "is-app")
+	}
+
 
 	try {
 		timezone = Intl.DateTimeFormat().resolvedOptions().timezone
@@ -72,7 +76,7 @@ if (self !== top) {
 	// It could be any element on page but we want to start from `BODY`.
 	View("#body", body)
 
-	View.on("show", function() {
+	View.on("show", function(params, view) {
 		// Re-render all .js-viewHook elements on each View change
 		El.findAll(body, ".js-viewRender").render()
 	})
@@ -220,27 +224,6 @@ if (self !== top) {
 
 	i18n.setLang(lang)
 
-	El.on(document.body, "click", function(e) {
-		var target = e.target
-		, fastLink = target.tagName == "A" && target.href.split("#")
-
-		if (
-			fastLink &&
-			!(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) &&
-			fastLink[0] == (base || location.href.split("#")[0])
-		) {
-			history.setUrl(fastLink[1])
-			Event.stop(e)
-		}
-	})
-
-
-
-
-
-	if (standalone) {
-		El.addClass(html, "is-app")
-	}
 
 
 	xhr.load(El.findAll(body, "script[type='litejs/view']").pluck("src"), function() {
@@ -248,7 +231,18 @@ if (self !== top) {
 		history.start(View.show, base && base.replace(/.*:\/\/[^/]*|[^\/]*$/g, ""))
 	})
 
-	if (this.console && console.log) {
+	El.on(body, "click", function(e) {
+		var el = e.target
+		, link = !(e.altKey || e.shiftKey) && el.tagName == "A" && el.href.split("#")
+
+		if (link && link[0] == (base || location.href.split("#")[0])) {
+			if (e[El.kbMod] ? window.open(el.href, "_blank") : !history.setUrl(link[1])) {
+				return Event.stop(e)
+			}
+		}
+	})
+
+	if (window.console && console.log) {
 		link.toString = function() {
 			return "https://en.wikipedia.org/wiki/Self-XSS"
 		}
@@ -259,6 +253,6 @@ if (self !== top) {
 			link
 		)
 	}
-}(document, navigator, View, El.i18n)
+}(this, document, navigator, View, El.i18n)
 
 
