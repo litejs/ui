@@ -228,7 +228,7 @@ if (self !== top) {
 
 	xhr.load(El.findAll(body, "script[type='litejs/view']").pluck("src"), function() {
 		// Start a router to show views
-		history.start(View.show, base && base.replace(/.*:\/\/[^/]*|[^\/]*$/g, ""))
+		history.start(View.show)
 	})
 
 	El.on(body, "click", function(e) {

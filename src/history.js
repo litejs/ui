@@ -68,10 +68,13 @@
 	history.getUrl = getUrl
 	history.setUrl = setUrl
 
-	history.start = function(_cb, _base, url) {
+	history.start = function(_cb) {
 		cb = _cb
 		//** PUSH
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
+		var url
+		, _base = document.documentElement.getElementsByTagName("base")[0]
+		if (_base) _base = _base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
 		if (_base && !history.pushState) {
 			url = location.pathname.slice(_base.length)
 			if (url) {
