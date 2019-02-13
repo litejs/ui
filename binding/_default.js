@@ -93,16 +93,17 @@
 		}
 	}
 
-	bindings.is = function bindingIs(node, model, path, list) {
+	bindings.is = function bindingIs(node, model, path, list, state) {
 		var i, match, val
 		, scope = this
 		if (typeof model === "string") {
+			state = list
 			list = path
 			path = model
 			model = scope.model
 		}
 		if (model && path) {
-			match = val = model.get(path)
+			match = val = state || model.get(path)
 			if (list) {
 				if (!Array.isArray(list)) {
 					list = list.split(",")
