@@ -75,7 +75,7 @@
 						)
 						tmp.file = null
 					} else {
-						View("404").show(JSON.merge({}, params))
+						View("404").show(Object.assign({}, params))
 					}
 					return
 				}

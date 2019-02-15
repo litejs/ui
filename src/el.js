@@ -864,7 +864,7 @@
 	El.plugins = {
 		binding: js.extend({
 			done: function() {
-				JSON.merge(bindings, Function("return({" + this.txt + "})")())
+				Object.assign(bindings, Function("return({" + this.txt + "})")())
 			}
 		}),
 		child: plugin.extend({
@@ -1113,7 +1113,7 @@
 
 	function i18nAdd(lang, texts) {
 		if (i18n.list.indexOf(lang) == -1) i18n.list.push(lang)
-		JSON.merge(i18n[lang] || (i18n[lang] = {}), texts)
+		Object.assign(i18n[lang] || (i18n[lang] = {}), texts)
 		if (!currentLang) i18nUse(lang)
 	}
 

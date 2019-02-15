@@ -52,7 +52,7 @@
 
 			El.on(form, "submit", function() {
 				var data = El.val(this)
-				, _scope = JSON.merge({}, scope.route, model && model.data)
+				, _scope = Object.assign({}, scope.route, model && model.data)
 				, href = (_link.href || selfHref).format(_scope)
 				JSON.schemaApply(schema, data)
 
@@ -162,7 +162,7 @@
 			sc.del = del
 			if (ro !== "") sc.noAdd = true
 
-			JSON.merge(sc, schema)
+			Object.assign(sc, schema)
 
 			if (schema.type == "array") {
 				var content = El.find(row, ".js-items")
