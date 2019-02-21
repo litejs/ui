@@ -21,9 +21,9 @@
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.camelCase()] = "" + val || ""
 		}),
-		"class": function(el, name, fn) {
+		"class": El.cls = acceptMany(function(el, name, fn) {
 			;(arguments.length < 3 || fn ? addClass : rmClass)(el, name)
-		},
+		}),
 		data: function(el, key, val) {
 			setAttr(el, "data-" + key, val)
 		},
@@ -446,7 +446,13 @@
 				, i = 0
 				, len = names.length
 
-				if (len > 1) {
+				if (arguments.length < 3) {
+					if (len > 1) {
+						for (; i < len; ) fn(el, names[i++])
+					} else {
+						fn(el, name)
+					}
+				} else if (len > 1) {
 					/*
 					if (Array.isArray(val)) {
 						for (; i < len; ) fn(el, names[i], val[i++])
