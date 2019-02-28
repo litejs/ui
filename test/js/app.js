@@ -78,6 +78,7 @@ if (self !== top) {
 	View.on("show", function(params, view) {
 		// Re-render all .js-viewHook elements on each View change
 		El.findAll(body, ".js-viewRender").render()
+		scroll(0, 1)
 	})
 
 	View.on("xhr:406", function(body, method, url, data, onResponse, send) {
