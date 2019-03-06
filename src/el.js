@@ -59,7 +59,7 @@
 	, addClass = El.addClass = acceptMany(_addClass)
 	, rmClass  = El.rmClass  = acceptMany(_rmClass)
 
-	//** modernBrowser
+	/*** ie8 ***/
 
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	, ie678 = !+"\v1"
@@ -301,12 +301,12 @@
 		// http://www.matts411.com/post/setting_the_name_attribute_in_ie_dom/
 		// http://msdn.microsoft.com/en-us/library/ms536614(VS.85).aspx
 
-		//** modernBrowser
+		/*** ie8 ***/
 		// istanbul ignore next: IE fix
 		if (ie67 && (key == "id" || key == "name" || key == "checked")) {
 			el.mergeAttributes(document.createElement('<INPUT ' + key + '="' + val + '">'), false)
 		} else
-		//*/
+		/**/
 		if (key == "class") {
 			addClass(el, val)
 		} else if (val || val === 0) {
@@ -328,10 +328,10 @@
 
 	El.txt = function(el, newText) {
 		return arguments.length > 1 && el[txtAttr] != newText ? (
-			//** modernBrowser
+			/*** ie8 ***/
 			// Fix for IE5-7
 			//(ie67 && el.tagName == "OPTION" && (el.label = newText)),
-			//*/
+			/**/
 			el[txtAttr] = newText
 		) : el[txtAttr]
 	}
@@ -705,10 +705,10 @@
 					return
 				}
 			} catch (e) {
-				//** debug
+				/*** debug ***/
 				e.message += "\nBINDING: " + bind
 				console.error(e, node)
-				//*/
+				/**/
 				if (window.onerror) {
 					window.onerror(e.message, e.fileName, e.lineNumber)
 				}
@@ -719,11 +719,11 @@
 			fn = bind.nextSibling
 			render(bind, scope)
 		}
-		//** modernBrowser
+		/*** ie8 ***/
 		if (ie678 && node.nodeName == "SELECT") {
 			node.parentNode.insertBefore(node, node)
 		}
-		//*/
+		/**/
 	}
 
 	El.empty = empty
@@ -749,8 +749,6 @@
 
 	El.append = append
 	El.scope = elScope
-
-	//** templates
 
 	function parseTemplate(str) {
 		var parent = El("div")
@@ -959,8 +957,6 @@
 		else append(styleNode, str)
 	}
 
-	//*/
-
 	El.scrollLeft = scrollLeft
 	function scrollLeft() {
 		return window.pageXOffset || root.scrollLeft || body.scrollLeft || 0
@@ -979,7 +975,7 @@
 		}
 	}
 
-	//** kb
+	/*** kb ***/
 	var kbMaps = []
 	, kbKeys = {
 		  8: "backspace", 9: "tab",
@@ -1041,10 +1037,10 @@
 	}
 
 	addEvent(document, "keydown", kbDown)
-	//*/
+	/**/
 
 
-	//** responsive
+	/*** responsive ***/
 	var lastSize, lastOrient
 	, breakpoints = {
 		sm: 0,
@@ -1088,10 +1084,10 @@
 	addEvent(window, "resize", setBreakpointsRated)
 	addEvent(window, "orientationchange", setBreakpointsRated)
 	addEvent(window, "load", setBreakpointsRated)
-	//*/
+	/**/
 
 
-	//** i18n
+	/*** i18n ***/
 	function i18n(text, lang) {
 		lang = i18n[i18nGet(lang) || currentLang]
 		return (
@@ -1135,7 +1131,7 @@
 	// navigator.userLanguage for IE, navigator.language for others
 	// var lang = navigator.language || navigator.userLanguage;
 	// i18nUse("en")
-	//*/
+	/**/
 
 }(window, document, Object, Event, "prototype")
 

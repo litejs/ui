@@ -29,8 +29,10 @@
 @import url("css/state.css");            /* 4 */
 @import url("css/theme/blue.css");       /* 5 */
 
-/*** ie7
-.ie7 {}
+/*** ie8 ***/
+.ie8 {}
+/*/
+.no-ie8{}
 /**/
 
 /*

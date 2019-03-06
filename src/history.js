@@ -23,11 +23,11 @@
 
 	function getUrl(_loc) {
 		var url
-		//** PUSH
+		/*** PUSH ***/
 		if (base) {
 			url = location.pathname.slice(base.length)
 		} else {
-		//*/
+		/**/
 			// bug in Firefox where location.hash is decoded
 			// bug in Safari where location.pathname is decoded
 
@@ -35,27 +35,27 @@
 			// https://bugs.webkit.org/show_bug.cgi?id=30225
 			// https://github.com/documentcloud/backbone/pull/967
 			url = (_loc || location).href.split("#")[1] || ""
-		//** PUSH
+		/*** PUSH ***/
 		}
-		//*/
+		/**/
 		return url.replace(cleanRe, "")
 	}
 
 	function setUrl(url, replace) {
-		//** PUSH
+		/*** PUSH ***/
 		if (base) {
 			history[replace ? "replaceState" : "pushState"](null, null, base + url)
 		} else {
-		//*/
+		/**/
 			location[replace ? "replace" : "assign"]("#" + url)
 			// Opening and closing the iframe tricks IE7 and earlier
 			// to push a history entry on hash-tag change.
 			if (iframe && getUrl() !== getUrl(iframe.location) ) {
 				iframe.location[replace ? "replace" : iframe.document.open().close(), "assign"]("#" + url)
 			}
-		//** PUSH
+		/*** PUSH ***/
 		}
-		//*/
+		/**/
 		checkUrl()
 	}
 
@@ -70,7 +70,7 @@
 
 	history.start = function(_cb) {
 		cb = _cb
-		//** PUSH
+		/*** PUSH ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var url
 		, _base = document.documentElement.getElementsByTagName("base")[0]
@@ -98,7 +98,7 @@
 			// http://html5.org/tools/web-apps-tracker?from=5345&to=5346.
 			window.onpopstate = checkUrl
 		} else
-		//*/
+		/**/
 			if ("onhashchange" in window && !ie6_7) {
 			// There are onhashchange in IE7 but its not get emitted
 			//

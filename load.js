@@ -38,7 +38,7 @@
 		Function("d,Date", "return(1,eval)('(Date)')==d&&eval")(Date, 1) ||
 		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(c,b.firstChild))")
 
-	//** errorLog
+	/*** errorLog ***/
 	, lastError
 	, unsentErrors = []
 
@@ -67,7 +67,7 @@
 			setTimeout(sendErrors, 1307)
 		}
 	}
-	//*/
+	/**/
 
 	// next === true is for sync call
 	//
@@ -168,7 +168,7 @@
 	}
 
 
-	//** require
+	/*** require ***/
 	var modules = {}
 	, process = window.process = {
 		env: {}
@@ -196,7 +196,7 @@
 	require.def = function(map, key) {
 		for (key in map) modules[key] = map[key]
 	}
-	//*/
+	/**/
 
 	/**
 	 *  1. FireFox 3.0 and below throws on `xhr.send()` without arguments.
