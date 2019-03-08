@@ -76,7 +76,10 @@
 				El.kill(el)
 				el = null
 				var action = key || El.attr(this, "data-action")
-				if (next && action) next(action, code)
+				if (action && next) {
+					if (typeof next === "function") next(action, code)
+					else if (next[action]) View.emit(next[action], code)
+				}
 			}
 		}
 	})
