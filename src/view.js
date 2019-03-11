@@ -3,16 +3,16 @@
 
 
 
-!function(window) {
+!function(exports) {
 	var fn, lastView, lastParams, lastStr, lastUrl, syncResume
+	, capture = 1
 	, fnStr = ""
 	, reStr = ""
 	, views = View.views = {}
-	, groupsCount = 1
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 
-	window.View = View
+	exports.View = View
 
 	function View(route, el, parent) {
 		var view = views[route]
@@ -30,10 +30,10 @@
 		view.parent = parent && View(parent)
 
 		if (route.charAt(0) != "#") {
-			var params = "u[" + (view.seq = groupsCount++) + "]?("
+			var params = "m[" + (view.seq = capture++) + "]?("
 			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
-					(params += "o['" + key + "']=u[" + (groupsCount++) + "],") && "([^/]+?)" :
+					(params += "o['" + key + "']=m[" + (capture++) + "],") && "([^/]+?)" :
 					_.replace(escapeRe, "\\$&")
 			})
 
@@ -156,9 +156,9 @@
 	function get(url, params) {
 		if (!fn) {
 			fn = Function(
-				"u,o,r",
-				"return (u=/^\\/?(?:" + reStr + ")[\\/\\s]*$/.exec(u))?(" + fnStr + "r):r"
-			)
+				"var r=/^\\/?(?:" + reStr + ")[\\/\\s]*$/;" +
+				"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
+			)()
 		}
 		return View(fn(url || View.home, params || {}, "404"))
 	}
