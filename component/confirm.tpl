@@ -78,6 +78,7 @@
 				var action = key || El.attr(this, "data-action")
 				if (action && next) {
 					if (typeof next === "function") next(action, code)
+					else if (typeof next[action] === "function") next[action](code)
 					else if (next[action]) View.emit(next[action], code)
 				}
 			}
