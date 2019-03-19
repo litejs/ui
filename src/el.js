@@ -165,13 +165,19 @@
 	}
 
 	/*/
-	, closest = proto.closest
-
-	proto.find = proto.querySelector
-	proto.findAll = function(sel) {
-		return new ElWrap(this.querySelectorAll(sel))
+	El.matches = function(el, sel) {
+		return el.matches(sel)
 	}
-	//*/
+	El.closest = function(el, sel) {
+		return (el.closest ? el : el.parentNode).closest(sel)
+	}
+	El.find = function(el, sel) {
+		return el.querySelector(sel)
+	}
+	El.findAll = function(el, sel) {
+		return new ElWrap(el.querySelectorAll(sel))
+	}
+	/**/
 
 	/**
 	 * Turns CSS selector like syntax to DOM Node
