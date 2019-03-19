@@ -1,36 +1,45 @@
 
-!function(window, xhr) {
-	var auth, poll
-	, put = getName(window)
-
-	if (!put.a) {
-		put.b = getName(window.opener).a || sessionStorage.getItem("last")
-		put.c = document.referrer
-	}
+!function(window, document, xhr) {
+	var auth, hash, poll
+	, events = []
 
 	// JSON.parse and sessionStorage IE8
 
-	Object.each(
-		{ DELETE: "del", GET: 0, PATCH: 0, POST: 0, PUT:0 },
-		function(name, method) {
-			xhr[name || method.toLowerCase()] = xhr[method] = xhrReq.bind(null, method)
-		}
-	)
+	Object.each({ DELETE: "del", GET: 0, PATCH: 0, POST: 0, PUT:0 }, addMethod)
 
-	xhr.hello = function(data, next) {
+	xhr.addMethod = addMethod
+	xhr.hello = hello
+
+	function hello(data, next) {
+		var put = {
+			a: nameStorage(window).a
+		}
+		if (!put.a) {
+			put.b = nameStorage(window.opener).a || sessionStorage.getItem("act")
+			put.c = document.referrer
+		}
+
 		xhr.put("/hello", function(err, json) {
-			auth = !err && json.authorization
-			if (!err && json.a) {
-				put.a = json.a
-				window.name = JSON.stringify(put)
+			auth = json && json.authorization
+			poll = json && json.user
+			if (json && json.a) {
+				nameStorage(window, {a: json.a})
+				hash = json.a
 			}
 			if (next) {
 				next(err, json)
 			}
 			setTimeout(xhrPoll, 1500)
-		}, data)
+			onFocus()
+		}, Object.assign(put, data))
 	}
 
+	xhr.logout = function() {
+		xhr.del("/hello", function(err, json) {
+			authorization = null
+			location.reload()
+		})
+	}
 	/*, ws
 	try {
 		new WebSocket("ws" + location.protocol.slice(4) + "//" + location.host + "/events")
@@ -45,6 +54,15 @@
 	}
 	*/
 
+	El.on(window, "focus", onFocus)
+	El.on(window, "unload", function() {
+		xhr.unload = true
+		if (events.length) navigator.sendBeacon("/events", JSON.stringify(events))
+	})
+
+	function addMethod(name, method) {
+		xhr[name || method.toLowerCase()] = xhr[method] = xhrReq.bind(null, method)
+	}
 
 	function xhrReq(method, url, next, data) {
 		var req = xhr(method, url, function onResponse(err, txt) {
@@ -53,10 +71,12 @@
 				JSON.parse(txt) :
 				txt
 			)
+			if (next && next(err, body, req) === true) return
 			if (err) {
-				View.emit("xhr:" + err, body, method, url, data, onResponse, xhrSend)
-			} else if (next) {
-				next(err, body, req)
+				View.emit(
+					View._e["xhr:" + err] ? "xhr:" + err : "xhr:err",
+					body, method, url, data, onResponse, xhrSend
+				)
 			}
 		})
 		xhrSend(req, data)
@@ -74,8 +94,8 @@
 	}
 
 	function xhrPoll() {
-		if (auth) {
-			xhr.put("/events", pollHandler)
+		if (poll) {
+			xhr.post("/events", pollHandler, events.length > 0 ? events.splice(0) : null)
 		}
 	}
 
@@ -95,19 +115,22 @@
 		setTimeout(xhrPoll, err ? 6000 : 600)
 	}
 
-	function getName(a) {
+	function nameStorage(win, append) {
+		var data = {}
 		try {
 			// RE against XSS
-			a = JSON.parse(a.name.match(/^{[\w:"]*}$/)[0])
-		} catch(e) {
-			a = {}
+			data = JSON.parse(win.name.match(/^{[\w:"]*}$/)[0])
+		} catch(e) {}
+		if (append) {
+			win.name = JSON.stringify(Object.assign(data, append))
 		}
-		return a
+		return data
 	}
 
-	El.on(window, "focus", onFocus)
 	function onFocus() {
-		sessionStorage.setItem("last", put.a)
+		if (hash && document.hasFocus()) {
+			sessionStorage.setItem("act", hash)
+		}
 	}
-}(this, xhr)
+}(this, document, xhr)
 
