@@ -1024,9 +1024,17 @@
 			}
 			kbRun(e, code, key)
 			if (e.shiftKey && code != 16) kbRun(e, code, "shift+" + key)
-			if (e.ctrlKey && code != 17) kbRun(e, code, "ctrl+" + key)
-			if (e.altKey && code != 18) kbRun(e, code, "alt+" + key)
-			if (e[kbMod] && code != 17 && code != 91) kbRun(e, code, "mod+" + key)
+			/**
+			 * people in Poland use Right Alt+S to type in Ś.
+			 * Right Alt+S is mapped internally to Ctrl+Alt+S.
+			 * https://medium.engineering/the-curious-case-of-disappearing-polish-s-fa398313d4df
+			 */
+			if (e.altKey) {
+				if (code != 18) kbRun(e, code, "alt+" + key)
+			} else if (code != 17) {
+				if (e.ctrlKey) kbRun(e, code, "ctrl+" + key)
+				if (e[kbMod] && code != 91) kbRun(e, code, "mod+" + key)
+			}
 		}
 	}
 
