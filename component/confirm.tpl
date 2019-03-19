@@ -67,7 +67,7 @@
 			var num = _num == void 0 ? El.txt(e.target || e.srcElement) : _num
 			code += num
 			if (num == "CLEAR" || num == "del" || num == "backspace") code = ""
-			El.txt(El.find(el, ".t2"), code.replace(/./g, "•") || opts.body)
+			El.txt(El.find(el, ".js-body"), code.replace(/./g, "•") || opts.body)
 			// if (code.length == 4 && id && !sent) next(sent = code, id, resolve, reject)
 		}
 		function resolve(e, key) {
@@ -89,8 +89,8 @@
 	.max.fix
 		.Confirm-bg.abs.max
 		.Confirm-content.grid.p2
-			.col {title}
-			.col.t2 {body}
+			.col.ts3 {title}
+			.col.js-body {body}
 			.row.js-numpad
 				&if: code
 				&each: num in [1,2,3,4,5,6,7,8,9,"CLEAR",0]
