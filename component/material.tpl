@@ -17,7 +17,7 @@
 		max-width: 90%;
 		text-align: center;
 		pointer-events: none;
-		z-index: 9;
+		z-index: 8;
 	}
 	.tooltip[data-pos]:before {
 		content: "";
@@ -59,7 +59,7 @@
 		background: #fff;
 		min-width: 124px;
 		max-width: 100%;
-		z-index: 8;
+		z-index: 7;
 		transition: opacity .4s cubic-bezier(0, 0, .2, 1) .2s, transform .2s cubic-bezier(0, 0, .2, 1) .2s;
 	}
 	.mat-Menu-item {

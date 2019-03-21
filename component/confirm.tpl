@@ -1,5 +1,8 @@
 
 @css
+	.Confirm {
+		z-index: 9;
+	}
 	.Confirm-bg {
 		background-color: #000;
 		opacity: .6;
@@ -86,8 +89,8 @@
 	})
 
 @el Confirm
-	.max.fix
-		.Confirm-bg.abs.max
+	.Confirm.max.fix
+		.Confirm-bg.max.abs
 		.Confirm-content.grid.p2
 			.col.ts3 {title}
 			.col.js-body {body}
