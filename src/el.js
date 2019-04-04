@@ -530,7 +530,6 @@
 				}
 			}
 		}
-
 	}
 
 	// The addEventListener is supported in Internet Explorer from version 9.
@@ -701,9 +700,9 @@
 					""
 				) + (
 					fn ?
-					"b['" + name + "'].call(data,this" + (fn.raw ? ",'" + args + "'" : args ? "," + args : "") + ")||" :
-					"s(this,'" + name + "'," + args + ")||"
-				)
+					"b['" + name + "'].call(data,this" + (fn.raw ? ",'" + args + "'" : args ? "," + args : "") :
+					"s(this,'" + name + "'," + args
+				) + ")||"
 			}) + "r)"
 
 			try {
@@ -772,7 +771,7 @@
 				stack.shift()
 			}
 
-			if (parent.txtMode) {
+			if (parent._r) {
 				parent.txt += all + "\n"
 			} else if (plugin || mapStart && (name = "map")) {
 				if (El.plugins[name]) {
@@ -862,7 +861,8 @@
 
 	function js(parent, params, attr1) {
 		var t = this
-		t.txtMode = t.parent = parent
+		// Raw text mode
+		t._r = t.parent = parent
 		t.txt = ""
 		t.plugin = t.el = t
 		t.params = params
@@ -932,9 +932,9 @@
 					fn = bind.replace(renderRe, function(match, name, op, args) {
 						return "(this['" + name + "']" + (
 							typeof view[name] == "function" ?
-							"(" + (args || "") + "))," :
-							"=" + args + "),"
-						)
+							"(" + (args || "") + ")" :
+							"=" + args
+						) + "),"
 					}) + "1"
 					Fn(fn, view, scopeData)()
 				}
@@ -1088,8 +1088,7 @@
 			_addClass(root, lastOrient = next)
 		}
 
-		next = window.View
-		if (next) next.emit("resize")
+		if (next = window.View) next.emit("resize")
 	}
 	El.setBreakpoints = setBreakpoints
 
