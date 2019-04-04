@@ -9,6 +9,8 @@
 	, fnStr = ""
 	, reStr = ""
 	, views = View.views = {}
+	, paramCb = {}
+	, hasOwn = views.hasOwnProperty
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 
@@ -82,7 +84,7 @@
 			}
 
 			for (tmp in params) if (tmp.charAt(0) != "_") {
-				if (syncResume = param[tmp] || param["*"]) {
+				if (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"]) {
 					syncResume.call(view, params[tmp], tmp, params)
 					syncResume = null
 				}
@@ -176,10 +178,9 @@
 		}
 	}
 
-	View.param = param
-	function param(name, cb) {
+	View.param = function(name, cb, re) {
 		[].concat(name).forEach(function(n) {
-			param[n] = cb
+			paramCb[n] = cb
 		})
 	}
 
