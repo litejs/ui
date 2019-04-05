@@ -995,7 +995,7 @@
 		112: "f1",      113: "f2",   114: "f3",   115: "f4",  116: "f5",  117: "f6",
 		118: "f7",      119: "f8",   120: "f9",   121: "f10", 122: "f11", 123: "f12"
 	}
-	, kbMod = El.kbMod = /Mac|iPod|iPhone|iPad|Pike/.test(navigator.platform) ? "metaKey" : "ctrlKey"
+	, kbMod = El.kbMod = /^(Mac|iP)/.test(navigator.platform) ? "metaKey" : "ctrlKey"
 
 	function kbRun(e, code, chr) {
 		var fn, map
