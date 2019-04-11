@@ -51,8 +51,8 @@
 		top: -3px;
 		left: 0px;
 	}
-	input[type=checkbox]:checked + .Toggle-knob {
-		background-color: rgb(245, 245, 245);
+	input:checked + .Toggle-knob {
+		background-color: #00a651;
 		left: 16px;
 	}
 	.Slider-knob.is-active {
@@ -71,15 +71,22 @@
 	}
 
 @js
-	El.bindings.SliderVal = function(el, model, path) {
-		if (path && path.charAt(0)!=="/") path = "/"+path.replace(/\./g,"/")
-		model.on("change:" + path, set)
+	El.bindings.SliderVal = function(el, model, path, minMax) {
+		if (path) {
+			if (path.charAt(0)!=="/") path = "/" + path.replace(/\./g, "/")
+			model.on("change:" + path, set)
+			setTimeout(function(){
+				set(model.get(path))
+			}, 10)
+		}
 		function set(val) {
 			el.set(parseFloat(val) || 0)
 		}
-		setTimeout(function(){
-			set(model.get(path))
-		},10)
+		if (minMax) {
+			minMax = minMax.split("-")
+			el.min = +minMax[0]
+			el.max = +minMax[1]
+		}
 	}
 	El.bindings.fixReadonlyCheckbox = function(el) {
 		function False(e) {
@@ -96,9 +103,7 @@
 		, fill = track.firstChild
 		, knob = fill.lastChild
 		, value
-		, emit = function(val) {
-			El.emit(el, "change", val)
-		}.rate(500, true)
+		, emit = El.emit.bind(el, el, "change").rate(500, true)
 		El.on(window, "blur", stop)
 		function load(e) {
 			min = el.min || 0
@@ -146,7 +151,7 @@
 		function move(e) {
 			var diff = El.mouse(e).left - offset
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
-			el.set( diff / px, diff )
+			el.set( (diff / px) + min, diff )
 			if (el.onMove) {
 				el.onMove( diff + knobLen )
 			}
@@ -173,7 +178,7 @@
 			}
 			value = val
 			if (!drag || pos !== void 0) {
-				fill.style.width = ((pos || value*px)+knobLen) + "px"
+				fill.style.width = ((pos || (value-min)*px)+knobLen) + "px"
 			}
 		}
 		El.on(el, "mousedown", start)
