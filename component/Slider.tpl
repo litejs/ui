@@ -53,6 +53,7 @@
 		height: 32px;
 		left: -6px;
 		display: block;
+		top: -44px;
 		animation: .1s linear 0s 1 forwards Slider-active;
 	}
 	.Slider-knob.is-active:before {
