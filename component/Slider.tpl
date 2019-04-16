@@ -132,7 +132,10 @@
 	*/
 
 @js
-	El.bindings.SliderVal = function(el, model, path, minMax) {
+	El.bindings.SliderVal = function(el, model, path, range) {
+		if (range) {
+			El.attr(el, "range", range)
+		}
 		if (path) {
 			if (path.charAt(0)!=="/") path = "/" + path.replace(/\./g, "/")
 			model.on("change:" + path, set)
@@ -142,12 +145,6 @@
 		}
 		function set(val) {
 			el.set(parseFloat(val) || 0)
-		}
-		if (minMax) {
-			minMax = minMax.split(/[^+\-\d.]/)
-			el.min = +(minMax[0] || 0)
-			el.max = +(minMax[1] || 100)
-			el.step = +(minMax[2] || 1)
 		}
 	}
 	El.bindings.fixReadonlyCheckbox = function(el) {
@@ -169,9 +166,10 @@
 		El.on(window, "blur", stop)
 		function load(e) {
 			var attr = vert ? "offsetHeight" : "offsetWidth"
-			min = el.min || 0
-			max = el.max || 100
-			step = el.step || 1
+			, range = (El.attr(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
+			min = +(range[0] || 0)
+			max = +(range[1] || 100)
+			step = +(range[2] || 1)
 			knobLen = knob[attr]>>1
 			minPx = 0
 			maxPx = track[attr] - knobLen - knobLen
@@ -179,33 +177,35 @@
 			offset = el.getBoundingClientRect()
 			offset = (vert ? offset.top + maxPx : offset.left) + knobLen
 			if (e && track.childNodes.length > 1) {
-				var diff = El.mouse(e)
-				diff = (vert ? offset - diff.top : diff.left - offset)
 				fill = track.firstChild
-				for (var next, x = maxPx, tmp = fill; tmp; tmp = tmp.nextSibling) {
-					next = Math.abs(diff - tmp[attr])
-					if (next < x) {
+				var next
+				, x = maxPx
+				, tmp = fill
+				, diff = El.mouse(e)
+				for (diff = (vert ? offset - diff.top : diff.left - offset); tmp; tmp = tmp.nextSibling) {
+					next = diff - tmp[attr] + knobLen
+					if (next < 0 ? -next <= x : next < x) {
 						fill = tmp
 						knob = fill.firstChild
-						x = next
+						x = next < 0 ? -next : next
 					}
 				}
 				if (fill.previousSibling) {
-					maxPx = fill.previousSibling[attr] - knobLen - knobLen
-					max = maxPx / px
+					maxPx = fill.previousSibling[attr] - knobLen
+					if (range[3]) maxPx -= px * range[3]
 				}
 				if (fill.nextSibling) {
-					minPx = fill.nextSibling[attr]
-					min = minPx / px
+					minPx = fill.nextSibling[attr] - knobLen
+					if (range[3]) minPx += px * range[3]
 				}
 			}
 		}
 		function start(e) {
+			drag = true
 			load(e)
+			move(e)
 			El.rmClass(fill, "anim")
 			El.addClass(knob, "is-active")
-			drag = true
-			move(e)
 			El.on(document.body, "mouseup", stop)
 			El.on(document.body, "mousemove", move)
 		}
@@ -214,8 +214,7 @@
 			diff = (vert ? offset - diff.top : diff.left - offset)
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
 			el.set( (diff / px) + min, diff )
-			Event.stop(e)
-			return false
+			return Event.stop(e)
 		}
 		function stop(e) {
 			if (!drag) return
@@ -241,9 +240,9 @@
 		}
 		El.on(el, "mousedown", start)
 		El.on(el, "wheel", function(e, delta) {
-			Event.stop(e)
 			load(e)
 			el.set( 1*value + delta*step, 0, 1 )
+			return Event.stop(e)
 		})
 		Event.touchAsMouse(el)
 	}
