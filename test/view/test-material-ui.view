@@ -46,12 +46,12 @@
 					&on: "click", "toggleClass", "MenuBtn--close"
 			.col-3 Sliders
 			.col-9
-				Slider[valu=33]
-					&SliderVal: 0, 0, "1-10"
+				Slider[range="1:10:.5"]
+					&SliderVal: 0, 0, "1:10:.5"
 				br
-				Slider2.no-first[valu=100][style="width:400px"]
+				Slider2.no-first[style="width:400px"]
 				br
-				Slider3.color[valu=33][style="width:400px"]
+				Slider3.color[style="width:400px"]
 				br
 				Toggle
 

@@ -127,9 +127,10 @@
 			el.set(parseFloat(val) || 0)
 		}
 		if (minMax) {
-			minMax = minMax.split("-")
-			el.min = +minMax[0]
-			el.max = +minMax[1]
+			minMax = minMax.split(/[^+\-\d.]/)
+			el.min = +(minMax[0] || 0)
+			el.max = +(minMax[1] || 100)
+			el.step = +(minMax[2] || 1)
 		}
 	}
 	El.bindings.fixReadonlyCheckbox = function(el) {
