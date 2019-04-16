@@ -51,7 +51,7 @@
 				br
 				Slider2.no-first[style="width:400px"]
 				br
-				Slider3[range="10:90:2:4"].color[style="width:400px"]
+				Slider3[range="10:90:2:4"][format="{val}C"].color[style="width:400px"]
 				br
 				Toggle
 				br

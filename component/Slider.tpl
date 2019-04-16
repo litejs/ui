@@ -232,7 +232,9 @@
 				if (drag || scroll) {
 					emit(val)
 				}
-				El.attr(knob, "data-val", value = val)
+				var format = El.attr(el, "format")
+				El.attr(knob, "data-val", format ? format.format({val:val}) : val)
+				value = val
 			}
 			if (!drag || pos !== void 0) {
 				fill.style[vert ? "height" : "width"] = ((pos || (value-min)*px)+knobLen) + "px"
