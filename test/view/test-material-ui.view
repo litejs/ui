@@ -54,4 +54,7 @@
 				Slider3.color[style="width:400px"]
 				br
 				Toggle
+				br
+				Slider[range="1:10:.5"].is-vertical
+					&SliderVal: 0, 0, "1:10:.5"
 

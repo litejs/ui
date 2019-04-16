@@ -4,6 +4,23 @@
 		width: 200px;
 		background: transparent;
 	}
+	.Slider.is-vertical {
+		width: unset;
+		height: 200px;
+	}
+	.is-vertical > .Slider-track {
+		margin: 0 14px;
+		width: 4px;
+		height: 100%;
+	}
+	.is-vertical > .Slider-track > .Slider-fill {
+		top: unset;
+		bottom: 0;
+		width: 4px;
+	}
+	.is-vertical > .Slider-track > .Slider-fill > .Slider-knob {
+		margin: -10px -8px 0 0;
+	}
 	.Slider-track {
 		position: relative;
 		margin: 14px 0;
@@ -144,26 +161,29 @@
 	}
 	El.bindings.SliderInit = function(el) {
 		var knobLen, offset, px, drag, min, max, step, minPx, maxPx, value
+		, vert = El.hasClass(el, "is-vertical")
 		, track = el.firstChild
 		, fill = track.firstChild
 		, knob = fill.lastChild
 		, emit = El.emit.bind(el, el, "change").rate(500, true)
 		El.on(window, "blur", stop)
 		function load(e) {
+			var attr = vert ? "offsetHeight" : "offsetWidth"
 			min = el.min || 0
 			max = el.max || 100
 			step = el.step || 1
-			knobLen = knob.offsetWidth>>1
+			knobLen = knob[attr]>>1
 			minPx = 0
-			maxPx = track.offsetWidth - knobLen - knobLen
+			maxPx = track[attr] - knobLen - knobLen
 			px = maxPx / (max - min)
-			offset = el.getBoundingClientRect().left + knobLen
+			offset = el.getBoundingClientRect()
+			offset = (vert ? offset.top + maxPx : offset.left) + knobLen
 			if (e && track.childNodes.length > 1) {
-				var diff = El.mouse(e).left - offset
-				diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
+				var diff = El.mouse(e)
+				diff = (vert ? offset - diff.top : diff.left - offset)
 				fill = track.firstChild
 				for (var next, x = maxPx, tmp = fill; tmp; tmp = tmp.nextSibling) {
-					next = Math.abs(diff - tmp.offsetWidth)
+					next = Math.abs(diff - tmp[attr])
 					if (next < x) {
 						fill = tmp
 						knob = fill.firstChild
@@ -171,11 +191,11 @@
 					}
 				}
 				if (fill.previousSibling) {
-					maxPx = fill.previousSibling.offsetWidth - knobLen - knobLen
+					maxPx = fill.previousSibling[attr] - knobLen - knobLen
 					max = maxPx / px
 				}
 				if (fill.nextSibling) {
-					minPx = fill.nextSibling.offsetWidth
+					minPx = fill.nextSibling[attr]
 					min = minPx / px
 				}
 			}
@@ -190,7 +210,8 @@
 			El.on(document.body, "mousemove", move)
 		}
 		function move(e) {
-			var diff = El.mouse(e).left - offset
+			var diff = El.mouse(e)
+			diff = (vert ? offset - diff.top : diff.left - offset)
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
 			el.set( (diff / px) + min, diff )
 			Event.stop(e)
@@ -215,7 +236,7 @@
 				El.attr(knob, "data-val", value = val)
 			}
 			if (!drag || pos !== void 0) {
-				fill.style.width = ((pos || (value-min)*px)+knobLen) + "px"
+				fill.style[vert ? "height" : "width"] = ((pos || (value-min)*px)+knobLen) + "px"
 			}
 		}
 		El.on(el, "mousedown", start)
