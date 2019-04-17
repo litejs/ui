@@ -120,15 +120,16 @@
 	.Confirm.max.fix
 		.Confirm-bg.max.abs
 		.Confirm-content.grid.p2
-			.col.ts3 {title}
-			.col.js-body {body}
+			.col.ts3 &txt:: _(title)
+			.col.js-body &txt:: _(body)
 			.row.js-numpad
 				&if: code
 				&each: num in [1,2,3,4,5,6,7,8,9,"CLEAR",0]
 				.col.w4>.btn {num}
 			.col
 				.group &each: action in actions
-					.btn.js-btn {action.title}
+					.btn.js-btn
+						&txt:: _(action.title)
 						&class:: "w" + (12/actions.length)
 						&nop: this.focus()
 						&data: "action", action.action
