@@ -69,7 +69,7 @@
 			var body = (
 				req.getResponseHeader("Content-Type") == "application/json" ?
 				JSON.parse(txt) :
-				txt
+				{ message: txt, code: err }
 			)
 			if (next && next(err, body, req) === true) return
 			if (err) {
