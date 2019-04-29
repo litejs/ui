@@ -93,7 +93,7 @@
 		function numpad(e, _num) {
 			// Enter pressed on focused element
 			if (_num == void 0 && e.clientX == 0) return
-			var num = _num == void 0 ? El.txt(e.target || e.srcElement) : _num
+			var num = _num == void 0 ? e.target[El.T] : _num
 			code += num
 			if (num == "CLEAR" || num == "del" || num == "backspace") code = ""
 			El.txt(El.find(el, ".js-body"), code.replace(/./g, "•") || opts.body)

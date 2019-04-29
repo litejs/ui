@@ -12,7 +12,7 @@
 	, hasOwn = elCache.hasOwnProperty
 	, body = document.body
 	, root = document.documentElement
-	, txtAttr = "textContent" in body ? "textContent" : "innerText"
+	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(([\])}]?).*?([[({]?))$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, splitRe = /[,\s]+/
@@ -33,8 +33,14 @@
 		ref: function(el, name) {
 			this[name] = el
 		},
-		txt: function(el, txt) {
-			el[txtAttr] = txt
+		txt: El.txt = function(el, txt) {
+			// In Safari 2.x, innerText results an empty string
+			// when style.display=="none" or node is not in dom
+			//
+			// innerText is implemented in IE4, textContent in IE9
+			// Opera 9-10 have Node.text
+
+			if (el[txtAttr] !== txt) el[txtAttr] = txt
 		},
 		val: function(el, txt) {
 			valFn(el, txt)
@@ -322,24 +328,6 @@
 		} else if (current) {
 			el.removeAttribute(key)
 		}
-	}
-
-	// In Safari 2.x, innerText functions properly only
-	// if an element is neither hidden (via style.display == "none")
-	// nor orphaned from the document.
-	// Otherwise, innerText results in an empty string.
-	//
-	// textContent is suported from IE9
-	// Opera 9-10 have Node.text so we use Node.txt
-
-	El.txt = function(el, newText) {
-		return arguments.length > 1 && el[txtAttr] != newText ? (
-			/*** ie8 ***/
-			// Fix for IE5-7
-			//(ie67 && el.tagName == "OPTION" && (el.label = newText)),
-			/**/
-			el[txtAttr] = newText
-		) : el[txtAttr]
 	}
 
 	El.val = valFn
