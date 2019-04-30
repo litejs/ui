@@ -278,12 +278,12 @@
 			var menu = openMenu
 			if (menu) {
 				El.rmClass(menu, "is-visible")
-				setTimeout(El.kill.bind(null, menu), 800)
+				setTimeout(menu.closeFn || El.kill.bind(null, menu), 800)
+				openMenu = null
 			}
 			if (lastMenuTarget) {
 				El.rmClass(lastMenuTarget, "is-active")
 			}
-			openMenu = null
 		}
 		View.on("resize", closeMenu)
 		View.on("showMenu", function(e, target, menu, x, y, margin) {
@@ -292,7 +292,7 @@
 			closeMenu()
 			if (close) return
 			lastMenuTarget = target
-			openMenu = El(menu)
+			openMenu = typeof menu == "string" ? El(menu) : menu
 			if (openMenu.style.transform !== void 0) {
 				El.addClass(openMenu, "no-events")
 				El.on(openMenu, "transitionend", function(e) {
