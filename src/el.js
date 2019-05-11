@@ -22,7 +22,7 @@
 			el.style[key.camelCase()] = "" + val || ""
 		}),
 		"class": El.cls = acceptMany(function(el, name, fn) {
-			;(arguments.length < 3 || fn ? addClass : rmClass)(el, name)
+			el && (arguments.length < 3 || fn ? addClass : rmClass)(el, name)
 		}),
 		data: function(el, key, val) {
 			setAttr(el, "data-" + key, val)
@@ -434,8 +434,9 @@
 	}
 
 	function acceptMany(fn) {
-		return function(el, name, val) {
+		return function f(el, name, val, delay) {
 			if (typeof name === "string" && name !== "") {
+				if (delay > 0) return setTimeout(f, delay, el, name, val)
 				var names = name.split(splitRe)
 				, i = 0
 				, len = names.length
