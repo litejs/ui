@@ -20,7 +20,7 @@ El.bindings.list = function(node, list, extra, val) {
 
 	El.on(node, "kill", clear)
 
-	El.addClass(node, "loading")
+	El.cls(node, "loading")
 
 	if (extra) {
 		extra.each(clone)
@@ -38,7 +38,7 @@ El.bindings.list = function(node, list, extra, val) {
 			}
 			El.val(node, val)
 		}
-		El.rmClass(node, "loading")
+		El.cls(node, "loading", 0)
 	})
 
 	// Do not render childs when list initialized

@@ -91,8 +91,7 @@
 	bindings.initChart = function(el) {
 		El.on(el, "mouseout", function(e) {
 			if (svgToLastActive && e.target == el) {
-				El.rmClass(svgToLastActive, "is-active")
-				svgToLastActive = null
+				El.cls(svgToLastActive, "is-active", svgToLastActive = null)
 			}
 		})
 	}
@@ -100,10 +99,9 @@
 	bindings.svgToLast = function(el) {
 		El.on(el, "mouseover", function() {
 			if (!svgToLastActive || el != el.parentNode.lastChild) {
-				if (svgToLastActive) El.rmClass(svgToLastActive, "line-active")
+				El.cls(svgToLastActive, "line-active", 0)
 				El.append(el.parentNode, el)
-				El.addClass(el, "is-active")
-				svgToLastActive = el
+				El.cls(el, "is-active", svgToLastActive = el)
 			}
 		})
 	}

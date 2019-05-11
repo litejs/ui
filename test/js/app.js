@@ -48,7 +48,7 @@ if (self !== top) {
 
 	history.scrollRestoration = "manual"
 	if (standalone) {
-		El.addClass(html, "is-app")
+		El.cls(html, "is-app")
 	}
 
 
@@ -144,7 +144,7 @@ if (self !== top) {
 	})
 
 	View.on("toggleClass", function(e, el, clName, target) {
-		El[El.hasClass(el, clName) ? "rmClass" : "addClass"](el, clName)
+		El.cls(el, clName, !El.hasClass(el, clName))
 	})
 
 	View.on("logout", function() {
@@ -200,14 +200,14 @@ if (self !== top) {
 
 	View("public")
 	.on("openChild", function(open, close) {
-		if (close) El.addClass(open.isOpen, close.seq < open.seq ? "from" + upper : "from" + lower)
+		if (close) El.cls(open.isOpen, close.seq < open.seq ? "from" + upper : "from" + lower)
 	})
 
 	View("public")
 	.on("closeChild", function(close, open) {
 		var isOpen = close.isOpen
 		close.isOpen = null
-		El.addClass(isOpen, open && open.seq < close.seq ? "to" + upper : "to" + lower)
+		El.cls(isOpen, open && open.seq < close.seq ? "to" + upper : "to" + lower)
 		setTimeout(function() {
 			El.kill(isOpen)
 		}, 600)

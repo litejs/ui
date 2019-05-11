@@ -204,10 +204,7 @@
 			drag = true
 			load(e)
 			move(e)
-			El.rmClass(fill, "anim")
-			El.addClass(knob, "is-active")
-			El.on(document.body, "mouseup", stop)
-			El.on(document.body, "mousemove", move)
+			listen("on")
 		}
 		function move(e) {
 			var diff = El.mouse(e)
@@ -218,12 +215,15 @@
 		}
 		function stop(e) {
 			if (!drag) return
-			El.addClass(fill, "anim")
-			El.rmClass(knob, "is-active")
 			drag = false
-			El.off(document.body, "mouseup", stop)
-			El.off(document.body, "mousemove", move)
+			listen("off")
 			el.set(value)
+		}
+		function listen(on) {
+			El.cls(fill, "anim", !drag)
+			El.cls(knob, "is-active", drag)
+			El[on](document.body, "mouseup", stop)
+			El[on](document.body, "mousemove", move)
 		}
 		el.set = function(val, pos, scroll) {
 			px || load()

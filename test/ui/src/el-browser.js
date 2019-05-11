@@ -234,47 +234,47 @@ testman
 .equal(El.hasClass(el, "c2"), false)
 .equal(El.hasClass(el, "c3"), false)
 
-.equal(El.addClass(el, "c1"), null)
+.equal(El.cls(el, "c1"), null)
 .equal(El.hasClass(el, "c1"), true)
 .equal(El.hasClass(el, "c2"), false)
 .equal(El.hasClass(el, "c3"), false)
 
-.equal(El.addClass(el, "c2"), null)
+.equal(El.cls(el, "c2"), null)
 .equal(El.hasClass(el, "c1"), true)
 .equal(El.hasClass(el, "c2"), true)
 .equal(El.hasClass(el, "c3"), false)
 
-.equal(El.addClass(el, "c3"), null)
+.equal(El.cls(el, "c3"), null)
 .equal(El.hasClass(el, "c1"), true)
 .equal(El.hasClass(el, "c2"), true)
 .equal(El.hasClass(el, "c3"), true)
 
-.equal(El.rmClass(el, "c2"), null)
+.equal(El.cls(el, "c2", 0), null)
 .equal(El.hasClass(el, "c1"), true)
 .equal(El.hasClass(el, "c2"), false)
 .equal(El.hasClass(el, "c3"), true)
 
-.equal(El.rmClass(el, "c3"), null)
+.equal(El.cls(el, "c3", 0), null)
 .equal(El.hasClass(el, "c1"), true)
 .equal(El.hasClass(el, "c2"), false)
 .equal(El.hasClass(el, "c3"), false)
 
-.equal(El.rmClass(el, "c3"), null)
+.equal(El.cls(el, "c3", 0), null)
 .equal(El.hasClass(el, "c1"), true)
 .equal(El.hasClass(el, "c2"), false)
 .equal(El.hasClass(el, "c3"), false)
 
-.equal(El.rmClass(el, "c1"), null)
+.equal(El.cls(el, "c1", 0), null)
 .equal(El.hasClass(el, "c1"), false)
 .equal(El.hasClass(el, "c2"), false)
 .equal(El.hasClass(el, "c3"), false)
 
-.equal(El.addClass(el, "c1 c3"), null)
+.equal(El.cls(el, "c1 c3"), null)
 .equal(El.hasClass(el, "c1"), true)
 .equal(El.hasClass(el, "c2"), false)
 .equal(El.hasClass(el, "c3"), true)
 
-.equal(El.rmClass(el, "c1 c3"), null)
+.equal(El.cls(el, "c1 c3", 0), null)
 .equal(el.className, "")
 
 

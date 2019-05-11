@@ -21,9 +21,7 @@
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.camelCase()] = "" + val || ""
 		}),
-		"class": El.cls = acceptMany(function(el, name, fn) {
-			el && (arguments.length < 3 || fn ? addClass : rmClass)(el, name)
-		}),
+		"class": El.cls = acceptMany(cls),
 		data: function(el, key, val) {
 			setAttr(el, "data-" + key, val)
 		},
@@ -62,8 +60,6 @@
 		history: history,
 		View: View
 	}
-	, addClass = El.addClass = acceptMany(_addClass)
-	, rmClass  = El.rmClass  = acceptMany(_rmClass)
 
 	/*** ie8 ***/
 
@@ -320,7 +316,7 @@
 		} else
 		/**/
 		if (key == "class") {
-			addClass(el, val)
+			cls(el, val)
 		} else if (val || val === 0) {
 			if (current != val) {
 				el.setAttribute(key, val)
@@ -435,7 +431,7 @@
 
 	function acceptMany(fn) {
 		return function f(el, name, val, delay) {
-			if (typeof name === "string" && name !== "") {
+			if (el && typeof name === "string" && name !== "") {
 				if (delay > 0) return setTimeout(f, delay, el, name, val)
 				var names = name.split(splitRe)
 				, i = 0
@@ -480,7 +476,7 @@
 		return !!current && current.split(splitRe).indexOf(name) > -1
 	}
 
-	function _addClass(el, name) {
+	function cls(el, name, set) {
 		var current = el.className || ""
 		, useAttr = typeof current !== "string"
 
@@ -488,8 +484,12 @@
 			current = el.getAttribute("class") || ""
 		}
 
-		if (current) {
-			name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
+		if (arguments.length < 3 || set) {
+			if (current) {
+				name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
+			}
+		} else {
+			name = current ? (" " + current + " ").replace(" " + name + " ", " ").trim() : current
 		}
 
 		if (current != name) {
@@ -497,26 +497,6 @@
 				el.setAttribute("class", name)
 			} else {
 				el.className = name
-			}
-		}
-	}
-
-	function _rmClass(el, name) {
-		var current = el.className || ""
-		, useAttr = typeof current != "string"
-
-		if (useAttr) {
-			current = el.getAttribute("class") || ""
-		}
-
-		if (current) {
-			name = (" " + current + " ").replace(" " + name + " ", " ").trim()
-			if (current != name) {
-				if (useAttr) {
-					el.setAttribute("class", name)
-				} else {
-					el.className = name
-				}
 			}
 		}
 	}
@@ -1066,15 +1046,15 @@
 		}
 
 		if ( next != lastSize ) {
-			_rmClass(root, lastSize)
-			_addClass(root, lastSize = next)
+			cls(root, lastSize, 0)
+			cls(root, lastSize = next)
 		}
 
 		next = width > root.offsetHeight ? "landscape" : "portrait"
 
 		if ( next != lastOrient) {
-			_rmClass(root, lastOrient)
-			_addClass(root, lastOrient = next)
+			cls(root, lastOrient, 0)
+			cls(root, lastOrient = next)
 		}
 
 		if (next = window.View) next.emit("resize")

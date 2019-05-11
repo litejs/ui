@@ -117,8 +117,8 @@
 					}
 				}
 			}
-			El.rmClass(node, scope["_is-" + path])
-			El.addClass(node, scope["_is-" + path] = match && "is-" + match)
+			El.cls(node, scope["_is-" + path], 0)
+			El.cls(node, scope["_is-" + path] = match && "is-" + match)
 		}
 	}
 
