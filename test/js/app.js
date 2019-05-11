@@ -137,6 +137,12 @@ if (self !== top) {
 		View.show(true, {error: err})
 	})
 
+	View.on("timerTest", function(e, el) {
+		setTimeout(function() {
+			El.txt(el, arguments.length)
+		}, 1000, 1, 2, 3)
+	})
+
 	View.on("toggleClass", function(e, el, clName, target) {
 		El[El.hasClass(el, clName) ? "rmClass" : "addClass"](el, clName)
 	})

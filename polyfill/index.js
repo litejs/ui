@@ -176,12 +176,18 @@
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
 	add("escape", function(s) { return esc(s) }, esc("a", 0) != "a")
 
-
-	// Remove background image flickers on hover in IE6
-	//
-	// You could also use CSS
-	// html { filter: expression(document.execCommand("BackgroundImageCache", false, true)); }
-	eval("/*@cc_on try{document.execCommand('BackgroundImageCache',false,true)}catch(e){}@*/")
+	eval(
+		"/*@cc_on " +
+		// Remove background image flickers on hover in IE6
+		// You could also use CSS
+		// html { filter: expression(document.execCommand("BackgroundImageCache", false, true)); }
+		"try{document.execCommand('BackgroundImageCache',false,true)}catch(e){}" +
+		// Patch parameters support for setTimeout callback
+		"function f(n){var s=window[n];window[n]=function(f,t){var a=arguments;" +
+		"return s(typeof f=='function'&&a.length>2?f.apply.bind(f,null,[].slice.call(a,2)):f,t)}}" +
+		"if(!+'\v1'||document.documentMode<=9){f('setTimeout');f('setInterval')}" +
+		"@*/"
+	)
 }(this, Function)
 
 
