@@ -60,7 +60,7 @@
 		min-width: 124px;
 		max-width: 100%;
 		z-index: 7;
-		transition: opacity .4s cubic-bezier(0, 0, .2, 1) .2s, transform .2s cubic-bezier(0, 0, .2, 1) .2s;
+		transition: opacity .4s cubic-bezier(0, 0, .2, 1) 0s, transform .2s cubic-bezier(0, 0, .2, 1) 0s;
 	}
 	.mat-Menu-item {
 		display: block;
@@ -84,7 +84,6 @@
 	.tooltip.is-visible {
 		transform: scale(1);
 		opacity: 1;
-		transition: opacity .4s cubic-bezier(0, 0, .2, 1) 0s, transform .2s cubic-bezier(0, 0, .2, 1) 0s;
 	}
 	.waves {
 		position: relative;
@@ -240,8 +239,7 @@
 			El.css(source, "left", (left < 0 ? 0 : left) + "px")
 		}
 		function closeTooltip() {
-			El.rmClass(tooltip, "is-visible")
-			tipOpen = null
+			El.cls(tooltip, "is-visible", tipOpen = null)
 		}
 		El.on(document.body, "mouseover", onOver)
 		El.on(window, "focusin", onOver)
@@ -271,19 +269,15 @@
 			El.attr(tooltip, "data-pos", pos)
 			near(tooltip, target, x, y, 6)
 			tooltip.offsetTop // force repaint
-			El.addClass(tooltip, "is-visible")
+			El.cls(tooltip, "is-visible")
 		}
 		function closeMenu(e) {
 			if (e && e.target == lastMenuTarget) return
-			var menu = openMenu
-			if (menu) {
-				El.rmClass(menu, "is-visible")
-				setTimeout(menu.closeFn || El.kill.bind(null, menu), 800)
-				openMenu = null
+			if (openMenu) {
+				setTimeout(openMenu.closeFn || El.kill.bind(null, openMenu), 800)
+				El.cls(openMenu, "is-visible", openMenu = null, 300)
 			}
-			if (lastMenuTarget) {
-				El.rmClass(lastMenuTarget, "is-active")
-			}
+			El.cls(lastMenuTarget, "is-active", 0)
 		}
 		View.on("resize", closeMenu)
 		View.on("showMenu", function(e, target, menu, x, y, margin) {
@@ -294,20 +288,20 @@
 			lastMenuTarget = target
 			openMenu = typeof menu == "string" ? El(menu) : menu
 			if (openMenu.style.transform !== void 0) {
-				El.addClass(openMenu, "no-events")
+				El.cls(openMenu, "no-events")
 				El.on(openMenu, "transitionend", function(e) {
-					if (openMenu && e.propertyName === "transform") El.rmClass(openMenu, "no-events")
+					if (e.propertyName === "transform") El.cls(openMenu, "no-events", 0)
 				})
 			}
 			El.scope(openMenu, El.scope(target))
 			El.append(document.body, openMenu)
 			El.render(openMenu)
 			near(openMenu, target, x, y, 4)
-			El.addClass(target, "is-active")
+			El.cls(target, "is-active")
 			openMenu.offsetTop // force repaint
-			El.addClass(openMenu, "is-visible")
+			El.cls(openMenu, "is-visible")
 		})
-		El.on(document.body, "mouseup", closeMenu)
+		El.on(document.body, "click", closeMenu)
 		El.on(document.body, "mousedown", mousedown)
 		function mousedown(e) {
 			var target = e.target
@@ -331,11 +325,11 @@
 			tick = setTimeout(end, 800)
 			El.one(document.body, "mouseup", end)
 			ripple.offsetTop // force repaint
-			El.addClass(ripple, "waves-ripple--play")
+			El.cls(ripple, "waves-ripple--play")
 		}
 		function end() {
 			if (!(wait--)) {
-				El.rmClass(ripple, "waves-ripple--play")
+				El.cls(ripple, "waves-ripple--play", 0)
 			}
 		}
 	}(View)
