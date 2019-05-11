@@ -16,10 +16,14 @@
 	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(([\])}]?).*?([[({]?))$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, splitRe = /[,\s]+/
+	, camelRe = /\-([a-z])/g
+	, camelFn = function(_, a) {
+		return a.toUpperCase()
+	}
 	, bindings = El.bindings = {
 		attr: setAttr,
 		css: El.css = acceptMany(function(el, key, val) {
-			el.style[key.camelCase()] = "" + val || ""
+			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
 		}),
 		"class": El.cls = acceptMany(cls),
 		data: function(el, key, val) {
