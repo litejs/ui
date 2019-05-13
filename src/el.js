@@ -22,10 +22,10 @@
 	}
 	, bindings = El.bindings = {
 		attr: setAttr,
+		cls: El.cls = acceptMany(cls),
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
 		}),
-		"class": El.cls = acceptMany(cls),
 		data: function(el, key, val) {
 			setAttr(el, "data-" + key, val)
 		},

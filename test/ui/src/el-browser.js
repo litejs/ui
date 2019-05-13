@@ -313,7 +313,7 @@ testman
 		"@el test9",
 		" a>b>i |link",
 		"@el test10",
-		" a>b[data-bind=\"class:'red',i>1\"]>i &txt:name"
+		" a>b[data-bind=\"cls:'red',i>1\"]>i &txt:name"
 	].join("\n"))
 }())
 .htmlSimilar(El("test1"), '<a><b><i></i></b></a>')
@@ -332,17 +332,17 @@ testman
 	var el = El("test10")
 
 	assert.htmlSimilar(el,
-		"<a><b data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\"></i></b></a>")
+		"<a><b data-bind=\"cls:'red',i&gt;1\"><i data-bind=\"txt:name\"></i></b></a>")
 
 	El.render(el, {i:1,name:"world"})
 
 	assert.htmlSimilar(el,
-		"<a><b data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\">world</i></b></a>")
+		"<a><b data-bind=\"cls:'red',i&gt;1\"><i data-bind=\"txt:name\">world</i></b></a>")
 
 	El.render(el, {i:2,name:"moon"})
 
 	assert.htmlSimilar(el,
-		"<a><b class=\"red\" data-bind=\"class:'red',i&gt;1\"><i data-bind=\"txt:name\">moon</i></b></a>")
+		"<a><b class=\"red\" data-bind=\"cls:'red',i&gt;1\"><i data-bind=\"txt:name\">moon</i></b></a>")
 
 	assert.end()
 })
