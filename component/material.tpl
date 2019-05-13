@@ -64,10 +64,13 @@
 	}
 	.mat-Menu-item {
 		display: block;
-		padding: 0 16px;
+		padding: 12px 16px;
 		text-decoration: none;
-		line-height: 48px;
+		line-height: 24px;
 		cursor: pointer;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.mat-Menu-item:hover {
 		background-color: #eee;
