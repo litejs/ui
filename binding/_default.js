@@ -123,10 +123,35 @@
 	}
 
 	bindings.on = bindingOn
-	function bindingOn(el, ev, fn, a1, a2, a3, a4, a5) {
-		El.on(el, ev, typeof fn == "string" ? function(e) {
-			View.emit(fn, e, el, a1, a2, a3, a4, a5)
-		} : fn)
+	// .on( events [, selector ] [, data ], handler )
+	function bindingOn(el, events, selector, data, handler) {
+		var argi = arguments.length
+		if (argi == 4) {
+			handler = data
+			if (typeof selector == "string") {
+				data = null
+			} else {
+				data = selector
+				selector = null
+			}
+		}
+		if (argi == 3) {
+			handler = selector
+			selector = data = null
+		}
+		El.on(el, events, (
+			typeof handler == "string" ? function(e) {
+				var target = selector ? El.closest(e.target, selector) : el
+				if (!target) return
+				var args = [handler, e, target]
+				args.push.apply(args, data)
+				View.emit.apply(View, args)
+			} :
+			selector ? function(e) {
+				if (El.matches(e.target, selector)) handler(e)
+			} :
+			handler
+		))
 	}
 
 	bindings.emitForm = emitForm
