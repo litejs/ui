@@ -239,12 +239,6 @@
 			El.css(source, "top", (top < 0 ? 0 : top) + "px")
 			El.css(source, "left", (left < 0 ? 0 : left) + "px")
 		}
-		function closeTooltip() {
-			if (tipOpen) {
-				setTimeout(El.kill.bind(El, tooltip), 999)
-				El.cls(tooltip, "is-visible", tipOpen = tooltip = null)
-			}
-		}
 		El.on(document.body, "mouseover", onOver)
 		El.on(window, "focusin", onOver)
 		View.on("show", closeTooltip)
@@ -276,11 +270,23 @@
 			near(tooltip, target, x, y, 6)
 			El.cls(tooltip, "is-visible")
 		}
+		function close(el) {
+			if (el) {
+				setTimeout(el.closeFn || El.kill.bind(El, el), 999)
+				El.cls(el, "is-visible", 0)
+			}
+		}
+		function closeTooltip() {
+			if (tooltip) {
+				close(tooltip)
+				tipOpen = tooltip = null
+			}
+		}
 		function closeMenu(e) {
 			if (e && e.target == lastMenuTarget) return
 			if (openMenu) {
-				setTimeout(openMenu.closeFn || El.kill.bind(null, openMenu), 800)
-				El.cls(openMenu, "is-visible", openMenu = null, 300)
+				close(openMenu)
+				openMenu = null
 			}
 			El.cls(lastMenuTarget, "is-active", 0)
 		}
