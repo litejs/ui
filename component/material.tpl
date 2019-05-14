@@ -8,6 +8,7 @@
 		margin: 0;
 		opacity: 0;
 		transform: scale(0);
+		transition: opacity .4s cubic-bezier(0, 0, .2, 1) 0s, transform .2s cubic-bezier(0, 0, .2, 1) 0s;
 	}
 	.tooltip {
 		padding: 8px;
@@ -60,7 +61,6 @@
 		min-width: 124px;
 		max-width: 100%;
 		z-index: 7;
-		transition: opacity .4s cubic-bezier(0, 0, .2, 1) 0s, transform .2s cubic-bezier(0, 0, .2, 1) 0s;
 	}
 	.mat-Menu-item {
 		display: block;
@@ -197,10 +197,8 @@
 
 @js
 	!function(View) {
-		var lastMenuTarget, openMenu, tipOpen, tick, wait
-		, tooltip = El("pre.tooltip")
+		var lastMenuTarget, openMenu, tipOpen, tooltip, tick, wait
 		, ripple = El(".waves-ripple")
-		El.append(document.body, tooltip)
 		El.near = near
 		function near(source, target, x, y, margin) {
 			var rect = target.getBoundingClientRect()
@@ -242,7 +240,10 @@
 			El.css(source, "left", (left < 0 ? 0 : left) + "px")
 		}
 		function closeTooltip() {
-			El.cls(tooltip, "is-visible", tipOpen = null)
+			if (tipOpen) {
+				setTimeout(El.kill.bind(El, tooltip), 999)
+				El.cls(tooltip, "is-visible", tipOpen = tooltip = null)
+			}
 		}
 		El.on(document.body, "mouseover", onOver)
 		El.on(window, "focusin", onOver)
@@ -261,6 +262,7 @@
 			}
 			closeTooltip()
 			if (!text) return
+			tooltip = El("pre.tooltip")
 			tipOpen = target
 			pos = El.attr(target, "data-tooltip-pos") || "top"
 			El.txt(tooltip, text)
@@ -270,8 +272,8 @@
 				y = pos
 			}
 			El.attr(tooltip, "data-pos", pos)
+			El.append(document.body, tooltip)
 			near(tooltip, target, x, y, 6)
-			tooltip.offsetTop // force repaint
 			El.cls(tooltip, "is-visible")
 		}
 		function closeMenu(e) {
