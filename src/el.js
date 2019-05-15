@@ -5,6 +5,7 @@
 
 !function(window, document, Object, Event, protoStr) {
 	var currentLang, styleNode
+	, isArray = Array.isArray
 	, seq = 0
 	, elCache = El.cache = {}
 	, wrapProto = []
@@ -367,7 +368,7 @@
 
 		if (arguments.length > 1) {
 			if (opts) {
-				value = (Array.isArray(val) ? val : [ val ]).map(String)
+				value = (isArray(val) ? val : [ val ]).map(String)
 				for (; input = opts[i++]; ) {
 					input.selected = value.indexOf(input.value) > -1
 				}
@@ -435,9 +436,15 @@
 
 	function acceptMany(fn) {
 		return function f(el, name, val, delay) {
-			if (el && typeof name === "string" && name !== "") {
+			if (el && name) {
 				if (delay > 0) return setTimeout(f, delay, el, name, val)
-				var names = name.split(splitRe)
+				if (name.constructor === Object) {
+					for (i in name) {
+						if (hasOwn.call(name, i)) f(el, i, name[i])
+					}
+					return
+				}
+				var names = isArray(name) ? name : name.split(splitRe)
 				, i = 0
 				, len = names.length
 
@@ -456,7 +463,7 @@
 					}
 					/*/
 					for (; i < len; ) {
-						fn(el, names[i++], Array.isArray(val) ? val[i - 1] : val)
+						fn(el, names[i++], isArray(val) ? val[i - 1] : val)
 					}
 					//*/
 				} else {
