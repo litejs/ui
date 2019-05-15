@@ -197,7 +197,7 @@
 
 @js
 	!function(View) {
-		var lastMenuTarget, openMenu, tipOpen, tooltip, tick, wait
+		var menuTarget, menuEl, tipTarget, tipEl, tick, wait
 		, ripple = El(".waves-ripple")
 		El.near = near
 		function near(source, target, x, y, margin) {
@@ -235,9 +235,11 @@
 			}
 			left += El.scrollLeft()
 			top += El.scrollTop()
-			El.css(source, "transform-origin", x + y)
-			El.css(source, "top", (top < 0 ? 0 : top) + "px")
-			El.css(source, "left", (left < 0 ? 0 : left) + "px")
+			El.css(source, {
+				"transform-origin": x + y,
+				top: (top < 0 ? 0 : top) + "px",
+				left: (left < 0 ? 0 : left) + "px"
+			})
 		}
 		El.on(document.body, "mouseover", onOver)
 		El.on(window, "focusin", onOver)
@@ -248,69 +250,67 @@
 			, text = target.getAttribute("data-tooltip")
 			, relTarg = e.relatedTarget || e.fromElement
 			// without relTarg is event on click
-			if (!relTarg && e.type !== "focusin" || target === tipOpen) return
-			if (!text && tipOpen) {
+			if (!relTarg && e.type !== "focusin" || target === tipTarget) return
+			if (!text && tipTarget) {
 				for (; target = target.parentNode; ) {
-					if (target === tipOpen) return
+					if (target === tipTarget) return
 				}
 			}
 			closeTooltip()
 			if (!text) return
-			tooltip = El("pre.tooltip")
-			tipOpen = target
+			tipEl = openVisible("pre.tooltip", tipTarget = target)
 			pos = El.attr(target, "data-tooltip-pos") || "top"
-			El.txt(tooltip, text)
+			El.txt(tipEl, text)
 			if (pos === "left" || pos === "right") {
 				x = pos
 			} else {
 				y = pos
 			}
-			El.attr(tooltip, "data-pos", pos)
-			El.append(document.body, tooltip)
-			near(tooltip, target, x, y, 6)
-			El.cls(tooltip, "is-visible")
+			El.attr(tipEl, "data-pos", pos)
+			near(tipEl, target, x, y, 6)
 		}
-		function close(el) {
+		function openVisible(tag, target) {
+			var el = typeof tag == "string" ? El(tag) : tag
+			El.scope(el, El.scope(target))
+			El.render(el)
+			El.append(document.body, el)
+			El.cls(el, "is-visible", 1, 5)
+			return el
+		}
+		function closeVisible(el, delay) {
 			if (el) {
 				setTimeout(el.closeFn || El.kill.bind(El, el), 999)
-				El.cls(el, "is-visible", 0)
+				El.cls(el, "is-visible", 0, delay)
 			}
 		}
 		function closeTooltip() {
-			if (tooltip) {
-				close(tooltip)
-				tipOpen = tooltip = null
+			if (tipEl) {
+				closeVisible(tipEl)
+				tipTarget = tipEl = null
 			}
 		}
 		function closeMenu(e) {
-			if (e && e.target == lastMenuTarget) return
-			if (openMenu) {
-				close(openMenu)
-				openMenu = null
+			if (e && e.target == menuTarget) return
+			if (menuEl) {
+				closeVisible(menuEl, 200)
+				El.cls(menuTarget, "is-active", menuEl = menuTarget = null)
 			}
-			El.cls(lastMenuTarget, "is-active", 0)
 		}
 		View.on("resize", closeMenu)
 		View.on("showMenu", function(e, target, menu, x, y, margin) {
 			Event.stop(e)
-			var close = openMenu && lastMenuTarget == target
+			var close = menuEl && menuTarget == target
 			closeMenu()
 			if (close) return
-			lastMenuTarget = target
-			openMenu = typeof menu == "string" ? El(menu) : menu
-			if (openMenu.style.transform !== void 0) {
-				El.cls(openMenu, "no-events")
-				El.on(openMenu, "transitionend", function(e) {
-					if (e.propertyName === "transform") El.cls(openMenu, "no-events", 0)
+			El.cls(target, "is-active")
+			menuEl = openVisible(menu, menuTarget = target)
+			near(menuEl, target, x, y, 4)
+			if (menuEl.style.transform !== void 0) {
+				El.cls(menuEl, "no-events")
+				El.on(menuEl, "transitionend", function(e) {
+					if (e.propertyName === "transform") El.cls(menuEl, "no-events", 0)
 				})
 			}
-			El.scope(openMenu, El.scope(target))
-			El.append(document.body, openMenu)
-			El.render(openMenu)
-			near(openMenu, target, x, y, 4)
-			El.cls(target, "is-active")
-			openMenu.offsetTop // force repaint
-			El.cls(openMenu, "is-visible")
 		})
 		El.on(document.body, "click", closeMenu)
 		El.on(document.body, "mousedown", mousedown)
@@ -325,10 +325,12 @@
 			, maxW = Math.max(left, target.offsetWidth - left)
 			, max = Math.sqrt(maxH * maxH + maxW * maxW)
 			, size = (fromMouse ? 2 * max : max) + "px"
-			El.css(ripple, "top", (top - max) + "px")
-			El.css(ripple, "left", (left - max) + "px")
-			El.css(ripple, "width", size)
-			El.css(ripple, "height", size)
+			El.css(ripple, {
+				top: (top - max) + "px",
+				left: (left - max) + "px",
+				width: size,
+				height: size
+			})
 			El.append(target, ripple)
 			clearTimeout(tick)
 			end()
