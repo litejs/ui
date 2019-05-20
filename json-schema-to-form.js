@@ -117,7 +117,11 @@
 
 				for (i = 0; tmp = schema[i++]; ) {
 					keys = keys.filter(function(val) {
-						return tmp.properties[val] && tmp.properties[val]["enum"]
+						return (
+							tmp.properties[val] &&
+							tmp.properties[val]["enum"] ||
+							tmp.properties[val].type == "boolean"
+						)
 					})
 				}
 
@@ -126,17 +130,23 @@
 					root = El(".grid.b2.w12")
 					tmp = JSON.clone(tmp)
 					keys.each(function(val) {
-						title = title || tmp.properties[val].title
-						tmp.properties[val]["enum"].each(function(val) {
-							key.push(val)
-							alternatives[val] = root
-						})
+						var prop = tmp.properties[val]
+						title = title || prop.title
+						if (prop.type == "boolean") {
+							setAlt(prop["default"])
+						} else {
+							prop["enum"].each(setAlt)
+						}
 						delete tmp.properties[val]
 					})
+					function setAlt(val) {
+						key.push(val)
+						alternatives[val] = root
+					}
 					root._draw = [tmp, null, root, data, namePrefix, scope, model]
 				}
 
-				schema = {
+				schema = typeof key[0] == "boolean" ? JSON.clone(schema[0].properties[keys[0]]) : {
 					title: title,
 					"enum": key
 				}
@@ -242,12 +252,13 @@
 			}
 
 			if (alternatives) {
-				El.on(field, "change", alUp)
+				El.on(field, "change click", alUp)
 				alUp()
 			}
 
 			function alUp() {
 				var val = El.val(field)
+				if (typeof val !== "string") val = !!val
 				scope["selected"][key] = val
 				if (alSelected != alternatives[val]) {
 					if (alSelected) {
