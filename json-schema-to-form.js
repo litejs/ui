@@ -3,12 +3,13 @@
 
 !function() {
 	var dummy = El("div")
+	, isArray = Array.isArray
 
 	El.bindings.schemaToForm = schemaToForm
 	schemaToForm.once = 1
 
 	function allOf(schema) {
-		return Array.isArray(schema.allOf) ?
+		return isArray(schema.allOf) ?
 		schema.allOf.reduce(function(memo, item) {
 			return JSON.mergePatch(memo, item)
 		}, {}):
@@ -107,7 +108,7 @@
 				if (!schema.anyOf) return
 			}
 
-			if (schema.anyOf) {
+			if (isArray(schema.anyOf)) {
 				var title
 				schema = schema.anyOf.map(allOf)
 				key = []
@@ -117,10 +118,10 @@
 
 				for (i = 0; tmp = schema[i++]; ) {
 					keys = keys.filter(function(val) {
-						return (
-							tmp.properties[val] &&
-							tmp.properties[val]["enum"] ||
-							tmp.properties[val].type == "boolean"
+						var t = tmp.properties[val]
+						return t && (
+							t["enum"] ||
+							t.type == "boolean" && typeof t["default"] == t.type
 						)
 					})
 				}
@@ -184,14 +185,14 @@
 
 				El.attr(hidden, "name", key)
 
-				if (Array.isArray(schema.items)) {
+				if (isArray(schema.items)) {
 					sc.noAdd = true
 					schema.items.each(function(item, i) {
 						add(val && val[i], item)
 					})
 				} else if (schema.resourceCollection) {
 					api(schema.resourceCollection.format(scope.route, scope)).each(add2)
-				} else if (Array.isArray(val) && val.length) {
+				} else if (isArray(val) && val.length) {
 					val.each(function(v) { add(v) })
 				} else if (schema.minItems) {
 					for (i = schema.minItems; i--; ) {

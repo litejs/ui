@@ -637,13 +637,11 @@
 	}
 
 	function elScope(node, parent, fb) {
-		return elScope[node._scope] ||
-		fb ||
-		(parent ?
+		return elScope[node._scope] || fb || (
+			parent ?
 			(((fb = elScope[node._scope = ++seq] = Object.create(parent))._super = parent), fb) :
 			closestScope(node)
-		) ||
-		scopeData
+		) || scopeData
 
 	}
 
@@ -653,16 +651,15 @@
 		}
 	}
 
-	function render(node, scope) {
+	function render(node, _scope) {
 		var bind, fn
+		, scope = elScope(node, 0, _scope)
 		, i = 0
 
 		if (node.nodeType != 1) {
 			node.render ? node.render(scope) : node
 			return
 		}
-
-		scope = elScope(node, 0, scope)
 
 		if (bind = getAttr(node, "data-bind")) {
 			scope._m = bindMatch

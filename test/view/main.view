@@ -50,7 +50,11 @@
 				dd>a[href="https://fb.com/LiteJS#info"] Fb
 
 @view public #body
-	&kb: {h: history.setUrl.bind(null, "home"), u: history.setUrl.bind(null, "users"), "shift+s": history.setUrl.bind(null, "settings")}
+	&kb: {
+		h: history.setUrl.bind(null, "home"),
+		u: history.setUrl.bind(null, "users"),
+		"shift+s": history.setUrl.bind(null, "settings")
+	}
 	.App.max-height
 		top
 		Menu

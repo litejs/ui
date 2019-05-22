@@ -53,7 +53,7 @@ if (self !== top) {
 
 
 	try {
-		timezone = Intl.DateTimeFormat().resolvedOptions().timezone
+		timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 	} catch(e) {}
 
 	i18n.setLang = function(lang) {
