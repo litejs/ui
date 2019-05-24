@@ -15,7 +15,7 @@
 	, body = document.body
 	, root = document.documentElement
 	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
-	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*([>&^|\\\/]?)(([\])}]?).*?([[({]?))$/gm
+	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>&^|\\\/=]?)(([\])}]?).*?([[({]?))$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
@@ -766,8 +766,7 @@
 					parentStack.push(parent)
 					stack.unshift(q)
 					q = El(name, 0, 1)
-					append(parent, q)
-					parent = q
+					append(parent, parent = q)
 				}
 				if (text && op != "/") {
 					if (op == ">") {
@@ -775,9 +774,11 @@
 					} else if (op == "|" || op == "\\") {
 						append(parent, text) // + "\n")
 					} else {
-						if (!op) {
-							text = (parent.tagName == "INPUT" ? "val" : "txt")
-							+ ":_('" + text.replace(/'/g, "\\'") + "').format(data)"
+						if (op != "&" && op != "^") {
+							text = (parent.tagName == "INPUT" ? "val" : "txt") + (
+								op == "=" ? ":" + text.replace(/'/g, "\\'") :
+								":_('" + text.replace(/'/g, "\\'") + "').format(data)"
+							)
 						}
 						appendBind(parent, text, ";", op)
 					}
