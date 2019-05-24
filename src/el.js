@@ -5,6 +5,7 @@
 
 !function(window, document, Object, Event, protoStr) {
 	var currentLang, styleNode
+	, BIND_ATTR = "data-bind"
 	, isArray = Array.isArray
 	, seq = 0
 	, elCache = El.cache = {}
@@ -14,7 +15,7 @@
 	, body = document.body
 	, root = document.documentElement
 	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
-	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*(([\])}]?).*?([[({]?))$/gm
+	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]=])*)[ \t]*([>&^|\\\/]?)(([\])}]?).*?([[({]?))$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
@@ -661,19 +662,19 @@
 			return
 		}
 
-		if (bind = getAttr(node, "data-bind")) {
+		if (bind = getAttr(node, BIND_ATTR)) {
 			scope._m = bindMatch
 			scope._t = bind
 			// i18n(bind, lang).format(scope)
 			// document.documentElement.lang
 			// document.getElementsByTagName('html')[0].getAttribute('lang')
 
-			fn = "data b s r->data&&(" + bind.replace(renderRe, function(match, name, op, args) {
+			fn = "data b s B r->data&&(" + bind.replace(renderRe, function(match, name, op, args) {
 				scope._m[i] = match
 				var fn = bindings[name]
 				return (
 					(op == ":" || fn && hasOwn.call(fn, "once")) ?
-					"s(this,'data-bind',data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
+					"s(this,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
 					""
 				) + (
 					fn ?
@@ -683,7 +684,7 @@
 			}) + "r)"
 
 			try {
-				if (Fn(fn, node, scope)(scope, bindings, setAttr)) {
+				if (Fn(fn, node, scope)(scope, bindings, setAttr, BIND_ATTR)) {
 					return
 				}
 			} catch (e) {
@@ -737,7 +738,7 @@
 		, stack = [-1]
 		, parentStack = []
 
-		function work(all, indent, plugin, name, q, text, mapEnd, mapStart, offset) {
+		function work(all, indent, plugin, name, q, op, text, mapEnd, mapStart, offset) {
 			if (offset && all === indent) return
 
 			for (q = indent.length; q <= stack[0]; ) {
@@ -754,7 +755,7 @@
 				if (El.plugins[name]) {
 					parentStack.push(parent)
 					stack.unshift(q)
-					parent = (new El.plugins[name](parent, text, mapEnd ? "" : ";")).el
+					parent = (new El.plugins[name](parent, op + text, mapEnd ? "" : ";")).el
 				} else {
 					append(parent, all)
 				}
@@ -768,19 +769,17 @@
 					append(parent, q)
 					parent = q
 				}
-				if (text) {
-					q = text.charAt(0)
-					name = text.slice(1)
-					if (q == ">") {
-						(indent + " " + name).replace(templateRe, work)
-					} else if (q == "|" || q == "\\") {
-						append(parent, name) // + "\n")
-					} else if (q != "/") {
-						if (q != "&") {
-							name = (parent.tagName == "INPUT" ? "val" : "txt")
+				if (text && op != "/") {
+					if (op == ">") {
+						(indent + " " + text).replace(templateRe, work)
+					} else if (op == "|" || op == "\\") {
+						append(parent, text) // + "\n")
+					} else {
+						if (!op) {
+							text = (parent.tagName == "INPUT" ? "val" : "txt")
 							+ ":_('" + text.replace(/'/g, "\\'") + "').format(data)"
 						}
-						appendBind(parent, name, ";")
+						appendBind(parent, text, ";", op)
 					}
 				}
 			}
@@ -789,9 +788,13 @@
 		work("", "")
 	}
 
-	function appendBind(el, val, sep) {
-		var current = getAttr(el, "data-bind")
-		setAttr(el, "data-bind", (current ? current + sep + val : val))
+	function appendBind(el, val, sep, q) {
+		var current = getAttr(el, BIND_ATTR)
+		setAttr(el, BIND_ATTR, (current ? (
+			q == "^" ?
+			val + sep + current :
+			current + sep + val
+		) : val))
 	}
 
 	function plugin(parent, name) {
@@ -903,7 +906,7 @@
 				var fn
 				, t = this
 				, arr = t.name.split(splitRe)
-				, bind = getAttr(t.el, "data-bind")
+				, bind = getAttr(t.el, BIND_ATTR)
 				, view = View(arr[0], t._done(), arr[1], arr[2])
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, name, op, args) {
