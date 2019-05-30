@@ -154,7 +154,7 @@
 				key = keys[0]
 			}
 
-			var ro = model && model.acl && !model.acl("write", key) ? "-ro" : ""
+			var ro = model && model.acl && !model.acl("write", key || namePrefix) ? "-ro" : ""
 
 
 			var row = El(template + (
