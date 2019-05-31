@@ -70,6 +70,7 @@
 			{ action: "ok", title: "Ok", key: "enter" }
 		]
 		for (var a, i = 0; a = scope.actions[i++]; ) {
+			if (typeof a == "string") a = scope.actions[i-1] = {title:a,action:a}
 			if (a.key) kbMap[a.key] = resolve.bind(el, el, a.action)
 		}
 		kbMap.backspace = kbMap.del = kbMap.num = numpad
