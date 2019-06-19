@@ -181,8 +181,8 @@
 				var next
 				, x = maxPx
 				, tmp = fill
-				, diff = El.mouse(e)
-				for (diff = (vert ? offset - diff.top : diff.left - offset); tmp; tmp = tmp.nextSibling) {
+				, diff = vert ? offset - e.pageY : e.pageX - offset
+				for (; tmp; tmp = tmp.nextSibling) {
 					next = diff - tmp[attr] + knobLen
 					if (next < 0 ? -next <= x : next < x) {
 						fill = tmp
@@ -207,8 +207,7 @@
 			listen("on")
 		}
 		function move(e) {
-			var diff = El.mouse(e)
-			diff = (vert ? offset - diff.top : diff.left - offset)
+			var diff = vert ? offset - e.pageY : e.pageX - offset
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
 			el.set( (diff / px) + min, diff )
 			return Event.stop(e)

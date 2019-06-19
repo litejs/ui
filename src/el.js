@@ -557,6 +557,10 @@
 				e.target = e.srcElement
 				e.preventDefault = preventDefault
 				e.stopPropagation = stopPropagation
+				if (e.clientX !== void 0) {
+					e.pageX = e.clientX + scrollLeft()
+					e.pageY = e.clientY + scrollTop()
+				}
 			}
 			fn.call(el, e)
 		} : fn
@@ -952,14 +956,6 @@
 	El.scrollTop = scrollTop
 	function scrollTop() {
 		return window.pageYOffset || root.scrollTop || body.scrollTop || 0
-	}
-
-	El.mouse = function(e) {
-		if (e.changedTouches) e = e.changedTouches[0]
-		return {
-			left: e.pageX || e.clientX + scrollLeft(),
-			top: e.pageY || e.clientY + scrollTop()
-		}
 	}
 
 	/*** kb ***/
