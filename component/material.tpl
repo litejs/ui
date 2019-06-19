@@ -302,9 +302,16 @@
 			var close = menuEl && menuTarget == target
 			closeMenu()
 			if (close) return
-			El.cls(target, "is-active")
-			menuEl = openVisible(menu, menuTarget = target)
-			near(menuEl, target, x, y, 4)
+			menuEl = openVisible(menu, target)
+			if (x == "mouse") {
+				El.css(menuEl, {
+					top: e.pageY + "px",
+					left: e.pageX + "px"
+				})
+			} else {
+				El.cls(menuTarget = target, "is-active")
+				near(menuEl, target, x, y, 4)
+			}
 			if (menuEl.style.transform !== void 0) {
 				El.cls(menuEl, "no-events")
 				El.on(menuEl, "transitionend", function(e) {
