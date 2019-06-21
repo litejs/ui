@@ -7,6 +7,10 @@
 
 html {
 	background: linear-gradient(#fff, #cde) fixed;
+	/* 'transform' and 'will-change' will break position: fixed
+	 * Element 'transform' property establishes a new local coordinate system,
+	 * so 'position: fixed' will become relative to that element - not the viewport
+	 */
 	will-change: transform;
 }
 
@@ -27,6 +31,22 @@ html {
 ::selection {                  /* 1 */
 	text-shadow: none;     /* 2 */
 	background: var(--bg-color);
+}
+
+@media (pointer:coarse) {
+	/* Primary Input is a coarse pointer device such as touchscreen or XBox Kinect etc */
+}
+@media (pointer:fine) {
+	/* Primary Input is a fine pointer device such as a mouse or stylus */
+}
+@media (hover:none) {
+	/* Primary Input doesn't respond to hover at all, even partially (ie: there is no pointing device) */
+}
+@media (hover:on-demand) {
+	/* Primary Input responds to hover only via emulation, such as touch screen devices */
+}
+@media (hover:hover) {
+	/* Primary Input responds to hover fully, such as a mouse or a Nintendo Wii controller */
 }
 
 input[disabled],

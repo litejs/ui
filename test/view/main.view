@@ -14,6 +14,9 @@
 @el form-js
 	form[action="javascript:"][method=POST]
 
+@el svg-icon
+	svg[viewBox="0 0 24 24"][width=24px][height=24px]
+
 @el top
 	.bg-1
 		.top.t-1.App-row
@@ -32,10 +35,12 @@
 			@el nav-row
 				a.Menu-item.waves
 					&class: "selected", (route._u || View.home).indexOf(this.href.split("#")[1]) == 0
-			nav-row[href="#home"] Home
+			nav-row[href="#home"]
+				svg-icon>path[d="M12 2 L1 12L 4 12L 4 21 L9 21 L9 14 L15 14 L15 21 L20 21 L20 12 L23 12 L12 2 z"]
 			nav-row[href="#users"] Users
 			nav-row[href="#settings"] Settings
 			nav-row[href="#test"] Test
+
 
 @el Footer
 	.bg-1
