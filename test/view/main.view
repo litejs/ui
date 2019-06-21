@@ -54,6 +54,36 @@
 				dd>a[href="mailto:mail@to.com"] email
 				dd>a[href="https://fb.com/LiteJS#info"] Fb
 
+@css
+	.scroll-up {
+		position: fixed;
+		bottom: 30px;
+		right: 30px;
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background-color: currentColor;
+		border: 2px solid #fff;
+		opacity: 0;
+		transition: opacity .25s ease-in-out;
+	}
+	.scroll-up.is-visible {
+		opacity: .6;
+	}
+	.scroll-up.is-visible:hover {
+		opacity: .9;
+	}
+	.scroll-up:after {
+		border: 0 solid #fff;
+		border-width: 2px 0 0 2px;
+		content: "";
+		display: block;
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		transform: translate(8px,10px) rotate(45deg);
+	}
+
 @view public #body
 	&kb: {
 		h: history.setUrl.bind(null, "home"),
@@ -67,6 +97,19 @@
 			@child
 		.Footer-spacer
 	Footer
+	.scroll-up
+		&init: function(el) {
+			console.log("i", arguments)
+			var state = false
+			El.on(el, 'click', function() {
+				window.scrollTo(0, 0)
+			})
+			El.on(window, 'scroll', function() {
+				if (state !== (El.scrollTop() > 100)) {
+					El.cls(el, 'is-visible', state = !state)
+				}
+			})
+		}
 
 @view #private #body
 	.App.max-height
