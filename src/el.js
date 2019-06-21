@@ -893,7 +893,7 @@
 		map: js.extend({
 			done: function() {
 				var self = this
-				, txt = (self.params + self.txt).replace(/\n+/g, "")
+				, txt = (self.params + self.txt)
 				appendBind(
 					self.parent,
 					self.a ? txt.slice(1) : txt,
