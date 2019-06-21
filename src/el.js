@@ -707,7 +707,7 @@
 			render(bind, scope)
 		}
 		/*** ie8 ***/
-		if (ie678 && node.nodeName == "SELECT") {
+		if (ie678 && node.tagName == "SELECT") {
 			node.parentNode.insertBefore(node, node)
 		}
 		/**/
