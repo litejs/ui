@@ -450,14 +450,10 @@
 				, len = names.length
 
 				if (arguments.length < 3) {
-					if (len > 1) {
-						for (; i < len; ) fn(el, names[i++])
-					} else {
-						fn(el, name)
-					}
-				} else if (len > 1) {
+					for (; i < len; ) fn(el, names[i++])
+				} else {
 					/*
-					if (Array.isArray(val)) {
+					if (isArray(val)) {
 						for (; i < len; ) fn(el, names[i], val[i++])
 					} else {
 						for (; i < len; ) fn(el, names[i++], val)
@@ -467,8 +463,6 @@
 						fn(el, names[i++], isArray(val) ? val[i - 1] : val)
 					}
 					//*/
-				} else {
-					fn(el, name, val)
 				}
 			}
 		}
