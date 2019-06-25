@@ -32,22 +32,39 @@ html {
 	text-shadow: none;     /* 2 */
 	background: var(--bg-color);
 }
-
+/*
 @media (pointer:coarse) {
-	/* Primary Input is a coarse pointer device such as touchscreen or XBox Kinect etc */
+	Primary Input is a coarse pointer device
+	such as touchscreen or XBox Kinect etc
 }
 @media (pointer:fine) {
-	/* Primary Input is a fine pointer device such as a mouse or stylus */
+	Primary Input is a fine pointer device
+	such as a mouse or stylus
 }
 @media (hover:none) {
-	/* Primary Input doesn't respond to hover at all, even partially (ie: there is no pointing device) */
+	Primary Input doesn't respond to hover at all,
+	even partially (ie: there is no pointing device)
 }
 @media (hover:on-demand) {
-	/* Primary Input responds to hover only via emulation, such as touch screen devices */
+	Primary Input responds to hover only via emulation,
+	such as touch screen devices
 }
 @media (hover:hover) {
-	/* Primary Input responds to hover fully, such as a mouse or a Nintendo Wii controller */
+	Primary Input responds to hover fully,
+	such as a mouse or a Nintendo Wii controller
 }
+// ms-high-contrast media feature was introduced in Windows 8
+http://hardlikesoftware.com/weblog/2009/11/04/css-sprites-vs-high-contrast-mode/
+@media screen and (-ms-high-contrast: active) {
+	All high contrast styling rules
+}
+@media screen and (-ms-high-contrast: black-on-white) {
+	div { background-image: url('image-bw.png'); }
+}
+@media screen and (-ms-high-contrast: white-on-black) {
+	div { background-image: url('image-wb.png'); }
+}
+*/
 
 input[disabled],
 input[readonly] {
