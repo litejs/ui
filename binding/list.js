@@ -30,6 +30,12 @@ El.bindings.list = function(node, list, extra, val) {
 	list
 	.each(clone)
 	.on("add", clone).on("remove", remove)
+	.on("startLoading", function(){
+		El.cls(node, "loading")
+	})
+	.on("endLoading", function(){
+		El.cls(node, "loading", 0)
+	})
 	.then(function() {
 		if (val !== void 0 && El.val(node) !== val) {
 			if (!this.get(val)) {
