@@ -17,6 +17,9 @@
 @el svg-icon
 	svg[viewBox="0 0 24 24"][width=24px][height=24px]
 
+@el svg-flag
+	svg[viewBox="0 0 4 3"][width=32px][height=24px]
+
 @el top
 	.bg-1
 		.top.t-1.App-row
@@ -53,6 +56,10 @@
 				dt Contacts
 				dd>a[href="mailto:mail@to.com"] email
 				dd>a[href="https://fb.com/LiteJS#info"] Fb
+			svg-flag
+				path[d="M0 0h4v1H0z"][fill="#0072CE"]
+				path[d="M0 1h4v1H0z"][fill="#000"]
+				path[d="M0 2h4v1H0z"][fill="#fff"]
 
 @css
 	.scroll-up {
