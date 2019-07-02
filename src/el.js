@@ -540,6 +540,15 @@
 			}
 		}
 	}
+	, passiveEvents = false
+	try {
+		window[addEv]("t", null, Object.defineProperty({}, "passive", {
+			get: function() {
+				passiveEvents = true
+			}
+		}))
+	} catch (e) {}
+	Event.passive = passiveEvents
 
 	var emitter = new Event.Emitter
 
