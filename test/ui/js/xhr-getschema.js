@@ -33,7 +33,7 @@ require("../..")
 	}
 	global.Item = require("../../../model").Item
 
-	require("../../../ui/js/xhr-getschema.js")
+	require("../../../ui/xhr-getschema.js")
 
 	assert.plan(4)
 

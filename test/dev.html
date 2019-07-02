@@ -85,7 +85,7 @@
 		<link rel="shortcut icon" href="favicon.ico">
 		<link rel="apple-touch-icon" href="apple-touch-icon.png">
 		-->
-		<link rel="stylesheet" href="app.css" drop="ie7 ie8" min="../test/min/0.css">
+		<link rel="stylesheet" href="app.css" drop="ie7 ie8" min="min/0.css">
 		<link rel="stylesheet" title="Default look" href="css/theme/blue.css">
 		<link rel="alternate stylesheet" title="New look" href="css/theme/new.css">
 	</head>
@@ -94,14 +94,14 @@
 		Include scripts in the end of the body,
 		so there is no need for waiting DOMContentLoaded
 		-->
-		<script src="load.js" inline></script>
-		<script src="../test/min/up.js" min="../test/min/0.js?{hash}"
+		<script src="../ui/load.js" inline></script>
+		<script src="min/up.js" min="min/0.js?{hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
 			if="!Object.assign"
 			require="
 				litejs/ui/polyfill/es5
 		"></script>
-		<script src="index.js" min="../test/min/1.js?h={hash}"
+		<script src="../ui/index.js" min="min/1.js?h={hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
 			drop="debug"
 			require="
@@ -111,29 +111,29 @@
 		<script src="../lib/timing.js" min></script>
 		<script src="../lib/fn.js" min></script>
 		<script src="../lib/events.js" min></script>
-		<script src="src/history.js" min></script>
-		<script src="src/view.js" min></script>
-		<script src="src/el.js" min></script>
-		<script src="binding/_default.js" min></script>
-		<script src="binding/list.js" min></script>
+		<script src="../ui/src/history.js" min></script>
+		<script src="../ui/src/view.js" min></script>
+		<script src="../ui/src/el.js" min></script>
+		<script src="../ui/binding/_default.js" min></script>
+		<script src="../ui/binding/list.js" min></script>
 		<script src="js/debug.js" exclude></script>
-		<script src="js/touch.js" min="../test/min/2.js?{hash}"></script>
-		<script src="svg.js"></script>
-		<script src="js/drag.js" min></script>
-		<script src="js/xhr-getschema.js" min></script>
-		<script src="js/json-schema-to-form.js" min></script>
-		<script src="js/schema-apply.js" min></script>
-		<script src="js/hello.js" min></script>
-		<script src="component/form1.tpl" type="litejs/view"></script>
-		<script src="component/confirm.tpl" type="litejs/view"></script>
-		<script src="component/Segment7.tpl" type="litejs/view"></script>
+		<script src="../ui/touch.js" min="min/2.js?{hash}"></script>
+		<script src="../ui/svg.js"></script>
+		<script src="../ui/drag.js" min></script>
+		<script src="../ui/xhr-getschema.js" min></script>
+		<script src="../ui/json-schema-to-form.js" min></script>
+		<script src="../ui/schema-apply.js" min></script>
+		<script src="../ui/hello.js" min></script>
+		<script src="../ui/component/form1.tpl" type="litejs/view"></script>
+		<script src="../ui/component/confirm.tpl" type="litejs/view"></script>
+		<script src="../ui/component/Segment7.tpl" type="litejs/view"></script>
 		<script src="view/main.view" type="litejs/view"></script>
-		<script src="../model/index.js" min="../test/min/3.js?{hash}"></script>
+		<script src="../model/index.js" min="min/3.js?{hash}"></script>
 		<script src="js/data.js" min></script>
 		<script src="js/stat.js" min></script>
 		<script src="js/app.js" min></script>
 		<script src="//www.litejs.com/pub/testman.js" exclude></script>
-		<script src="../test/min/object-utils.js" exclude></script>
+		<script src="min/object-utils.js" exclude></script>
 		<script src="js/test.js" exclude></script>
 		<noscript>
 			<h1>Error</h1>This application requires JavaScript

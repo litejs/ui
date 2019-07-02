@@ -1,7 +1,7 @@
 
 require("../../_setup")
 
-var schemaApply = require("../../../ui/js/schema-apply").schemaApply
+var schemaApply = require("../../../ui/schema-apply").schemaApply
 
 
 require("../..")
