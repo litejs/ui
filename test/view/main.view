@@ -2,14 +2,14 @@
 @def #mat ../../ui/component/material.tpl
 @def
 	settings %.view,%.css
-	events,test-form1,test-grid,test-touch %.view
+	test-form1,test-grid,pointer %.view
 	test-form1 %.view,../binding/persist.js
 	test-svg #mat,../svg.js,../../ui/component/Pie.tpl,test-svg.view
 	testman,+/lcov,+/lcov/{file} %.view
 	test-material-ui #mat,../../ui/component/Slider.tpl,test-material-ui.view
 
 @el anim-page
-	.content.loader.abs
+	.content.loader
 
 @el form-js
 	form[action="javascript:"][method=POST]
@@ -232,13 +232,13 @@
 		h2 Test
 		ul
 			li>a[href="#testman"] Testman
-			li>a[href="#events"] Events
 			li>a[href="#broken-link"] Test broken link
 			li>a[href="#test-view-link"] Test View link
 			li>a[href="#test-form1"] Test form
 			li>a[href="#test-svg"] Test SVG
 			li>a[href="#test-grid"] Test grid
 			li>a[href="#test-material-ui"] Test Material-UI
+			li>a[href="#pointer"] PointerEvent
 			li>a[href="iframe.html#test1"] Iframe
 			li>a[href="//localhost:81/litejs/litejs/ui/iframe.html#test2"] Iframe 81
 		@rel user home vnd.app.home

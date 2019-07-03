@@ -573,7 +573,9 @@
 			fn.call(el, e)
 		} : fn
 
-		el[addEv](prefix + (fixEv[ev] || ev), fix, false)
+		if (fixEv[ev] !== "") {
+			el[addEv](prefix + (fixEv[ev] || ev), fix, false)
+		}
 
 		emitter.on.call(el, ev, fix, el, _fn)
 	}
@@ -582,6 +584,9 @@
 		var evs = el._e && el._e[ev]
 		, id = evs && evs.indexOf(fn)
 		if (id > -1) {
+			if (fn !== evs[id + 1] && evs[id + 1]._rm) {
+				evs[id + 1]._rm()
+			}
 			el[remEv](prefix + (fixEv[ev] || ev), evs[id + 1])
 			evs.splice(id - 1, 3)
 		}
