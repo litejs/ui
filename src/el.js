@@ -590,7 +590,7 @@
 	}
 
 	Event.stop = function(e) {
-		if (e.preventDefault) {
+		if (e && e.preventDefault) {
 			e.stopPropagation()
 			e.preventDefault()
 		}
