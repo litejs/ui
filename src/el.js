@@ -27,6 +27,8 @@
 		cls: El.cls = acceptMany(cls),
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
+		}, function(el, key) {
+			return getComputedStyle(el).getPropertyValue(key)
 		}),
 		data: function(el, key, val) {
 			setAttr(el, "data-" + key, val)
@@ -435,7 +437,7 @@
 		return el
 	}
 
-	function acceptMany(fn) {
+	function acceptMany(fn, getter) {
 		return function f(el, name, val, delay) {
 			if (el && name) {
 				if (delay > 0) return setTimeout(f, delay, el, name, val)
@@ -450,6 +452,7 @@
 				, len = names.length
 
 				if (arguments.length < 3) {
+					if (getter) return getter(el, name)
 					for (; i < len; ) fn(el, names[i++])
 				} else {
 					/*
