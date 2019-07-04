@@ -320,8 +320,8 @@
 			}
 		})
 		El.on(document.body, "click", closeMenu)
-		El.on(document.body, "mousedown", mousedown)
-		function mousedown(e) {
+		El.on(document.body, "pointerdown", pointerdown)
+		function pointerdown(e) {
 			var target = e.target
 			if (!El.hasClass(target, "waves") || target.disabled) return
 			var rect = target.getBoundingClientRect()
@@ -343,7 +343,7 @@
 			end()
 			wait = 1
 			tick = setTimeout(end, 800)
-			El.one(document.body, "mouseup", end)
+			El.one(document.body, "pointerup", end)
 			ripple.offsetTop // force repaint
 			El.cls(ripple, "waves-ripple--play")
 		}

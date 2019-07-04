@@ -3,9 +3,10 @@
 	.Slider {
 		width: 200px;
 		background: transparent;
+		touch-action: none;
 	}
 	.Slider.is-vertical {
-		width: unset;
+		width: auto;
 		height: 200px;
 	}
 	.is-vertical > .Slider-track {
@@ -14,7 +15,7 @@
 		height: 100%;
 	}
 	.is-vertical > .Slider-track > .Slider-fill {
-		top: unset;
+		top: auto;
 		bottom: 0;
 		width: 4px;
 	}
@@ -154,7 +155,7 @@
 			}
 		}
 		El.on(el, "click", False)
-		El.on(el, "mousedown", False)
+		El.on(el, "pointerdown", False)
 	}
 	El.bindings.SliderInit = function(el) {
 		var knobLen, offset, px, drag, min, max, step, minPx, maxPx, value
@@ -175,7 +176,7 @@
 			maxPx = track[attr] - knobLen - knobLen
 			px = maxPx / (max - min)
 			offset = el.getBoundingClientRect()
-			offset = (vert ? offset.top + maxPx : offset.left) + knobLen
+			offset = (vert ? offset.top + maxPx + El.scrollTop() : offset.left + El.scrollLeft()) + knobLen
 			if (e && track.childNodes.length > 1) {
 				fill = track.firstChild
 				var next
@@ -221,8 +222,8 @@
 		function listen(on) {
 			El.cls(fill, "anim", !drag)
 			El.cls(knob, "is-active", drag)
-			El[on](document.body, "mouseup", stop)
-			El[on](document.body, "mousemove", move)
+			El[on](el, "pointerup", stop)
+			El[on](el, "pointermove", move)
 		}
 		el.set = function(val, pos, scroll) {
 			px || load()
@@ -239,13 +240,7 @@
 				fill.style[vert ? "height" : "width"] = ((pos || (value-min)*px)+knobLen) + "px"
 			}
 		}
-		El.on(el, "mousedown", start)
-		El.on(el, "wheel", function(e, delta) {
-			load(e)
-			el.set( 1*value + delta*step, 0, 1 )
-			return Event.stop(e)
-		})
-		Event.touchAsMouse(el)
+		El.on(el, "pointerdown", start)
 	}
 	El.bindings.fixReadonlyCheckbox.once =
 	El.bindings.SliderInit.once = El.bindings.SliderVal.once = 1
