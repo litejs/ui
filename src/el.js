@@ -556,17 +556,19 @@
 	var emitter = new Event.Emitter
 
 	function addEvent(el, ev, _fn) {
-		var fn = fixFn[ev] && fixFn[ev](el, _fn) || _fn
+		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
 		, fix = prefix ? function() {
-			var e = window.event
-			if (e) {
-				e.target = e.srcElement
-				e.preventDefault = preventDefault
-				e.stopPropagation = stopPropagation
-				if (e.clientX !== void 0) {
-					e.pageX = e.clientX + scrollLeft()
-					e.pageY = e.clientY + scrollTop()
-				}
+			var b, e = {}
+			for (b in event) e[b] = event[b]
+			e.target = e.srcElement
+			b = e.buttons = e.button
+			e.button = b == 1 ? 0: b == 4 ? 1 : b
+			e.preventDefault = preventDefault
+			e.stopPropagation = stopPropagation
+			e.type = ev
+			if (e.clientX !== void 0) {
+				e.pageX = e.clientX + scrollLeft()
+				e.pageY = e.clientY + scrollTop()
 			}
 			fn.call(el, e)
 		} : fn
@@ -586,10 +588,10 @@
 	}
 
 	function preventDefault() {
-		this.returnValue = false
+		event.returnValue = false
 	}
 	function stopPropagation() {
-		this.cancelBubble = this.cancel = true
+		event.cancelBubble = event.cancel = true
 	}
 
 	Event.stop = function(e) {

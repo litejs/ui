@@ -105,7 +105,7 @@ if (self !== top) {
 	El.data.Fn = Fn
 	El.data.console = console
 	El.data.window = window
-	El.data.alert = alert.bind(window)
+	//El.data.alert = alert.bind(window)
 	El.data.Date = Date
 	El.data.Math = Math
 	El.data.started = new Date()
