@@ -5,6 +5,7 @@
 
 !function(exports) {
 	var fn, lastView, lastParams, lastStr, lastUrl, syncResume
+	, isArray = Array.isArray
 	, capture = 1
 	, fnStr = ""
 	, reStr = ""
@@ -179,7 +180,7 @@
 	}
 
 	View.param = function(name, cb, re) {
-		[].concat(name).forEach(function(n) {
+		;(isArray(name) ? name : name.split(/\s+/)).forEach(function(n) {
 			paramCb[n] = cb
 		})
 	}
