@@ -77,7 +77,7 @@
 
 	, matches = El.matches = body.matches ?
 		function(el, sel) {
-			return el.matches(sel)
+			return el && el.matches(sel)
 		} :
 		function(el, sel) {
 			return !!selectorFn(sel)(el)
