@@ -59,7 +59,6 @@
 			for (; tmp; tmp = parent) {
 				syncResume = params._v = tmp
 				tmp.emit("ping", params)
-				View.emit("ping", params, tmp)
 				syncResume = null
 				if (lastParams != params) return
 				if (parent = tmp.parent) {
