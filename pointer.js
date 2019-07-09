@@ -63,12 +63,25 @@
 		if (lastDist !== null) {
 			diff = dist - lastDist
 			if (diff) El.emit(firstEl, "pinch", e, diff, angle)
+			// GestureEvent onGestureChange: function(e) {
+			//	e.target.style.transform =
+			//		'scale(' + e.scale  + startScale  + ') rotate(' + e.rotation + startRotation + 'deg)'
 			diff = angle - lastAngle
 			if (diff) El.emit(firstEl, "rotate", e, diff * (180/Math.PI))
 		}
 
 		lastDist = dist
 		lastAngle = angle
+	}
+
+	function wheel(e, diff) {
+		// IE10 enabled pinch-to-zoom gestures from multi-touch trackpad’s as mousewheel event with ctrlKey.
+		// Chrome adapted this in Chrome M35 and Mozilla followed up with Firefox 55.
+		if (e.ctrlKey && !pointers[0]) {
+			if (El.emit(e.currentTarget || e.target, "pinch", e, diff, 0)) {
+				return Event.stop(e)
+			}
+		}
 	}
 
 	function up(e) {
@@ -95,6 +108,7 @@
 			el.style.touchAction = el.style.msTouchAction = "none"
 			El.on(el, "pointerdown", down)
 			El.on(el, "pointerup pointercancel", up)
+			El.on(el, "wheel", wheel)
 			el[TOUCH_FLAG] = 1
 		}
 	}

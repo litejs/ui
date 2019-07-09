@@ -50,12 +50,18 @@
 				fn
 			)
 		})
-		El.on(el, "wheel pinch", function(e, diff) {
-			Event.stop(e)
+		var lastWheel = Date.now()
+		El.on(el, "pinch", function(e, diff) {
+			var isTouchPad = e.wheelDeltaY ? e.wheelDeltaY === -3 * e.deltaY : e.deltaMode === 0
+			var d = Date.now()
+			console.log("pinch", diff, e, e.deltaMode)
+			// console.log("wheel", diff, d-lastWheel, isTouchPad, e)
+			lastWheel = d
 			// IE5-8 mousewheel.type == "wheel"
-			if (e.type && e.type.slice(-5) === "wheel") diff *= 10
+			// if (e.type && e.type.slice(-5) === "wheel") diff *= 10
 			El.css(el, "height", (el.offsetHeight + diff) + "px")
 			//debu2.innerHTML += e.type + "." + diff + " "
+			Event.stop(e)
 		})
 		return
 		El.drag(el, el, null, {
