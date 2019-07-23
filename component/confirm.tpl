@@ -15,12 +15,23 @@
 		top: 60px;
 		width: 400px;
 		background-color: #fff;
-		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+		box-shadow: 0 2px 10px 2px rgba(255,255,255,.5);
+		animation: .2s cubic-bezier(.2, -.3, .8, 0) reverse Confirm--blur;
 	}
 	.sm .Confirm-content {
 		width: 100%;
 	}
+	.Confirm--blur {
+		animation: .2s cubic-bezier(.2, 1, .8, 1.3) forwards Confirm--blur;
+	}
+	@keyframes Confirm--blur {
+		to {
+			filter: blur(4px);
+			transform: scale(.9);
+		}
+	}
 
+// reverse animation: x1, y1, x2, y2 -> (1 - x2), (1 - y2), (1 - x1), (1 - y1)
 // https://developer.mozilla.org/en-US/docs/Web/API/Notification
 // https://developers.google.com/web/fundamentals/push-notifications/display-a-notification
 // var n = new Notification(title, options);
@@ -63,6 +74,7 @@
 		, el = El("Confirm")
 		, scope = El.scope(el, El.data)
 		, kbMap = { esc: resolve }
+		, body = document.body
 		Object.assign(scope, opts)
 		scope.title = title || "Confirm?"
 		if (!scope.actions) scope.actions = [
@@ -76,7 +88,8 @@
 		kbMap.backspace = kbMap.del = kbMap.num = numpad
 		El.addKb(kbMap)
 		El.on(el, "kill", El.rmKb)
-		El.append(document.body, el)
+		El.cls(body.lastChild, "Confirm--blur")
+		El.append(body, el)
 		El.render(el, scope)
 		El.findAll(el, ".js-numpad").on("click", numpad)
 		El.findAll(el, ".js-btn").on("click", resolve)
@@ -104,6 +117,7 @@
 			if (el) {
 				El.rmKb(kbMap)
 				El.kill(el)
+				El.cls(body.lastChild, "Confirm--blur", 0)
 				el = null
 				var action = key || El.attr(this, "data-action")
 				if (action && next) {
