@@ -1,18 +1,33 @@
 
 !function(Event, document) {
-	var firstEl, lastDist, lastAngle, pinchThreshhold
+	var firstEl, lastDist, lastAngle, pinchThreshhold, mode
 	, TOUCH_FLAG = "-tf"
 	, MOVE = "pointermove"
+	, START = "start"
+	, END = "end"
 	, MS_WHICH = [0, 1, 4, 2]
 	, fixEv = Event.fixEv
 	, fixFn = Event.fixFn
 	, pointers = []
 	, firstPos = {}
 
-	function down(e) {
+	// tap
+	// swipe + left/right/up/down
+
+	"pan pinch rotate".split(" ").map(function(name) {
+		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
+		fixFn[name] = setup
+	})
+
+	function down(e, e2) {
 		var len = e ? pointers.push(e) : pointers.length
+		firstPos.cancel = false
 
 		if (len === 0) {
+			if (mode) {
+				El.emit(firstEl, mode + END, e2, firstPos, firstEl)
+				mode = null
+			}
 			firstEl = null
 		}
 		if (len === 1) {
@@ -45,10 +60,19 @@
 		}
 		firstPos.leftPos = e.clientX - firstPos.X + firstPos.left
 		firstPos.topPos  = e.clientY - firstPos.Y + firstPos.top
+		if (!mode) {
+			mode = "pan"
+			El.emit(firstEl, mode + START, e, firstPos, firstEl)
+		}
 		El.emit(firstEl, "pan", e, firstPos, firstEl)
 		if (!firstPos.cancel) {
-			firstEl.style.left = firstPos.leftPos + "px"
-			firstEl.style.top = firstPos.topPos + "px"
+			if (firstEl.getBBox) {
+				firstEl.setAttributeNS(null, "x", firstPos.leftPos)
+				firstEl.setAttributeNS(null, "y", firstPos.topPos)
+			} else {
+				firstEl.style.left = firstPos.leftPos + "px"
+				firstEl.style.top = firstPos.topPos + "px"
+			}
 		}
 	}
 
@@ -91,19 +115,22 @@
 				break
 			}
 		}
-		down()
+		down(null, e)
 	}
 
 	function savePos(name, offset) {
-		var val = firstEl.style[name]
+		var val = (
+			firstEl.getBBox ?
+			firstEl.getAttributeNS(null, name == "top" ? "y":"x") :
+			firstEl.style[name]
+		)
 		firstPos[name] = parseInt(val, 10) || 0
 		if (val && val.indexOf("%") > -1) {
 			firstPos[name] *= firstEl.parentNode[offset] / 100
 		}
 	}
 
-	fixEv.pan = fixEv.pinch = ""
-	fixFn.pan = fixFn.pinch = function setup(el) {
+	function setup(el) {
 		if (!el[TOUCH_FLAG]) {
 			el.style.touchAction = el.style.msTouchAction = "none"
 			El.on(el, "pointerdown", down)
