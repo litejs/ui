@@ -13,7 +13,12 @@
 		return
 	}
 
-	"svg circle clipPath defs g path rect text stop use line linearGradient".replace(/\w+/g, populateSvgElements)
+	;(
+		"svg defs pattern g symbol use clipPath textPath marker mask stop linearGradient radialGradient " +
+		"circle ellipse image line mesh path polygon polyline rect text tspan " +
+		"filter feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDropShadow feFlood eFuncA feFuncB feFuncG feFuncR eGaussianBlur feImage feMerge feMergeNode feMorphology feOffset feSpecularLighting feTile feTurbulence"
+	).replace(/\w+/g, populateSvgElements)
+
 	//http://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
 	function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 		var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0

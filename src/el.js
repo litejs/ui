@@ -426,6 +426,11 @@
 					tmp = before.parentNode
 					// TODO:2016-07-05:lauri:handle numeric befores
 				}
+				/*** debug ***/
+				if (tmp.namespaceURI && child.namespaceURI && tmp.namespaceURI !== child.namespaceURI && child.tagName !== "svg") {
+					console.error("NAMESPACE CHANGE!", tmp.namespaceURI, child.namespaceURI, child)
+				}
+				/**/
 				tmp.insertBefore(child,
 					(before === true ? tmp.firstChild :
 					typeof before == "number" ? tmp.childNodes[
