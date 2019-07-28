@@ -24,7 +24,7 @@ require("../..")
 		}
 	}
 
-	assert.deepEqual(schemaApply(schema, input), expected)
+	assert.equal(schemaApply(schema, input), expected)
 	assert.end()
 })
 

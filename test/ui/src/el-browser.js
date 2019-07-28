@@ -87,32 +87,35 @@ h4 = El("h4")
 
 testman
 .describe("El")
-.it ("should build elements")
-.htmlSimilar(el, "<div></div>")
-.htmlSimilar(h1, "<h1></h1>")
-.htmlSimilar(h2, "<h2></h2>")
-.htmlSimilar(h3, "<h3></h3>")
-.htmlSimilar(h4, "<h4></h4>")
+.it ("should build elements", function(assert) {
+	assert
+	.htmlSimilar(el, "<div></div>")
+	.htmlSimilar(h1, "<h1></h1>")
+	.htmlSimilar(h2, "<h2></h2>")
+	.htmlSimilar(h3, "<h3></h3>")
+	.htmlSimilar(h4, "<h4></h4>")
 
-.htmlSimilar(El(""),               "<div></div>")
-.htmlSimilar(El("div"),            "<div></div>")
-.htmlSimilar(El("#123"),           '<div id="123"></div>')
+	.htmlSimilar(El(""),               "<div></div>")
+	.htmlSimilar(El("div"),            "<div></div>")
+	.htmlSimilar(El("#123"),           '<div id="123"></div>')
 
-.htmlSimilar(El("div#123"),        '<div id="123"></div>')
-.htmlSimilar(El("p#123"),          '<p id="123"></p>')
-.htmlSimilar(El(".c-1"),           '<div class="c-1"></div>')
-.htmlSimilar(El("div.c1"),         '<div class="c1"></div>')
-.htmlSimilar(El("p.c1"),           '<p class="c1"></p>')
-.htmlSimilar(El(".c1.c2"),         '<div class="c1 c2"></div>')
-.htmlSimilar(El("div.c1.c2"),      '<div class="c1 c2"></div>')
-.htmlSimilar(El("p.c1.c2"),        '<p class="c1 c2"></p>')
-.htmlSimilar(El("#123.c1"),        '<div id="123" class="c1"></div>')
-.htmlSimilar(El("div#123.c1"),     '<div id="123" class="c1"></div>')
+	.htmlSimilar(El("div#123"),        '<div id="123"></div>')
+	.htmlSimilar(El("p#123"),          '<p id="123"></p>')
+	.htmlSimilar(El(".c-1"),           '<div class="c-1"></div>')
+	.htmlSimilar(El("div.c1"),         '<div class="c1"></div>')
+	.htmlSimilar(El("p.c1"),           '<p class="c1"></p>')
+	.htmlSimilar(El(".c1.c2"),         '<div class="c1 c2"></div>')
+	.htmlSimilar(El("div.c1.c2"),      '<div class="c1 c2"></div>')
+	.htmlSimilar(El("p.c1.c2"),        '<p class="c1 c2"></p>')
+	.htmlSimilar(El("#123.c1"),        '<div id="123" class="c1"></div>')
+	.htmlSimilar(El("div#123.c1"),     '<div id="123" class="c1"></div>')
 
-.htmlSimilar(El("a[href='http://example.com/']"), '<a href="http://example.com/"></a>')
-.htmlSimilar(El('a[href="http://example.com/"]'), '<a href="http://example.com/"></a>')
-.htmlSimilar(El("a[href='http://example.com/'][title=link]"), '<a href="http://example.com/" title="link"></a>')
-.htmlSimilar(El('a[href="http://example.com/"][title="link to site"]'), '<a href="http://example.com/" title="link to site"></a>')
+	.htmlSimilar(El("a[href='http://example.com/']"), '<a href="http://example.com/"></a>')
+	.htmlSimilar(El('a[href="http://example.com/"]'), '<a href="http://example.com/"></a>')
+	.htmlSimilar(El("a[href='http://example.com/'][title=link]"), '<a href="http://example.com/" title="link"></a>')
+	.htmlSimilar(El('a[href="http://example.com/"][title="link to site"]'), '<a href="http://example.com/" title="link to site"></a>')
+	.end()
+})
 
 .test ("it shoult set attributes", function(t) {
 	t
@@ -128,56 +131,71 @@ testman
 	.end()
 })
 
-.it ("has kill() and empty() methods")
-.equal(El.kill(select), null)
-.equal(h2.innerHTML, "")
-.equal(El.empty(el), el)
-.equal(el.innerHTML, "")
+.it ("has kill() and empty() methods", function(assert) {
+	assert
+	.equal(El.kill(select), null)
+	.equal(h2.innerHTML, "")
+	.equal(El.empty(el), el)
+	.equal(el.innerHTML, "")
+	.end()
+})
 
-.it ("set childs")
-.htmlSimilar(to(el, document.body), "<div></div>")
-.htmlSimilar(El.append(el, h2), "<div><h2></h2></div>")
-.htmlSimilar(El.append(el, h1, h2), "<div><h1></h1><h2></h2></div>")
-.htmlSimilar(to(h4, el), "<h4></h4>")
-.htmlSimilar(el, "<div><h1></h1><h2></h2><h4></h4></div>")
-.htmlSimilar(to(h3, el,  h4), "<h3></h3>")
-.htmlSimilar(el, "<div><h1></h1><h2></h2><h3></h3><h4></h4></div>")
-.htmlSimilar(to(h3, el, h4), "<h3></h3>")
-.htmlSimilar(el, "<div><h1></h1><h2></h2><h3></h3><h4></h4></div>")
+.it ("set childs", function(assert) {
+	assert
+	.htmlSimilar(to(el, document.body), "<div></div>")
+	.htmlSimilar(El.append(el, h2), "<div><h2></h2></div>")
+	.htmlSimilar(El.append(el, h1, h2), "<div><h1></h1><h2></h2></div>")
+	.htmlSimilar(to(h4, el), "<h4></h4>")
+	.htmlSimilar(el, "<div><h1></h1><h2></h2><h4></h4></div>")
+	.htmlSimilar(to(h3, el,  h4), "<h3></h3>")
+	.htmlSimilar(el, "<div><h1></h1><h2></h2><h3></h3><h4></h4></div>")
+	.htmlSimilar(to(h3, el, h4), "<h3></h3>")
+	.htmlSimilar(el, "<div><h1></h1><h2></h2><h3></h3><h4></h4></div>")
 
-.htmlSimilar(El.append(h1, [h2, h3]), "<h1><h2></h2><h3></h3></h1>")
-.htmlSimilar(el, "<div><h1><h2></h2><h3></h3></h1><h4></h4></div>")
+	.htmlSimilar(El.append(h1, [h2, h3]), "<h1><h2></h2><h3></h3></h1>")
+	.htmlSimilar(el, "<div><h1><h2></h2><h3></h3></h1><h4></h4></div>")
 
-.htmlSimilar(to(select, h2), '<select id="id2" disabled="disabled" class="cl2"></select>')
+	.htmlSimilar(to(select, h2), '<select id="id2" disabled="disabled" class="cl2"></select>')
+	.end()
+})
 
-.it ("should get element by id")
-.equal(El.get("id2"), select)
+.it ("should get element by id", function(assert) {
+	assert
+	.equal(El.get("id2"), select)
+	.end()
+})
 
-.it ("find childs")
-.equal(El.find(el, "#id2"), select)
-.equal(El.find(el, ".cl2"), select)
-.equal(El.find(el, "#id2.cl2"), select)
-.equal(El.find(el, ".cl2#id2"), select)
-.equal(El.find(el, "select"), select)
-.equal(El.find(el, "select#id2"), select)
-.equal(El.find(el, "select.cl2"), select)
-.equal(El.find(el, "select#id2.cl2"), select)
-.equal(El.find(el, "select.cl2#id2"), select)
-.equal(El.find(el, "SELECT"), select)
-.equal(El.find(el, "SELECT#id2"), select)
-.equal(El.find(el, "SELECT.cl2"), select)
-.equal(El.find(el, "SELECT#id2.cl2"), select)
-.equal(El.find(el, "SELECT.cl2#id2"), select)
+.it ("find childs", function(assert) {
+	assert
+	.equal(El.find(el, "#id2"), select)
+	.equal(El.find(el, ".cl2"), select)
+	.equal(El.find(el, "#id2.cl2"), select)
+	.equal(El.find(el, ".cl2#id2"), select)
+	.equal(El.find(el, "select"), select)
+	.equal(El.find(el, "select#id2"), select)
+	.equal(El.find(el, "select.cl2"), select)
+	.equal(El.find(el, "select#id2.cl2"), select)
+	.equal(El.find(el, "select.cl2#id2"), select)
+	.equal(El.find(el, "SELECT"), select)
+	.equal(El.find(el, "SELECT#id2"), select)
+	.equal(El.find(el, "SELECT.cl2"), select)
+	.equal(El.find(el, "SELECT#id2.cl2"), select)
+	.equal(El.find(el, "SELECT.cl2#id2"), select)
 
-.equal(El.find(el, "h2"), h2)
-.equal(!!El.find(el, ".cl3"), false)
-.equal(El.findAll(document.body, "input").length, 2)
-.equal(El.findAll(document.body, "input")[0], input)
-.equal(El.findAll(document.body, "input")[1], radio)
+	.equal(El.find(el, "h2"), h2)
+	.equal(!!El.find(el, ".cl3"), false)
+	.equal(El.findAll(document.body, "input").length, 2)
+	.equal(El.findAll(document.body, "input")[0], input)
+	.equal(El.findAll(document.body, "input")[1], radio)
+	.end()
+})
 
 
-.it ("supports boolean attributes")
-.htmlSimilar(El("input:selected"), '<input selected="selected">')
+.it ("supports boolean attributes", function(assert) {
+	assert
+	.htmlSimilar(El("input:selected"), '<input selected="selected">')
+	.end()
+})
 
 .it ("has txt() method", function(assert) {
 	assert.equal(el.textContent, "")
@@ -190,143 +208,155 @@ testman
 	assert.end()
 })
 
-.it ("has val() method")
-.anyOf(El.val(input), ["", undef])
-.equal(El.val(input, "xx"), undef)
-.anyOf(El.val(select), ["", undef])
-.equal(El.val(radio), null)
-.notOk(function() {
-	input.valObject = map1
-	select.valObject = map2
-}())
-.equal(El.val(input), map1)
-.equal(El.val(select), map2)
-.ok(function() {
-	select1 = El("select")
-	select2 = El("select:multiple")
-	El.append(select1, [
-		El("option[value=1]"),
-		El("option[value=2]:selected"),
-		El("option[value=o1]"),
-		El("option[value=o2]:selected"),
-	])
-	El.append(select2, [
-		El("option[value=1]"),
-		El("option[value=2]:selected"),
-		El("option[value=o1]"),
-		El("option[value=o2]:selected"),
-	])
-	// HACK: set type and options manualy as dom-lite does not handle them correctly
-	select1.options = select1.childNodes
-	select2.type = "select-multiple"
-	select2.options = select2.childNodes
+.it ("has val() method", function(assert) {
+	assert
+	.anyOf(El.val(input), ["", undef])
+	.equal(El.val(input, "xx"), undef)
+	.anyOf(El.val(select), ["", undef])
+	.equal(El.val(radio), null)
+	.notOk(function() {
+		input.valObject = map1
+		select.valObject = map2
+	}())
+	.equal(El.val(input), map1)
+	.equal(El.val(select), map2)
+	.ok(function() {
+		select1 = El("select")
+		select2 = El("select:multiple")
+		El.append(select1, [
+			El("option[value=1]"),
+			El("option[value=2]:selected"),
+			El("option[value=o1]"),
+			El("option[value=o2]:selected"),
+		])
+		El.append(select2, [
+			El("option[value=1]"),
+			El("option[value=2]:selected"),
+			El("option[value=o1]"),
+			El("option[value=o2]:selected"),
+		])
+		// HACK: set type and options manualy as dom-lite does not handle them correctly
+		select1.options = select1.childNodes
+		select2.type = "select-multiple"
+		select2.options = select2.childNodes
 
-	return "2,o2" == El.val(select2)
-}())
-//equal(select1.val(), "o2")
-.equal("" + El.val(select2), "2,o2")
-.equal(select2.options.length, 4)
+		return "2,o2" == El.val(select2)
+	}())
+	//equal(select1.val(), "o2")
+	.equal("" + El.val(select2), "2,o2")
+	.equal(select2.options.length, 4)
+	.end()
+})
 
 
-.it ("has class methods")
-.equal(el.className, "")
-.equal(El.hasClass(el, "c1"), false)
-.equal(El.hasClass(el, "c2"), false)
-.equal(El.hasClass(el, "c3"), false)
+.it ("has class methods", function(assert) {
+	assert
+	.equal(el.className, "")
+	.equal(El.hasClass(el, "c1"), false)
+	.equal(El.hasClass(el, "c2"), false)
+	.equal(El.hasClass(el, "c3"), false)
 
-.equal(El.cls(el, "c1"), null)
-.equal(El.hasClass(el, "c1"), true)
-.equal(El.hasClass(el, "c2"), false)
-.equal(El.hasClass(el, "c3"), false)
+	.equal(El.cls(el, "c1"), null)
+	.equal(El.hasClass(el, "c1"), true)
+	.equal(El.hasClass(el, "c2"), false)
+	.equal(El.hasClass(el, "c3"), false)
 
-.equal(El.cls(el, "c2"), null)
-.equal(El.hasClass(el, "c1"), true)
-.equal(El.hasClass(el, "c2"), true)
-.equal(El.hasClass(el, "c3"), false)
+	.equal(El.cls(el, "c2"), null)
+	.equal(El.hasClass(el, "c1"), true)
+	.equal(El.hasClass(el, "c2"), true)
+	.equal(El.hasClass(el, "c3"), false)
 
-.equal(El.cls(el, "c3"), null)
-.equal(El.hasClass(el, "c1"), true)
-.equal(El.hasClass(el, "c2"), true)
-.equal(El.hasClass(el, "c3"), true)
+	.equal(El.cls(el, "c3"), null)
+	.equal(El.hasClass(el, "c1"), true)
+	.equal(El.hasClass(el, "c2"), true)
+	.equal(El.hasClass(el, "c3"), true)
 
-.equal(El.cls(el, "c2", 0), null)
-.equal(El.hasClass(el, "c1"), true)
-.equal(El.hasClass(el, "c2"), false)
-.equal(El.hasClass(el, "c3"), true)
+	.equal(El.cls(el, "c2", 0), null)
+	.equal(El.hasClass(el, "c1"), true)
+	.equal(El.hasClass(el, "c2"), false)
+	.equal(El.hasClass(el, "c3"), true)
 
-.equal(El.cls(el, "c3", 0), null)
-.equal(El.hasClass(el, "c1"), true)
-.equal(El.hasClass(el, "c2"), false)
-.equal(El.hasClass(el, "c3"), false)
+	.equal(El.cls(el, "c3", 0), null)
+	.equal(El.hasClass(el, "c1"), true)
+	.equal(El.hasClass(el, "c2"), false)
+	.equal(El.hasClass(el, "c3"), false)
 
-.equal(El.cls(el, "c3", 0), null)
-.equal(El.hasClass(el, "c1"), true)
-.equal(El.hasClass(el, "c2"), false)
-.equal(El.hasClass(el, "c3"), false)
+	.equal(El.cls(el, "c3", 0), null)
+	.equal(El.hasClass(el, "c1"), true)
+	.equal(El.hasClass(el, "c2"), false)
+	.equal(El.hasClass(el, "c3"), false)
 
-.equal(El.cls(el, "c1", 0), null)
-.equal(El.hasClass(el, "c1"), false)
-.equal(El.hasClass(el, "c2"), false)
-.equal(El.hasClass(el, "c3"), false)
+	.equal(El.cls(el, "c1", 0), null)
+	.equal(El.hasClass(el, "c1"), false)
+	.equal(El.hasClass(el, "c2"), false)
+	.equal(El.hasClass(el, "c3"), false)
 
-.equal(El.cls(el, "c1 c3"), null)
-.equal(El.hasClass(el, "c1"), true)
-.equal(El.hasClass(el, "c2"), false)
-.equal(El.hasClass(el, "c3"), true)
+	.equal(El.cls(el, "c1 c3"), null)
+	.equal(El.hasClass(el, "c1"), true)
+	.equal(El.hasClass(el, "c2"), false)
+	.equal(El.hasClass(el, "c3"), true)
 
-.equal(El.cls(el, "c1 c3", 0), null)
-.equal(el.className, "")
+	.equal(El.cls(el, "c1 c3", 0), null)
+	.equal(el.className, "")
+	.end()
+})
 
 
 .describe( "Templates" )
-.it ("supports templates")
-.notOk(function() {
-	El.tpl([
-		"@el test1",
-		" a",
-		"  b",
-		"   i",
-		"@el test2",
-		" a ",
-		"  b",
-		"   i",
-		"@el test3",
-		" a ",
-		"  b",
-		"   i |link",
-		"@el test4",
-		" a ",
-		"  b ",
-		"   i |link",
-		"@el test5",
-		" a ",
-		"  b",
-		"   i |link>to",
-		"@el test6",
-		" a[href='#a>b']",
-		"  b.bold ",
-		"   i#ital |link",
-		"@el test7",
-		" a>b>i",
-		"@el test8",
-		" a > b>i",
-		"@el test9",
-		" a>b>i |link",
-		"@el test10",
-		" a>b[data-bind=\"cls:'red',i>1\"]>i &txt:name"
-	].join("\n"))
-}())
-.htmlSimilar(El("test1"), '<a><b><i></i></b></a>')
-.htmlSimilar(El("test2"), '<a><b><i></i></b></a>')
-.htmlSimilar(El("test3"), '<a><b><i>link</i></b></a>')
-.htmlSimilar(El("test4"), '<a><b><i>link</i></b></a>')
-.htmlSimilar(El("test5"), '<a><b><i>link&gt;to</i></b></a>')
-.htmlSimilar(El("test6"), '<a href="#a&gt;b"><b class="bold"><i id="ital">link</i></b></a>')
+.it ("supports templates", function(assert) {
+	assert
+	.notOk(function() {
+		El.tpl([
+			"@el test1",
+			" a",
+			"  b",
+			"   i",
+			"@el test2",
+			" a ",
+			"  b",
+			"   i",
+			"@el test3",
+			" a ",
+			"  b",
+			"   i |link",
+			"@el test4",
+			" a ",
+			"  b ",
+			"   i |link",
+			"@el test5",
+			" a ",
+			"  b",
+			"   i |link>to",
+			"@el test6",
+			" a[href='#a>b']",
+			"  b.bold ",
+			"   i#ital |link",
+			"@el test7",
+			" a>b>i",
+			"@el test8",
+			" a > b>i",
+			"@el test9",
+			" a>b>i |link",
+			"@el test10",
+			" a>b[data-bind=\"cls:'red',i>1\"]>i &txt:name"
+		].join("\n"))
+	}())
+	.htmlSimilar(El("test1"), '<a><b><i></i></b></a>')
+	.htmlSimilar(El("test2"), '<a><b><i></i></b></a>')
+	.htmlSimilar(El("test3"), '<a><b><i>link</i></b></a>')
+	.htmlSimilar(El("test4"), '<a><b><i>link</i></b></a>')
+	.htmlSimilar(El("test5"), '<a><b><i>link&gt;to</i></b></a>')
+	.htmlSimilar(El("test6"), '<a href="#a&gt;b"><b class="bold"><i id="ital">link</i></b></a>')
+	.end()
+})
 
-.it ("supports block expansion")
-.htmlSimilar(El("test7"), '<a><b><i></i></b></a>')
-.htmlSimilar(El("test8"), '<a><b><i></i></b></a>')
-.htmlSimilar(El("test9"), '<a><b><i>link</i></b></a>')
+.it ("supports block expansion", function(assert) {
+	assert
+	.htmlSimilar(El("test7"), '<a><b><i></i></b></a>')
+	.htmlSimilar(El("test8"), '<a><b><i></i></b></a>')
+	.htmlSimilar(El("test9"), '<a><b><i>link</i></b></a>')
+	.end()
+})
 
 .it ( "should render bindings" , function(assert) {
 	var el = El("test10")
