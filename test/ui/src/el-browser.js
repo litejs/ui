@@ -67,14 +67,14 @@ var undef
 , map1 = {"map1": 1}
 , map2 = {"map2": 2}
 
-testman.defineAssert("htmlSimilar", function(actual, expected) {
+testman.describe.assert.htmlSimilar = function(actual, expected) {
 	var re = /[^\s"'=]+(=("|')(?:\\?.)*?\2)?/g
 	, str1 = getString(actual).replace(/=(\w+)/g, '="$1"').match(re).sort().join(" ")
 	, str2 = expected.replace(/=(\w+)/g, '="$1"').match(re).sort().join(" ")
 
 	this.equal(str1, str2)
 	return this
-})
+}
 
 el = El("div")
 select = El("select#id2.cl2:disabled")
