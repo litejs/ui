@@ -119,14 +119,14 @@ testman
 
 .test ("it shoult set attributes", function(t) {
 	t
-	.equal(El.attr(input, {id: "set_id", title:"set title"}))
+	.equal(El.attr(input, {id: "set_id", title:"set title"}), void 0)
 	.equal(input.id, "set_id")
 	.equal(input.title, "set title")
-	.equal(El.attr(input, {title:"change title", name:"new name", id: "new_id"}))
+	.equal(El.attr(input, {title:"change title", name:"new name", id: "new_id"}), void 0)
 	.equal(input.title, "change title")
 	.equal(input.name, "new name")
 	.equal(input.id, "new_id")
-	.equal(El.attr(input, {title: null}))
+	.equal(El.attr(input, {title: null}), void 0)
 	.ok(!input.title)
 	.end()
 })
