@@ -711,8 +711,8 @@
 				}
 			} catch (e) {
 				/*** debug ***/
-				e.message += "\nBINDING: " + bind
-				console.error(e, node)
+				console.error(e)
+				console.error("BINDING: " + bind, node)
 				/**/
 				if (window.onerror) {
 					window.onerror(e.message, e.fileName, e.lineNumber)
