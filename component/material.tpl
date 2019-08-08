@@ -247,7 +247,7 @@
 		function onOver(e) {
 			var x, y, pos
 			, target = e.target
-			, text = target.getAttribute("data-tooltip")
+			, text = El.attr(target, "data-tooltip")
 			, relTarg = e.relatedTarget || e.fromElement
 			// without relTarg is event on click
 			if (!relTarg && e.type !== "focusin" || target === tipTarget) return
