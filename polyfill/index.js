@@ -6,6 +6,8 @@
 !function(exports, Function) {
 	var a, b, c, O
 	, P = "prototype"
+	, JSONmap = {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t",'"':'\\"',"\\":"\\\\"}
+	, hasOwn = JSONmap.hasOwnProperty
 	, esc = escape
 	, patched = (exports.xhr || exports)._patched = []
 
@@ -90,25 +92,32 @@
 	add("Event", {})
 
 	add("JSON", {
-		map: {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t",'"':'\\"',"\\":"\\\\"},
-		parse: Function("t", "return Function('return('+t+')')()"),
-		stringify: Function("o", ""
-			+ "var i,s=[],c=typeof o;"
-			+ "if(c=='string'){"
-				+ "for(i=o.length;c=o.charAt(--i);s[i]=JSON.map[c]||(c<' '?'\\\\u00'+((c=c.charCodeAt(0))|4)+(c%16).toString(16):c));"
-				+ "o='\"'+s.join('')+'\"'"
-			+ "}"
-			+ "if(o&&c=='object'){"
-				+ "if(typeof o.toJSON=='function')return'\"'+o.toJSON()+'\"';"
-				+ "if(Array.isArray(o)){"
-					+ "for(i=o.length;i--;s[i]=JSON.stringify(o[i]));"
-					+ "return'['+s.join()+']'"
-				+ "}"
-				+ "for(i in o)Object.prototype.hasOwnProperty.call(o,i)&&s.push(JSON.stringify(i)+':'+JSON.stringify(o[i]));"
-				+ "o='{'+s.join()+'}'"
-			+ "}"
-			+ "return o==null?'null':''+o"
-		)
+		parse: function(t) {
+			return Function("return(" + t + ")")()
+		},
+		stringify: function stringify(o) {
+			var i
+			, s = []
+			, c = typeof o
+			if (c == "string") {
+				for (i = o.length; c = o.charAt(--i); s[i] = JSONmap[c] || (
+					c < " " ? "\\u00" + ((c=c.charCodeAt(0))|4) + (c%16).toString(16):c
+				));
+				o = '"' + s.join("") + '"'
+			}
+			if (o && c == "object") {
+				if (typeof o.toJSON == "function") return '"' + o.toJSON() + '"'
+				if (Array.isArray(o)) {
+					for (i = o.length; i--; s[i] = stringify(o[i]));
+					return "[" + s.join() + "]"
+				}
+				for (i in o) if (hasOwn.call(o, i)) {
+					s.push(stringify(i) + ":" + stringify(o[i]))
+				}
+				o = "{" + s.join() + "}"
+			}
+			return c == "number" && !isFinite(o) ? "null" : "" + o
+		}
 	})
 
 
