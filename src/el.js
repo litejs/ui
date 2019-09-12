@@ -4,7 +4,7 @@
 
 
 !function(window, document, Object, Event, protoStr) {
-	var currentLang, styleNode
+	var styleNode
 	, BIND_ATTR = "data-bind"
 	, isArray = Array.isArray
 	, seq = 0
@@ -1105,53 +1105,5 @@
 	addEvent(window, "orientationchange", setBreakpointsRated)
 	addEvent(window, "load", setBreakpointsRated)
 	/**/
-
-
-	/*** i18n ***/
-	function i18n(text, lang) {
-		lang = i18n[i18nGet(lang) || currentLang]
-		return (
-			lang[text] ||
-			typeof text === "string" && lang[text = text.slice(text.indexOf(":") + 1) || text] ||
-			text || ""
-		)
-	}
-	El.i18n = i18n
-
-	function i18nGet(lang) {
-		return lang && (
-			i18n[lang = ("" + lang).toLowerCase()] ||
-			i18n[lang = lang.split("-")[0]]
-		) && lang
-	}
-
-	function i18nUse(lang) {
-		lang = i18nGet(lang)
-		if (lang && currentLang != lang) {
-			i18n[currentLang = i18n.current = lang] = i18n[currentLang] || {}
-		}
-		return currentLang
-	}
-
-	function i18nAdd(lang, texts) {
-		if (i18n.list.indexOf(lang) < 0) i18n.list.push(lang)
-		Object.assign(i18n[lang] || (i18n[lang] = {}), texts)
-		if (!currentLang) i18nUse(lang)
-	}
-
-	i18n.list = []
-	i18n.get = i18nGet
-	i18n.use = i18nUse
-	i18n.add = i18nAdd
-	i18n.def = function(map, key) {
-		for (key in map) {
-			i18nAdd(key, map)
-		}
-	}
-	// navigator.userLanguage for IE, navigator.language for others
-	// var lang = navigator.language || navigator.userLanguage;
-	// i18nUse("en")
-	/**/
-
 }(window, document, Object, Event, "prototype")
 

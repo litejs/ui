@@ -281,6 +281,6 @@ var app = LiteJS({
 			link
 		)
 	}
-}(this, document, navigator, View, El.i18n)
+}(this, document, navigator, View, i18n)
 
 

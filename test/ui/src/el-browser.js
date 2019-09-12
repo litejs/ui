@@ -1,6 +1,5 @@
 
 require("../../../ui/src/el.js")
-global.i18n = window.El.i18n
 
 El.get = function(id) {
 	return document.getElementById(id)
@@ -20,45 +19,7 @@ function to(el, parent, before) {
 	return el
 }
 
-i18n.def({ "et":"Eesti keeles"
-	, "en":"In English"
-	, "ru":"На русском"
-	, "fi":"Suomeksi"
-	, "se":"på Svenska"
-})
 
-i18n.add("en", {
-	date: "%a, %d %b %Y %H:%M:%S %z",
-	name: "Name {date|lang}"
-})
-
-i18n.add("et", {
-	date: "%Y %H:%M:%S %z",
-	name: "Nimi {date|lang:'et'}"
-})
-
-/*
- * navigator.language
- * "et"
- * navigator.languages
- * ["et", "en-US", "en"]
- */
-//i18n.setLang(navigator.language || navigator.userLanguage)
-
-Date.prototype.lang = function(lang) {
-	return this.format( i18n("date", lang) )
-}
-
-String.prototype.lang = function(lang) {
-	return i18n(this, lang)
-}
-
-i18n.add("en", {
-	firstName: "First Name",
-	lastName: "Last Name"
-})
-
-i18n.use("en")
 
 var undef
 , el, h1, h2, h3, h4, input, radio, select, t1
