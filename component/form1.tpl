@@ -217,8 +217,8 @@
 			.js-items.cf
 			a.btn.right
 				;if: !data.noAdd
-				;txt: _(data.name + ":Add")
-				;on: "click", data.add
+				;txt: _(data.name + ".Add")
+				@click: data.add
 
 %el form1-array-item
 	.input.p3.m2b.js-del
