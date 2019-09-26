@@ -787,8 +787,7 @@
 				if (name) {
 					parentStack.push(parent)
 					stack.unshift(q)
-					q = El(name, 0, 1)
-					append(parent, parent = q)
+					append(parent, parent = q = El(name))
 				}
 				if (text && op != "/") {
 					if (op == ">") {
@@ -1122,7 +1121,7 @@
 	}
 
 	function i18nAdd(lang, texts) {
-		if (i18n.list.indexOf(lang) == -1) i18n.list.push(lang)
+		if (i18n.list.indexOf(lang) < 0) i18n.list.push(lang)
 		Object.assign(i18n[lang] || (i18n[lang] = {}), texts)
 		if (!currentLang) i18nUse(lang)
 	}

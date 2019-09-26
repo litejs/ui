@@ -27,7 +27,7 @@
 
 				for (i = 0; tmp = keys[i++]; ) {
 					tmp2 = schema.properties[tmp]["enum"]
-					if (tmp2 && tmp2.indexOf(data[tmp]) == -1) {
+					if (tmp2 && tmp2.indexOf(data[tmp]) < 0) {
 						return
 					}
 				}
@@ -35,7 +35,7 @@
 			})
 		}
 		if (Array.isArray(tmp = schema["enum"])) {
-			if (tmp.indexOf(data) === -1) {
+			if (tmp.indexOf(data) < 0) {
 				for (var i = tmp.length; i--; ) {
 					if (tmp[i] == data) {
 						data = tmp[i]

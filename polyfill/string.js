@@ -13,7 +13,7 @@
 	}
 
 	if (!Str$.endsWith) Str$.endsWith = function(str) {
-		return this.indexOf(str, this.length - str.length) !== -1
+		return this.indexOf(str, this.length - str.length) > -1
 	}
 
 	if (!Str$.codePointAt) Str$.codePointAt = function(pos) {
