@@ -15,7 +15,7 @@
 	form[action="javascript:"][method=POST]
 
 @el svg-icon
-	svg[viewBox="0 0 24 24"][width=24px][height=24px]
+	svg[viewBox="0 0 24 24"][width=24px][height=24px][aria-hidden=true][focusable=false]
 
 @el svg-flag
 	svg[viewBox="0 0 4 3"][width=32px][height=24px]
