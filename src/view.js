@@ -211,10 +211,10 @@
 	View.def = function(str) {
 		for (var match, re = /(\S+) (\S+)/g; match = re.exec(str);) {
 			match[1].split(",").map(function(view) {
-				view = View(defMap(view, lastStr))
+				view = View(expand(view, lastStr))
 				view.file = (view.file ? view.file + "," : "") +
 				match[2].split(",").map(function(file) {
-					return views[file] ? views[file].file : defMap(file, lastStr)
+					return views[file] ? views[file].file : expand(file, lastStr)
 				})
 			})
 		}
@@ -231,8 +231,8 @@
 		} catch(e) {}
 	}
 
-	View.url = defMap
-	function defMap(str, _last) {
+	View.expand = expand
+	function expand(str, _last) {
 		var chr = str.charAt(0)
 		, slice = str.slice(1)
 		, last = _last || lastUrl
