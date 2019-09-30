@@ -38,19 +38,19 @@ require("../..")
 	assert.strictEqual(View.get(), view2)
 	assert.strictEqual(View.get("hello/world", params), view3)
 	assert.strictEqual(params.attr, "world")
-	assert.equal(View.active, null)
+	assert.equal(View.route, null)
 
 	tmp = lastParams
 	View.show("hello/moon")
-	assert.equal(View.active, "hello/{attr}")
+	assert.equal(View.route, "hello/{attr}")
 	assert.notStrictEqual(tmp, lastParams)
 	tmp = lastParams
 	View.show(true)
-	assert.equal(View.active, "hello/{attr}")
+	assert.equal(View.route, "hello/{attr}")
 	assert.notStrictEqual(tmp, lastParams)
 	tmp = lastParams
 	View.show("hello/world")
-	assert.equal(View.active, "hello/{attr}")
+	assert.equal(View.route, "hello/{attr}")
 	assert.notStrictEqual(tmp, lastParams)
 	assert.end()
 })

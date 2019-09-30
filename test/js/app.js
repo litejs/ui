@@ -201,7 +201,7 @@ var app = LiteJS({
 
 	View("#private")
 	.on("ping", function() {
-		if (!user && View.active != "login") {
+		if (!user && View.route != "login") {
 			View("login").show()
 		}
 	})

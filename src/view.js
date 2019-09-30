@@ -77,7 +77,7 @@
 			, tmp = params._v || view
 			, close = view.isOpen && view
 
-			View.active = view.route
+			View.route = view.route
 
 			for (; tmp; tmp = parent) {
 				syncResume = params._v = tmp
