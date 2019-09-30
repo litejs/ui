@@ -519,37 +519,12 @@
 	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 	// - IE8 always prevents the default of the mousewheel event.
 
-	var wheelDiff = 120
-	, addEv = "addEventListener"
+	var addEv = "addEventListener"
 	, remEv = "removeEventListener"
 	, prefix = window[addEv] ? "" : (addEv = "attachEvent", remEv = "detachEvent", "on")
-	, fixEv = Event.fixEv = {
-		wheel:
-			"onwheel" in document      ? "wheel" :      // Modern browsers
-			"onmousewheel" in document ? "mousewheel" : // Webkit and IE
-			"DOMMouseScroll"                            // older Firefox
-	}
-	, fixFn = Event.fixFn = {
-		wheel: function(el, _fn) {
-			return function(e) {
-				var delta = (e.wheelDelta || -e.detail || -e.deltaY) / wheelDiff
-				if (delta) {
-					if (delta < 1 && delta > -1) {
-						var diff = (delta < 0 ? -1 : 1)/delta
-						delta *= diff
-						wheelDiff /= diff
-					}
-					//TODO: fix event
-					// e.deltaY =
-					// e.deltaX = - 1/40 * e.wheelDeltaX|0
-					// e.target = e.target || e.srcElement
-					_fn.call(el, e, delta)
-				}
-			}
-		}
-	}
-
-	var emitter = new Event.Emitter
+	, fixEv = Event.fixEv || (Event.fixEv = {})
+	, fixFn = Event.fixFn || (Event.fixFn = {})
+	, emitter = new Event.Emitter
 
 	function addEvent(el, ev, _fn) {
 		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
