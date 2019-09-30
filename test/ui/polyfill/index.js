@@ -6,7 +6,7 @@ require("../..")
 	, forEach = mock.replace(Array.prototype, "forEach", null)
 	, from = mock.replace(Array, "from", null)
 	, isArray = mock.replace(Array, "isArray", null)
-	, polyfill = require("../../../ui/polyfill/es5.js")
+	, polyfill = require("../../../ui/polyfill")
 
 	assert.notStrictEqual(forEach, Array.prototype.forEach)
 	assert.notStrictEqual(from, Array.from)
