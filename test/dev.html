@@ -82,7 +82,7 @@
 		<script src="../ui/load.js" inline></script>
 		<script src="min/up.js" min="min/0.js?{hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
-			if="!window.PointerEvent"
+			if="!window.PointerEvent||!navigator.sendBeacon"
 			require="
 				litejs/ui/polyfill/es5
 		"></script>

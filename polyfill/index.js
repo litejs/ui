@@ -265,12 +265,20 @@
 				delete data[id]
 			},
 			clear: function() {
-				Object.keys(data).forEach(data.removeItem)
+				for (var key in data) delete data[key]
 			}
 		})
 		patch(name, data)
 	}
 
+	O = navigator
+	patch("sendBeacon", function(url, data) {
+		// The synchronous XMLHttpRequest blocks the process of unloading the document,
+		// which in turn causes the next navigation appear to be slower.
+		var req = xhr("POST", url, xhr.unload)
+		req.setRequestHeader("Content-Type", "text/plain;charset=UTF-8")
+		req.send(data)
+	})
 
 	eval(
 		"/*@cc_on " +
