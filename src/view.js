@@ -14,8 +14,31 @@
 	, hasOwn = views.hasOwnProperty
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
+	, defaults = {
+		base: "view/",
+		home: "home",
+		root: document.body
+	}
 
 	exports.View = View
+	exports.LiteJS = LiteJS
+
+
+	function LiteJS(_opts) {
+		var key, name
+		, opts = Object.assign({}, defaults, _opts)
+		for (key in opts) if (hasOwn.call(opts, key)) {
+			if (typeof View[key] == "function") {
+				for (name in opts[key]) if (hasOwn.call(opts[key], name)) {
+					View[key](name, opts[key][name])
+				}
+			} else {
+				View[key] = opts[key]
+			}
+		}
+		View("#body", opts.root)
+		return View
+	}
 
 	function View(route, el, parent) {
 		var view = views[route]
@@ -151,9 +174,6 @@
 	Event.asEmitter(View)
 	Event.asEmitter(View.prototype)
 
-	View.base = "view/"
-	View.home = "home"
-
 	View.get = get
 	function get(url, params) {
 		if (!fn) {
@@ -163,6 +183,10 @@
 			)()
 		}
 		return View(fn(url || View.home, params || {}, "404"))
+	}
+
+	View.ping = function(name, fn) {
+		View(name).on("ping", fn)
 	}
 
 	View.show = function(url, _params) {

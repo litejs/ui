@@ -12,6 +12,19 @@ if (self !== top) {
 	throw top.location = self.location
 }
 
+var app = LiteJS({
+	base: "view/",
+	home: "home",
+	root: document.body,
+	on: {
+		show: function(params, view) {
+			// Re-render all .js-viewHook elements on each View change
+			El.findAll(this.root, ".js-viewRender").render()
+			scroll(0, 1)
+		}
+	}
+})
+
 
 !function(window, document, navigator, View, i18n) {
 	i18n.def({
@@ -70,16 +83,6 @@ if (self !== top) {
 		})
 	}
 
-
-	// Define `#body` view, it is a starting point for us.
-	// It could be any element on page but we want to start from `BODY`.
-	View("#body", body)
-
-	View.on("show", function(params, view) {
-		// Re-render all .js-viewHook elements on each View change
-		El.findAll(body, ".js-viewRender").render()
-		scroll(0, 1)
-	})
 
 	View.on("xhr:406", function(body, method, url, data, onResponse, send) {
 		View.emit("confirm", body.title || "Not Acceptable", body, function(action) {
