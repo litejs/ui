@@ -10,7 +10,6 @@
 	bindingEvery.once =
 	emitForm.once =
 	bindingFn.once =
-	bindingOn.once =
 	bindingsEach.raw = bindingsEach.once =
 	true
 
@@ -120,38 +119,6 @@
 			El.cls(node, scope["_is-" + path], 0)
 			El.cls(node, scope["_is-" + path] = match && "is-" + match)
 		}
-	}
-
-	bindings.on = bindingOn
-	// .on( events [, selector ] [, data ], handler )
-	function bindingOn(el, events, selector, data, handler) {
-		var argi = arguments.length
-		if (argi == 4) {
-			handler = data
-			if (typeof selector == "string") {
-				data = null
-			} else {
-				data = selector
-				selector = null
-			}
-		}
-		if (argi == 3) {
-			handler = selector
-			selector = data = null
-		}
-		El.on(el, events, (
-			typeof handler == "string" ? function(e) {
-				var target = selector ? El.closest(e.target, selector) : el
-				if (!target) return
-				var args = [handler, e, target]
-				args.push.apply(args, data)
-				View.emit.apply(View, args)
-			} :
-			selector ? function(e) {
-				if (El.matches(e.target, selector)) handler(e)
-			} :
-			handler
-		))
 	}
 
 	bindings.emitForm = emitForm

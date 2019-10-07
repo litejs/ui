@@ -578,7 +578,46 @@
 		return false
 	}
 
-	El.on = acceptMany(addEvent)
+	function bindingOn(el, events, selector, data, handler, delay) {
+		var argi = arguments.length
+		if (argi == 3 || argi == 4 && typeof data == "number") {
+			delay = data
+			handler = selector
+			selector = data = null
+		} else if (argi == 4 || argi == 5 && typeof handler == "number") {
+			delay = handler
+			handler = data
+			if (typeof selector == "string") {
+				data = null
+			} else {
+				data = selector
+				selector = null
+			}
+		}
+		if (delay > 0) return setTimeout(bindingOn, delay, el, events, selector, data, handler)
+		var fn = (
+			typeof handler == "string" ? function(e) {
+				var target = selector ? El.closest(e.target, selector) : el
+				if (!target) return
+				var args = [handler, e, target]
+				args.push.apply(args, data)
+				View.emit.apply(View, args)
+			} :
+			selector ? function(e) {
+				if (El.matches(e.target, selector)) handler(e)
+			} :
+			handler
+		)
+		, names = isArray(events) ? events : events.split(splitRe)
+		, i = 0
+		, len = names.length
+
+		for (; i < len; ) {
+			addEvent(el, names[i++], fn)
+		}
+	}
+	bindingOn.once = 1
+	El.on = bindings.on = bindingOn
 	El.off = acceptMany(rmEvent)
 
 	El.one = function(el, ev, fn) {
