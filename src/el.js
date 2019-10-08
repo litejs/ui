@@ -48,9 +48,7 @@
 
 			if (el[txtAttr] !== txt) el[txtAttr] = txt
 		},
-		val: function(el, txt) {
-			valFn(el, txt)
-		},
+		val: El.val = valFn,
 		"with": function(el, map) {
 			var scope = elScope(el, this)
 			Object.assign(scope, map)
@@ -334,7 +332,6 @@
 		}
 	}
 
-	El.val = valFn
 	function valFn(el, val) {
 		var input, step, key, value
 		, i = 0
