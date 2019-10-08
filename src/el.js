@@ -982,6 +982,7 @@
 
 	/*** kb ***/
 	var kbMaps = []
+	, kbMod = El.kbMod = /^(Mac|iP)/.test(navigator.platform) ? "metaKey" : "ctrlKey"
 	, kbKeys = {
 		  8: "backspace", 9: "tab",
 		 13: "enter",    16: "shift", 17: "ctrl",  18: "alt",  19: "pause",
@@ -994,7 +995,6 @@
 		112: "f1",      113: "f2",   114: "f3",   115: "f4",  116: "f5",  117: "f6",
 		118: "f7",      119: "f8",   120: "f9",   121: "f10", 122: "f11", 123: "f12"
 	}
-	, kbMod = El.kbMod = /^(Mac|iP)/.test(navigator.platform) ? "metaKey" : "ctrlKey"
 
 	function kbRun(e, code, chr) {
 		var fn, map
@@ -1029,11 +1029,9 @@
 			}
 			kbRun(e, code, key)
 			if (e.shiftKey && code != 16) kbRun(e, code, "shift+" + key)
-			/**
-			 * people in Poland use Right Alt+S to type in Ś.
-			 * Right Alt+S is mapped internally to Ctrl+Alt+S.
-			 * https://medium.engineering/the-curious-case-of-disappearing-polish-s-fa398313d4df
-			 */
+			// people in Poland use Right-Alt+S to type in Ś.
+			// Right-Alt+S is mapped internally to Ctrl+Alt+S.
+			// THANKS: Marcin Wichary - disappearing Polish Ś [https://medium.engineering/fa398313d4df]
 			if (e.altKey) {
 				if (code != 18) kbRun(e, code, "alt+" + key)
 			} else if (code != 17) {
@@ -1043,8 +1041,17 @@
 		}
 	}
 
-	El.addKb = kbMaps.unshift.bind(kbMaps)
-	El.rmKb = function(map) {
+	El.addKb = function(map, killEl) {
+		if (map) {
+			kbMaps.unshift(map)
+			if (killEl) {
+				// addEvent(killEl, "kill", rmKb.bind(map, map))
+				emitter.on.call(killEl, "kill", rmKb.bind(map, map))
+			}
+		}
+	}
+	El.rmKb = rmKb
+	function rmKb(map) {
 		var i = kbMaps.indexOf(map||kbMaps[0])
 		if (i > -1) kbMaps.splice(i, 1)
 	}
