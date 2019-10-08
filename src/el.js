@@ -375,6 +375,8 @@
 				for (; input = opts[i++]; ) {
 					input.selected = value.indexOf(input.value) > -1
 				}
+			} else if (el.val) {
+				el.val(val)
 			} else {
 				checkbox ? (el.checked = !!val) : (el.value = val)
 			}
