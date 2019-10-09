@@ -4,15 +4,6 @@
 
 
 !function(window, document, Function) {
-
-	function patch(key, src, force) {
-		return !force && O[key] || (O[key] = (
-			patched.push(key), typeof src === "string" ?
-			Function("a,b,c", "var P='" + P + "',o=Object[P].hasOwnProperty;" + src) :
-			src
-		))
-	}
-
 	var a, b, c
 	, EV = "Event"
 	, P = "prototype"
@@ -44,7 +35,48 @@
 		c: "touchcancel"
 	}
 
-	// Chrome55, Edge12, Firefox59, IE11, Safari13
+	// window.PointerEvent  - Chrome55, Edge12, Firefox59, IE11, Safari13
+	// navigator.sendBeacon - Chrome39, Edge14, Firefox31, -,    Safari11.1
+
+	function patch(key, src, force) {
+		return !force && O[key] || (O[key] = (
+			patched.push(key), typeof src === "string" ?
+			Function("n,o,P", "return function(a,b,c){" + src + "}")(nop, hasOwn, P) :
+			src
+		))
+	}
+
+	patch("JSON", {
+		parse: function(t) {
+			return Function("return(" + t + ")")()
+		},
+		stringify: function stringify(o) {
+			var i
+			, s = []
+			, c = typeof o
+			if (c == "string") {
+				for (i = o.length; c = o.charAt(--i); s[i] = JSONmap[c] || (
+					c < " " ? "\\u00" + ((c=c.charCodeAt(0))|4) + (c%16).toString(16):c
+				));
+				o = '"' + s.join("") + '"'
+			}
+			if (o && c == "object") {
+				if (typeof o.toJSON == "function") return '"' + o.toJSON() + '"'
+				if (Array.isArray(o)) {
+					for (i = o.length; i--; s[i] = stringify(o[i]));
+					return "[" + s.join() + "]"
+				}
+				for (i in o) if (hasOwn.call(o, i)) {
+					s.push(stringify(i) + ":" + stringify(o[i]))
+				}
+				o = "{" + s.join() + "}"
+			}
+			return c == "number" && !isFinite(o) ? "null" : "" + o
+		}
+	})
+
+	createStorage("sessionStorage")    // Chrome5, FF2, IE8, Safari4
+	createStorage("localStorage")      // Chrome5, FF3.5, IE8, Safari4
 
 	if (!window.PointerEvent) {
 		// IE10
@@ -134,10 +166,8 @@
 
 
 	O = Object
-	O.nop = function(){}
-
 	// Chrome5, FF4, IE9, Safari5
-	patch("create", "b=Object.nop;b[P]=a;a=new b;b[P]=null;return a")
+	patch("create", "n[P]=a;a=new n;n[P]=null;return a")
 	patch("keys", "c=[];for(b in a)o.call(a,b)&&c.push(b);return c")
 
 	// Object.assign ( target, source ) in ECMAScript 6
@@ -162,7 +192,7 @@
 	patch("reduce",      b + "[++i];while(++i<l)" + c)
 	patch("reduceRight", b + "[--l];i=l;while(i--)" + c)
 
-	b = a+"while(++i<l)if(i in t)"
+	b = a + "while(++i<l)if(i in t)"
 	patch("forEach",     b + "a.call(b,t[i],i,t)")
 	patch("every",       b + "if(!a.call(b,t[i],i,t))return!1;return!0")
 
@@ -188,40 +218,14 @@
 	// `Date.prototype.date` is implemented in `litejs/date`.
 	patch("toJSON", "return this.date('iso')")
 
-	O = window
-
-	patch("JSON", {
-		parse: function(t) {
-			return Function("return(" + t + ")")()
-		},
-		stringify: function stringify(o) {
-			var i
-			, s = []
-			, c = typeof o
-			if (c == "string") {
-				for (i = o.length; c = o.charAt(--i); s[i] = JSONmap[c] || (
-					c < " " ? "\\u00" + ((c=c.charCodeAt(0))|4) + (c%16).toString(16):c
-				));
-				o = '"' + s.join("") + '"'
-			}
-			if (o && c == "object") {
-				if (typeof o.toJSON == "function") return '"' + o.toJSON() + '"'
-				if (Array.isArray(o)) {
-					for (i = o.length; i--; s[i] = stringify(o[i]));
-					return "[" + s.join() + "]"
-				}
-				for (i in o) if (hasOwn.call(o, i)) {
-					s.push(stringify(i) + ":" + stringify(o[i]))
-				}
-				o = "{" + s.join() + "}"
-			}
-			return c == "number" && !isFinite(o) ? "null" : "" + o
-		}
+	O = navigator
+	patch("sendBeacon", function(url, data) {
+		// The synchronous XMLHttpRequest blocks the process of unloading the document,
+		// which in turn causes the next navigation appear to be slower.
+		var req = xhr("POST", url, xhr.unload)
+		req.setRequestHeader("Content-Type", "text/plain;charset=UTF-8")
+		req.send(data)
 	})
-
-
-	createStorage("sessionStorage")    // Chrome5, FF2, IE8, Safari4
-	createStorage("localStorage")      // Chrome5, FF3.5, IE8, Safari4
 
 	function createStorage(name) {
 		try {
@@ -271,14 +275,7 @@
 		patch(name, data)
 	}
 
-	O = navigator
-	patch("sendBeacon", function(url, data) {
-		// The synchronous XMLHttpRequest blocks the process of unloading the document,
-		// which in turn causes the next navigation appear to be slower.
-		var req = xhr("POST", url, xhr.unload)
-		req.setRequestHeader("Content-Type", "text/plain;charset=UTF-8")
-		req.send(data)
-	})
+	function nop(){}
 
 	eval(
 		"/*@cc_on " +
