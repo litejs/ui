@@ -1,4 +1,4 @@
-@css
+%css
 	svg {
 		overflow: visible;
 		fill: currentColor;
@@ -20,7 +20,7 @@
 	}
 
 
-@view test-svg public
+%view test-svg public
 	anim-page
 		h2 SVG
 		svg[viewBox="0 0 60 60"][height=128][width=128].hide
@@ -30,36 +30,36 @@
 					circle[cx=30][cy=30][r=25][fill=none][stroke=gray][stroke-width=8]
 		.grid-2
 			svg[viewBox="0 0 60 60"][width=128]
-				&css: "color", "blue"
-				use[color=blue] &xlink: "#cir"
-				path.arc &arc:0,30,25
+				;css: "color", "blue"
+				use[color=blue] ;xlink: "#cir"
+				path.arc ;arc:0,30,25
 				text[x=75][y=15][font-family=Verdana][font-size=10] Hello, out there
 		.grid-2
 			h3 tooltip
-				&data: "tooltip", "Hello"
+				;data: "tooltip", "Hello"
 			.col-12
 				svg[viewBox="0 0 60 60"][width=128]
-					path.arc &arc:0,30,12
-					path.arc &arc:30,90,12
-					path.arc &arc:90,100,12
-					path.arc &arc:0,40,25
-						&data: "tooltip", "Option C 40%\nSome more text"
-					path.arc &arc:40,70,25
-						&data: "tooltip", "Option B 30%"
+					path.arc ;arc:0,30,12
+					path.arc ;arc:30,90,12
+					path.arc ;arc:90,100,12
+					path.arc ;arc:0,40,25
+						;data: "tooltip", "Option C 40%\nSome more text"
+					path.arc ;arc:40,70,25
+						;data: "tooltip", "Option B 30%"
 					path.arc
-						&arc:70,100,25
-						&data: "tooltip", "Option A 30%"
+						;arc:70,100,25
+						;data: "tooltip", "Option A 30%"
 			.col-12
 				Chart[height=300]
-					&ref: "chart"
+					;ref: "chart"
 					Chart-axes
 					Chart-legend
 					Chart-line.c3
-						&with: {name: "Line 1", points: [80, 230, 15, 225, 40, 255], radius: 8}
+						;with: {name: "Line 1", points: [80, 230, 15, 225, 40, 255], radius: 8}
 					Chart-line.c4
-						&with: {name: "Line 2", points: [110, 230, 15, 225, 40, 255]}
+						;with: {name: "Line 2", points: [110, 230, 15, 225, 40, 255]}
 					Chart-line.c2
-						&with: {name: "Line 3", points: [10, 24, 15, 25, 0, 90], radius: 6}
+						;with: {name: "Line 3", points: [10, 24, 15, 25, 0, 90], radius: 6}
 					Chart-area.c5
 					Chart-bar.c1
 

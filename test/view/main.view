@@ -1,43 +1,43 @@
 
-@def #mat ../../ui/component/material.tpl
-@def
+%def #mat ../../ui/component/material.tpl
+%def
 	settings %.view,%.css
 	test-form1,test-grid,pointer %.view
 	test-form1 %.view,../binding/persist.js
-	test-svg #mat,../svg.js,../../ui/component/Pie.tpl,test-svg.view
+	test-svg #mat,../../ui/component/Pie.tpl,test-svg.view
 	testman,+/lcov,+/lcov/{file} %.view
 	test-material-ui #mat,../../ui/component/Slider.tpl,test-material-ui.view
 
-@el anim-page
+%el anim-page (href,name)
 	.content.loader
 
-@el form-js
+%el form-js
 	form[action="javascript:"][method=POST]
 
-@el svg-icon
+%el svg-icon
 	svg[viewBox="0 0 24 24"][width=24px][height=24px][aria-hidden=true][focusable=false]
 
-@el svg-flag
+%el svg-flag
 	svg[viewBox="0 0 4 3"][width=32px][height=24px]
 
-@el top
+%el top
 	.bg-1
 		.top.t-1.App-row
 			.right
-				@child
-			.right.lang &each: lng in _.list
+				%child
+			.right.lang ;each: lng in _.list
 				a.hand - {lng.upper()} -
-					&on:"click", _.setLang.bind(null, lng)
-					&class:"selected", lng == _.current
-					&class:"lang-" + lng
+					@click: _.setLang.bind(null, lng)
+					;cls: "selected", lng == _.current
+					;cls: "lang-" + lng
 			a[href="#home"].home-link Header
 			span.sizeHint Responsive
-@el Menu
+%el Menu
 	.bg-2
 		.Menu.App-row.js-viewRender
-			@el nav-row
+			%el nav-row
 				a.Menu-item.waves
-					&class: "selected", (route._u || View.home).indexOf(this.href.split("#")[1]) == 0
+					;cls: "selected", (route._u || View.home).indexOf(this.href.split("#")[1]) == 0
 			nav-row[href="#home"]
 				svg-icon>path[d="M12,2L1,12h3v9h5V14h6v7h5V12h3z"]
 				svg-icon>path[d="M12,2L1,12h3v9h5V14h9V2h-3V21h5V12h3z"]
@@ -48,7 +48,7 @@
 			nav-row[href="#test"] Test
 
 
-@el Footer
+%el Footer
 	.bg-1
 		.Footer.App-row.grid-3.c2
 			.Footer-item.col-4
@@ -64,7 +64,7 @@
 				path[d="M0 1h4v1H0z"][fill="#000"]
 				path[d="M0 2h4v1H0z"][fill="#fff"]
 
-@css
+%css
 	.scroll-up {
 		position: fixed;
 		bottom: 30px;
@@ -94,8 +94,8 @@
 		transform: translate(8px,10px) rotate(45deg);
 	}
 
-@view public #body
-	&kb: {
+%view public #body
+	;kb: {
 		h: history.setUrl.bind(null, "home"),
 		u: history.setUrl.bind(null, "users"),
 		"shift+s": history.setUrl.bind(null, "settings")
@@ -104,11 +104,11 @@
 		top
 		Menu
 		.rel.App-row
-			@child
+			%child
 		.Footer-spacer
 	Footer
 	.scroll-up
-		&init: function(el) {
+		;init: function(el) {
 			console.log("i", arguments)
 			var state = false
 			El.on(el, 'click', function() {
@@ -121,71 +121,71 @@
 			})
 		}
 
-@view #private #body
+%view #private #body
 	.App.max-height
 		top
 			.p2
 				span {user.name}
 				button.c0 Logout
-					&on:"click", "logout"
+					;on:"click", "logout"
 		Menu
-			@child
+			%child
 		.Footer-spacer
 	Footer
 
-@view svg public
+%view svg public
 	anim-page
 		/ 210° = r-Math.sqrt(3)/2*r
 		/ 225° = r-Math.sqrt(2)/2*r
 		svg-icon[width=800][height=800]>path[d="M2,12a10,10 0,1,1 4,8a1,1 0,0,1 1.3,-1.6a8,8 0,1,0 -3.2,-6.4h-4l3,3l3,-3zM11,6h2v5.5h3v2h-5z"]
 
-@view 404 public
+%view 404 public
 	anim-page
 		h2 Error 404
 		\ Page not found.
 		\ Maybe you want to look something else?
 
-@view home public
+%view home public
 	anim-page
 		h2 Home
 		div _welcome
-			&on: "click", Fn("this.style.fontStyle = this.style.fontStyle == 'italic' ? '' : 'italic'")
-		div &txt: _("_welcome")
-			&on: "mouseover", Fn("El.cls(this,'bg3'),El.txt(this, El.txt(this) == _('_welcome') ? 'Over!' : _('_welcome'))")
-			&on: "mouseout", Fn("El.cls(this,'bg3',0),El.txt(this, _('_welcome'))")
-		div &txt: _(welcomeText)
-		div &txt: _(nonExistingWelcomeText)
+			;on: "click", Fn("this.style.fontStyle = this.style.fontStyle == 'italic' ? '' : 'italic'")
+		div ;txt: _("_welcome")
+			;on: "mouseover", Fn("El.cls(this,'bg3'),El.txt(this, El.txt(this) == _('_welcome') ? 'Over!' : _('_welcome'))")
+			;on: "mouseout", Fn("El.cls(this,'bg3',0),El.txt(this, _('_welcome'))")
+		div ;txt: _(welcomeText)
+		div ;txt: _(nonExistingWelcomeText)
 		div
-			&if: Math.random() > .5
-			&txt: "If"
+			;if: Math.random() > .5
+			;txt: "If"
 		.time ="Init '\" " + started.date()
 		.time
-			&txt: "Load " + new Date().date()
+			;txt: "Load " + new Date().date()
 
 
-@view users public
+%view users public
 	anim-page
 		h2 Users
-		ul.users &list: Data("users")
+		ul.users ;list: Data("users")
 			li
 				a
-					&txt: item.name
-					&title: _("_welcome")
-					&href: "#users/" + item.id
+					;txt: item.name
+					;title: _("_welcome")
+					;href: "#users/" + item.id
 
-@view users/{userId} public
+%view users/{userId} public
 	anim-page
 		form-js
-			&schemaToForm: "../test/ui/schema/user.json", "edit", "form1"
+			;schemaToForm: "../test/ui/schema/user.json", "edit", "form1"
 
-@view users/{userId}/{pageId} public
+%view users/{userId}/{pageId} public
 	anim-page
 		h3 {page.get("name")}
 
-@view login public
+%view login public
 	anim-page
 		form[action="javascript:"][method=POST]
-			&emitForm:"login"
+			;emitForm:"login"
 			fieldset.grid-2.login
 				legend Login
 				.error {route.error||""}
@@ -200,13 +200,13 @@
 					.col-12.col-md-8>input.btn[type=submit] Log In
 
 
-@view ok public
+%view ok public
 	anim-page
 		h1 Ok!
 
-@view-link test-view-link ok
+%view-link test-view-link ok
 
-@css
+%css
 	.tip {
 		position: relative;
 		margin: 1.5em 0;
@@ -236,7 +236,7 @@
 		color: rgba(0,0,0,0.6);
 	}
 
-@view test public
+%view test public
 	anim-page
 		h2 Test
 		ul
@@ -250,12 +250,12 @@
 			li>a[href="#pointer"] PointerEvent
 			li>a[href="iframe.html#test1"] Iframe
 			li>a[href="//localhost:81/litejs/litejs/ui/iframe.html#test2"] Iframe 81
-		@rel user home vnd.app.home
+		%rel user home vnd.app.home
 			.home {home.name} was here
-		@rel user home vnd.app.home.v2
+		%rel user home vnd.app.home.v2
 			.home {home.homeName}
 		.tip
-			@rel is not implemented
+			%rel is not implemented
 		h2 Seven-segment display
 		.seg
 			Segment7[data-value=1]

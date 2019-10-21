@@ -1,38 +1,38 @@
 
-@view pointer public
+%view pointer public
 	.content
 		h2 Test touch 1
 		.rel
 			#debu DEBU
 			#debu2 DEBU
-			&css: "background", "#ddd"
-			&css: "height", "400px"
+			;css: "background", "#ddd"
+			;css: "height", "400px"
 			.abs.w3.h3 BTN
-				&initTouch::
-				&css: "background", "#999"
-				&css: "height", "180px"
-				&css: "width", "180px"
+				;initTouch::
+				;css: "background", "#999"
+				;css: "height", "180px"
+				;css: "width", "180px"
 		h2 Events
 		div
-			&init: data.count1=0
-			&txt: "Click " + count1
-			&title:: "Click " + count1
-			&on: "click", Fn("el data->e->data.count1++,El.render(el)")(this, data)
+			;init: data.count1=0
+			;txt: "Click " + count1
+			;title:: "Click " + count1
+			;on: "click", Fn("el data->e->data.count1++,El.render(el)")(this, data)
 		div
-			&init: data.count2=0
-			&init: El.one(this, "click", Fn("el data->e->data.count2++,El.render(el)")(this, data))
-			&txt: "One click " + count2
+			;init: data.count2=0
+			;init: El.one(this, "click", Fn("el data->e->data.count2++,El.render(el)")(this, data))
+			;txt: "One click " + count2
 		div
-			&init: data.count2=0
-			&txt: "Hover"
-			&on: "mouseover", Fn("El el txt->_->El.txt(el, txt)")(El, this, "mouseover")
-			&on: "mouseout", Fn("El el txt->_->El.txt(el, txt)")(El, this, "mouseout")
+			;init: data.count2=0
+			;txt: "Hover"
+			;on: "mouseover", Fn("El el txt->_->El.txt(el, txt)")(El, this, "mouseover")
+			;on: "mouseout", Fn("El el txt->_->El.txt(el, txt)")(El, this, "mouseout")
 		div
-			&init: data.count3=0
-			&txt: "Wheel " + count3
-			&on: "wheel", Fn("el data->e delta->data.count3=delta,El.render(el),Event.stop(e)")(this, data)
+			;init: data.count3=0
+			;txt: "Wheel " + count3
+			;on: "wheel", Fn("el data->e delta->data.count3=delta,El.render(el),Event.stop(e)")(this, data)
 
-@js
+%js
 	El.bindings.initTouch = function(el) {
 		El.on(el, "move", function(e, pos) {
 			Event.stop(e)

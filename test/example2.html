@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html><body>
 <script id="index" type="text/tpl">
-@el menu
+%el menu
 	ul
-		@el row
+		%el row
 			li.my-row
 				i.icon
 				b
-					@child
+					%child
 		row.first
 			a[href="#home"] Home
 		row.last
 			a[href="#page/about"] About
 	hr
 
-@el footer
+%el footer
 	.footer
 		hr
 		i Bye
 
-@view home #body
+%view home #body
 	menu
 	h1 Home
 	section Welcome
 	footer
 
-@view page/{pageName} #body
+%view page/{pageName} #body
 	menu
 	h1 Welcome to {route.pageName} page!
 	section Hello World!

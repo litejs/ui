@@ -1,5 +1,5 @@
 
-@css
+%css
 	.Pie {
 		overflow: visible;
 		fill: currentColor;
@@ -58,21 +58,21 @@
 		stroke-width: 1;
 	}
 
-@el Pie
+%el Pie
 	svg.Pie[viewBox="0 0 60 60"]
 
 
 
-@el Chart
+%el Chart
 	svg.Chart[viewBox="0 0 600 300"][preserveAspectRatio="xMinYMid meet"]
-		&initChart
+		;initChart
 
-@el Chart-line
+%el Chart-line
 	g.Chart-line
-		&svgToLast
-		path &svgLine: points, {radius: radius}
+		;svgToLast
+		path ;svgLine: points, {radius: radius}
 
-@el Chart-axes
+%el Chart-axes
 	g.labels.x-labels
 		text[x="100"][y="400"] 2008
 		text[x="246"][y="400"] 2009

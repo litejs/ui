@@ -1,5 +1,5 @@
 
-@css
+%css
 	.Segment7 {
 		position: relative;
 		height: 1em;
@@ -70,7 +70,7 @@
 		color: rgba(0,0,0,0.07);
 	}
 
-@el Segment7
+%el Segment7
 	.Segment7.left
 		.Seg.Seg-V.Seg-A[off="1 4 b d"]
 		.Seg.Seg-V.Seg-G[off="0 1 7 c"]

@@ -1,5 +1,5 @@
-@view test-grid public
-	@css
+%view test-grid public
+	%css
 		.border-white, .border-white > .col, .border-white > .grid > .col {
 			border-color: #fff !important;
 		}
@@ -29,7 +29,7 @@
 			.col.w1g.md-w5g.lg-w5g c12
 		h2 Test tiles
 		.grid.b2.border-white
-			&css: "height", "300px"
+			;css: "height", "300px"
 			.grid.w4.h8
 				.col.h6 c1
 				.col.h6 c2

@@ -1,5 +1,5 @@
 
-@css
+%css
 	.mat-Menu,
 	.tooltip {
 		font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -195,7 +195,7 @@
 		left: 25%;
 	}
 
-@js
+%js
 	!function(View) {
 		var menuTarget, menuEl, tipTarget, tipEl, tick, wait
 		, ripple = El(".waves-ripple")
@@ -355,24 +355,24 @@
 	}(View)
 
 
-@el Checkbox
+%el Checkbox
 	label.Checkbox
 		input[type=checkbox].hide
 		i.Checkbox-icon.waves
 
-@el Button
+%el Button
 	button[type=button].Button.waves Button
 
-@el Fab
+%el Fab
 	button[type=button].Fab.waves.raised
 
-@el Toggle
+%el Toggle
 	button[type=button].Toggle.waves
 
-@el Radio
+%el Radio
 	button[type=button].Radio.waves
 
-@css
+%css
 	.MenuBtn {
 		position: relative;
 		width: 30px;
@@ -420,7 +420,7 @@
 		transform: rotateZ(-45deg) translate(0, 0);
 	}
 
-@el MenuBtn
+%el MenuBtn
 	button[type=button].MenuBtn.reset.noselect
 		.MenuBtn-x.anim
 

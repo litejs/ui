@@ -1,5 +1,5 @@
 
-@css
+%css
 	.Slider {
 		width: 200px;
 		background: transparent;
@@ -132,7 +132,7 @@
 	}
 	*/
 
-@js
+%js
 	El.bindings.SliderVal = function(el, model, path, range) {
 		if (range) {
 			El.attr(el, "range", range)
@@ -245,35 +245,35 @@
 	El.bindings.fixReadonlyCheckbox.once =
 	El.bindings.SliderInit.once = El.bindings.SliderVal.once = 1
 
-@el Slider
-	button.Slider.reset &SliderInit
+%el Slider
+	button.Slider.reset ;SliderInit
 		.Slider-track
 			.Slider-fill.abs.anim
 				.Slider-knob.anim[tabindex=0]
 
-@el Slider2
-	button.Slider.reset &SliderInit
-		.Slider-track
-			.Slider-fill.abs.anim
-				.Slider-knob.anim[tabindex=0]
-			.Slider-fill.abs.anim
-				.Slider-knob.anim[tabindex=0]
-
-@el Slider3
-	button.Slider.reset &SliderInit
+%el Slider2
+	button.Slider.reset ;SliderInit
 		.Slider-track
 			.Slider-fill.abs.anim
 				.Slider-knob.anim[tabindex=0]
 			.Slider-fill.abs.anim
 				.Slider-knob.anim[tabindex=0]
+
+%el Slider3
+	button.Slider.reset ;SliderInit
+		.Slider-track
+			.Slider-fill.abs.anim
+				.Slider-knob.anim[tabindex=0]
+			.Slider-fill.abs.anim
+				.Slider-knob.anim[tabindex=0]
 			.Slider-fill.abs.anim
 				.Slider-knob.anim[tabindex=0]
 
-@el Toggle
+%el Toggle
 	label.Toggle.reset[tabindex=0]
-		&fixReadonlyCheckbox
+		;fixReadonlyCheckbox
 		input[type=checkbox].hide
-			&readonly: row && !row.write
-			&checked: model && !!model.get(row.path)
+			;readonly: row && !row.write
+			;checked: model && !!model.get(row.path)
 		.Toggle-knob.anim
 

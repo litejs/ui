@@ -1,4 +1,4 @@
-@css
+%css
 	::-moz-focus-inner {
 		border: 0;
 		padding: 0;
@@ -142,88 +142,88 @@
 	}
 
 
-@el form1-row
+%el form1-row
 	label.row
 		.col.md-w4.input__label {name}
 		.col.md-w8
-			@child
+			%child
 			.input__hint {description}
 
-@el form1-subheader
+%el form1-subheader
 	.col {title}
 
-@el form1-fieldset
+%el form1-fieldset
 	fieldset.grid.b2
 		legend {schema.title || _link.title || ""}
 
-@el form1
+%el form1
 	form1-row
 		input.field
 
-@el form1-ro
-	form1-row>span &txt: value
+%el form1-ro
+	form1-row>span ;txt: value
 
-@el form1-hidden
+%el form1-hidden
 	div>input.field[type=hidden]
 
-@el form1-boolean
+%el form1-boolean
 	form1-row
-		input.field[type=checkbox] &value: value
+		input.field[type=checkbox] ;value: value
 
-@el form1-boolean-ro
-	form1-row>span &txt: _(!!value)
+%el form1-boolean-ro
+	form1-row>span ;txt: _(!!value)
 
-@el form1-password
+%el form1-password
 	form1-row
 		input.field[type=password]
 
-@el form1-new-password
+%el form1-new-password
 	form1-row
 		input.field[type=password][autocomplete=new-password]
 
-@el form1-text
+%el form1-text
 	form1-row
 		textarea.field
 
-@el form1-text-ro
+%el form1-text-ro
 	form1-ro
 
-@el form1-enum
+%el form1-enum
 	form1-row
-		select.field &each:val in data["enum"]
+		select.field ;each:val in data["enum"]
 			option
-				&val:: val
-				&txt: _("" + val)
+				;val:: val
+				;txt: _("" + val)
 
-@el form1-enum-ro
+%el form1-enum-ro
 	form1-ro
 
-@el form1-list
+%el form1-list
 	form1-row
 		select.field
-			&list: api(resourceCollection.format(data.route, data)), required ? 0 : [""], value
+			;list: api(resourceCollection.format(data.route, data)), required ? 0 : [""], value
 			option
-				&val:: item.id
-				&txt:: _(item.name)
+				;val:: item.id
+				;txt:: _(item.name)
 
-@el form1-list-ro
-	form1-row>span &txt: _(item.name)
+%el form1-list-ro
+	form1-row>span ;txt: _(item.name)
 
-@el form1-array
+%el form1-array
 	.col
 		.input.p13
 			.left {name}
 			.input__hint {description}
 			.js-items.cf
 			a.btn.right
-				&if: !data.noAdd
-				&txt: _(data.name + ":Add")
-				&on: "click", data.add
+				;if: !data.noAdd
+				;txt: _(data.name + ":Add")
+				;on: "click", data.add
 
-@el form1-array-item
+%el form1-array-item
 	.input.p3.m2b.js-del
 		a.right.Form1-del.hand ×
-			&if: !data.noAdd
-			&on: "click", data.del
+			;if: !data.noAdd
+			;on: "click", data.del
 		.grid.b2.js-item
 

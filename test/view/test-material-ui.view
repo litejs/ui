@@ -1,6 +1,6 @@
 
 
-@view test-material-ui public
+%view test-material-ui public
 	anim-page
 		h2 Material UI
 		.grid-2
@@ -10,13 +10,13 @@
 				Button.raised Primary
 				Button:disabled Disabled
 				Button.raised.is-warning Warn
-			@el Fab-menu1
+			%el Fab-menu1
 				ul.mat-Menu.shadow-1
 					li.mat-Menu-item.waves Some Action
 					li.mat-Menu-item.waves.is-divider Another Action
 					li.mat-Menu-item.waves:disabled Disabled Action
 					li.mat-Menu-item.waves Yet Another Action
-			@el Fab-menu2
+			%el Fab-menu2
 				ul.mat-Menu.shadow-1
 					li.mat-Menu-item.waves Some Action
 					li.mat-Menu-item.waves.is-divider Another Action
@@ -25,30 +25,30 @@
 			.col-3 Fab buttons
 			.col-9
 				Fab>\+
-					&data: "tooltip", "Hello1"
-					&on: "click", ["Fab-menu1", "right-end", "bottom", 0, 1], "showMenu"
+					;data: "tooltip", "Hello1"
+					@click: ["Fab-menu1", "right-end", "bottom", 0, 1], "showMenu"
 				Fab.Fab--red[data-tooltip-pos=left]>\—
-					&data: "tooltip", "World\n2"
-					&on: "click", ["Fab-menu2", "left-start", "bottom", 0, 1], "showMenu"
+					;data: "tooltip", "World\n2"
+					;on: "click", ["Fab-menu2", "left-start", "bottom", 0, 1], "showMenu"
 				Fab[data-tooltip-pos=right]>\+
-					&data: "tooltip", "Hello2"
+					;data: "tooltip", "Hello2"
 				Fab>\+
-					&data: "tooltip", "Hello3"
+					;data: "tooltip", "Hello3"
 				Fab[data-tooltip-pos=bottom]>\+
-					&data: "tooltip", "Hello4"
+					;data: "tooltip", "Hello4"
 			.col-3 Checkboxes
 			.col-9
 				Checkbox
 					\ Default
 				MenuBtn.MenuBtn--back
-					&on: "click", ["MenuBtn--back"], "toggleClass"
+					;on: "click", ["MenuBtn--back"], "toggleClass"
 				MenuBtn.MenuBtn--close
-					&on: "click", ["MenuBtn--close"], "toggleClass"
+					;on: "click", ["MenuBtn--close"], "toggleClass"
 			.col-3 Sliders
-				&on: "click", "timerTest"
+				;on: "click", "timerTest"
 			.col-9
 				Slider[range="1:10:.5"]
-					&SliderVal: 0, 0, "1:10:.5"
+					;SliderVal: 0, 0, "1:10:.5"
 				br
 				Slider2.no-first[style="width:400px"]
 				br
@@ -57,5 +57,5 @@
 				Toggle
 				br
 				Slider[range="1:10:.5"].is-vertical
-					&SliderVal: 0, 0, "1:10:.5"
+					;SliderVal: 0, 0, "1:10:.5"
 

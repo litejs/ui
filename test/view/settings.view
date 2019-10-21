@@ -1,10 +1,10 @@
 
-@view settings public
+%view settings public
 	anim-page
 		h2.settings Settings for {user.name}
 		.h | Settings
 		| Lot of settings
-		ul &each: row in ["A", "B", "C"]
+		ul ;each: row in ["A", "B", "C"]
 			li
 				span Row {row}
 				input[name=a0][type=checkbox][data-bind="checked:Math.random()>.5"]

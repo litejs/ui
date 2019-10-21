@@ -15,7 +15,7 @@
 	, body = document.body
 	, root = document.documentElement
 	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
-	, templateRe = /^([ \t]*)(@?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>&^|\\\/=]?)(([\])}]?).*?([[({]?))$/gm
+	, templateRe = /^([ \t]*)(%?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
@@ -799,7 +799,9 @@
 					} else if (op == "|" || op == "\\") {
 						append(parent, text) // + "\n")
 					} else {
-						if (op != "&" && op != "^") {
+						if (op == "@") {
+							text = text.replace(/(\w+):?/, "on:'$1',")
+						} else if (op != ";" && op != "^") {
 							text = (parent.tagName == "INPUT" ? "val" : "txt") + (
 								op == "=" ? ":" + text.replace(/'/g, "\\'") :
 								":_('" + text.replace(/'/g, "\\'") + "').format(data)"

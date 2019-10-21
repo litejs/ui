@@ -3,54 +3,54 @@
 <link rel="stylesheet" href="app.css">
 <script id="index" type="text/tpl">
 // An end-of-line comment starts with a slash
-//  +------------------ plugins starts with `@`
+//  +------------------ plugins starts with `%`
 //  |    +------------- route, this view is accessible from #main url
 //  |    |    +-------- parent view route
 //  |    |    |
-@view main body
+%view main body
   // CSS selector declares an element, you can leave off the tag to get a div
   .App.max-height
     .App-row.bg-1.top.t-1>a[href="https://www.litejs.com/"] LiteJS Minimal Example
     .App-row.bg-2
       .Menu.js-viewHook
         // Custom elements can be defined inline with 'el' plugin
-        @el Menu-item
+        %el Menu-item
           a.Menu-item
-            &class: "selected", View(this.href.split("#")[1]).isOpen
+            ;cls: "selected", View(this.href.split("#")[1]).isOpen
         Menu-item[href="#home"] Home
         Menu-item[href="#users"] Users
         Menu-item[href="#settings"] Settings
     .App-row
       // Subviews will be mounted here
-      @child
+      %child
     .Footer-spacer
   .App-row.Footer.bg-1
     h6 Bye
 
-@view home main
+%view home main
   .page
     h2 Subheader Home
     p Welcome
 
-@view settings main
+%view settings main
   .page
     h2 Subheader Settings
     p You Can Set Things Up
 
-@view users main
+%view users main
   .page
     h2 Users
     // In real application here would be data from api, not hardcoded array
-    ul &each: userId in ["1", "2", "3", "4", "5"]
+    ul ;each: userId in ["1", "2", "3", "4", "5"]
       li
         a User {userId}
-          &href: "#users/" + userId
+          ;href: "#users/" + userId
 
-@view users/{id} main
+%view users/{id} main
   .page
     h2 User #{route.id}
 
-@view 404 body
+%view 404 body
 	h2 Error 404
 	| Page not found 
 	a.btn-link[href="#"] Start over again
