@@ -37,7 +37,7 @@
 		.Menu.App-row.js-viewRender
 			%el nav-row
 				a.Menu-item.waves
-					;cls: "selected", (route._u || View.home).indexOf(this.href.split("#")[1]) == 0
+					;cls: "selected", (params._u || View.home).indexOf(this.href.split("#")[1]) == 0
 			nav-row[href="#home"]
 				svg-icon>path[d="M12,2L1,12h3v9h5V14h6v7h5V12h3z"]
 				svg-icon>path[d="M12,2L1,12h3v9h5V14h9V2h-3V21h5V12h3z"]
@@ -188,7 +188,7 @@
 			;emitForm:"login"
 			fieldset.grid-2.login
 				legend Login
-				.error {route.error||""}
+				.error {params.error||""}
 				label.row
 					.col-12.col-md-4.login__label Username
 					.col-12.col-md-8>input[name=name]

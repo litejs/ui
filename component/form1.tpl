@@ -201,7 +201,7 @@
 %el form1-list
 	form1-row
 		select.field
-			;list: api(resourceCollection.format(data.route, data)), required ? 0 : [""], value
+			;list: api(resourceCollection.format(data.params, data)), required ? 0 : [""], value
 			option
 				;val:: item.id
 				;txt:: _(item.name)

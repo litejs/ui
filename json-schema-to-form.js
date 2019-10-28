@@ -53,7 +53,7 @@
 
 			El.on(form, "submit", function() {
 				var data = El.val(this)
-				, _scope = Object.assign({}, scope.route, model && model.data)
+				, _scope = Object.assign({}, scope.params, model && model.data)
 				, href = (_link.href || selfHref).format(_scope)
 				JSON.schemaApply(schema, data)
 
@@ -191,7 +191,7 @@
 						add(val && val[i], item)
 					})
 				} else if (schema.resourceCollection) {
-					api(schema.resourceCollection.format(scope.route, scope)).each(add2)
+					api(schema.resourceCollection.format(scope.params, scope)).each(add2)
 				} else if (isArray(val) && val.length) {
 					val.each(function(v) { add(v) })
 				} else if (schema.minItems) {

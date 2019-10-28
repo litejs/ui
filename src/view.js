@@ -198,7 +198,7 @@
 		, view = get(url, params)
 		if (!view.isOpen || lastUrl != url) {
 			params._u = lastUrl = url
-			view.show(El.data.route = params)
+			view.show(El.data.params = params)
 		}
 	}
 
