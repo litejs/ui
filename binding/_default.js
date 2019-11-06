@@ -27,7 +27,7 @@
 				data.model.on("change:" + list, render)
 				render()
 			} else if (list.eachLive) {
-				list.eachLive(add, remove)
+				list.eachLive(add, remove, list)
 			} else {
 				comm.render = render
 				render()
@@ -39,7 +39,11 @@
 			for (; len; len--) {
 				El.kill(comm.previousSibling)
 			}
-			Object.each(typeof list === "string" ? data.model.get(list) : list, add)
+			_list = typeof list === "string" ? data.model.get(list, []) : list
+			if (typeof _list === "string") _list.split(",")
+			Object.each(_list, add, (
+				_list.constructor === Object ? Object.keys(_list) : _list
+			))
 		}
 
 		function add(item, i) {
@@ -48,6 +52,7 @@
 			, clone = el.cloneNode(true)
 			, scope = El.scope(clone, data)
 			scope.i = i
+			scope.len = this.length
 			scope[attrName || "item"] = item
 			El.append(parent, clone, comm)
 			El.render(clone, scope)
