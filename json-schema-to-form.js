@@ -167,7 +167,7 @@
 			, sc = El.scope(row, scope)
 			, val = data === null ? (def && def[key] || schema["default"]) : (key == null ? data : data[key])
 
-			sc.name = _(schema.title || key || "")
+			sc.name = key || ""
 			sc.value = val
 			sc.add = function(e) { add() }
 			sc.del = del

@@ -67,6 +67,7 @@
 	input[type=checkbox] {
 		width: auto;
 		display: inline;
+		margin-top: -2px;
 	}
 	.btn,
 	input[type=submit] {                /* 1 */
@@ -113,10 +114,15 @@
 	.lg .input__label {
 		padding-right: 8px;
 		text-align: right;
+		line-height: 28px;
 	}
 	.input__hint {
 		text-align: right;
 		color: #444;
+	}
+	input[type=checkbox]+.input__hint {
+		display: inline-block;
+		margin-left: 8px;
 	}
 	.btn:active, .btn:focus,
 	input:active, input:focus,
@@ -144,17 +150,22 @@
 
 %el form1-row
 	label.row
-		.col.md-w4.input__label {name}
+		.col.md-w4.input__label
+			= _(title||name)
 		.col.md-w8
 			%child
-			.input__hint {description}
+			.input__hint
+				= _(description)
+				;if: description
 
 %el form1-subheader
-	.col {title}
+	.col
+		= _(title)
 
 %el form1-fieldset
 	fieldset.grid.b2
-		legend {schema.title || _link.title || ""}
+		legend
+			= _(schema.title || _link.title || "")
 
 %el form1
 	form1-row
@@ -171,7 +182,8 @@
 		input.field[type=checkbox] ;value: value
 
 %el form1-boolean-ro
-	form1-row>span ;txt: _(!!value)
+	form1-row>span
+		= _(!!value)
 
 %el form1-password
 	form1-row
@@ -193,7 +205,7 @@
 		select.field ;each:val in data["enum"]
 			option
 				;val:: val
-				;txt: _("" + val)
+				= _("" + val)
 
 %el form1-enum-ro
 	form1-ro
@@ -207,13 +219,16 @@
 				;txt:: _(item.name)
 
 %el form1-list-ro
-	form1-row>span ;txt: _(item.name)
+	form1-row>span
+		= _(item.name)
 
 %el form1-array
 	.col
 		.input.p13
-			.left {name}
-			.input__hint {description}
+			.left
+				= _(title||name)
+			.input__hint
+				= _(description)
 			.js-items.cf
 			a.btn.right
 				;if: !data.noAdd
