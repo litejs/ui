@@ -52,6 +52,7 @@
 			, clone = el.cloneNode(true)
 			, scope = El.scope(clone, data)
 			scope.i = i
+			scope._scope = scope
 			scope.len = this.length
 			scope[attrName || "item"] = item
 			El.append(parent, clone, comm)
