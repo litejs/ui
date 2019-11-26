@@ -27,7 +27,7 @@
 				hash = json.a
 			}
 			if (next) {
-				next(err, json)
+				next.call(this, err, json)
 			}
 			setTimeout(xhrPoll, 1500)
 			onFocus()
@@ -71,7 +71,7 @@
 				JSON.parse(txt) :
 				{ message: txt, code: err }
 			)
-			if (next && next(err, body, req) === true) return
+			if (next && next.call(this, err, body, req) === true) return
 			if (err) {
 				View.emit(
 					View._e["xhr:" + err] ? "xhr:" + err : "xhr:err",
