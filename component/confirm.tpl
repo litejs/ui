@@ -73,30 +73,30 @@
 		, code = ""
 		, el = El("Confirm")
 		, scope = El.scope(el, El.data)
-		, kbMap = { esc: resolve }
+		, kbMap = {}
 		, body = document.body
 		Object.assign(scope, opts)
 		scope.title = title || "Confirm?"
 		if (!scope.actions) scope.actions = [
-			{ title: "Cancel" },
-			{ action: "ok", title: "Ok", key: "enter" }
+			{ action: "close", title: "Close" }
 		]
 		for (var a, i = 0; a = scope.actions[i++]; ) {
 			if (typeof a == "string") a = scope.actions[i-1] = {title:a,action:a}
 			if (a.key) kbMap[a.key] = resolve.bind(el, el, a.action)
 		}
-		kbMap.backspace = kbMap.del = kbMap.num = numpad
-		El.addKb(kbMap)
-		El.on(el, "kill", El.rmKb)
 		El.cls(body.lastChild, "Confirm--blur")
 		El.append(body, el)
 		El.render(el, scope)
-		El.findAll(el, ".js-numpad").on("click", numpad)
+		if (scope.code) {
+			El.findAll(el, ".js-numpad").on("click", numpad)
+			kbMap.backspace = kbMap.del = kbMap.num = numpad
+		}
+		El.addKb(kbMap, el)
 		El.findAll(el, ".js-btn").on("click", resolve)
-		El.on(el, "wheel", Event.stop)
-		El.on(el, "click", resolve)
-		El.on(el.lastChild, "click", Event.stop)
 		View.one("navigation", resolve)
+		if (scope.bgClose) El.on(el, "click", resolve)
+		El.on(el, "wheel", Event.stop)
+		El.on(el.lastChild, "click", Event.stop)
 		if (scope.vibrate && navigator.vibrate) {
 			vibrate = navigator.vibrate(scope.vibrate)
 		}
