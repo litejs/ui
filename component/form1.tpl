@@ -50,6 +50,9 @@
 	input[type=checkbox] {
 		height: auto;
 	}
+	input[type=time] {
+		padding: 0 0 0 8px;
+	}
 	textarea {
 		height: 64px;
 		padding: 8px;
