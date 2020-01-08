@@ -66,6 +66,10 @@
 		history: history,
 		View: View
 	}
+	// After iOS 13 iPad with default enabled "desktop" option
+	// is the only Macintosh with multi-touch
+	, iOS = /^(Mac|iP)/.test(navigator.platform)
+	// || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 
 	/*** ie8 ***/
 
@@ -525,6 +529,11 @@
 	, fixFn = Event.fixFn || (Event.fixFn = {})
 	, emitter = new Event.Emitter
 
+	if (iOS) {
+		// iOS doesn't support beforeunload, use pagehide instead
+		fixEv.beforeunload = "pagehide"
+	}
+
 	function addEvent(el, ev, _fn) {
 		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
 		, fix = prefix ? function() {
@@ -983,7 +992,7 @@
 
 	/*** kb ***/
 	var kbMaps = []
-	, kbMod = El.kbMod = /^(Mac|iP)/.test(navigator.platform) ? "metaKey" : "ctrlKey"
+	, kbMod = El.kbMod = iOS ? "metaKey" : "ctrlKey"
 	, kbKeys = {
 		  8: "backspace", 9: "tab",
 		 13: "enter",    16: "shift", 17: "ctrl",  18: "alt",  19: "pause",
