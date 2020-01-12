@@ -243,5 +243,8 @@
 		a.right.Form1-del.hand ×
 			;if: !data.noAdd
 			;on: "click", data.del
+		b
+			;if: title
+			;txt: title
 		.grid.b2.js-item
 

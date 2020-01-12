@@ -86,6 +86,19 @@
 					)
 				}
 			})
+			if (schema.patternProperties) {
+				tmp = schema.properties || {}
+				Object.each(schema.patternProperties, function(propSchema, _re) {
+					var re = RegExp(_re)
+					Object.each(data, function(val, prop) {
+						if (!tmp[prop] && re.test(prop)) data[prop] = schemaApply(
+							propSchema,
+							data[prop],
+							reqArr && reqArr.indexOf(prop) > -1
+						)
+					})
+				})
+			}
 		}
 
 		return data

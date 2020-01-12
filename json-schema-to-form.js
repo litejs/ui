@@ -162,6 +162,7 @@
 				schema["enum"] ? "-enum" + ro :
 				schema.type == "boolean" ? "-boolean" + ro :
 				schema.type == "array" ? "-" + schema.type :
+				schema.patternProperties ? "-array" :
 				schema.resourceCollection ? "-list" + ro :
 				ro ))
 			, sc = El.scope(row, scope)
@@ -169,13 +170,24 @@
 
 			sc.name = key || ""
 			sc.value = val
-			sc.add = function(e) { add() }
+			sc.add = function(e) {
+				if (schema.patternProperties) {
+					var key = Object.keys(schema.patternProperties)[0]
+					app.emit("confirm", " ", {
+						body: "Enter key", code:1
+						}, function(action, code) {
+						add(null, schema.patternProperties[key], code)
+					})
+				} else {
+					add()
+				}
+			}
 			sc.del = del
 			if (ro !== "") sc.noAdd = true
 
 			Object.assign(sc, schema)
 
-			if (schema.type == "array") {
+			if (schema.type == "array" || schema.patternProperties) {
 				var content = El.find(row, ".js-items")
 				, hidden = El("input[type=hidden]")
 
@@ -190,6 +202,16 @@
 					schema.items.each(function(item, i) {
 						add(val && val[i], item)
 					})
+				} else if (schema.patternProperties) {
+					hidden.valObject = null
+					if (val) Object.each(schema.patternProperties, function(sub, _re) {
+						var re = RegExp(_re)
+						Object.each(val, function(val, key) {
+							if (re.test(key)) {
+								add(val, sub, key)
+							}
+						})
+					})
 				} else if (schema.resourceCollection) {
 					api(schema.resourceCollection.format(scope.params, scope)).each(add2)
 				} else if (isArray(val) && val.length) {
@@ -203,6 +225,7 @@
 				El.append(fieldset, row)
 				return
 			}
+
 			El.render(row, sc)
 			El.append(fieldset, row)
 
@@ -221,20 +244,25 @@
 				)
 			}
 
-			function add(val, itemSchema) {
+			function add(val, itemSchema, param) {
 				var root = El(template + "-array-item")
 				, rootScope = El.scope(root, sc)
+				rootScope.key = param
+				if (itemSchema && param) {
+					rootScope.title = _(itemSchema.title, rootScope)
+				}
 				El.append(content, root)
 				El.render(root, rootScope)
 
 				root = El.find(root, ".js-item") || root
+
 
 				drawSchema(
 					itemSchema || schema.items,
 					null,
 					root,
 					data && val || null,
-					key + "[" + (count++) + "]",
+					key + "[" + (param || count++) + "]",
 					scope,
 					model,
 					val

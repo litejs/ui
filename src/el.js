@@ -360,7 +360,7 @@
 					step = opts
 					key.replace(/\[(.*?)\]/g, function(_, _key, offset) {
 						if (step == opts) key = key.slice(0, offset)
-						step = step[key] || (step[key] = _key && +_key != _key ? {} : [])
+						step = step[key] || (step[key] = step[key] === null || _key && +_key != _key ? {} : [])
 						key = _key
 					})
 					step[key || step.length] = value
@@ -400,7 +400,7 @@
 
 		return checkbox && !el.checked ?
 		(type === "radio" ? void 0 : null) :
-		el.valObject || el.value
+		el.valObject !== void 0 ? el.valObject : el.value
 	}
 
 	function append(el, child, before) {
