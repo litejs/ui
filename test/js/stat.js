@@ -6,9 +6,24 @@
 	var nameData
 	, body = document.body
 	, started = new Date()
+	, layout
 
 	try {
 		nameData = JSON.parse(window.name)
+	} catch(e) {}
+
+	try {
+		// Chrome69, Opera56(48 android)
+		navigator.keyboard.getLayoutMap().then(function(k) {
+			layout = {
+				"'f": "Dvorak",
+				"b!": "Bepo",
+				ay: "Azerty",
+				qj: "Colemak",
+				qy: "Qwerty",
+				qz: "Qwertz"
+			}[k.get("KeyQ") + k.get("KeyY")]
+		})
 	} catch(e) {}
 
 	if (!isObject(nameData)) {
