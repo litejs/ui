@@ -34,6 +34,9 @@
 		u: "touchend",
 		c: "touchcancel"
 	}
+	, nulled = {}
+
+	for (a in nulled) nulled[a] = void 0
 
 	// window.PointerEvent  - Chrome55, Edge12, Firefox59, IE11, Safari13
 	// navigator.sendBeacon - Chrome39, Edge14, Firefox31, -,    Safari11.1
@@ -41,7 +44,7 @@
 	function patch(key, src, force) {
 		return !force && O[key] || (O[key] = (
 			patched.push(key), typeof src === "string" ?
-			Function("n,o,P", "return function(a,b,c){" + src + "}")(nop, hasOwn, P) :
+			Function("o,P,N,U", "return function(a,b,c){" + src + "}")(hasOwn, P, nop, nulled) :
 			src
 		))
 	}
@@ -167,7 +170,7 @@
 
 	O = Object
 	// Chrome5, FF4, IE9, Safari5
-	patch("create", "n[P]=a;a=new n;n[P]=null;return a")
+	patch("create", "N[P]=a||U;return new N")
 	patch("keys", "c=[];for(b in a)o.call(a,b)&&c.push(b);return c")
 
 	// Object.assign ( target, source ) in ECMAScript 6
