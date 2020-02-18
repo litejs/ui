@@ -22,8 +22,31 @@
 		ev.type = name
 		return ev
 	}, typeof O.Event !== "function")
-	, fixEv = Event.fixEv = {}
-	, fixFn = Event.fixFn = {}
+	, wheelDiff = 120
+	, fixEv = Event.fixEv = {
+		wheel: "onwheel" in document      ? "wheel" :      // Modern browsers
+			"onmousewheel" in document ? "mousewheel" : // Webkit and IE
+			"DOMMouseScroll"                            // older Firefox
+	}
+	, fixFn = Event.fixFn = {
+		wheel: function(el, fn) {
+			return function(e) {
+				var delta = (e.wheelDelta || -e.detail || -e.deltaY) / wheelDiff
+				if (delta) {
+					if (delta < 1 && delta > -1) {
+						var diff = (delta < 0 ? -1 : 1) / delta
+						delta *= diff
+						wheelDiff /= diff
+					}
+					//TODO: fix event
+					// e.deltaY =
+					// e.deltaX = - 1/40 * e.wheelDeltaX|0
+					// e.target = e.target || e.srcElement
+					fn.call(el, e, delta)
+				}
+			}
+		}
+	}
 	, MS = "MSPointer"
 	, DOWN = "pointerdown"
 	, MOVE = "pointermove"
