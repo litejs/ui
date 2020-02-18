@@ -58,9 +58,15 @@
 		u: "touchend",
 		c: "touchcancel"
 	}
-	, nulled = {}
-
-	for (a in nulled) nulled[a] = void 0
+	, nulled = {
+		constructor: a,
+		hasOwnProperty: a,
+		isPrototypeOf: a,
+		propertyIsEnumerable: a,
+		toLocaleString: a,
+		toString: a,
+		valueOf: a
+	}
 
 	function preventDefault() {
 		event.returnValue = false
