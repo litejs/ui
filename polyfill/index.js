@@ -13,12 +13,13 @@
 	, esc = escape
 	, patched = (window.xhr || window)._patched = []
 	, Event = patch(EV, function(name) {
-		var ev = document.createEvent ? document.createEvent("Event") : document.createEventObject()
-		if (ev.initEvent) {
-			ev.initEvent(name, false, false)
-		} else {
-			ev.type = name
-		}
+		var ev = document.createEventObject(event)
+		, b = ev.buttons = ev.button
+		ev.button = b == 1 ? 0: b == 4 ? 1 : b
+		ev.preventDefault = preventDefault
+		ev.stopPropagation = stopPropagation
+		ev.target = ev.srcElement
+		ev.type = name
 		return ev
 	}, typeof O.Event !== "function")
 	, fixEv = Event.fixEv = {}
@@ -37,6 +38,13 @@
 	, nulled = {}
 
 	for (a in nulled) nulled[a] = void 0
+
+	function preventDefault() {
+		event.returnValue = false
+	}
+	function stopPropagation() {
+		event.cancelBubble = event.cancel = true
+	}
 
 	// window.PointerEvent  - Chrome55, Edge12, Firefox59, IE11, Safari13
 	// navigator.sendBeacon - Chrome39, Edge14, Firefox31, -,    Safari11.1

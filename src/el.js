@@ -537,14 +537,7 @@
 	function addEvent(el, ev, _fn) {
 		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
 		, fix = prefix ? function() {
-			var b, e = {}
-			for (b in event) e[b] = event[b]
-			e.target = e.srcElement
-			b = e.buttons = e.button
-			e.button = b == 1 ? 0: b == 4 ? 1 : b
-			e.preventDefault = preventDefault
-			e.stopPropagation = stopPropagation
-			e.type = ev
+			var e = new Event(ev)
 			if (e.clientX !== void 0) {
 				e.pageX = e.clientX + scrollLeft()
 				e.pageY = e.clientY + scrollTop()
@@ -569,13 +562,6 @@
 			el[remEv](prefix + (fixEv[ev] || ev), evs[id + 1])
 			evs.splice(id - 1, 3)
 		}
-	}
-
-	function preventDefault() {
-		event.returnValue = false
-	}
-	function stopPropagation() {
-		event.cancelBubble = event.cancel = true
 	}
 
 	Event.stop = function(e) {
