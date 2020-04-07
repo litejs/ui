@@ -1,5 +1,5 @@
 
-require("../..")
+require("../..").describe
 .test("ui/polyfill/string", function(assert) {
 	var textEncoder
 	, fn = require("../../../ui/polyfill/string.js")

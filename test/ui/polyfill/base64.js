@@ -1,5 +1,5 @@
 
-require("../..")
+require("../..").describe
 .test("base64", function(assert) {
 	var lib = require("../../../ui/polyfill/base64.js")
 	, tests = [
