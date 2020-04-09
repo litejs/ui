@@ -17,6 +17,7 @@
 	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
 	, templateRe = /^([ \t]*)(%?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))$/gm
 	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
+	, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
 	, camelFn = function(_, a) {
@@ -77,119 +78,18 @@
 	, ie678 = !+"\v1"
 	, ie67 = ie678 && (document.documentMode | 0) < 8
 
-	, matches = El.matches = body.matches ?
-		function(el, sel) {
-			return el && el.matches(sel)
-		} :
-		function(el, sel) {
-			return !!selectorFn(sel)(el)
-		}
-	, closest = El.closest = body.closest ?
-		function(el, sel) {
-			return (el.closest ? el : el.parentNode).closest(sel)
-		} :
-		function(el, sel) {
-			return walk("parentNode", 1, el, sel)
-		}
-
-
-	, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
-	, selectorLastRe = /([~\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
-	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
-	, selectorCache = {}
-	, selectorMap = {
-		"first-child": "(a=_.parentNode)&&a.firstChild==_",
-		"last-child": "(a=_.parentNode)&&a.lastChild==_",
-		".": "~_.className.split(/\\s+/).indexOf(a)",
-		"#": "_.id==a",
-		"^": "!a.indexOf(v)",
-		"|": "a.split('-')[0]==v",
-		"$": "a.slice(-v.length)==v",
-		"~": "~a.split(/\\s+/).indexOf(v)",
-		"*": "~a.indexOf(v)"
-	}
-
-	function selectorFn(str) {
-		// jshint evil:true
-		return selectorCache[str] ||
-		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
-			str.split(selectorSplitRe).map(function(sel) {
-				var relation, from
-				, rules = ["_&&_.nodeType==1"]
-				, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
-					from = start + _rel.length
-					relation = _rel.trim()
-					return ""
-				})
-				, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation) {
-					rules.push(
-						"((v='" +
-						(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/'/g, "\\'") +
-						"'),(a='" + key + "'),1)"
-						,
-						selectorMap[op == ":" ? key : op] ||
-						"(a=_.getAttribute(a))" +
-						(fn ? "&&" + selectorMap[fn] : val ? "==v" : "")
-					)
-					return ""
-				})
-
-				if (tag && tag != "*") rules[0] += "&&_.tagName=='" + tag.toUpperCase() + "'"
-				if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
-				return rules.join("&&")
-			}).join("||") + "}"
-		)(matches, closest))
-	}
-
-	function walk(next, first, el, sel, nextFn) {
-		var out = []
-		if (typeof sel !== "function") sel = selectorFn(sel)
-		for (; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
-			if (first) return el
-			out.push(el)
-		}
-		return first ? null : out
-	}
-
-	function find(node, sel, first) {
-		return walk("firstChild", first, node.firstChild, sel, function(el) {
-			var next = el.nextSibling
-			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
-			return next
-		})
-	}
-
-	// Note: querySelector in IE8 supports only CSS 2.1 selectors
-	if (!ie678 && body.querySelector) {
-		El.find = function(el, sel) {
-			return el.querySelector(sel)
-		}
-		El.findAll = function(el, sel) {
-			return new ElWrap(el.querySelectorAll(sel))
-		}
-	} else {
-		El.find = function(el, sel) {
-			return find(el, sel, true)
-		}
-		El.findAll = function(el, sel) {
-			return new ElWrap(find(el, sel))
-		}
-	}
-
-	/*/
 	El.matches = function(el, sel) {
-		return el.matches(sel)
+		return el && body.matches.call(el, sel)
 	}
 	El.closest = function(el, sel) {
-		return (el.closest ? el : el.parentNode).closest(sel)
+		return el && body.closest.call(el.closest ? el : el.parentNode, sel)
 	}
 	El.find = function(el, sel) {
-		return el.querySelector(sel)
+		return body.querySelector.call(el, sel)
 	}
 	El.findAll = function(el, sel) {
-		return new ElWrap(el.querySelectorAll(sel))
+		return new ElWrap(body.querySelectorAll.call(el, sel))
 	}
-	/**/
 
 	/**
 	 * Turns CSS selector like syntax to DOM Node
@@ -425,7 +325,7 @@
 			if (child.nodeType) {
 				tmp = el.insertBefore ? el : el[el.length - 1]
 				if (i = getAttr(tmp, "data-child")) {
-					before = find(tmp, Fn("v->n->n.nodeType===8&&n.nodeValue==v")(i), 1) || tmp
+					before = findCom(tmp, i) || tmp
 					tmp = before.parentNode
 					// TODO:2016-07-05:lauri:handle numeric befores
 				}
@@ -443,6 +343,15 @@
 			}
 		}
 		return el
+	}
+
+	function findCom(node, val) {
+		for (var next, el = node.firstChild; el; ) {
+			if (el.nodeType === 8 && el.nodeValue == val) return el
+			next = el.firstChild || el.nextSibling
+			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
+			el = next
+		}
 	}
 
 	function acceptMany(fn, getter) {

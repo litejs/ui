@@ -5,6 +5,10 @@
 
 !function(window, document, Function) {
 	var a, b, c
+	// JScript engine in IE<9 does not recognize vertical tabulation character
+	// The documentMode is an IE only property, supported from IE8.
+	, ie678 = !+"\v1"
+	, ie67 = ie678 && (document.documentMode | 0) < 8
 	, EV = "Event"
 	, P = "prototype"
 	, O = window
@@ -185,9 +189,6 @@
 		}
 	}
 
-	// The HTML5 document.head DOM tree accessor
-	// doc.head = doc.head || doc.getElementsByTagName("head")[0]
-
 	// 20 fps is good enough
 	patch("requestAnimationFrame", "return setTimeout(a,50)")
 	// window.mozRequestAnimationFrame    || // Firefox 4-23
@@ -199,6 +200,89 @@
 	// Ignore FF3 escape second non-standard argument
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
 	patch("escape", function(s) { return esc(s) }, esc("a", 0) != "a")
+
+	// The HTML5 document.head DOM tree accessor
+	// patch("head", document.getElementsByTagName("head")[0])
+	O = document.body
+	var selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
+	, selectorLastRe = /([~\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
+	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
+	, selectorCache = {}
+	, selectorMap = {
+		"first-child": "(a=_.parentNode)&&a.firstChild==_",
+		"last-child": "(a=_.parentNode)&&a.lastChild==_",
+		".": "~_.className.split(/\\s+/).indexOf(a)",
+		"#": "_.id==a",
+		"^": "!a.indexOf(v)",
+		"|": "a.split('-')[0]==v",
+		"$": "a.slice(-v.length)==v",
+		"~": "~a.split(/\\s+/).indexOf(v)",
+		"*": "~a.indexOf(v)"
+	}
+	, matches = patch("matches", function(sel) {
+		return !!selectorFn(sel)(this)
+	})
+	, closest = patch("closest", function(sel) {
+		return walk("parentNode", 1, this, sel)
+	})
+	function selectorFn(str) {
+		// jshint evil:true
+		return selectorCache[str] ||
+		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
+			str.split(selectorSplitRe).map(function(sel) {
+				var relation, from
+				, rules = ["_&&_.nodeType==1"]
+				, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
+					from = start + _rel.length
+					relation = _rel.trim()
+					return ""
+				})
+				, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation) {
+					rules.push(
+						"((v='" +
+						(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/'/g, "\\'") +
+						"'),(a='" + key + "'),1)"
+						,
+						selectorMap[op == ":" ? key : op] ||
+						"(a=_.getAttribute(a))" +
+						(fn ? "&&" + selectorMap[fn] : val ? "==v" : "")
+					)
+					return ""
+				})
+
+				if (tag && tag != "*") rules[0] += "&&_.tagName=='" + tag.toUpperCase() + "'"
+				if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
+				return rules.join("&&")
+			}).join("||") + "}"
+		)(matches, closest))
+	}
+
+	function walk(next, first, el, sel, nextFn) {
+		var out = []
+		if (typeof sel !== "function") sel = selectorFn(sel)
+		for (; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
+			if (first) return el
+			out.push(el)
+		}
+		return first ? null : out
+	}
+
+	function find(node, sel, first) {
+		return walk("firstChild", first, node.firstChild, sel, function(el) {
+			var next = el.nextSibling
+			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
+			return next
+		})
+	}
+
+	// Note: querySelector in IE8 supports only CSS 2.1 selectors
+	patch("querySelector", function(sel) {
+		return find(this, sel, true)
+	}, ie678)
+
+	patch("querySelectorAll", function(sel) {
+		return find(this, sel, false)
+	}, ie678)
 
 	O = Function[P]
 	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4

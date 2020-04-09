@@ -13,6 +13,7 @@ global.Element = dom.HTMLElement
 global.window = global
 global.attachEvent = function() {}
 global.navigator = {language: "en-US"}
+require("../../../ui/polyfill/index.js")
 
 window.addEventListener = document.addEventListener = function(){}
 
