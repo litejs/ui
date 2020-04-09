@@ -8,6 +8,7 @@
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	// The documentMode is an IE only property, supported from IE8.
 	, ie678 = !+"\v1"
+	, ie6789 = ie678 || document.documentMode <= 9
 	, ie67 = ie678 && (document.documentMode | 0) < 8
 	, EV = "Event"
 	, P = "prototype"
@@ -401,18 +402,25 @@
 
 	function nop(){}
 
-	eval(
-		"/*@cc_on " +
-		// Remove background image flickers on hover in IE6
-		// You could also use CSS
-		// html { filter: expression(document.execCommand("BackgroundImageCache", false, true)); }
-		"try{document.execCommand('BackgroundImageCache',false,true)}catch(e){}" +
+	function patchTimer(name) {
+		var orig = window[name]
+		window[name] = function(f, t) {
+			var a = arguments
+			return orig(typeof f == "function" && a.length > 2 ? f.apply.bind(f, null, [].slice.call(a,2)) : f, t)
+		}
+	}
+	if (ie6789) {
 		// Patch parameters support for setTimeout callback
-		"function f(n){var s=window[n];window[n]=function(f,t){var a=arguments;" +
-		"return s(typeof f=='function'&&a.length>2?f.apply.bind(f,null,[].slice.call(a,2)):f,t)}}" +
-		"if(!+'\v1'||document.documentMode<=9){f('setTimeout');f('setInterval')}" +
-		"@*/"
-	)
+		patched.push("timers")
+		patchTimer("setTimeout")
+		patchTimer("setInterval")
+		try {
+			// Remove background image flickers on hover in IE6
+			// You could also use CSS
+			// html { filter: expression(document.execCommand("BackgroundImageCache", false, true)); }
+			document.execCommand("BackgroundImageCache", false, true)
+		} catch(e){}
+	}
 }(this, document, Function)
 
 
