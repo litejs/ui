@@ -155,24 +155,6 @@
 
 	ElWrap[protoStr] = wrapProto
 
-	wrapProto.append = function(el) {
-		var elWrap = this
-		if (elWrap._childId != void 0) {
-			append(elWrap[elWrap._childId], el)
-		} else {
-			elWrap.push(el)
-		}
-		return elWrap
-	}
-
-	wrapProto.cloneNode = function(deep) {
-		var clone = new ElWrap(this.map(function(el) {
-			return el.cloneNode(deep)
-		}))
-		clone._childId = this._childId
-		return clone
-	}
-
 
 	El.attr = function(el, key, val) {
 		return arguments.length < 3 && key.constructor != Object ? getAttr(el, key) : setAttr(el, key, val)
@@ -643,22 +625,38 @@
 	El.kill = kill
 	El.render = render
 
-	Object.each(El, function(fn, key) {
-		if (!wrapProto[key]) {
-			wrapProto[key] = function wrap() {
-				var i = 0
-				, self = this
-				, len = self.length
-				, arr = slice.call(arguments)
-				arr.unshift(1)
-				for (; i < len; ) {
-					arr[0] = self[i++]
-					fn.apply(null, arr)
-				}
-				return self
+	for (var key in El) !function(key) {
+		wrapProto[key] = function wrap() {
+			var i = 0
+			, self = this
+			, len = self.length
+			, arr = slice.call(arguments)
+			arr.unshift(1)
+			for (; i < len; ) {
+				arr[0] = self[i++]
+				El[key].apply(null, arr)
 			}
+			return self
 		}
-	})
+	}(key)
+
+	wrapProto.append = function(el) {
+		var elWrap = this
+		if (elWrap._childId != void 0) {
+			append(elWrap[elWrap._childId], el)
+		} else {
+			elWrap.push(el)
+		}
+		return elWrap
+	}
+
+	wrapProto.cloneNode = function(deep) {
+		var clone = new ElWrap(this.map(function(el) {
+			return el.cloneNode(deep)
+		}))
+		clone._childId = this._childId
+		return clone
+	}
 
 	El.append = append
 	El.scope = elScope
