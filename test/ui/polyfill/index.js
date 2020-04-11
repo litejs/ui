@@ -23,9 +23,10 @@ describe("ui/polyfill")
 	tmp = {a:1}
 	assert.equal(Object.create(null).toString, void 0)
 	assert.equal(Object.create(tmp).a, 1)
-	assert.equal(Object.keys(tmp), ["a"])
-	assert.strictEqual(Object.assign(tmp, {b:2}), tmp)
-	assert.equal(tmp, {a:1, b:2})
+	assert.strictEqual(Object.assign(tmp, {b:"2"}), tmp)
+	assert.equal(tmp, {a:1, b:"2"})
+	assert.equal(Object.keys(tmp), ["a", "b"])
+	assert.equal(Object.values(tmp), [1, "2"])
 
 	assert.equal(Array.isArray([1]), true)
 	assert.equal(Array.isArray(1), false)
@@ -59,6 +60,7 @@ describe.onprint = function(str) {
 	result.innerHTML += str + "\n"
 }
 describe.onend = function() {
+	xhr._patched.sort()
 	result.innerHTML += "patched: " + xhr._patched.length + "\n" + xhr._patched + "\n"
 }
 

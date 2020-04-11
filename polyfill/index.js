@@ -293,7 +293,10 @@
 	O = Object
 	// Chrome5, FF4, IE9, Safari5
 	patch("create", "N[P]=a||U;return new N")
-	patch("keys", "c=[];for(b in a)o.call(a,b)&&c.push(b);return c")
+	a = "c=[];for(b in a)o.call(a,b)&&c.push("
+	b = ");return c"
+	patch("keys", a + "b" + b)
+	patch("values", a + "a[b]" + b)
 
 	// Object.assign ( target, source ) in ECMAScript 6
 	// Chrome45, Edge, FF34, Safari9
