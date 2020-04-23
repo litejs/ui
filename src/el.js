@@ -61,7 +61,7 @@
 	}
 	, bindMatch = []
 	, scopeData = El.data = {
-		_: i18n,
+		_: String,
 		_b: bindings,
 		El: El,
 		history: history,
