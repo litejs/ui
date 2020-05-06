@@ -181,7 +181,7 @@
 	bindings.href = function(el, url) {
 		if (url) {
 			var chr = url.charAt(0)
-			el.href = chr === "+" || chr === "%" ? "#" + View.expand(url) : url
+			El.attr(el, "href", chr === "+" || chr === "%" ? "#" + View.expand(url) : url)
 		}
 	}
 }(El.bindings)
