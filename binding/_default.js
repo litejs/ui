@@ -108,20 +108,7 @@
 			model = scope.model
 		}
 		if (model && path) {
-			match = val = state || model.get(path)
-			if (list) {
-				if (!Array.isArray(list)) {
-					list = list.split(",")
-				}
-				i = list.length & -2
-
-				for (; i > -1; i -= 2) {
-					if (i == 0 || list[i - 1] == "" + val || +list[i - 1] <= val) {
-						match = list[i]
-						break
-					}
-				}
-			}
+			match = i18n.pick(state || model.get(path), list)
 			El.cls(node, scope["_is-" + path], 0)
 			El.cls(node, scope["_is-" + path] = match && "is-" + match)
 		}
