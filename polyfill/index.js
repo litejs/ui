@@ -9,7 +9,6 @@
 	// The documentMode is an IE only property, supported from IE8.
 	, ie678 = !+"\v1"
 	, ie6789 = ie678 || document.documentMode <= 9
-	, ie67 = ie678 && (document.documentMode | 0) < 8
 	, EV = "Event"
 	, P = "prototype"
 	, O = window
