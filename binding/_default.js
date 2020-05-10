@@ -19,15 +19,22 @@
 		, data = this
 		, parent = el.parentNode
 		, comm = document.createComment("every " + (list.name || list.length))
+		, nodes = []
 
 		parent.replaceChild(comm, el)
 
 		if (list) {
 			if (typeof list === "string") {
 				data.model.on("change:" + list, render)
+				El.on(parent, "kill", function() {
+					data.model.off("change:" + list, render)
+				})
 				render()
 			} else if (list.eachLive) {
 				list.eachLive(add, remove, list)
+				El.on(parent, "kill", function() {
+					list.off("add", add, list).off("remove", remove, list)
+				})
 			} else {
 				comm.render = render
 				render()
@@ -37,7 +44,7 @@
 
 		function render() {
 			for (; len; len--) {
-				El.kill(comm.previousSibling)
+				remove(len)
 			}
 			_list = typeof list === "string" ? data.model.get(list, []) : list
 			if (typeof _list === "string") _list.split(",")
@@ -51,11 +58,13 @@
 			var up
 			, clone = el.cloneNode(true)
 			, scope = El.scope(clone, data)
+			, before = nodes[i] || comm
+			nodes.splice(i, 0, clone)
 			scope.i = i
 			scope._scope = scope
 			scope.len = this.length
 			scope[attrName || "item"] = item
-			El.append(parent, clone, comm)
+			El.append(before.parentNode, clone, before)
 			El.render(clone, scope)
 			if (typeof item.on === "function") {
 				item.on("change", up = El.render.bind(clone, clone))
@@ -65,11 +74,8 @@
 			}
 		}
 
-		function remove(pos) {
-			for (var el = comm, i = pos + 1; i--; ) {
-				el = el.previousSibling
-			}
-			El.kill(el)
+		function remove(item, i) {
+			El.kill(nodes.splice(i, 1)[0])
 		}
 	}
 
@@ -99,7 +105,7 @@
 	}
 
 	bindings.is = function bindingIs(node, model, path, list, state) {
-		var i, match, val
+		var match
 		, scope = this
 		if (typeof model === "string") {
 			state = list
@@ -108,7 +114,7 @@
 			model = scope.model
 		}
 		if (model && path) {
-			match = i18n.pick(state || model.get(path), list)
+			match = i18n.pick(state != null ? state : model.get(path), list)
 			El.cls(node, scope["_is-" + path], 0)
 			El.cls(node, scope["_is-" + path] = match && "is-" + match)
 		}
