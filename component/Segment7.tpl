@@ -4,6 +4,7 @@
 		position: relative;
 		height: 1em;
 		width: .5em;
+		margin-right: 8px;
 	}
 	.Seg-V, .Seg-H {
 		position: absolute;

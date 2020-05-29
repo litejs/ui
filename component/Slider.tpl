@@ -90,17 +90,26 @@
 		text-align: center;
 	}
 	.Toggle {
-		background: #bdbdbd;
 		position: relative;
 		display: block;
 		width: 36px;
+		height: 22px;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	}
+	.Toggle:before {
+		display: block;
+		content: "";
+		background: #bdbdbd;
+		position: absolute;
+		width: 36px;
 		height: 14px;
+		top: 4px;
 		border-radius: 7px;
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 	}
 	.Toggle-knob {
 		background-color: #666;
-		top: -3px;
+		top: 1px;
 		left: 0px;
 	}
 	input:checked + .Toggle-knob {
@@ -133,6 +142,8 @@
 	*/
 
 %js
+	var on = El.on
+	, off = El.off
 	El.bindings.SliderVal = function(el, model, path, range) {
 		if (range) {
 			El.attr(el, "range", range)
@@ -154,8 +165,8 @@
 				return Event.stop(e)
 			}
 		}
-		El.on(el, "click", False)
-		El.on(el, "pointerdown", False)
+		on(el, "click", False)
+		on(el, "pointerdown", False)
 	}
 	El.bindings.SliderInit = function(el) {
 		var knobLen, offset, px, drag, min, max, step, minPx, maxPx, value
@@ -164,7 +175,7 @@
 		, fill = track.firstChild
 		, knob = fill.lastChild
 		, emit = El.emit.bind(el, el, "change").rate(500, true)
-		El.on(window, "blur", stop)
+		on(window, "blur", stop)
 		function load(e) {
 			var attr = vert ? "offsetHeight" : "offsetWidth"
 			, range = (El.attr(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
@@ -205,7 +216,7 @@
 			drag = true
 			load(e)
 			move(e)
-			listen("on")
+			listen(on)
 		}
 		function move(e) {
 			var diff = vert ? offset - e.pageY : e.pageX - offset
@@ -216,14 +227,14 @@
 		function stop(e) {
 			if (!drag) return
 			drag = false
-			listen("off")
+			listen(off)
 			el.set(value)
 		}
 		function listen(on) {
 			El.cls(fill, "anim", !drag)
 			El.cls(knob, "is-active", drag)
-			El[on](el, "pointerup", stop)
-			El[on](el, "pointermove", move)
+			on(document, "pointerup", stop)
+			on(document, "pointermove", move)
 		}
 		el.set = function(val, pos, scroll) {
 			px || load()
@@ -240,7 +251,7 @@
 				fill.style[vert ? "height" : "width"] = ((pos || (value-min)*px)+knobLen) + "px"
 			}
 		}
-		El.on(el, "pointerdown", start)
+		on(el, "pointerdown", start)
 	}
 	El.bindings.fixReadonlyCheckbox.once =
 	El.bindings.SliderInit.once = El.bindings.SliderVal.once = 1

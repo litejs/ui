@@ -366,9 +366,6 @@
 %el Fab
 	button[type=button].Fab.waves.raised
 
-%el Toggle
-	button[type=button].Toggle.waves
-
 %el Radio
 	button[type=button].Radio.waves
 
