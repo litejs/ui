@@ -20,9 +20,6 @@
 	, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
-	, camelFn = function(_, a) {
-		return a.toUpperCase()
-	}
 	, bindings = El.bindings = {
 		attr: setAttr,
 		cls: El.cls = acceptMany(cls),
@@ -155,6 +152,9 @@
 
 	ElWrap[protoStr] = wrapProto
 
+	function camelFn(_, a) {
+		return a.toUpperCase()
+	}
 
 	El.attr = function(el, key, val) {
 		return arguments.length < 3 && key.constructor != Object ? getAttr(el, key) : setAttr(el, key, val)

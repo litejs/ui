@@ -22,23 +22,18 @@
 	, ie6_7 = !+"\v1" && (document.documentMode | 0) < 8
 
 	function getUrl(_loc) {
-		var url
-		/*** PUSH ***/
-		if (base) {
-			url = location.pathname.slice(base.length)
-		} else {
-		/**/
+		return (
+			/*** PUSH ***/
+			base ? location.pathname.slice(base.length) :
+			/**/
 			// bug in Firefox where location.hash is decoded
 			// bug in Safari where location.pathname is decoded
 
 			// var hash = location.href.split('#')[1] || '';
 			// https://bugs.webkit.org/show_bug.cgi?id=30225
 			// https://github.com/documentcloud/backbone/pull/967
-			url = (_loc || location).href.split("#")[1] || ""
-		/*** PUSH ***/
-		}
-		/**/
-		return url.replace(cleanRe, "")
+			(_loc || location).href.split("#")[1] || ""
+		).replace(cleanRe, "")
 	}
 
 	function setUrl(url, replace) {
