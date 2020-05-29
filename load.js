@@ -27,7 +27,7 @@
 // MSXML 6.0 has improved XSD, deprecated several legacy features
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
-!function(window, scripts, next) {
+!function(window, next) {
 	var seq = 0
 	, xhrs = []
 	, loaded = {}
@@ -251,8 +251,8 @@
 		}
 	}
 
-	load(scripts, next)
+	load([/*!{loadFiles}*/], next)
 
 	function nop() {}
-}(this, [/*!{loadFiles}*/])
+}(this)
 
