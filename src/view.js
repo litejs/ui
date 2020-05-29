@@ -81,7 +81,7 @@
 
 			for (; tmp; tmp = parent) {
 				syncResume = params._v = tmp
-				tmp.emit("ping", params)
+				emit(tmp, "ping", params)
 				syncResume = null
 				if (lastParams != params) return
 				if (parent = tmp.parent) {
@@ -144,9 +144,8 @@
 			)
 			El.append(tmp, view.isOpen)
 			El.render(view.isOpen)
-			parent.emit("openChild", view, close)
-			view.emit("open", params)
-			View.emit("open", params, view)
+			emit(parent, "openChild", view, close)
+			emit(view, "open", params)
 			if (view.kb) El.addKb(view.kb)
 			close = null
 		}
@@ -154,21 +153,25 @@
 			bubbleDown(params, close)
 		}
 		if (lastView == view) {
-			view.emit("show", params)
-			View.emit("show", params, view)
+			emit(view, "show", params)
 			blur()
 		}
 	}
 
 	function closeView(view, open) {
 		if (view && view.isOpen) {
-			view.parent.emit("closeChild", view, open)
+			emit(view.parent, "closeChild", view, open)
 			closeView(view.child)
 			El.kill(view.isOpen)
 			view.isOpen = null
 			if (view.kb) El.rmKb(view.kb)
-			view.emit("close")
+			emit(view, "close")
 		}
+	}
+
+	function emit(view, event, a, b) {
+		view.emit(event, a, b)
+		View.emit(event, view, a, b)
 	}
 
 	Event.asEmitter(View)
