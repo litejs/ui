@@ -106,6 +106,8 @@
 				}
 			}
 
+			if (view !== close) emit(view, "change", close)
+
 			for (tmp in params) if (tmp.charAt(0) != "_") {
 				if (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"]) {
 					syncResume.call(view, params[tmp], tmp, params)
