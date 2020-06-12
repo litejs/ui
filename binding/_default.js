@@ -59,6 +59,7 @@
 			, clone = el.cloneNode(true)
 			, scope = El.scope(clone, data)
 			, before = nodes[i] || comm
+			if (!before.parentNode) return
 			nodes.splice(i, 0, clone)
 			scope.i = i
 			scope._scope = scope
