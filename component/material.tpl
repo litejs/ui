@@ -297,6 +297,7 @@
 			}
 		}
 		View.on("resize", closeMenu)
+		View.on("closeMenu", closeMenu)
 		View.on("showMenu", function(e, target, menu, x, y, margin) {
 			Event.stop(e)
 			var close = menuEl && menuTarget == target
