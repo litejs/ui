@@ -177,7 +177,8 @@
 		, emit = El.emit.bind(el, el, "change").rate(500, true)
 		on(window, "blur", stop)
 		function load(e) {
-			var attr = vert ? "offsetHeight" : "offsetWidth"
+			var tmp
+			, attr = vert ? "offsetHeight" : "offsetWidth"
 			, range = (El.attr(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
 			min = +(range[0] || 0)
 			max = +(range[1] || 100)
@@ -188,6 +189,10 @@
 			px = maxPx / (max - min)
 			offset = el.getBoundingClientRect()
 			offset = (vert ? offset.top + maxPx + El.scrollTop() : offset.left + El.scrollLeft()) + knobLen
+			if (e) {
+				tmp = offset - e.clientX + (value-min||0)*px
+				if (tmp < knobLen && tmp > -knobLen) offset -= tmp
+			}
 			if (e && track.childNodes.length > 1) {
 				fill = track.firstChild
 				var next
