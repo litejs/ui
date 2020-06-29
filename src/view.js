@@ -80,8 +80,7 @@
 			View.route = view.route
 
 			for (; tmp; tmp = parent) {
-				syncResume = params._v = tmp
-				emit(tmp, "ping", params)
+				emit(syncResume = params._v = tmp, "ping", params, View)
 				syncResume = null
 				if (lastParams != params) return
 				if (parent = tmp.parent) {

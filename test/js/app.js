@@ -21,6 +21,36 @@ var app = LiteJS({
 			// Re-render all .js-viewHook elements on each View change
 			El.findAll(this.root, ".js-viewRender").render()
 			scroll(0, 1)
+		},
+		"xhr:406": function(body, method, url, data, onResponse, send) {
+			this.emit("confirm", body.title || "Not Acceptable", body, function(action) {
+				if (action) {
+					var req = xhr(method, url, onResponse)
+					req.setRequestHeader("Accept-Confirm", action)
+					send(req, data)
+				}
+			})
+		}
+	},
+	param: {
+		"userId pageId": function(value, name, params) {
+			var list = Data(name.slice(0, -2) + "s")
+
+			list.get(value, function(err, item) {
+				if (err) return app("404").show()
+				console.log("set", name, item)
+				El.data.model = item
+			})
+			.then(this.wait())
+		}
+	},
+	ping: {
+		"users": function() {
+			this.wait()()
+		},
+		"users/{userId}": function() {
+			setTimeout(this.wait(), 2000)
+			setTimeout(this.wait(), 1000)
 		}
 	}
 })
@@ -84,20 +114,6 @@ var app = LiteJS({
 	}
 
 
-	View.on("xhr:406", function(body, method, url, data, onResponse, send) {
-		View.emit("confirm", body.title || "Not Acceptable", body, function(action) {
-			if (action) {
-				var req = xhr(method, url, onResponse)
-				req.setRequestHeader("Accept-Confirm", action)
-				send(req, data)
-			}
-		})
-	})
-
-
-
-
-
 
 
 	document.title = "Litejs Example"
@@ -106,6 +122,7 @@ var app = LiteJS({
 
 	El.data.window = window
 	El.data.Fn = Fn
+	El.data._ = i18n
 	El.data.console = console
 	El.data.window = window
 	//El.data.alert = alert.bind(window)
@@ -138,16 +155,6 @@ var app = LiteJS({
 
 	var user
 
-	View.on("login", function(e, data) {
-		var err
-		if (data.name != "a") {
-			err = "Login fail. Try name: a"
-			data = null
-		}
-		user = El.data.user = data
-		View.show(true, {error: err})
-	})
-
 	View.on("timerTest", function(e, el) {
 		setTimeout(function() {
 			El.txt(el, arguments.length)
@@ -158,20 +165,8 @@ var app = LiteJS({
 		El.cls(el, clName, !El.hasClass(el, clName))
 	})
 
-	View.on("logout", function() {
-		user = El.data.user = null
-		View.show(true)
-	})
-
 	View.on("reload", function() {
 		location.reload(true)
-	})
-	View.on("updateready", function(e) {
-		View.emit("confirm", "Update is ready, load?", function(confirmed) {
-			if (confirmed) {
-				View.emit("up")
-			}
-		})
 	})
 
 	View.on("logForm", function(e, el) {
@@ -199,13 +194,6 @@ var app = LiteJS({
 		El.findAll(body, ".Menu,.lang").render()
 	})
 
-	View("#private")
-	.on("ping", function() {
-		if (!user && View.route != "login") {
-			View("login").show()
-		}
-	})
-
 	//var lower = "Back", upper = "Forward"
 	var lower = "Left", upper = "Right"
 
@@ -222,29 +210,6 @@ var app = LiteJS({
 		setTimeout(function() {
 			El.kill(isOpen)
 		}, 600)
-	})
-
-	View.param(["userId","pageId"], function(value, name, params) {
-		var key = name.slice(0, -2)
-		, list = Data(key + "s")
-
-		list.get(value, function(err, item) {
-			if (err) return View("404").show()
-			console.log("set", key, item)
-			El.data.model = item
-		})
-		.then(this.wait())
-	})
-
-	View("users/{userId}")
-	.on("ping", function() {
-		setTimeout(this.wait(), 2000)
-		setTimeout(this.wait(), 1000)
-	})
-
-	View("users")
-	.on("ping", function() {
-		this.wait()()
 	})
 
 

@@ -8,7 +8,7 @@
 	testman,+/lcov,+/lcov/{file} %.view
 	test-material-ui #mat,../../ui/component/Slider.tpl,test-material-ui.view
 
-%el anim-page (href,name)
+%el anim-page
 	.content.loader
 
 %el form-js
@@ -122,6 +122,30 @@
 		}
 
 %view #private #body
+	;on: "ping", function() {
+		var user
+		View.on("login", function(e, data) {
+			var err
+			if (data.name != "a") {
+				err = "Login fail. Try name: a"
+				data = null
+			}
+			user = data
+			View.show(true, {error: err})
+		})
+		View.on("logout", function() {
+			user = null
+			View.show(true)
+		})
+		View.on("xhr:401", "logout")
+		return function(params, app) {
+			if (!user && app.route != "login") {
+				app("login").show()
+			} else {
+				El.data.user = user
+			}
+		}
+	}()
 	.App.max-height
 		top
 			.p2
@@ -129,6 +153,7 @@
 				button.c0 Logout
 					;on:"click", "logout"
 		Menu
+		.rel.App-row
 			%child
 		.Footer-spacer
 	Footer
@@ -163,7 +188,7 @@
 			;txt: "Load " + new Date().date()
 
 
-%view users public
+%view users #private
 	anim-page
 		h2 Users
 		ul.users ;list: Data("users")
@@ -173,7 +198,7 @@
 					;title: _("_welcome")
 					;href: "#users/" + item.id
 
-%view users/{userId} public
+%view users/{userId} #private
 	anim-page
 		form-js
 			;schemaToForm: "../test/ui/schema/user.json", "edit", "form1"
