@@ -229,7 +229,7 @@ button,
 .md .md-right,
 .lg .lg-right,
 .right {
-	float: right;
+	float: right !important;
 }
 
 .t-left {
