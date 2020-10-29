@@ -483,10 +483,7 @@
 		var fn = (
 			typeof handler == "string" ? function(e) {
 				var target = selector ? El.closest(e.target, selector) : el
-				if (!target) return
-				var args = [handler, e, target]
-				args.push.apply(args, data)
-				View.emit.apply(View, args)
+				if (target) View.emit.apply(View, [handler, e, target].concat(data))
 			} :
 			selector ? function(e) {
 				if (El.matches(e.target, selector)) handler(e)
