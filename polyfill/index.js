@@ -3,12 +3,11 @@
 
 
 
-!function(window, document, Function) {
+!function(window, Function) {
 	var a, b, c
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	// The documentMode is an IE only property, supported from IE8.
 	, ie678 = !+"\v1"
-	, ie6789 = ie678 || document.documentMode <= 9
 	, EV = "Event"
 	, P = "prototype"
 	, O = window
@@ -16,6 +15,9 @@
 	, hasOwn = JSONmap.hasOwnProperty
 	, esc = escape
 	, patched = (window.xhr || window)._patched = []
+	, document = patch("document", {body:{}})
+	, navigator = patch("navigator", {})
+	, performance = patch("performance", {})
 	, Event = patch(EV, function(name) {
 		var ev = document.createEventObject(event)
 		, b = ev.buttons = ev.button
@@ -335,7 +337,7 @@
 	patch("trim", "return this.replace(/^\\s+|\\s+$/g,'')")
 
 	// Chrome24, FF15, IE10
-	O = window.performance || (window.performance = {})
+	O = performance
 	patch("now", (a = "return+new Date"))
 
 	O = Date
@@ -411,7 +413,9 @@
 			return orig(typeof f == "function" && a.length > 2 ? f.apply.bind(f, null, [].slice.call(a,2)) : f, t)
 		}
 	}
-	if (ie6789) {
+
+	// ie6789
+	if (ie678 || document.documentMode <= 9) {
 		// Patch parameters support for setTimeout callback
 		patched.push("timers")
 		patchTimer("setTimeout")
@@ -423,7 +427,7 @@
 			document.execCommand("BackgroundImageCache", false, true)
 		} catch(e){}
 	}
-}(this, document, Function)
+}(this, Function)
 
 
 
