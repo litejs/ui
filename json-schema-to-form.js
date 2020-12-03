@@ -63,7 +63,7 @@
 					JSON.mergePatch(clone, data, changed)
 
 					if (changed.length) {
-						data = Item.copy({}, data, changed)
+						data = JSON.tr(changed)(data)
 					} else {
 						data = null
 					}

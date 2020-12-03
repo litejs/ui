@@ -1,0 +1,35 @@
+{
+  "name": "@litejs/ui",
+  "version": "21.0.0-rc.1",
+  "description": "UI engine for LiteJS full-stack framework",
+  "license": "MIT",
+  "author": "Lauri Rooden <lauri@rooden.ee>",
+  "keywords": [
+    "litejs",
+    "framework",
+    "frontend",
+    "browser"
+  ],
+  "homepage": "https://litejs.com",
+  "repository": "github:litejs/ui",
+  "bugs": "https://github.com/litejs/dev/issues",
+  "main": "index.js",
+  "files": [
+    "*.js",
+    "binding",
+    "component",
+    "polyfill",
+    "css"
+  ],
+  "litejs": {
+    "build": [
+      "-i test/dev.html -o test/index.html"
+    ]
+  },
+  "jshintConfig": {
+    "asi": true,
+    "laxcomma": true,
+    "maxdepth": 6,
+    "quotmark": "double"
+  }
+}

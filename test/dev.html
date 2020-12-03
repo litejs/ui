@@ -79,46 +79,43 @@
 		Include scripts in the end of the body,
 		so there is no need for waiting DOMContentLoaded
 		-->
-		<script src="../ui/load.js" inline></script>
+		<script src="../load.js" inline></script>
 		<script src="min/up.js" min="min/0.js?{hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
 			if="!window.PointerEvent||!navigator.sendBeacon"
 			require="
-				litejs/ui/polyfill
+				../polyfill/index.js
 		"></script>
-		<script type=x src="../ui/index.js" min="min/1.js?h={hash}"
+		<script type=x src="../index.js" min="min/1.js?h={hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
 			require="
 		"></script>
-		<script src="../date/index.js" min></script>
-		<script src="../lib/json.js" min></script>
-		<script src="../lib/timing.js" min></script>
-		<script src="../lib/fn.js" min></script>
-		<script src="../lib/events.js" min></script>
-		<script src="../ui/src/history.js" min></script>
-		<script src="../ui/src/view.js" min></script>
-		<script src="../ui/src/el.js" min></script>
-		<script src="../ui/binding/_default.js" min></script>
-		<script src="../ui/binding/list.js" min></script>
+		<script src="../../old/date/index.js" min></script>
+		<script src="../../litejs/json.js" min></script>
+		<script src="../../old/lib/timing.js" min></script>
+		<script src="../../old/lib/fn.js" min></script>
+		<script src="../../litejs/event.js" min></script>
+		<script src="../src/history.js" min></script>
+		<script src="../src/view.js" min></script>
+		<script src="../src/el.js" min></script>
+		<script src="../binding/_default.js" min></script>
+		<script src="../binding/list.js" min></script>
 		<script src="js/debug.js" exclude></script>
-		<script src="../ui/pointer.js" min="min/2.js?{hash}"></script>
-		<script src="../../lib/i18n/index.js" min></script>
-		<script src="../ui/svg.js" min></script>
-		<script src="../ui/xhr-getschema.js" min></script>
-		<script src="../ui/json-schema-to-form.js" min></script>
-		<script src="../ui/schema-apply.js" min></script>
-		<script src="../ui/hello.js" min></script>
-		<script src="../ui/component/form1.tpl" type="litejs/view" min></script>
-		<script src="../ui/component/confirm.tpl" type="litejs/view" min></script>
-		<script src="../ui/component/Segment7.tpl" type="litejs/view" min></script>
+		<script src="../pointer.js" min="min/2.js?{hash}"></script>
+		<script src="../../i18n/index.js" min></script>
+		<script src="../svg.js" min></script>
+		<script src="../xhr-getschema.js" min></script>
+		<script src="../json-schema-to-form.js" min></script>
+		<script src="../schema-apply.js" min></script>
+		<script src="../hello.js" min></script>
+		<script src="../component/form1.tpl" type="litejs/view" min></script>
+		<script src="../component/confirm.tpl" type="litejs/view" min></script>
+		<script src="../component/Segment7.tpl" type="litejs/view" min></script>
 		<script src="view/main.view" type="litejs/view" min></script>
-		<script src="../model/index.js" min="min/3.js?{hash}"></script>
+		<script src="../../old/model/index.js" min="min/3.js?{hash}"></script>
 		<script src="js/data.js" min></script>
 		<script src="js/stat.js" min></script>
 		<script src="js/app.js" min></script>
-		<script src="index.js" exclude></script>
-		<script src="min/object-utils.js" exclude></script>
-		<script src="js/test.js" exclude></script>
 		<noscript>
 			<h1>Error</h1>This application requires JavaScript
 			<!--

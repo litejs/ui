@@ -31,7 +31,6 @@ require("../..")
 			}
 		}
 	}
-	global.Item = require("../../../model").Item
 
 	require("../../../ui/xhr-getschema.js")
 
