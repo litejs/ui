@@ -1,5 +1,5 @@
 /*
-* @version  21.0.0-rc.1
+* @version  21.1.0
 * @author   Lauri Rooden <lauri@rooden.ee>
 * @license  MIT License
 */
