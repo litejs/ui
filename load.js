@@ -6,7 +6,7 @@
 // With initial congestion window set to 2 and 1452 bytes of data in a segment.
 //
 // 1 round trip to get 2904 bytes, Initial Window (IW) = 2
-// 2 round trips to get 8712 bytes, Congestion Window (CW)=4
+// 2 round trips to get 8712 bytes, Congestion Window (CW) = 4
 // 3 round trips to get 20328 bytes, CW = 8
 // 4 round trips to get 43560 bytes, CW = 16
 
@@ -17,28 +17,35 @@
 
 // IE9 and below allows up to 32 stylesheets, this was increased to 4095 in IE10.
 
-// You can invalidate a URL in the browser's cache by sending a PUT method xmlhttprequest to it:
+// Invalidate a URL in the browser's cache by sending a PUT method xmlhttprequest to it:
 // xhr("PUT", url).send(null) Works in all major browsers
 
 // XMLHttpRequest was unsupported in IE 5-6 and PATCH is not supported in IE7-8.
+// XDomainRequest is a CORS implementation in IE8/9 and was removed in IE10 in favor of using XMLHttpRequest with proper CORS
 // IE does not allow to add arbitrary properties to ActiveX objects.
 // IE does not allow to assign or read the readystatechange after the send().
 // Last version-independent ProgID with 3.0 is good enough (MSXML2 is supported from IE4.01).
 // MSXML 6.0 has improved XSD, deprecated several legacy features
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
-!function(window, next) {
-	var seq = 0
-	, xhrs = []
-	, loaded = {}
+!function(window, Function) {
+	var loaded = {}
 	, urlEscRe = /[+#\s]+/g
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('MSXML2.XMLHTTP')")
 	, execScript = window.execScript ||
+	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
-		Function("d,Date", "return(1,eval)('(Date)')==d&&eval")(Date, 1) ||
-		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(c,b.firstChild))")
+		Function("e,eval", "try{return e('eval')==e&&e}catch(e){}")(eval) ||
+		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
+	/*/
+		eval
+	/**/
 
-	/*** errorLog ***/
+	/*** reuse ***/
+	, xhrs = []
+	/**/
+
+	/*** onerror ***/
 	, lastError
 	, unsentErrors = []
 
@@ -53,7 +60,8 @@
 			].join(":")
 		) && 1 == unsentErrors.push(
 			[ lastError
-			, error && (error.stack || error.backtrace || error.stacktrace) || "-"
+			// Error().stacktrace in Opera
+			, error && (error.stack || error.stacktrace) || "-"
 			, +new Date()
 			, "" + location
 			]
@@ -77,9 +85,7 @@
 
 	window.xhr = xhr
 	function xhr(method, url, next, attr1, attr2) {
-		// encodeURI("A + B").replace(/%5[BD]/g, decodeURI).replace(/\+/g, "%2B").replace(/%20/g, "+")
-		// unescape("A+%2B+B".replace(/\+/g, " "))
-		var xhr = xhrs.shift() || new XMLHttpRequest()
+		var xhr = /*** reuse ***/ xhrs.pop() || /**/ new XMLHttpRequest()
 
 		// To be able to reuse the XHR object properly,
 		// use the open method first and set onreadystatechange later.
@@ -107,6 +113,8 @@
 		// if (xhr.getResponseHeader("Set-Cookie")) sessionID = xhr.getResponseHeader("Set-Cookie");
 
 
+		// encodeURI("A + B").replace(/%5[BD]/g, decodeURI).replace(/\+/g, "%2B").replace(/%20/g, "+")
+		// unescape("A+%2B+B".replace(/\+/g, " "))
 		xhr.open(method, url.replace(urlEscRe, encodeURIComponent).replace(/%20/g, "+"), next !== true)
 
 
@@ -161,7 +169,9 @@
 					attr2
 				)
 				xhr.onreadystatechange = next = nop
+				/*** reuse ***/
 				xhrs.push(xhr)
+				/**/
 			}
 		}
 		return xhr
@@ -198,61 +208,57 @@
 	}
 	/**/
 
-	/**
-	 *  1. FireFox 3.0 and below throws on `xhr.send()` without arguments.
-	 *     You can work around this by explicitly setting the message body to null.
-	 */
 
 	xhr.load = load
-	function load(files, next, raw) {
+	function load(files, next) {
 		if (typeof files == "string") files = [files]
 		var file
-		, len = files && files.length
 		, i = 0
-		, pending = 0
+		, pos = 0
+		, len = files && files.length
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) && file !== loaded[file]) {
+		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file]) {
 			if (loaded[file]) {
-				!function(old, i2) {
-					loaded[file] = function(err, str, file, i) {
-						old(err, str, file, i)
-						cb(1, str, file, i2)
-					}
-				}(loaded[file], i)
+				;(loaded[file].x || (loaded[file].x = [])).push(cb, file, i)
 			} else {
-				loaded[file] = cb
-				xhr("GET", file, function(err, str, file, i) {
-					loaded[file](err, str, file, i)
-				}, pending).send(null)                            /* 1 */
+				// FireFox 3 throws on `xhr.send()` without arguments
+				xhr("GET", file, loaded[file] = cb, i).send(null)
 			}
-			pending += 1
+			pos++
 		}
 
-		if (!pending && next) next()
+		if (!pos && next) next()
+		pos = 0
 
 		function cb(err, str, file, i) {
-			loaded[file] = file
-			if (err) {
-				res[i] = ""
-				onerror(err, file)
-			} else {
-				res[i] = str
-				err = file.split("?")[0].split(".").pop()
-				if (!raw && err != "js") {
-					xhr[++seq] = str
-					res[i] = "xhr." + err + "(xhr[" + seq + "]);delete xhr[" + seq + "]"
+			loaded[file] = 2
+			res[i] = err ? (onerror(err, file), "") : str
+			exec()
+		}
+		function exec() {
+			if (res[pos]) {
+				try {
+					;(xhr[files[pos].split("?")[0].split(".").pop()] || execScript)(res[pos])
+				} catch(e) {
+					onerror(e, files[pos])
 				}
+				res[pos] = ""
 			}
-			if (!--pending) {
-				if (!raw) execScript( res.join("/**/;") || ";" )
-				if (next) next(files, res, raw)
+			if (res[pos] === "" || !files[pos]) {
+				if (++pos < len) exec()
+				else {
+					if (next) next()
+					if (res = cb.x) {
+						for (i = 0; res[i];) res[i++](0, "", res[i++], res[i++])
+					}
+				}
 			}
 		}
 	}
 
-	load([/*!{loadFiles}*/], next)
+	load([/*!{loadFiles}*/])
 
 	function nop() {}
-}(this)
+}(this, Function)
 
