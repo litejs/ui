@@ -6,6 +6,7 @@
 !function (exports) {
 	var resolver
 	, nativePromise = exports.Promise
+	// setImmediate is IE10 only
 	, setImmediate = exports.setImmediate || function (fn) { setTimeout(fn, 1) }
 
 	// Older version of the spec had a resolver object
@@ -18,7 +19,7 @@
 	function Promise(fn) {
 		var promise = this
 		if (!(promise instanceof Promise && isFn(fn)))
-			throw new Error("Use: new Promise(fn)")
+			throw Error("Use: new Promise(fn)")
 
 		promise._d = []
 		resolve(promise, fn)
@@ -50,7 +51,7 @@
 		try {
 			fn(function (val) {
 				if (val === promise)
-					end(new TypeError("A promise resolved with itself"))
+					end(TypeError("A promise resolved with itself"))
 				if (!done) try {
 					if (done = getThen(val)) {
 						resolve(promise, done)

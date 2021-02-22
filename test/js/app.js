@@ -78,6 +78,13 @@ var app = LiteJS({
 	, standalone = "standalone" in navigator ?
 		navigator.standalone :
 		window.matchMedia && matchMedia("(display-mode:standalone)").matches
+		// matchMedia("(prefers-color-scheme:light)").matches
+		// window.matchMedia('(max-width: 600px)')        // Chrome 9
+		// .addListener(function(e){ if (e.matches) {} }) // Chrome 9
+		// .addEventListener()                            // Chrome 45
+		// .onchange = function() { ... }                 // Chrome 45
+		// MediaQueryList.prototype.addEventListener !== MediaQueryList.prototype.addListener
+
 
 	// Detect first available language
 	, lang = i18n.use([].concat(

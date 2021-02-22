@@ -4,30 +4,33 @@
 
 
 !function(window, Function) {
-	var a, b, c
+	// window.PointerEvent  - Chrome55, Edge12, Firefox59, Safari13,   IE11
+	// navigator.sendBeacon - Chrome39, Edge14, Firefox31, Safari11.1
+	// Object.fromEntries   - Chrome73, Edge79, Firefox63, Safari12.1, Opera60, Node.js12.0.0
+	// queueMicrotask       - Chrome71, Edge79, Firefox69, Safari12.1
+
+	var isArr, oKeys
+	, a, b, c
 	// JScript engine in IE<9 does not recognize vertical tabulation character
-	// The documentMode is an IE only property, supported from IE8.
 	, ie678 = !+"\v1"
-	, EV = "Event"
 	, P = "prototype"
 	, O = window
+	, patched = (window.xhr || window)._patched = []
+	, aSlice = patched.slice
+	, jsonRe = /[\x00-\x1f\x22\x5c]/g
 	, JSONmap = {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t",'"':'\\"',"\\":"\\\\"}
 	, hasOwn = JSONmap.hasOwnProperty
 	, esc = escape
-	, patched = (window.xhr || window)._patched = []
 	, document = patch("document", {body:{}})
-	, navigator = patch("navigator", {})
-	, performance = patch("performance", {})
-	, Event = patch(EV, function(name) {
-		var ev = document.createEventObject(event)
-		, b = ev.buttons = ev.button
-		ev.button = b == 1 ? 0: b == 4 ? 1 : b
-		ev.preventDefault = preventDefault
-		ev.stopPropagation = stopPropagation
-		ev.target = ev.srcElement
-		ev.type = name
-		return ev
-	}, typeof O.Event !== "function")
+	, navigator = patch("navigator")
+	, EV = "Event"
+	, Event = patch(
+		EV,
+		"c=F.createEventObject(event),b=c.buttons=c.button;c.button=b==1?0:b==4?1:b;c.preventDefault=X;c.stopPropagation=Y;c.target=c.srcElement;c.type=a;return c",
+		!isFn(O[EV]) && document,
+		function(){ event.returnValue = false },
+		function(){ event.cancelBubble = event.cancel = true }
+	)
 	, wheelDiff = 120
 	, fixEv = Event.fixEv = {
 		wheel: "onwheel" in document      ? "wheel" :      // Modern browsers
@@ -64,65 +67,7 @@
 		u: "touchend",
 		c: "touchcancel"
 	}
-	, nulled = {
-		constructor: a,
-		hasOwnProperty: a,
-		isPrototypeOf: a,
-		propertyIsEnumerable: a,
-		toLocaleString: a,
-		toString: a,
-		valueOf: a
-	}
 
-	function preventDefault() {
-		event.returnValue = false
-	}
-	function stopPropagation() {
-		event.cancelBubble = event.cancel = true
-	}
-
-	// window.PointerEvent  - Chrome55, Edge12, Firefox59, IE11, Safari13
-	// navigator.sendBeacon - Chrome39, Edge14, Firefox31, -,    Safari11.1
-
-	function patch(key, src, force) {
-		return !force && O[key] || (O[key] = (
-			patched.push(key), typeof src === "string" ?
-			Function("o,P,N,U", "return function(a,b,c){" + src + "}")(hasOwn, P, nop, nulled) :
-			src
-		))
-	}
-
-	patch("JSON", {
-		parse: function(t) {
-			return Function("return(" + t + ")")()
-		},
-		stringify: function stringify(o) {
-			var i
-			, s = []
-			, c = typeof o
-			if (c == "string") {
-				for (i = o.length; c = o.charAt(--i); s[i] = JSONmap[c] || (
-					c < " " ? "\\u00" + ((c=c.charCodeAt(0))|4) + (c%16).toString(16):c
-				));
-				o = '"' + s.join("") + '"'
-			}
-			if (o && c == "object") {
-				if (typeof o.toJSON == "function") return '"' + o.toJSON() + '"'
-				if (Array.isArray(o)) {
-					for (i = o.length; i--; s[i] = stringify(o[i]));
-					return "[" + s.join() + "]"
-				}
-				for (i in o) if (hasOwn.call(o, i)) {
-					s.push(stringify(i) + ":" + stringify(o[i]))
-				}
-				o = "{" + s.join() + "}"
-			}
-			return c == "number" && !isFinite(o) ? "null" : "" + o
-		}
-	})
-
-	createStorage("sessionStorage")    // Chrome5, FF2, IE8, Safari4
-	createStorage("localStorage")      // Chrome5, FF3.5, IE8, Safari4
 
 	if (!window.PointerEvent) {
 		// IE10
@@ -191,170 +136,9 @@
 		}
 	}
 
-	// 20 fps is good enough
-	patch("requestAnimationFrame", "return setTimeout(a,50)")
-	// window.mozRequestAnimationFrame    || // Firefox 4-23
-	// window.webkitRequestAnimationFrame || // Chrome 10-24
-	// window.msRequestAnimationFrame     || // IE 10 PP2+
-	patch("cancelAnimationFrame", "clearTimeout(a)")
-
-
 	// Ignore FF3 escape second non-standard argument
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
-	patch("escape", function(s) { return esc(s) }, esc("a", 0) != "a")
-
-	// The HTML5 document.head DOM tree accessor
-	// patch("head", document.getElementsByTagName("head")[0])
-	O = document.body
-	var selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
-	, selectorLastRe = /([~\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
-	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
-	, selectorCache = {}
-	, selectorMap = {
-		"first-child": "(a=_.parentNode)&&a.firstChild==_",
-		"last-child": "(a=_.parentNode)&&a.lastChild==_",
-		".": "~_.className.split(/\\s+/).indexOf(a)",
-		"#": "_.id==a",
-		"^": "!a.indexOf(v)",
-		"|": "a.split('-')[0]==v",
-		"$": "a.slice(-v.length)==v",
-		"~": "~a.split(/\\s+/).indexOf(v)",
-		"*": "~a.indexOf(v)"
-	}
-	, matches = patch("matches", function(sel) {
-		return !!selectorFn(sel)(this)
-	})
-	, closest = patch("closest", function(sel) {
-		return walk("parentNode", 1, this, sel)
-	})
-	function selectorFn(str) {
-		// jshint evil:true
-		return selectorCache[str] ||
-		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
-			str.split(selectorSplitRe).map(function(sel) {
-				var relation, from
-				, rules = ["_&&_.nodeType==1"]
-				, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
-					from = start + _rel.length
-					relation = _rel.trim()
-					return ""
-				})
-				, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation) {
-					rules.push(
-						"((v='" +
-						(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/'/g, "\\'") +
-						"'),(a='" + key + "'),1)"
-						,
-						selectorMap[op == ":" ? key : op] ||
-						"(a=_.getAttribute(a))" +
-						(fn ? "&&" + selectorMap[fn] : val ? "==v" : "")
-					)
-					return ""
-				})
-
-				if (tag && tag != "*") rules[0] += "&&_.tagName=='" + tag.toUpperCase() + "'"
-				if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
-				return rules.join("&&")
-			}).join("||") + "}"
-		)(matches, closest))
-	}
-
-	function walk(next, first, el, sel, nextFn) {
-		var out = []
-		if (typeof sel !== "function") sel = selectorFn(sel)
-		for (; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
-			if (first) return el
-			out.push(el)
-		}
-		return first ? null : out
-	}
-
-	function find(node, sel, first) {
-		return walk("firstChild", first, node.firstChild, sel, function(el) {
-			var next = el.nextSibling
-			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
-			return next
-		})
-	}
-
-	// Note: querySelector in IE8 supports only CSS 2.1 selectors
-	patch("querySelector", function(sel) {
-		return find(this, sel, true)
-	}, ie678)
-
-	patch("querySelectorAll", function(sel) {
-		return find(this, sel, false)
-	}, ie678)
-
-	O = Function[P]
-	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4
-	patch("bind", "var t=this;b=[].slice.call(arguments,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(b.slice.call(arguments)))};if(t[P])c[P]=t[P];return c")
-
-
-	O = Object
-	// Chrome5, FF4, IE9, Safari5
-	patch("create", "N[P]=a||U;return new N")
-	a = "c=[];for(b in a)o.call(a,b)&&c.push("
-	b = ");return c"
-	patch("keys", a + "b" + b)
-	patch("values", a + "a[b]" + b)
-
-	// Object.assign ( target, source ) in ECMAScript 6
-	// Chrome45, Edge, FF34, Safari9
-	patch("assign", "var t,k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
-
-
-	O = Array
-	patch("isArray", "return Object[P].toString.call(a)==='[object Array]'")
-
-	// Chrome45, Edge, FF32, Safari9
-	patch("from", "a=typeof a==='string'?a.split(''):b?a:a.slice();return b?a.map(b,c):a")
-
-	O = O[P]
-	a = "var t=this,l=t.length,o=[],i=-1;"
-	c = "if(t[i]===a)return i;return -1"
-	patch("indexOf",     a + "i+=b|0;while(++i<l)" + c)
-	patch("lastIndexOf", a + "i=(b|0)||l;i>--l&&(i=l)||i<0&&(i+=l);++i;while(--i>-1)" + c)
-
-	b = a + "if(arguments.length<2)b=t"
-	c = "b=a.call(null,b,t[i],i,t);return b"
-	patch("reduce",      b + "[++i];while(++i<l)" + c)
-	patch("reduceRight", b + "[--l];i=l;while(i--)" + c)
-
-	b = a + "while(++i<l)if(i in t)"
-	patch("forEach",     b + "a.call(b,t[i],i,t)")
-	patch("every",       b + "if(!a.call(b,t[i],i,t))return!1;return!0")
-
-	c = ";return o"
-	patch("map",         b + "o[i]=a.call(b,t[i],i,t)" + c)
-
-	b += "if(a.call(b,t[i],i,t))"
-	patch("filter",      b + "o.push(t[i])" + c)
-	patch("some",        b + "return!0;return!1")
-
-
-	O = String[P]
-	patch("trim", "return this.replace(/^\\s+|\\s+$/g,'')")
-
-	// Chrome24, FF15, IE10
-	O = performance
-	patch("now", (a = "return+new Date"))
-
-	O = Date
-	patch("now", a)
-
-	O = O[P]
-	// `Date.prototype.date` is implemented in `litejs/date`.
-	patch("toJSON", "return this.date('iso')")
-
-	O = navigator
-	patch("sendBeacon", function(url, data) {
-		// The synchronous XMLHttpRequest blocks the process of unloading the document,
-		// which in turn causes the next navigation appear to be slower.
-		var req = xhr("POST", url, xhr.unload)
-		req.setRequestHeader("Content-Type", "text/plain;charset=UTF-8")
-		req.send(data)
-	})
+	patch("escape", "return X(a)", esc("a", 0) != "a", esc)
 
 	function createStorage(name) {
 		try {
@@ -387,7 +171,7 @@
 				if (surviveReboot) el.save("persist")
 			}
 		/**/
-		var data = Object.create({
+		var data = {
 			setItem: function(id, val) {
 				return data[id] = String(val)
 			},
@@ -400,32 +184,226 @@
 			clear: function() {
 				for (var key in data) delete data[key]
 			}
-		})
-		patch(name, data)
-	}
-
-	function nop(){}
-
-	function patchTimer(name) {
-		var orig = window[name]
-		window[name] = function(f, t) {
-			var a = arguments
-			return orig(typeof f == "function" && a.length > 2 ? f.apply.bind(f, null, [].slice.call(a,2)) : f, t)
 		}
+		patch(name, data, 1)
 	}
+
+	createStorage("sessionStorage")    // Chrome5, FF2, IE8, Safari4
+	createStorage("localStorage")      // Chrome5, FF3.5, IE8, Safari4
+
+	// 20 fps is good enough
+	patch("requestAnimationFrame", "return setTimeout(a,50)")
+	// window.mozRequestAnimationFrame    || // Firefox 4-23
+	// window.webkitRequestAnimationFrame || // Chrome 10-24
+	// window.msRequestAnimationFrame     || // IE 10 PP2+
+	patch("cancelAnimationFrame", "clearTimeout(a)")
+
+
+
+	function jsonFn(str) {
+		return JSONmap[str] || esc(str).replace(/%u/g, "\\u").replace(/%/g, "\\x")
+	}
+
+	patch("JSON", {
+		parse: function(t) {
+			return Function("return(" + t.replace(/\u2028|\u2029/g, jsonFn) + ")")()
+		},
+		stringify: function stringify(o) {
+			// IE 8 serializes `undefined` as `"undefined"`
+			var c = typeof o
+			return (
+				c == "string" ? '"' + o.replace(jsonRe, jsonFn) + '"' :
+				o && c == "object" ? (
+					isFn(o.toJSON) ? stringify(o.toJSON()) :
+					isArr(o) ? "[" + o.map(stringify) + "]" :
+					"{" + oKeys(o).map(function(a){return stringify(a) + ":" + stringify(o[a])}) + "}"
+				) :
+				c == "number" && !isFinite(o) ? "null" :
+				"" + o
+			)
+		}
+	})
+
+	O = patch("performance")
+	patch("now", (a = "return+new Date") + "-X", 0, new Date())
+	patch("timing")
+
+	O = Date
+	patch("now", a)
+
+	O = O[P]
+	// IE8 toJSON does not return milliseconds
+	patch("toISOString", patch("toJSON", [
+		"return this.getUTCFullYear(", "Month()+1,'-'", "Date(),'-'",
+		"Hours(),'T'", "Minutes(),':'", "Seconds(),':'", "Milliseconds(),'.')+'Z'"
+	].join(")+X(this.getUTC"), ie678, function(n, b){ return b + ("00" + n).slice((b !== ".")-3) }))
+
+
+	O = Function[P]
+	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4
+	patch("bind", "var t=this;b=S.call(arguments,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(S.call(arguments)))};if(t[P])c[P]=t[P];return c")
+
+
+	O = Object
+	patch("assign", "var t,k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
+	patch("create", "X[P]=a||Y;return new X", 0, function(){}, {
+		// oKeys is undefined at this point
+		constructor: oKeys, hasOwnProperty: oKeys, isPrototypeOf: oKeys, propertyIsEnumerable: oKeys,
+		toLocaleString: oKeys, toString: oKeys, valueOf: oKeys
+	})
+	a = "c=[];for(b in a)o.call(a,b)&&c.push("
+	b = ");return c"
+	patch("entries", a + "[b,a[b]]" + b)
+	oKeys = patch("keys", a + "b" + b)
+	patch("values", a + "a[b]" + b)
+	//patch("fromEntries", "for(a=a.entries(),c={};!(b=a.next()).done;c[b[0]]=b[1]" + b)
+
+	a = O[P].toString
+	O = Array
+	isArr = patch("isArray", "return X.call(a)==='[object Array]'", 0, a)
+
+	// TODO:2021-02-25:lauri:Accept iterable objects
+	//patch("from", "a=S.call(a);return b?a.map(b,c):a")
+	patch("from", "a=typeof a==='string'?a.split(''):b?a:S.call(a);return b?a.map(b,c):a")
+
+	O = O[P]
+	a = "var t=this,l=t.length,o=[],i=-1;"
+	c = "if(t[i]===a)return i;return -1"
+	patch("indexOf",     a + "i+=b|0;while(++i<l)" + c)
+	patch("lastIndexOf", a + "i=(b|0)||l;i>--l&&(i=l)||i<0&&(i+=l);++i;while(--i>-1)" + c)
+
+	b = a + "if(arguments.length<2)b=t"
+	c = "b=a.call(null,b,t[i],i,t);return b"
+	patch("reduce",      b + "[++i];while(++i<l)" + c)
+	patch("reduceRight", b + "[--l];i=l;while(i--)" + c)
+
+	b = a + "while(++i<l)if(i in t)"
+	patch("every",       b + "if(!a.call(b,t[i],i,t))return!1;return!0")
+	patch("forEach",     b + "a.call(b,t[i],i,t)")
+
+	c = ";return o"
+	patch("map",         b + "o[i]=a.call(b,t[i],i,t)" + c)
+
+	b += "if(a.call(b,t[i],i,t))"
+	patch("filter",      b + "o.push(t[i])" + c)
+	patch("some",        b + "return!0;return!1")
+
+	//patch("entries", "a=this;b=-1;return{next:function(){c=a.length<=++b;return{done:c,value:c?void 0:a[b]}}}")
+
+
+	O = String[P]
+	patch("trim", "return this.replace(/^\\s+|\\s+$/g,'')")
+
+
+	O = navigator
+	patch("sendBeacon", function(url, data) {
+		// The synchronous XMLHttpRequest blocks the process of unloading the document,
+		// which in turn causes the next navigation appear to be slower.
+		url = xhr("POST", url, xhr.unload)
+		url.setRequestHeader("Content-Type", "text/plain;charset=UTF-8")
+		url.send(data)
+	})
+
+	// The HTML5 document.head DOM tree accessor
+	// patch("head", document.getElementsByTagName("head")[0])
+	// HTMLElement (IE9) -> Element (IE8)
+	O = document.body
+	var selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
+	, selectorLastRe = /([~\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
+	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
+	, selectorCache = {}
+	, selectorMap = {
+		"first-child": "(a=_.parentNode)&&a.firstChild==_",
+		"last-child": "(a=_.parentNode)&&a.lastChild==_",
+		".": "~_.className.split(/\\s+/).indexOf(a)",
+		"#": "_.id==a",
+		"^": "!a.indexOf(v)",
+		"|": "a.split('-')[0]==v",
+		"$": "a.slice(-v.length)==v",
+		"~": "~a.split(/\\s+/).indexOf(v)",
+		"*": "~a.indexOf(v)"
+	}
+	, matches = patch("matches", "return!!X(a)(this)", 0, selectorFn)
+	, closest = patch("closest", "return X(this,'parentNode',a,1)", 0, walk)
+
+	// Note: querySelector in IE8 supports only CSS 2.1 selectors
+	patch("querySelector", (a = "return X(this,a,") + "1)", ie678, find)
+	patch("querySelectorAll", a + "0)", ie678, find)
+	//patch("addEventListener", function(ev, fn) { })
+	//patch("removeEventListener")
+
+	function selectorFn(str) {
+		// jshint evil:true
+		return selectorCache[str] ||
+		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
+			str.split(selectorSplitRe).map(function(sel) {
+				var relation, from
+				, rules = ["_&&_.nodeType==1"]
+				, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
+					from = start + _rel.length
+					relation = _rel.trim()
+					return ""
+				})
+				, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation) {
+					rules.push(
+						"((v='" +
+						(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/'/g, "\\'") +
+						"'),(a='" + key + "'),1)"
+						,
+						selectorMap[op == ":" ? key : op] ||
+						"(a=_.getAttribute(a))" +
+						(fn ? "&&" + selectorMap[fn] : val ? "==v" : "")
+					)
+					return ""
+				})
+
+				if (tag && tag != "*") rules[0] += "&&_.tagName=='" + tag.toUpperCase() + "'"
+				if (parentSel) rules.push("(v='" + parentSel + "')", selectorMap[relation + relation])
+				return rules.join("&&")
+			}).join("||") + "}"
+		)(matches, closest))
+	}
+	function walk(el, by, sel, first, nextFn) {
+		var out = []
+		if (typeof sel !== "function") sel = selectorFn(sel)
+		for (; el; el = el[by] || nextFn && nextFn(el)) if (sel(el)) {
+			if (first === 1) return el
+			out.push(el)
+		}
+		return first === 1? null : out
+	}
+	function find(node, sel, first) {
+		return walk(node.firstChild, "firstChild", sel, first, function(el) {
+			for (var next = el.nextSibling; !next && ((el = el.parentNode) !== node);) next = el.nextSibling
+			return next
+		})
+	}
+
 
 	// ie6789
+	// The documentMode is an IE only property, supported from IE8.
 	if (ie678 || document.documentMode <= 9) {
 		// Patch parameters support for setTimeout callback
-		patched.push("timers")
-		patchTimer("setTimeout")
-		patchTimer("setInterval")
+		patch("setTimeout", (a = "var A=arguments;return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), 1, isFn)
+		patch("setInterval", a, 1, isFn)
 		try {
 			// Remove background image flickers on hover in IE6
 			// You could also use CSS
 			// html { filter: expression(document.execCommand("BackgroundImageCache", false, true)); }
 			document.execCommand("BackgroundImageCache", false, true)
 		} catch(e){}
+	}
+
+	function isFn(f) {
+		return typeof f === "function"
+	}
+
+	function patch(key, src, force, arg1, arg2) {
+		return !force && O[key] || (O[patched.push(key), key] = (
+			typeof src === "string" ?
+			Function("o,O,P,S,F,X,Y", "return function(a,b,c){" + src + "}")(hasOwn, O[key], P, aSlice, force, arg1, arg2) :
+			src || {}
+		))
 	}
 }(this, Function)
 
