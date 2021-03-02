@@ -29,6 +29,7 @@
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
 !function(window, Function) {
+	xhr._s = new Date
 	var loaded = {}
 	, urlEscRe = /[+#\s]+/g
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('MSXML2.XMLHTTP')")
@@ -52,6 +53,7 @@
 	window.onerror = onerror
 	function onerror(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
+		// file = document.currentScript.src || import.meta.url
 		if (lastError !== (lastError =
 			[ file
 			, line
