@@ -264,14 +264,16 @@
 	O = Date
 	patch("d:now", a)
 
+	/*** toISOString ***/
 	O = O[P]
 	// IE8 toJSON does not return milliseconds
 	// ISO 8601 format is always 24 or 27 characters long,
 	// YYYY-MM-DDTHH:mm:ss.sssZ or ±YYYYYY-MM-DDTHH:mm:ss.sssZ
 	patch("toISOString", patch("toJSON", [
-		"a=t.getUTCFullYear();return(b=a<0?'-':a>9999?'+':'')+X(a<0?-a:a,'-',b?6:4", "Month()+1,'-'", "Date(),'T'",
+		"a=t.getUTCFullYear();if(a!==a)throw RangeError('Invalid time');return(b=a<0?'-':a>9999?'+':'')+X(a<0?-a:a,'-',b?6:4", "Month()+1,'-'", "Date(),'T'",
 		"Hours(),':'", "Minutes(),':'", "Seconds(),'.'", "Milliseconds(),'Z',3)"
 	].join(")+X(t.getUTC"), ie678, function(a, b, c){ return ("00000" + a).slice(-c || -2) + b }))
+	/**/
 
 	O = Function[P]
 	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4

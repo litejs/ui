@@ -142,6 +142,9 @@ describe("Browser test", function() {
 		assert.equal(new Date(864e12).toISOString(),  "+029349-01-26T00:00:00.000Z")
 		assert.equal(new Date(-864e12).toISOString(), "-025410-12-06T00:00:00.000Z")
 		assert.equal(new Date(-864e13).toISOString(), "-271821-04-20T00:00:00.000Z")
+		assert.throws(function() {
+			new Date(NaN).toISOString()
+		})
 
 
 		assert.equal(document.body.querySelector.call(document.documentElement, "body").tagName, "BODY")
