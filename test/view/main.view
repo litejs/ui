@@ -8,6 +8,9 @@
 	testman,+/lcov,+/lcov/{file} %.view
 	test-material-ui #mat,../../ui/component/Slider.tpl,test-material-ui.view
 
+%css
+	.content{ will-change: transform, opacity; }
+
 %el anim-page
 	.content.loader
 
