@@ -51,7 +51,6 @@ describe("Browser test", function() {
 
 		var tmp, undef
 		, obj = {a:1,b:2}
-		, d = new Date(1234567890123)
 
 		/*
 		assert.equal(lib._patched || xhr._patched, [
@@ -136,8 +135,14 @@ describe("Browser test", function() {
 
 		assert.equal(" a	".trim(), "a")
 
-		assert.equal(d.toJSON(), "2009-02-13T23:31:30.123Z")
-		assert.equal(d.toISOString(), "2009-02-13T23:31:30.123Z")
+		assert.equal(new Date(6e13-1).toISOString(),  "3871-04-29T10:39:59.999Z")
+		assert.equal(new Date(-6e13-1).toISOString(), "0068-09-03T13:19:59.999Z")
+		assert.equal(new Date(-8e13-1).toISOString(), "-000566-11-26T01:46:39.999Z")
+		assert.equal(new Date(864e13).toISOString(),  "+275760-09-13T00:00:00.000Z")
+		assert.equal(new Date(864e12).toISOString(),  "+029349-01-26T00:00:00.000Z")
+		assert.equal(new Date(-864e12).toISOString(), "-025410-12-06T00:00:00.000Z")
+		assert.equal(new Date(-864e13).toISOString(), "-271821-04-20T00:00:00.000Z")
+
 
 		assert.equal(document.body.querySelector.call(document.documentElement, "body").tagName, "BODY")
 		assert.equal(document.body.querySelectorAll.call(document.documentElement, "body").length, 1)
