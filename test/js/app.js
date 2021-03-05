@@ -86,12 +86,6 @@ var app = LiteJS({
 		// MediaQueryList.prototype.addEventListener !== MediaQueryList.prototype.addListener
 
 
-	// Detect first available language
-	, lang = i18n.use([].concat(
-		navigator.languages, navigator.language, navigator.userLanguage,
-		"en" // Default language
-	).filter(i18n.get)[0])
-
 	// Detect base from HTML <base> element
 	, base = (html.getElementsByTagName("base")[0] || i18n).href
 
@@ -106,7 +100,7 @@ var app = LiteJS({
 		timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 	} catch(e) {}
 
-	i18n.setLang = function(lang) {
+	function setLang(lang) {
 		html.lang = lang = i18n.use(lang)
 		xhr.load("lang/" + lang + ".js", function() {
 			Date.names = i18n("__date").split(" ")
@@ -119,6 +113,12 @@ var app = LiteJS({
 			El.render(body)
 		})
 	}
+	app.setLang = setLang
+	app.on("setLang", function(e, el, lang) {
+		console.log(arguments)
+		setLang(lang)
+	})
+	setLang(i18n.detect())
 
 
 
@@ -220,9 +220,6 @@ var app = LiteJS({
 	})
 
 
-
-
-	i18n.setLang(lang)
 
 
 

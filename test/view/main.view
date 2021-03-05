@@ -3,7 +3,7 @@
 %def
 	settings %.view,%.css
 	test-form1,test-grid,pointer %.view
-	test-form1 %.view,../binding/persist.js
+	test-form1 %.view,../../binding/persist.js
 	test-svg #mat,../../ui/component/Pie.tpl,test-svg.view
 	testman,+/lcov,+/lcov/{file} %.view
 	test-material-ui #mat,../../ui/component/Slider.tpl,test-material-ui.view
@@ -27,7 +27,7 @@
 				%child
 			.right.lang ;each: lng in _.list
 				a.hand - {lng.upper()} -
-					@click: _.setLang.bind(null, lng)
+					@click: [lng], "setLang"
 					;cls: "selected", lng == _.current
 					;cls: "lang-" + lng
 			a[href="#home"].home-link Header
@@ -151,7 +151,7 @@
 			.p2
 				span {user.name}
 				button.c0 Logout
-					;on:"click", "logout"
+					@click: "logout"
 		Menu
 		.rel.App-row
 			%child

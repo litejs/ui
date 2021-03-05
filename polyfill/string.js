@@ -27,6 +27,9 @@
 		void 0
 	}
 
+	// function fromCodePoint(i) { return unescape("%u"+i.toString(16)) }
+	// function fromCodePoint(i) { return unescape("%u"+ (i>0xFFFF?(0xD800+((i-65536)>>10)).toString(16)+"%u"+((i&0x3ff)+0xDC00).toString(16):i.toString(16))) }
+
 	if (!Str.fromCodePoint) Str.fromCodePoint = function() {
 		var code
 		, arr = arguments

@@ -79,7 +79,7 @@
 		Include scripts in the end of the body,
 		so there is no need for waiting DOMContentLoaded
 		-->
-		<script src="../load.js" inline></script>
+		<script src="../load.js" inline drop="reuse,require"></script>
 		<script src="min/up.js" min="min/0.js?{hash}"
 			banner="litejs.com/MIT-LICENSE.txt"
 			if="!window.PointerEvent||!navigator.sendBeacon"
@@ -110,6 +110,8 @@
 		<script src="../component/confirm.tpl" type="litejs/view" min></script>
 		<script src="../component/Segment7.tpl" type="litejs/view" min></script>
 		<script src="view/main.view" type="litejs/view" min></script>
+		<script src="../../litejs/json.js" min></script>
+		<script src="../../litejs/i18n.js" min></script>
 		<script src="../../old/model/index.js" min="min/3.js?{hash}"></script>
 		<script src="js/data.js" min></script>
 		<script src="js/stat.js" min></script>
