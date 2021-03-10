@@ -139,18 +139,6 @@ var app = LiteJS({
 	El.data.welcomeText = "_welcome"
 
 
-	El.bindings.fixReadonlyCheckbox = function(el) {
-		function False(e) {
-			console.log(this.readOnly)
-			if (this.readOnly) {
-				Event.stop(e)
-				return false
-			}
-		}
-		El.on(el, "click", False)
-		El.on(el, "mousedown", False)
-	}
-	El.bindings.fixReadonlyCheckbox.once = 1
 
 	El.bindings.init = function(el, fn) {
 		if (typeof fn == "function") {

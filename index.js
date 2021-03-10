@@ -374,13 +374,6 @@
 		}
 	}
 
-	// Chrome54, FF47, Edge14, Safari10.1
-	Object.values = function(obj) {
-		return Object.keys(obj || {}).map(function(e) {
-			return obj[e]
-		})
-	}
-
 	// Non-standard
 	// IE<9 bug: [1,2].splice(0).join("") == "" but should be "12"
 	A.remove = arrayRemove
@@ -445,20 +438,6 @@
 		}
 
 		return scope.length ? fn.bind.apply(fn, scope) : fn
-	}
-
-	Fn.keys = function(str) {
-		var i, tmp
-		, arr = []
-		, match = str.match(formatRe)
-		if (match) {
-			for (i = match.length; i--; ) {
-				if (tmp = match[i].replace(fnRe, "").match(wordRe)) {
-					arr.push.apply(arr, tmp)
-				}
-			}
-		}
-		return arr.uniq()
 	}
 
 	S.format = function() {
@@ -699,7 +678,7 @@
 	}
 
 // `this` refers to the `window` in browser and to the `exports` in Node.js.
-}(this)
+}(this) // jshint ignore:line
 /* litejs.com/MIT-LICENSE.txt */
 
 

@@ -159,15 +159,6 @@
 			el.set(parseFloat(val) || 0)
 		}
 	}
-	El.bindings.fixReadonlyCheckbox = function(el) {
-		function False(e) {
-			if ((this.firstChild || this).readOnly) {
-				return Event.stop(e)
-			}
-		}
-		on(el, "click", False)
-		on(el, "pointerdown", False)
-	}
 	El.bindings.SliderInit = function(el) {
 		var knobLen, offset, px, drag, min, max, step, minPx, maxPx, value
 		, vert = El.hasClass(el, "is-vertical")
@@ -226,14 +217,14 @@
 		function move(e) {
 			var diff = vert ? offset - e.pageY : e.pageX - offset
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
-			el.set( (diff / px) + min, diff )
+			el.set((diff / px) + min, e, diff)
 			return Event.stop(e)
 		}
 		function stop(e) {
 			if (!drag) return
 			drag = false
 			listen(off)
-			el.set(value)
+			el.set(value, e)
 		}
 		function listen(on) {
 			El.cls(fill, "anim", !drag)
@@ -241,16 +232,14 @@
 			on(document, "pointerup", stop)
 			on(document, "pointermove", move)
 		}
-		el.set = function(val, pos, scroll) {
+		el.set = function(val, e, pos) {
 			px || load()
 			val = (val < min ? min : val > max ? max : val).step(step)
 			if (value !== val) {
-				if (drag || scroll) {
-					emit(val)
-				}
+				el.value = value = val
+				if (drag && e) emit(e)
 				var format = El.attr(el, "format")
 				El.attr(knob, "data-val", format ? format.format({val:val}) : val)
-				value = val
 			}
 			if (!drag || pos !== void 0) {
 				fill.style[vert ? "height" : "width"] = ((pos || (value-min)*px)+knobLen) + "px"
@@ -258,7 +247,6 @@
 		}
 		on(el, "pointerdown", start)
 	}
-	El.bindings.fixReadonlyCheckbox.once =
 	El.bindings.SliderInit.once = El.bindings.SliderVal.once = 1
 
 %el Slider
@@ -267,23 +255,23 @@
 			.Slider-fill.abs.anim
 				.Slider-knob.anim[tabindex=0]
 
-%el Slider2
-	button.Slider.reset ;SliderInit
-		.Slider-track
-			.Slider-fill.abs.anim
-				.Slider-knob.anim[tabindex=0]
-			.Slider-fill.abs.anim
-				.Slider-knob.anim[tabindex=0]
-
-%el Slider3
-	button.Slider.reset ;SliderInit
-		.Slider-track
-			.Slider-fill.abs.anim
-				.Slider-knob.anim[tabindex=0]
-			.Slider-fill.abs.anim
-				.Slider-knob.anim[tabindex=0]
-			.Slider-fill.abs.anim
-				.Slider-knob.anim[tabindex=0]
+/%el Slider2
+/	button.Slider.reset ;SliderInit
+/		.Slider-track
+/			.Slider-fill.abs.anim
+/				.Slider-knob.anim[tabindex=0]
+/			.Slider-fill.abs.anim
+/				.Slider-knob.anim[tabindex=0]
+/
+/%el Slider3
+/	button.Slider.reset ;SliderInit
+/		.Slider-track
+/			.Slider-fill.abs.anim
+/				.Slider-knob.anim[tabindex=0]
+/			.Slider-fill.abs.anim
+/				.Slider-knob.anim[tabindex=0]
+/			.Slider-fill.abs.anim
+/				.Slider-knob.anim[tabindex=0]
 
 %el Toggle
 	label.Toggle.reset[tabindex=0]
