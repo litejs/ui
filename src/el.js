@@ -9,7 +9,7 @@
 	, isArray = Array.isArray
 	, seq = 0
 	, elCache = El.cache = {}
-	, wrapProto = []
+	, wrapProto = ElWrap[protoStr] = []
 	, slice = wrapProto.slice
 	, hasOwn = elCache.hasOwnProperty
 	, body = document.body
@@ -132,7 +132,7 @@
 		return el
 	}
 
-	function ElWrap(nodes) {
+	function ElWrap(nodes, clone) {
 		var wrap = this
 		, i = nodes.length
 		/**
@@ -142,15 +142,13 @@
 		if (i) {
 			wrap.length = i /* 1 */
 			for (; i--; ) {
-				wrap[i] = nodes[i]
+				wrap[i] = clone < 2 ? nodes[i].cloneNode(clone) : nodes[i]
 			}
 		} else if (i == null) {
 			wrap.length = 1 /* 1 */
 			wrap[0] = nodes
 		}
 	}
-
-	ElWrap[protoStr] = wrapProto
 
 	function camelFn(_, a) {
 		return a.toUpperCase()
@@ -639,8 +637,10 @@
 
 	wrapProto.append = function(el) {
 		var elWrap = this
-		if (elWrap._childId != void 0) {
-			append(elWrap[elWrap._childId], el)
+		if (elWrap._ca > -1) {
+			append(elWrap[elWrap._ca], el)
+		// } else if (elWrap._cb > -1) {
+		// elWrap.splice(elWrap._cb, 0, el)
 		} else {
 			elWrap.push(el)
 		}
@@ -648,10 +648,9 @@
 	}
 
 	wrapProto.cloneNode = function(deep) {
-		var clone = new ElWrap(this.map(function(el) {
-			return el.cloneNode(deep)
-		}))
-		clone._childId = this._childId
+		var clone = new ElWrap(this, deep)
+		clone._ca = this._ca
+		//clone._cb = this._cb
 		return clone
 	}
 
@@ -734,25 +733,14 @@
 
 	plugin[protoStr] = {
 		_done: function() {
-			var el, childId
-			, t = this
+			var t = this
 			, childNodes = t.el.childNodes
-			, i = childNodes.length
+			, i = t.el._cp
+			, el = childNodes[1] ? new ElWrap(childNodes) : childNodes[0]
 
-			for (; i--; ) {
-				el = childNodes[i]
-				if (el._childKey) {
-					childId = i
-					setAttr(el, "data-child", el._childKey)
-					break
-				}
-			}
-
-			if (childNodes[1]) {
-				el = new ElWrap(childNodes)
-				el._childId = childId
-			} else {
-				el = childNodes[0]
+			if (i > -1) {
+				if (childNodes[i].nodeType == 1) setAttr(childNodes[el._ca = i], "data-child", t.el._ck)
+				// else el._cb = i
 			}
 
 			t.el.plugin = t.el = t.parent = null
@@ -787,12 +775,10 @@
 		child: plugin.extend({
 			done: function() {
 				var key = "@child-" + (++seq)
-				, root = this.parent
-				for (; (root.parentNode.parentNode || key).nodeType == 1; ) {
-					root = root.parentNode
-				}
-				root._childKey = key
-				append(this.parent, document.createComment(key))
+				, root = append(this.parent, document.createComment(key))
+				for (; root.parentNode; root = root.parentNode);
+				root._ck = key
+				root._cp = root.childNodes.length - 1
 			}
 		}),
 		css: js.extend({
@@ -902,15 +888,10 @@
 		, el = e.target || e.srcElement
 		, input = /INPUT|TEXTAREA|SELECT/i.test((el.nodeType == 3 ? el.parentNode : el).tagName)
 
-		for (; map = kbMaps[i++]; ) {
-			if (!input || map.input) {
-				fn = map[code] ||
-				map[chr] ||
-				map.num && code > 47 && code < 58 && (chr|=0, map.num) ||
-				map.all
-			}
-			if (fn || !map.bubble) break
-		}
+		for (; (map = kbMaps[i++]) && (
+			!(fn = !input || map.input ? map[code] || map[chr] || map.num && code > 47 && code < 58 && (chr|=0, map.num) || map.all : fn) &&
+			map.bubble
+		););
 		if (fn) {
 			typeof fn === "string" ? View.emit(fn, e, chr, el) : fn(e, chr, el)
 		}
