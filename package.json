@@ -1,6 +1,6 @@
 {
   "name": "@litejs/ui",
-  "version": "21.1.1",
+  "version": "21.3.0",
   "description": "UI engine for LiteJS full-stack framework",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -24,9 +24,7 @@
   "litejs": {
     "build": [
       "-i test/dev.html -o test/index.html"
-    ],
-    "cmd": "release",
-    "name": []
+    ]
   },
   "jshintConfig": {
     "asi": true,
