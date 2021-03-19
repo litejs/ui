@@ -95,11 +95,10 @@
 							tmp.file
 							.replace(/^|,/g, "$&" + (View.base || ""))
 							.split(","),
-							view.wait()
+							view.wait(tmp.file = null)
 						)
-						tmp.file = null
 					} else {
-						View("404").show(Object.assign({}, params))
+						View("404").show({origin:params})
 					}
 					return
 				}
@@ -195,6 +194,7 @@
 
 	View.show = function(url, _params) {
 		if (url === true) {
+			if (lastParams._p > 0) return
 			url = lastUrl
 			lastUrl = 0
 		}
