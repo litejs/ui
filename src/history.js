@@ -105,7 +105,7 @@
 				// IE<9 encounters the Mixed Content warning when the URI javascript: is used.
 				// IE5/6 additionally encounters the Mixed Content warning when the URI about:blank is used.
 				// src="//:"
-				iframe = document.body.appendChild(document.createElement('<iframe class="hide" tabindex="-1">')).contentWindow
+				iframe = document.body.appendChild(document.createElement('<iframe style="display:none" tabindex="-1">')).contentWindow
 			}
 			clearInterval(tick)
 			tick = setInterval(function(){
