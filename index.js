@@ -1,5 +1,5 @@
 /*
-* @version  21.3.0
+* @version  21.3.1
 * @author   Lauri Rooden <lauri@rooden.ee>
 * @license  MIT License
 */
@@ -785,7 +785,7 @@
 				// IE<9 encounters the Mixed Content warning when the URI javascript: is used.
 				// IE5/6 additionally encounters the Mixed Content warning when the URI about:blank is used.
 				// src="//:"
-				iframe = document.body.appendChild(document.createElement('<iframe class="hide" tabindex="-1">')).contentWindow
+				iframe = document.body.appendChild(document.createElement('<iframe style="display:none" tabindex="-1">')).contentWindow
 			}
 			clearInterval(tick)
 			tick = setInterval(function(){
@@ -896,11 +896,10 @@
 							tmp.file
 							.replace(/^|,/g, "$&" + (View.base || ""))
 							.split(","),
-							view.wait()
+							view.wait(tmp.file = null)
 						)
-						tmp.file = null
 					} else {
-						View("404").show(Object.assign({}, params))
+						View("404").show({origin:params})
 					}
 					return
 				}
@@ -996,6 +995,7 @@
 
 	View.show = function(url, _params) {
 		if (url === true) {
+			if (lastParams._p > 0) return
 			url = lastUrl
 			lastUrl = 0
 		}
