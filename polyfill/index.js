@@ -258,7 +258,10 @@
 	patch("values", a + "a[b]" + b)
 	//patch("fromEntries", "for(a=a.entries(),c={};!(b=a.next()).done;c[b[0]]=b[1]" + b)
 
-	a = O[P].toString
+	a = O[P][b = "toString"]
+	O = Error[P]
+	// in IE8 Error("1") creates {description: "", message: "", name: "Error", number: 1}
+	patch(b, "a=t.message||t.number;return a?X+': '+a:X", Error(1) != "Error: 1", "Error")
 	O = Array
 	isArr = patch("isArray", "return X.call(a)==='[object Array]'", 0, a)
 
