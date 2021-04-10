@@ -49,9 +49,7 @@
 	/*** onerror ***/
 	, lastError
 	, unsentErrors = []
-
-	window.onerror = onerror
-	function onerror(message, file, line, col, error) {
+	, onerror = window.onerror = function(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
 		// file = document.currentScript.src || import.meta.url
 		if (lastError !== (lastError =
@@ -77,6 +75,8 @@
 			setTimeout(sendErrors, 1307)
 		}
 	}
+	/*/
+	, onerror = nop
 	/**/
 
 	// next === true is for sync call
@@ -211,6 +211,7 @@
 	/**/
 
 
+	/*** load ***/
 	xhr.load = load
 	function load(files, next) {
 		if (typeof files == "string") files = [files]
@@ -259,7 +260,10 @@
 		}
 	}
 
-	load([/*!{loadFiles}*/])
+	load([
+		//!{loadFiles}
+	])
+	/**/
 
 	function nop() {}
 }(this, Function)
