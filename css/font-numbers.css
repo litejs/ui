@@ -1,0 +1,8 @@
+
+
+@font-face {
+	font-family: "sans-num";
+	src: local(sans-serif);
+	unicode-range: U+30-39 /* numbers */, U+2070-207F /* superscript \d+-=()n */, U+2080-208F /* subscript \d+-=()n */;
+}
+

@@ -1,0 +1,58 @@
+
+/**
+ *  1. IE10 from Windows 7 and legacy Microsoft Edge
+ *     Microsoft Edge79 supports the new standards
+ *  2. As with all other keywords, these names are ASCII case-insensitive.
+ *     They are shown here with mixed capitalization for legibility.
+ *  3. Use transparent outline instead of removing it,
+ *     in forced color modes, you'll get a visual outline,
+ *     as the color will be overridden by the system colors.
+ *
+ * https://drafts.csswg.org/css-color-4/#css-system-colors
+ * https://www.a11yproject.com/posts/2020-01-23-operating-system-and-browser-accessibility-display-modes/
+ * https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/
+ *
+ * Internet Explorer and legacy Microsoft Edge    | New Microsoft Edge and web standards
+ * @media (-ms-high-contrast: active) {}          | @media (forced-colors: active) {}
+ * @media (-ms-high-contrast: black-on-white) {}  | @media (forced-colors: active) and (prefers-color-scheme: light) {}
+ * @media (-ms-high-contrast: white-on-black) {}  | @media (forced-colors: active) and (prefers-color-scheme: dark) {}
+ * -ms-high-contrast-adjust: none;                | forced-color-adjust: none;
+ */
+
+@media (-ms-high-contrast: active), (forced-colors: active) {
+	.preserveOriginalColors {
+		-ms-high-contrast-adjust: none;      /* 1 */
+		forced-color-adjust: none;
+	}
+	.useSystemColors {
+		background-color: Window;            /* 1 */
+		background-color: Canvas;            /* 2 */
+		border-color: -ms-hotlight;          /* 1 */
+		border-color: LinkText;
+		color: WindowText;                   /* 1 */
+		color: CanvasText;
+	}
+}
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: #000;
+		color: #fff;
+	}
+}
+@media (inverted-colors: inverted) {
+	img,
+	video {
+		filter: invert(100%);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.anim {
+		animation: none;
+	}
+}
+
+:focus {
+	outline: 2px solid transparent;              /* 3 */
+	box-shadow: 0 0 10px 2px rgba(0, 0, 0, .8);
+}
+
