@@ -234,18 +234,18 @@
 	O = O[P]
 	// IE8 toJSON does not return milliseconds
 	patch("toISOString", patch("toJSON", [
-		"return this.getUTCFullYear(", "Month()+1,'-'", "Date(),'-'",
+		"return t.getUTCFullYear(", "Month()+1,'-'", "Date(),'-'",
 		"Hours(),'T'", "Minutes(),':'", "Seconds(),':'", "Milliseconds(),'.')+'Z'"
-	].join(")+X(this.getUTC"), ie678, function(n, b){ return b + ("00" + n).slice((b !== ".")-3) }))
+	].join(")+X(t.getUTC"), ie678, function(n, b){ return b + ("00" + n).slice((b !== ".")-3) }))
 
 
 	O = Function[P]
 	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4
-	patch("bind", "var t=this;b=S.call(arguments,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(S.call(arguments)))};if(t[P])c[P]=t[P];return c")
+	patch("bind", "b=S.call(arguments,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(S.call(arguments)))};if(t[P])c[P]=t[P];return c")
 
 
 	O = Object
-	patch("assign", "var t,k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
+	patch("assign", "var k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 	patch("create", "X[P]=a||Y;return new X", 0, function(){}, {
 		// oKeys is undefined at this point
 		constructor: oKeys, hasOwnProperty: oKeys, isPrototypeOf: oKeys, propertyIsEnumerable: oKeys,
@@ -267,7 +267,7 @@
 	patch("from", "a=typeof a==='string'?a.split(''):b?a:S.call(a);return b?a.map(b,c):a")
 
 	O = O[P]
-	a = "var t=this,l=t.length,o=[],i=-1;"
+	a = "var l=t.length,o=[],i=-1;"
 	c = "if(t[i]===a)return i;return -1"
 	patch("indexOf",     a + "i+=b|0;while(++i<l)" + c)
 	patch("lastIndexOf", a + "i=(b|0)||l;i>--l&&(i=l)||i<0&&(i+=l);++i;while(--i>-1)" + c)
@@ -292,7 +292,7 @@
 
 
 	O = String[P]
-	patch("trim", "return this.replace(/^\\s+|\\s+$/g,'')")
+	patch("trim", "return t.replace(/^\\s+|\\s+$/g,'')")
 
 
 	O = navigator
@@ -323,12 +323,12 @@
 		"~": "~a.split(/\\s+/).indexOf(v)",
 		"*": "~a.indexOf(v)"
 	}
-	, matches = patch("matches", "return!!X(a)(this)", 0, selectorFn)
-	, closest = patch("closest", "return X(this,'parentNode',a,1)", 0, walk)
+	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
+	, closest = patch("closest", "return X(t,'parentNode',a,1)", 0, walk)
 
 	// Note: querySelector in IE8 supports only CSS 2.1 selectors
-	patch("querySelector", (a = "return X(this,a,") + "1)", ie678, find)
-	patch("querySelectorAll", a + "0)", ie678, find)
+	patch((b="querySelector"), (a = "return X(t,a,") + "1)", ie678, find)
+	patch(b + "All", a + "0)", ie678, find)
 	//patch("addEventListener", function(ev, fn) { })
 	//patch("removeEventListener")
 
@@ -401,7 +401,7 @@
 	function patch(key, src, force, arg1, arg2) {
 		return !force && O[key] || (O[patched.push(key), key] = (
 			typeof src === "string" ?
-			Function("o,O,P,S,F,X,Y", "return function(a,b,c){" + src + "}")(hasOwn, O[key], P, aSlice, force, arg1, arg2) :
+			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this;" + src + "}")(hasOwn, O[key], P, aSlice, force, arg1, arg2) :
 			src || {}
 		))
 	}
