@@ -33,7 +33,7 @@
 		if (len === 1) {
 			if (e) {
 				firstEl = e.currentTarget || e.target
-				if (El.matches(e.target, "INPUT,TEXTAREA,SELECT,.no-drag")) return
+				if (e.button === 2 || El.matches(e.target, "INPUT,TEXTAREA,SELECT,.no-drag")) return
 			} else {
 				e = pointers[0]
 			}
