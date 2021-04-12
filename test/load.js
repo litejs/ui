@@ -62,6 +62,20 @@ describe("load.js", function() {
 	}
 
 	this
+	.should("log errors", function(assert, mock) {
+		assert.setTimeout(2000)
+		mock.time()
+		lib.onerror("fault1", "t1.js", 11, 12, {stack:"a\nb"})
+		mock.tick(400)
+		lib.onerror("fault2", "t2.js", 21, 22, {backtrace:"c\nd"})
+		lib.onerror("fault3", "t3.js", 31, 32, {stacktrace:"e\nf"})
+		var log = xhr.logErrors = mock.fn()
+		assert.equal(log.called, 0)
+		mock.tick(2000)
+		assert.equal(log.called, 1)
+		assert.equal(log.calls[0].args[0].length, 3)
+		assert.end()
+	})
 	.should("load nothing", function(assert) {
 		xhrRes = []
 		xhr.load([])
@@ -92,7 +106,8 @@ describe("load.js", function() {
 			assert.end()
 		})
 	})
-	.should("load one file twice", function(assert) {
+	.should("load one file twice", function(assert, mock) {
+		mock.time()
 		xhrRes = []
 		xhr.load(["d.js", "e.js", "f.js", "h.js"], function() {
 			assert.equal(xhrRes, ["var d", "var e"])
@@ -104,17 +119,7 @@ describe("load.js", function() {
 			assert.equal(xhrRes, ["var d", "var e"])
 			assert.end()
 		})
-	})
-	.should("send errors", function(assert, mock) {
-		assert.setTimeout(2000)
-		lib.onerror("fault1", "t1.js", 11, 12, {stack:"a\nb"})
-		lib.onerror("fault2", "t2.js", 21, 22, {backtrace:"c\nd"})
-		lib.onerror("fault3", "t3.js", 31, 32, {stacktrace:"e\nf"})
-		var log = xhr.logErrors = mock.fn()
-		setTimeout(function() {
-			assert.equal(log.called, 1)
-			assert.end()
-		}, 1400)
+		mock.tick(500)
 	})
 	.should("fall back to injection", function(assert, mock) {
 		xhrRes = []
