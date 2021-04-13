@@ -135,8 +135,8 @@
 	.Confirm.max.fix
 		.Confirm-bg.max.abs
 		.Confirm-content.grid.p2
-			.col.ts3 ;txt:: _(title)
-			.col.js-body ;txt:: _(body)
+			.col.ts3 ;txt:: _(title, map)
+			.col.js-body ;txt:: _(body, map)
 			.row.js-numpad
 				;if: code
 				;each: num in [1,2,3,4,5,6,7,8,9,"CLEAR",0]
