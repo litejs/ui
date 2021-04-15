@@ -2,7 +2,6 @@
 /* litejs.com/MIT-LICENSE.txt */
 
 
-
 !function(window, document, Object, Event, protoStr) {
 	var styleNode
 	, BIND_ATTR = "data-bind"
@@ -477,7 +476,10 @@
 				selector = null
 			}
 		}
-		if (delay > 0) return setTimeout(bindingOn, delay, el, events, selector, data, handler)
+		if (delay > 0) {
+			setTimeout(bindingOn, delay, el, events, selector, data, handler)
+			return
+		}
 		var fn = (
 			typeof handler == "string" ? function(e) {
 				var target = selector ? El.closest(e.target, selector) : el
@@ -515,15 +517,19 @@
 	}
 
 	function empty(el) {
-		for (var node; node = el.firstChild; ) {
-			kill(node)
-		}
+		for (var node; node = el.firstChild; kill(node));
 		return el
 	}
 
-	function kill(el) {
+	function kill(el, tr, delay) {
 		var id
 		if (el) {
+			if (delay) return setTimeout(kill, delay, el, tr)
+			if (tr) {
+				cls(el, tr, tr = "transitionend")
+				// transitionend fires for each property transitioned
+				if ("on" + tr in el) return addEvent(el, tr, kill.bind(el, el, el = null))
+			}
 			if (el._e) {
 				emitter.emit.call(el, "kill")
 				for (id in el._e) rmEvent(el, id)
@@ -926,14 +932,13 @@
 		if (map) {
 			kbMaps.unshift(map)
 			if (killEl) {
-				// addEvent(killEl, "kill", rmKb.bind(map, map))
 				emitter.on.call(killEl, "kill", rmKb.bind(map, map))
 			}
 		}
 	}
 	El.rmKb = rmKb
 	function rmKb(map) {
-		var i = kbMaps.indexOf(map||kbMaps[0])
+		var i = kbMaps.indexOf(map || kbMaps[0])
 		if (i > -1) kbMaps.splice(i, 1)
 	}
 
