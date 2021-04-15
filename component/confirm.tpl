@@ -4,31 +4,25 @@
 		z-index: 9;
 	}
 	.Confirm-bg {
-		background-color: #000;
-		opacity: .6;
+		backdrop-filter: blur(5px);
+		background-color: rgba(0, 0, 0, .6);
 	}
 	.Confirm-content {
 		position: absolute;
 		left: 0;
 		right: 0;
 		margin: 0 auto;
-		top: 60px;
+		top: 4%;
 		width: 400px;
 		background-color: #fff;
 		box-shadow: 0 2px 10px 2px rgba(255,255,255,.5);
-		animation: .2s cubic-bezier(.2, -.3, .8, 0) reverse Confirm--blur;
 	}
 	.sm .Confirm-content {
-		width: 100%;
+		width: 94%;
 	}
 	.Confirm--blur {
-		animation: .2s cubic-bezier(.2, 1, .8, 1.3) forwards Confirm--blur;
-	}
-	@keyframes Confirm--blur {
-		to {
-			filter: blur(4px);
-			transform: scale(.9);
-		}
+		transform: scale(.85);
+		transform-origin: 50% 100vh;
 	}
 
 // reverse animation: x1, y1, x2, y2 -> (1 - x2), (1 - y2), (1 - x1), (1 - y1)
@@ -75,6 +69,7 @@
 		, scope = El.scope(el, El.data)
 		, kbMap = {}
 		, body = document.body
+		, blurEl = body.lastChild
 		Object.assign(scope, opts)
 		scope.title = title || "Confirm?"
 		if (!scope.actions) scope.actions = [
@@ -84,7 +79,8 @@
 			if (typeof a == "string") a = scope.actions[i-1] = {title:a,action:a}
 			if (a.key) kbMap[a.key] = resolve.bind(el, el, a.action)
 		}
-		El.cls(body.lastChild, "Confirm--blur")
+		El.cls(blurEl, "Confirm--blur")
+		El.cls(el.lastChild, "Confirm--blur", 0, 1)
 		El.append(body, el)
 		El.render(el, scope)
 		if (scope.code) {
@@ -115,10 +111,8 @@
 		}
 		function resolve(e, key) {
 			if (el) {
-				El.rmKb(kbMap)
-				El.kill(el)
-				El.cls(body.lastChild, "Confirm--blur", 0)
-				el = null
+				El.kill(el, "transparent")
+				El.cls(blurEl, "Confirm--blur", el = 0)
 				var action = key || El.attr(this, "data-action")
 				if (action && next) {
 					if (typeof next === "function") next(action, code)
@@ -132,9 +126,9 @@
 	})
 
 %el Confirm
-	.Confirm.max.fix
+	.Confirm.max.fix.anim
 		.Confirm-bg.max.abs
-		.Confirm-content.grid.p2
+		.Confirm-content.Confirm--blur.grid.p2.anim
 			.col.ts3 ;txt:: _(title, map)
 			.col.js-body ;txt:: _(body, map)
 			.row.js-numpad
