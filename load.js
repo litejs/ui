@@ -69,8 +69,8 @@
 	}
 
 	function sendErrors() {
-		if (xhr.logErrors) {
-			xhr.logErrors(unsentErrors)
+		if (xhr.err) {
+			xhr.err(unsentErrors)
 		} else {
 			setTimeout(sendErrors, 1307)
 		}
