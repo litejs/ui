@@ -24,7 +24,7 @@
 // XDomainRequest is a CORS implementation in IE8/9 and was removed in IE10 in favor of using XMLHttpRequest with proper CORS
 // IE does not allow to add arbitrary properties to ActiveX objects.
 // IE does not allow to assign or read the readystatechange after the send().
-// Last version-independent ProgID with 3.0 is good enough (MSXML2 is supported from IE4.01).
+// Last version-independent ProgID with 3.0 is good enough (MSXML2 namespace is supported from IE6).
 // MSXML 6.0 has improved XSD, deprecated several legacy features
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
@@ -32,7 +32,9 @@
 	xhr._s = new Date
 	var loaded = {}
 	, urlEscRe = /[+#\s]+/g
-	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('MSXML2.XMLHTTP')")
+	/*** activex ***/
+	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
+	/**/
 	, execScript = window.execScript ||
 	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
