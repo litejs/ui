@@ -2,6 +2,22 @@
 /* litejs.com/MIT-LICENSE.txt */
 
 
+// IE5 does not support
+//  - Array#push/pop
+//  - Function#call
+//  - encodeURIComponent
+//  - RegExp lookahead /(?=a)/ and non-greedy modifiers /a+?/
+//  - if ("key" in map) and hasOwnProperty
+
+// IE5.5-IE7 Patched: 41
+// Event, pointer, setTimeout, setInterval, sessionStorage, localStorage, requestAnimationFrame, cancelAnimationFrame, console, JSON, matchMedia, performance, p:now, timing, d:now, toJSON, toISOString, bind, assign, create, entries, keys, values, toString, isArray, from, indexOf, lastIndexOf, reduce, reduceRight, every, forEach, map, filter, some, trim, sendBeacon, matches, closest, querySelector, querySelectorAll
+// IE8 Patched: 38
+// Event, pointer, setTimeout, setInterval, requestAnimationFrame, cancelAnimationFrame, console, matchMedia, performance, p:now, timing, d:now, toJSON, toISOString, bind, assign, create, entries, keys, values, toString, isArray, from, indexOf, lastIndexOf, reduce, reduceRight, every, forEach, map, filter, some, trim, sendBeacon, matches, closest, querySelector, querySelectorAll
+// IE10 Patched: 9
+// Event, pointer:MS, assign, entries, values, from, sendBeacon, matches, closest
+// IE11 Patched: 8
+// Event, assign, entries, values, from, sendBeacon, matches, closest
+
 
 !function(window, Function) {
 	// window.PointerEvent  - Chrome55, Edge12, Firefox59, Safari13,   IE11

@@ -35,7 +35,8 @@ describe("polyfill", function() {
 		})
 		var lib = require("../polyfill/index.js")
 		/*/
-		lib = window
+
+		var lib = window
 		//*/
 
 
@@ -115,7 +116,6 @@ describe("polyfill", function() {
 
 		assert.equal(document.body.querySelector.call(document.documentElement, "body").tagName, "BODY")
 		assert.equal(document.body.querySelectorAll.call(document.documentElement, "body").length, 1)
-		assert.equal(document.body.querySelectorAll.call(document.documentElement, "script").length, 4)
 		assert.equal(document.body.matches("BODY"), true)
 		assert.equal(document.body.matches("HTML"), false)
 		assert.end()
