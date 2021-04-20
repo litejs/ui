@@ -214,6 +214,8 @@
 	// window.msRequestAnimationFrame     || // IE 10 PP2+
 	patch("cancelAnimationFrame", "clearTimeout(a)")
 
+	// IE8 has console, however, the console object does not exist if the console is not opened.
+	patch("console", {log: nop, error: nop})
 
 
 	function jsonFn(str) {
@@ -262,7 +264,7 @@
 
 	O = Object
 	patch("assign", "var k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
-	patch("create", "X[P]=a||Y;return new X", 0, function(){}, {
+	patch("create", "X[P]=a||Y;return new X", 0, nop, {
 		// oKeys is undefined at this point
 		constructor: oKeys, hasOwnProperty: oKeys, isPrototypeOf: oKeys, propertyIsEnumerable: oKeys,
 		toLocaleString: oKeys, toString: oKeys, valueOf: oKeys
@@ -416,6 +418,7 @@
 	function isFn(f) {
 		return typeof f === "function"
 	}
+	function nop() {}
 
 	function patch(key, src, force, arg1, arg2) {
 		return !force && O[key] || (O[patched.push(key), key] = (
