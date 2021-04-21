@@ -247,11 +247,11 @@
 	/**/
 
 	O = patch("performance")
-	patch("now", (a = "return+new Date") + "-X", 0, new Date())
+	patch("p:now", (a = "return+new Date") + "-X", 0, new Date())
 	patch("timing")
 
 	O = Date
-	patch("now", a)
+	patch("d:now", a)
 
 	O = O[P]
 	// IE8 toJSON does not return milliseconds
@@ -424,8 +424,9 @@
 	}
 	function nop() {}
 
-	function patch(key, src, force, arg1, arg2) {
-		return !force && O[key] || (O[patched.push(key), key] = (
+	function patch(key_, src, force, arg1, arg2) {
+		var key = key_.split(":").pop()
+		return !force && O[key] || (O[patched.push(key_), key] = (
 			typeof src === "string" ?
 			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this;" + src + "}")(hasOwn, O[key], P, aSlice, force, arg1, arg2) :
 			src || {}
