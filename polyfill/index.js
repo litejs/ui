@@ -242,6 +242,10 @@
 		}
 	})
 
+	/*** ie9 ***/
+	patch("matchMedia", "b=a||'all';return{media:b,matches:X?X.matchMedium(b):!1,addEventListener:Y}", 0, window.styleMedia || window.media, nop)
+	/**/
+
 	O = patch("performance")
 	patch("now", (a = "return+new Date") + "-X", 0, new Date())
 	patch("timing")
