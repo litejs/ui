@@ -35,7 +35,9 @@
 	/*** activex ***/
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
 	/**/
-	, execScript = window.execScript ||
+	, execScript =
+		// IE5-10, Chrome1-12
+		window.execScript ||
 	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
 		Function("e,eval", "try{return e('eval')==e&&e}catch(e){}")(eval) ||
@@ -225,6 +227,7 @@
 
 		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file]) {
 			if (loaded[file]) {
+				// Same file requested again
 				;(loaded[file].x || (loaded[file].x = [])).push(cb, file, i)
 			} else {
 				// FireFox 3 throws on `xhr.send()` without arguments
@@ -252,6 +255,10 @@
 			}
 			if (res[pos] === "" || !files[pos]) {
 				if (++pos < len) exec()
+				/*** inject ***/
+				// inject can be async
+				else if (pos === len) setTimeout(exec, 1)
+				/**/
 				else {
 					if (next) next()
 					if (res = cb.x) {
