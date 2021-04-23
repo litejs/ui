@@ -20,6 +20,7 @@
 
 
 !function(window, Function) {
+
 	// window.PointerEvent  - Chrome55, Edge12, Firefox59, Safari13,   IE11
 	// navigator.sendBeacon - Chrome39, Edge14, Firefox31, Safari11.1
 	// Object.fromEntries   - Chrome73, Edge79, Firefox63, Safari12.1, Opera60, Node.js12.0.0
@@ -28,7 +29,7 @@
 	var isArr, oKeys
 	, P = "prototype"
 	, O = window
-	, patched = (window.xhr || window)._patched = []
+	, patched = (window.xhr || window)._p = []
 	, aSlice = patched.slice
 	, jsonRe = /[\x00-\x1f\x22\x5c]/g
 	, JSONmap = {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t",'"':'\\"',"\\":"\\\\"}
@@ -47,8 +48,8 @@
 		EV,
 		"c=F.createEventObject(event),b=c.buttons=c.button;c.button=b==1?0:b==4?1:b;c.preventDefault=X;c.stopPropagation=Y;c.target=c.srcElement;c.type=a;return c",
 		!isFn(O[EV]) && document,
-		function(){ event.returnValue = false },
-		function(){ event.cancelBubble = event.cancel = true }
+		Function("event.returnValue=!1"),
+		Function("event.cancelBubble=event.cancel=!0")
 	)
 	, wheelDiff = 120
 	, fixEv = Event.fixEv = {
