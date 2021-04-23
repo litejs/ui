@@ -26,9 +26,6 @@
 	// queueMicrotask       - Chrome71, Edge79, Firefox69, Safari12.1
 
 	var isArr, oKeys
-	, a, b, c
-	// JScript engine in IE<9 does not recognize vertical tabulation character
-	, ie678 = !+"\v1"
 	, P = "prototype"
 	, O = window
 	, patched = (window.xhr || window)._patched = []
@@ -39,6 +36,12 @@
 	, esc = escape
 	, document = patch("document", {body:{}})
 	, navigator = patch("navigator")
+	// JScript engine in IE<9 does not recognize vertical tabulation character
+	// The documentMode is an IE only property, supported from IE8
+	, a = document.documentMode | 0, b, c
+	, ie678 = !+"\v1" && a < 9
+	, ie6789 = ie678 || a == 9
+	, ie67 = ie678 && a < 8
 	, EV = "Event"
 	, Event = patch(
 		EV,
@@ -155,6 +158,10 @@
 	// Ignore FF3 escape second non-standard argument
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
 	patch("escape", "return X(a)", esc("a", 0) != "a", esc)
+
+	// Patch parameters support for setTimeout callback
+	patch("setTimeout", (a = "var A=arguments;return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFn)
+	patch("setInterval", a, ie6789, isFn)
 
 	function createStorage(name) {
 		try {
@@ -408,9 +415,6 @@
 	// ie6789
 	// The documentMode is an IE only property, supported from IE8.
 	if (ie678 || document.documentMode <= 9) {
-		// Patch parameters support for setTimeout callback
-		patch("setTimeout", (a = "var A=arguments;return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), 1, isFn)
-		patch("setInterval", a, 1, isFn)
 		try {
 			// Remove background image flickers on hover in IE6
 			// You could also use CSS

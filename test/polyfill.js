@@ -1,9 +1,11 @@
 
-describe("polyfill", function() {
+describe("Browser test", function() {
 
 	this
-	.test("wait", function(assert) {
-		setTimeout(assert.end, 1)
+	.test("setTimeout parameters", function(assert) {
+		setTimeout(function(a) {
+			assert.equal(a, 2).end()
+		}, 1, 2)
 	})
 	.test("index.js", function(assert, mock) {
 
