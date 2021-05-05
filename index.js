@@ -1,5 +1,5 @@
 /*
-* @version  21.4.0
+* @version  21.5.0
 * @author   Lauri Rooden <lauri@rooden.ee>
 * @license  MIT License
 */
@@ -899,6 +899,10 @@
 							view.wait(tmp.file = null)
 						)
 					} else {
+						if (tmp.route == "404") {
+							El.txt(tmp = El("h3"), "# Error 404")
+							View("404", tmp, "#body")
+						}
 						View("404").show({origin:params})
 					}
 					return

@@ -24,7 +24,7 @@
 // XDomainRequest is a CORS implementation in IE8/9 and was removed in IE10 in favor of using XMLHttpRequest with proper CORS
 // IE does not allow to add arbitrary properties to ActiveX objects.
 // IE does not allow to assign or read the readystatechange after the send().
-// Last version-independent ProgID with 3.0 is good enough (MSXML2 is supported from IE4.01).
+// Last version-independent ProgID with 3.0 is good enough (MSXML2 namespace is supported from IE6).
 // MSXML 6.0 has improved XSD, deprecated several legacy features
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
@@ -32,8 +32,12 @@
 	xhr._s = new Date
 	var loaded = {}
 	, urlEscRe = /[+#\s]+/g
-	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('MSXML2.XMLHTTP')")
-	, execScript = window.execScript ||
+	/*** activex ***/
+	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
+	/**/
+	, execScript =
+		// IE5-10, Chrome1-12
+		window.execScript ||
 	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
 		Function("e,eval", "try{return e('eval')==e&&e}catch(e){}")(eval) ||
@@ -223,6 +227,7 @@
 
 		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file]) {
 			if (loaded[file]) {
+				// Same file requested again
 				;(loaded[file].x || (loaded[file].x = [])).push(cb, file, i)
 			} else {
 				// FireFox 3 throws on `xhr.send()` without arguments
@@ -250,6 +255,10 @@
 			}
 			if (res[pos] === "" || !files[pos]) {
 				if (++pos < len) exec()
+				/*** inject ***/
+				// inject can be async
+				else if (pos === len) setTimeout(exec, 1)
+				/**/
 				else {
 					if (next) next()
 					if (res = cb.x) {
@@ -261,7 +270,7 @@
 	}
 
 	load([
-		//!{loadFiles}
+		"min/0.css",(!window.PointerEvent||!navigator.sendBeacon)&&"min/0.js?1620214146567","min/1.js?h=1620214146567","min/2.js?1620214146567","min/3.js?1620214146567"
 	])
 	/**/
 
