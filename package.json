@@ -1,6 +1,6 @@
 {
   "name": "@litejs/ui",
-  "version": "21.5.0",
+  "version": "21.6.0",
   "description": "UI engine for LiteJS full-stack framework",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -30,7 +30,7 @@
     "maxdepth": 6,
     "quotmark": "double"
   },
-  "nyc": {
+  "c8": {
     "check-coverage": true,
     "branches": 100,
     "lines": 100,
