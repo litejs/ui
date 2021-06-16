@@ -336,10 +336,16 @@
 	function acceptMany(fn, getter) {
 		return function f(el, name, val, delay) {
 			if (el && name) {
-				if (delay > 0) return setTimeout(f, delay, el, name, val)
+				if (delay >= 0) {
+					if (delay > 0) setTimeout(f, delay, el, name, val)
+					else requestAnimationFrame(function() {
+						f(el, name, val)
+					})
+					return
+				}
 				if (name.constructor === Object) {
 					for (i in name) {
-						if (hasOwn.call(name, i)) f(el, i, name[i])
+						if (hasOwn.call(name, i)) f(el, i, name[i], val)
 					}
 					return
 				}
@@ -524,7 +530,7 @@
 	function kill(el, tr, delay) {
 		var id
 		if (el) {
-			if (delay) return setTimeout(kill, delay, el, tr)
+			if (delay > 0) return setTimeout(kill, delay, el, tr)
 			if (tr) {
 				cls(el, tr, tr = "transitionend")
 				// transitionend fires for each property transitioned

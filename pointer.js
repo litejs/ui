@@ -67,11 +67,15 @@
 		El.emit(firstEl, "pan", e, firstPos, firstEl)
 		if (!firstPos.cancel) {
 			if (firstEl.getBBox) {
-				firstEl.setAttributeNS(null, "x", firstPos.leftPos)
-				firstEl.setAttributeNS(null, "y", firstPos.topPos)
+				El.attr(firstEl, {
+					x: firstPos.leftPos,
+					y: firstPos.topPos
+				}, 0)
 			} else {
-				firstEl.style.left = firstPos.leftPos + "px"
-				firstEl.style.top = firstPos.topPos + "px"
+				El.css(firstEl, {
+					left: firstPos.leftPos + "px",
+					top: firstPos.topPos + "px"
+				}, 0)
 			}
 		}
 	}
