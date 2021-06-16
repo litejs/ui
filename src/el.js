@@ -584,14 +584,14 @@
 
 			fn = "data b s B r->data&&(" + bind.replace(renderRe, function(match, name, op, args) {
 				scope._m[i] = match
-				var fn = bindings[name]
+				match = bindings[name]
 				return (
-					(op == ":" || fn && hasOwn.call(fn, "once")) ?
+					(op == ":" || match && hasOwn.call(match, "once")) ?
 					"s(this,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
 					""
 				) + (
-					fn ?
-					"b['" + name + "'].call(data,this" + (fn.raw ? ",'" + args + "'" : args ? "," + args : "") :
+					match ?
+					"b['" + name + "'].call(data,this" + (match.raw ? ",'" + args + "'" : args ? "," + args : "") :
 					"s(this,'" + name + "'," + args
 				) + ")||"
 			}) + "r)"
@@ -654,10 +654,10 @@
 	}
 
 	wrapProto.cloneNode = function(deep) {
-		var clone = new ElWrap(this, deep)
-		clone._ca = this._ca
-		//clone._cb = this._cb
-		return clone
+		deep = new ElWrap(this, deep)
+		deep._ca = this._ca
+		//deep._cb = this._cb
+		return deep
 	}
 
 	El.append = append
@@ -938,8 +938,8 @@
 	}
 	El.rmKb = rmKb
 	function rmKb(map) {
-		var i = kbMaps.indexOf(map || kbMaps[0])
-		if (i > -1) kbMaps.splice(i, 1)
+		map = kbMaps.indexOf(map || kbMaps[0])
+		if (map > -1) kbMaps.splice(map, 1)
 	}
 
 	addEvent(document, "keydown", kbDown)

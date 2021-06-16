@@ -20,11 +20,11 @@
 	).replace(/\w+/g, populateSvgElements)
 
 	//http://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
-	function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-		var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0
+	function polarToCartesian(centerX, centerY, radius, angle/*InDegrees*/) {
+		angle/*InRadians*/ = (angle - 90) * Math.PI / 180.0
 		return {
-			x: centerX + (radius * Math.cos(angleInRadians)),
-			y: centerY + (radius * Math.sin(angleInRadians))
+			x: centerX + (radius * Math.cos(angle)),
+			y: centerY + (radius * Math.sin(angle))
 		}
 	}
 	function describeArc(x, y, radius, startAngle, endAngle) {
