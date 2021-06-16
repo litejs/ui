@@ -20,7 +20,7 @@
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
 	, bindings = El.bindings = {
-		attr: setAttr,
+		attr: El.attr = acceptMany(setAttr, getAttr),
 		cls: El.cls = acceptMany(cls),
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
@@ -151,10 +151,6 @@
 
 	function camelFn(_, a) {
 		return a.toUpperCase()
-	}
-
-	El.attr = function(el, key, val) {
-		return arguments.length < 3 && key.constructor != Object ? getAttr(el, key) : setAttr(el, key, val)
 	}
 
 	function getAttr(el, key) {
