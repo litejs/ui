@@ -126,6 +126,7 @@
 		}
 		if (model && path) {
 			match = i18n.pick(state != null ? state : model.get(path), list)
+			path += "-" + list
 			El.cls(node, scope["_is-" + path], 0)
 			El.cls(node, scope["_is-" + path] = match && "is-" + match)
 		}
