@@ -5,10 +5,10 @@
 
 [size]: https://packagephobia.now.sh/badge?p=@litejs/ui
 [size-src]: https://packagephobia.now.sh/result?p=@litejs/ui
+[wiki]: https://github.com/litejs/ui/wiki
 
 
-[LiteJS][] is a full-stack web framework in a tiny package.
-It is split into three main packages by designated install location:
+[LiteJS][] full-stack framework is split into three main packages by designated install location:
 
  - **[litejs][LiteJS]** - Server and core libraries installed as `dependencies`
  - **[@litejs/ui][UI]** - UI engine installed as `devDependencies` and bundled into your app
