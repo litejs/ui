@@ -125,10 +125,10 @@
 			model = scope.model
 		}
 		if (model && path) {
-			match = i18n.pick(state != null ? state : model.get(path), list)
+			match = i18n.pick(state !== match ? state : model.get(path), list)
 			path += "-" + list
-			El.cls(node, scope["_is-" + path], 0)
-			El.cls(node, scope["_is-" + path] = match && "is-" + match)
+			El.cls(node, node["_is-" + path], 0)
+			El.cls(node, node["_is-" + path] = match && "is-" + match)
 		}
 	}
 
