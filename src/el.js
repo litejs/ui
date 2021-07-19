@@ -3,7 +3,7 @@
 
 
 !function(window, document, Object, Event, protoStr) {
-	var styleNode
+	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
 	, isArray = Array.isArray
 	, seq = 0
@@ -96,6 +96,10 @@
 	 * <input id="12" class="nice class" type="checkbox" checked="checked" disabled="disabled" data-lang="en">
 	 */
 
+	function isObject(obj) {
+		return obj && obj.constructor === Object
+	}
+
 	window.El = El
 
 	function El(name) {
@@ -160,7 +164,7 @@
 	function setAttr(el, key, val) {
 		var current
 
-		if (key && key.constructor == Object) {
+		if (isObject(key)) {
 			for (current in key) {
 				setAttr(el, current, key[current])
 			}
@@ -231,7 +235,7 @@
 
 			for (; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
 				value = valFn(input)
-				if (value !== void 0) {
+				if (value !== UNDEF) {
 					step = opts
 					key.replace(/\[(.*?)\]/g, function(_, _key, offset) {
 						if (step == opts) key = key.slice(0, offset)
@@ -274,8 +278,8 @@
 		}
 
 		return checkbox && !el.checked ?
-		(type === "radio" ? void 0 : null) :
-		el.valObject !== void 0 ? el.valObject : el.value
+		(type === "radio" ? UNDEF : null) :
+		el.valObject !== UNDEF ? el.valObject : el.value
 	}
 
 	function append(el, child, before) {
@@ -339,7 +343,7 @@
 					})
 					return
 				}
-				if (name.constructor === Object) {
+				if (isObject(name)) {
 					for (i in name) {
 						if (hasOwn.call(name, i)) f(el, i, name[i], val)
 					}
@@ -428,7 +432,7 @@
 		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
 		, fix = prefix ? function() {
 			var e = new Event(ev)
-			if (e.clientX !== void 0) {
+			if (e.clientX !== UNDEF) {
 				e.pageX = e.clientX + scrollLeft()
 				e.pageY = e.clientY + scrollTop()
 			}
@@ -543,11 +547,11 @@
 				return el.kill && el.kill()
 			}
 			empty(el)
-			if (id = el._scope) {
-				delete elScope[id]
+			if (el._scope !== UNDEF) {
+				delete elScope[el._scope]
 			}
-			if (el.valObject) {
-				el.valObject = null
+			if (el.valObject !== UNDEF) {
+				el.valObject = UNDEF
 			}
 		}
 	}
@@ -801,10 +805,7 @@
 
 				JSON.parse(this.params)
 				.each(function(val) {
-					if (!val || val.constructor != Object) {
-						val = { item: val }
-					}
-					parseTemplate(txt.format(val))
+					parseTemplate(txt.format(isObject(val) ? val : { item: val }))
 				})
 			}
 		}),
