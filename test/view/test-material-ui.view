@@ -48,7 +48,6 @@
 				;on: "click", "timerTest"
 			.col-9
 				Slider[range="1:10:.5"]
-					;SliderVal: 0, 0, "1:10:.5"
 				br
 				Slider2.no-first[style="width:400px"]
 				br

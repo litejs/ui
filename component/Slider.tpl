@@ -144,21 +144,6 @@
 %js
 	var on = El.on
 	, off = El.off
-	El.bindings.SliderVal = function(el, model, path, range) {
-		if (range) {
-			El.attr(el, "range", range)
-		}
-		if (path) {
-			if (path.charAt(0)!=="/") path = "/" + path.replace(/\./g, "/")
-			model.on("change:" + path, set)
-			setTimeout(function(){
-				set(model.get(path))
-			}, 10)
-		}
-		function set(val) {
-			el.set(parseFloat(val) || 0)
-		}
-	}
 	El.bindings.SliderInit = function(el) {
 		var knobLen, offset, px, drag, min, max, step, minPx, maxPx, value
 		, vert = El.hasClass(el, "is-vertical")
@@ -167,9 +152,11 @@
 		, knob = fill.lastChild
 		, emit = El.emit.bind(el, el, "change").rate(500, true)
 		on(window, "blur", stop)
-		function load(e) {
-			var tmp
-			, attr = vert ? "offsetHeight" : "offsetWidth"
+		on(el, "pointerdown", start)
+		el.val = set
+		setTimeout(function() { set(value||0) }, 10)
+		function load() {
+			var attr = vert ? "offsetHeight" : "offsetWidth"
 			, range = (El.attr(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
 			min = +(range[0] || 0)
 			max = +(range[1] || 100)
@@ -178,13 +165,15 @@
 			minPx = 0
 			maxPx = track[attr] - knobLen - knobLen
 			px = maxPx / (max - min)
-			offset = el.getBoundingClientRect()
-			offset = (vert ? offset.top + maxPx + El.scrollTop() : offset.left + El.scrollLeft()) + knobLen
-			if (e) {
-				tmp = offset - e.clientX + (value-min||0)*px
-				if (tmp < knobLen && tmp > -knobLen) offset -= tmp
-			}
-			if (e && track.childNodes.length > 1) {
+		}
+		function start(e) {
+			drag = true
+			load()
+			var tmp = el.getBoundingClientRect()
+			offset = (vert ? tmp.top + maxPx + El.scrollTop() : tmp.left + El.scrollLeft()) + knobLen
+			tmp = offset - e.clientX + (value-min||0)*px
+			if (tmp < knobLen && tmp > -knobLen) offset -= tmp
+			if (track.childNodes.length > 1) {
 				fill = track.firstChild
 				var next
 				, x = maxPx
@@ -207,24 +196,21 @@
 					if (range[3]) minPx += px * range[3]
 				}
 			}
-		}
-		function start(e) {
-			drag = true
-			load(e)
 			move(e)
 			listen(on)
 		}
 		function move(e) {
 			var diff = vert ? offset - e.pageY : e.pageX - offset
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
-			el.set((diff / px) + min, e, diff)
+			set((diff / px) + min, e, diff)
 			return Event.stop(e)
 		}
 		function stop(e) {
-			if (!drag) return
-			drag = false
-			listen(off)
-			el.set(value, e)
+			if (drag) {
+				drag = false
+				listen(off)
+				set(value)
+			}
 		}
 		function listen(on) {
 			El.cls(fill, "anim", !drag)
@@ -232,22 +218,21 @@
 			on(document, "pointerup", stop)
 			on(document, "pointermove", move)
 		}
-		el.set = function(val, e, pos) {
-			px || load()
+		function set(val, e, pos) {
+			load()
 			val = (val < min ? min : val > max ? max : val).step(step)
+			if (value !== void 0 && (!drag || pos !== void 0)) {
+				El.css(fill, vert ? "height" : "width", ((pos || (val-min)*px)+knobLen) + "px", 0)
+			}
 			if (value !== val) {
 				el.value = value = val
 				if (drag && e) emit(e)
 				var format = El.attr(el, "format")
-				El.attr(knob, "data-val", format ? format.format({val:val}) : val)
-			}
-			if (!drag || pos !== void 0) {
-				fill.style[vert ? "height" : "width"] = ((pos || (value-min)*px)+knobLen) + "px"
+				El.attr(knob, "data-val", format ? _(format, {val:val}) : val)
 			}
 		}
-		on(el, "pointerdown", start)
 	}
-	El.bindings.SliderInit.once = El.bindings.SliderVal.once = 1
+	El.bindings.SliderInit.once = 1
 
 %el Slider
 	button.Slider.reset ;SliderInit
