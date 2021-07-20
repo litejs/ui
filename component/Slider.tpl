@@ -170,7 +170,7 @@
 			drag = true
 			load()
 			var tmp = el.getBoundingClientRect()
-			offset = (vert ? tmp.top + maxPx + El.scrollTop() : tmp.left + El.scrollLeft()) + knobLen
+			offset = (vert ? tmp.top + maxPx + El.scrollTop() + knobLen : tmp.left + El.scrollLeft()) + knobLen
 			tmp = offset - e.clientX + (value-min||0)*px
 			if (tmp < knobLen && tmp > -knobLen) offset -= tmp
 			if (track.childNodes.length > 1) {
