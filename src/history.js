@@ -51,12 +51,13 @@
 		/*** PUSH ***/
 		}
 		/**/
-		checkUrl()
+		return checkUrl()
 	}
 
 	function checkUrl() {
-		if (lastRoute != (lastRoute = getUrl()) && cb) {
-			cb(lastRoute)
+		if (lastRoute != (lastRoute = getUrl())) {
+			if (cb) cb(lastRoute)
+			return true
 		}
 	}
 
