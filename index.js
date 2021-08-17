@@ -1,5 +1,5 @@
 /*
-* @version  21.6.0
+* @version  21.8.0
 * @author   Lauri Rooden <lauri@rooden.ee>
 * @license  MIT License
 */
@@ -555,7 +555,8 @@
 		for (k in obj) if (typeof obj[k] == "function" && ignore.indexOf(k) < 0) !function(k) {
 			hooked.push(k, hasOwn.call(obj, k) && obj[k])
 			obj[k] = function() {
-				hooks.push(k, arguments)
+				if (hooks === null) obj[k].apply(this, arguments)
+				else hooks.push(k, arguments)
 				return obj
 			}
 		}(k)
@@ -731,12 +732,13 @@
 		/*** PUSH ***/
 		}
 		/**/
-		checkUrl()
+		return checkUrl()
 	}
 
 	function checkUrl() {
-		if (lastRoute != (lastRoute = getUrl()) && cb) {
-			cb(lastRoute)
+		if (lastRoute != (lastRoute = getUrl())) {
+			if (cb) cb(lastRoute)
+			return true
 		}
 	}
 
@@ -805,13 +807,14 @@
 
 
 !function(exports) {
-	var fn, lastView, lastParams, lastStr, lastUrl, syncResume
+	var fn, lastView, lastStr, lastUrl, syncResume
 	, isArray = Array.isArray
 	, capture = 1
 	, fnStr = ""
 	, reStr = ""
 	, views = View.views = {}
 	, paramCb = {}
+	, lastParams = paramCb
 	, hasOwn = views.hasOwnProperty
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
@@ -990,7 +993,7 @@
 				"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
 			)()
 		}
-		return View(fn(url || View.home, params || {}, "404"))
+		return View(url ? fn(url, params || {}, "404") : View.home)
 	}
 
 	View.ping = function(name, fn) {
@@ -1057,7 +1060,7 @@
 
 
 !function(window, document, Object, Event, protoStr) {
-	var styleNode
+	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
 	, isArray = Array.isArray
 	, seq = 0
@@ -1150,6 +1153,10 @@
 	 * <input id="12" class="nice class" type="checkbox" checked="checked" disabled="disabled" data-lang="en">
 	 */
 
+	function isObject(obj) {
+		return obj && obj.constructor === Object
+	}
+
 	window.El = El
 
 	function El(name) {
@@ -1214,7 +1221,7 @@
 	function setAttr(el, key, val) {
 		var current
 
-		if (key && key.constructor == Object) {
+		if (isObject(key)) {
 			for (current in key) {
 				setAttr(el, current, key[current])
 			}
@@ -1285,7 +1292,7 @@
 
 			for (; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
 				value = valFn(input)
-				if (value !== void 0) {
+				if (value !== UNDEF) {
 					step = opts
 					key.replace(/\[(.*?)\]/g, function(_, _key, offset) {
 						if (step == opts) key = key.slice(0, offset)
@@ -1328,8 +1335,8 @@
 		}
 
 		return checkbox && !el.checked ?
-		(type === "radio" ? void 0 : null) :
-		el.valObject !== void 0 ? el.valObject : el.value
+		(type === "radio" ? UNDEF : null) :
+		el.valObject !== UNDEF ? el.valObject : el.value
 	}
 
 	function append(el, child, before) {
@@ -1393,7 +1400,7 @@
 					})
 					return
 				}
-				if (name.constructor === Object) {
+				if (isObject(name)) {
 					for (i in name) {
 						if (hasOwn.call(name, i)) f(el, i, name[i], val)
 					}
@@ -1482,7 +1489,7 @@
 		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
 		, fix = prefix ? function() {
 			var e = new Event(ev)
-			if (e.clientX !== void 0) {
+			if (e.clientX !== UNDEF) {
 				e.pageX = e.clientX + scrollLeft()
 				e.pageY = e.clientY + scrollTop()
 			}
@@ -1597,11 +1604,11 @@
 				return el.kill && el.kill()
 			}
 			empty(el)
-			if (id = el._scope) {
-				delete elScope[id]
+			if (el._scope !== UNDEF) {
+				delete elScope[el._scope]
 			}
-			if (el.valObject) {
-				el.valObject = null
+			if (el.valObject !== UNDEF) {
+				el.valObject = UNDEF
 			}
 		}
 	}
@@ -1855,10 +1862,7 @@
 
 				JSON.parse(this.params)
 				.each(function(val) {
-					if (!val || val.constructor != Object) {
-						val = { item: val }
-					}
-					parseTemplate(txt.format(val))
+					parseTemplate(txt.format(isObject(val) ? val : { item: val }))
 				})
 			}
 		}),
