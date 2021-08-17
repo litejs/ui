@@ -4,13 +4,14 @@
 
 
 !function(exports) {
-	var fn, lastView, lastParams, lastStr, lastUrl, syncResume
+	var fn, lastView, lastStr, lastUrl, syncResume
 	, isArray = Array.isArray
 	, capture = 1
 	, fnStr = ""
 	, reStr = ""
 	, views = View.views = {}
 	, paramCb = {}
+	, lastParams = paramCb
 	, hasOwn = views.hasOwnProperty
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
@@ -189,7 +190,7 @@
 				"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
 			)()
 		}
-		return View(fn(url || View.home, params || {}, "404"))
+		return View(url ? fn(url, params || {}, "404") : View.home)
 	}
 
 	View.ping = function(name, fn) {
