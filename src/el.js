@@ -572,6 +572,7 @@
 	}
 
 	function render(node, _scope) {
+		if (!node) return
 		var bind, fn
 		, scope = elScope(node, 0, _scope)
 		, i = 0
