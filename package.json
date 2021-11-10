@@ -22,7 +22,7 @@
     "css"
   ],
   "litejs": {
-    "build": "--out=test/index.html test/dev.html"
+    "build": "lj b --out=test/index.html test/dev.html"
   },
   "jshintConfig": {
     "asi": true,
