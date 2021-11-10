@@ -140,13 +140,11 @@
 	}
 	.btn:hover,
 	.btn:focus {
-		background-color: #eee;
-		color: #333;
+		filter: brightness(1.3) saturate(1.2);
 		text-decoration: none;
 	}
 	.btn:active,
 	.btn.is-active {
-		background-color: #ccc;
 		box-shadow: inset 0 0 8px rgba(0, 0, 0, .5);
 	}
 
