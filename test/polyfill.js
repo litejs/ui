@@ -31,6 +31,7 @@ describe("Browser test", function() {
 			entries: null,
 			every: null,
 			filter: null,
+			flat: null,
 			forEach: null,
 			indexOf: null,
 			lastIndexOf: null,
@@ -109,6 +110,14 @@ describe("Browser test", function() {
 		assert.equal(Array.of(7), [7])
 		assert.equal(Array.of(undef), [undef])
 		assert.equal(Array.of(1, 2, 3), [1, 2, 3])
+
+		tmp = [0, 1, 2, [[[3, 4]]]]
+
+		assert.equal(tmp.flat(), [0, 1, 2, [[3, 4]]])
+		assert.equal(tmp.flat(0), tmp)
+		assert.notStrictEqual(tmp.flat(0), tmp)
+		assert.equal(tmp.flat(2), [0, 1, 2, [3, 4]])
+		assert.equal(tmp.flat(Infinity), [0, 1, 2, 3, 4])
 
 		tmp = ["a", 1, "2", 3, 1]
 		assert.equal(

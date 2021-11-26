@@ -21,6 +21,7 @@
 
 !function(window, Function) {
 
+	// Array#flat()         - Chrome69, Edge79, Firefox62, Safari12
 	// window.PointerEvent  - Chrome55, Edge12, Firefox59, Safari13,   IE11
 	// navigator.sendBeacon - Chrome39, Edge14, Firefox31, Safari11.1
 	// Object.fromEntries   - Chrome73, Edge79, Firefox63, Safari12.1, Opera60, Node.js12.0.0
@@ -87,6 +88,9 @@
 		c: "touchcancel"
 	}
 
+	// Missing PointerEvents with Scribble enable on Safari 14
+	// https://mikepk.com/2020/10/iOS-safari-scribble-bug/
+	// https://bugs.webkit.org/show_bug.cgi?id=217430
 
 	if (!window.PointerEvent) {
 		// IE10
@@ -321,6 +325,7 @@
 	patch("filter",      b + "o.push(t[i])" + c)
 	patch("some",        b + "return!0;return!1")
 
+	patch("flat",        "return a<1?S.call(t):(b=t.concat.apply([],t))&&a>1&&b.some(X)?b.flat(a-1):b", 0, isArr)
 	//patch("entries", "a=this;b=-1;return{next:function(){c=a.length<=++b;return{done:c,value:c?void 0:a[b]}}}")
 
 
