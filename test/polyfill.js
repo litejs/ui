@@ -22,7 +22,11 @@ describe("Browser test", function() {
 		mock.swap(String.prototype, "trim", null)
 		mock.swap(Date, "now", null)
 		mock.swap(Date.prototype, { toJSON: null, toISOString: null })
-		mock.swap(Array, {from: null, isArray: null})
+		mock.swap(Array, {
+			from: null,
+			isArray: null,
+			of: null
+		})
 		mock.swap(Array.prototype, {
 			entries: null,
 			every: null,
@@ -36,13 +40,15 @@ describe("Browser test", function() {
 			some: null
 		})
 		var lib = require("../polyfill/index.js")
+		, document = lib.document
+
 		/*/
 
 		var lib = window
 		//*/
 
 
-		var tmp
+		var tmp, undef
 		, obj = {a:1,b:2}
 		, d = new Date(1234567890123)
 
@@ -73,6 +79,9 @@ describe("Browser test", function() {
 		assert.type(lib.cancelAnimationFrame, "function")
 		assert.type(lib.navigator.sendBeacon, "function")
 
+		function bindTest(b, c, d, e) {
+			return [this.a, b, c, d, e].join(" ")
+		}
 		assert.equal(bindTest.bind({a: 1}, 2, 3)(4, 5), "1 2 3 4 5")
 
 		tmp = {a:1,b:1}
@@ -95,6 +104,11 @@ describe("Browser test", function() {
 		assert.equal(tmp(1,2,3), [ 1, 2, 3 ])
 		assert.equal(Array.from("äbc"), ["ä", "b", "c"])
 		assert.equal(Array.from([1, 2, 3], function(x){ return x + x}), [2, 4, 6])
+
+		assert.equal(Array.of(), [])
+		assert.equal(Array.of(7), [7])
+		assert.equal(Array.of(undef), [undef])
+		assert.equal(Array.of(1, 2, 3), [1, 2, 3])
 
 		tmp = ["a", 1, "2", 3, 1]
 		assert.equal(
@@ -122,9 +136,6 @@ describe("Browser test", function() {
 		assert.equal(document.body.matches("HTML"), false)
 		assert.end()
 
-		function bindTest(b, c, d, e) {
-			return [this.a, b, c, d, e].join(" ")
-		}
 	})
 })
 

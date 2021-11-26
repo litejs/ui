@@ -30,7 +30,6 @@
 	, P = "prototype"
 	, O = window
 	, patched = (window.xhr || window)._p = []
-	, aSlice = patched.slice
 	, jsonRe = /[\x00-\x1f\x22\x5c]/g
 	, JSONmap = {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t",'"':'\\"',"\\":"\\\\"}
 	, hasOwn = JSONmap.hasOwnProperty
@@ -161,7 +160,7 @@
 	patch("escape", "return X(a)", esc("a", 0) != "a", esc)
 
 	// Patch parameters support for setTimeout callback
-	patch("setTimeout", (a = "var A=arguments;return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFn)
+	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFn)
 	patch("setInterval", a, ie6789, isFn)
 
 	function createStorage(name) {
@@ -271,11 +270,11 @@
 
 	O = Function[P]
 	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4
-	patch("bind", "b=S.call(arguments,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(S.call(arguments)))};if(t[P])c[P]=t[P];return c")
+	patch("bind", "b=S.call(A,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(S.call(arguments)))};if(t[P])c[P]=t[P];return c")
 
 
 	O = Object
-	patch("assign", "var k,i=1,A=arguments,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
+	patch("assign", "var k,i=1,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 	patch("create", "X[P]=a||Y;return new X", 0, nop, {
 		// oKeys is undefined at this point
 		constructor: oKeys, hasOwnProperty: oKeys, isPrototypeOf: oKeys, propertyIsEnumerable: oKeys,
@@ -298,6 +297,7 @@
 	// TODO:2021-02-25:lauri:Accept iterable objects
 	//patch("from", "a=S.call(a);return b?a.map(b,c):a")
 	patch("from", "a=typeof a==='string'?a.split(''):b?a:S.call(a);return b?a.map(b,c):a")
+	patch("of", "return S.call(A)")
 
 	O = O[P]
 	a = "var l=t.length,o=[],i=-1;"
@@ -305,7 +305,7 @@
 	patch("indexOf",     a + "i+=b|0;while(++i<l)" + c)
 	patch("lastIndexOf", a + "i=(b|0)||l;i>--l&&(i=l)||i<0&&(i+=l);++i;while(--i>-1)" + c)
 
-	b = a + "if(arguments.length<2)b=t"
+	b = a + "if(A.length<2)b=t"
 	c = "b=a.call(null,b,t[i],i,t);return b"
 	patch("reduce",      b + "[++i];while(++i<l)" + c)
 	patch("reduceRight", b + "[--l];i=l;while(i--)" + c)
@@ -433,7 +433,7 @@
 		var key = key_.split(":").pop()
 		return !force && O[key] || (O[patched.push(key_), key] = (
 			typeof src === "string" ?
-			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this;" + src + "}")(hasOwn, O[key], P, aSlice, force, arg1, arg2) :
+			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this,A=arguments;" + src + "}")(hasOwn, O[key], P, patched.slice, force, arg1, arg2) :
 			src || {}
 		))
 	}
