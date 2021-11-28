@@ -194,7 +194,6 @@ button,
 .btn,
 .nowrap,
 .ellipsis {
-	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
