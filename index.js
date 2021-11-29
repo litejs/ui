@@ -1,5 +1,5 @@
 /*
-* @version  21.8.0
+* @version  21.11.0
 * @author   Lauri Rooden <lauri@rooden.ee>
 * @license  MIT License
 */
@@ -1934,7 +1934,7 @@
 	/*** kb ***/
 	var kbMaps = []
 	, kbMod = El.kbMod = iOS ? "metaKey" : "ctrlKey"
-	, kbKeys = {
+	, kbMap = El.kbMap = {
 		  8: "backspace", 9: "tab",
 		 13: "enter",    16: "shift", 17: "ctrl",  18: "alt",  19: "pause",
 		 20: "caps",     27: "esc",
@@ -1967,7 +1967,7 @@
 			var c = e.keyCode || e.which
 			, numpad = c > 95 && c < 106
 			, code = numpad ? c - 48 : c
-			, key = kbKeys[code] || String.fromCharCode(code).toLowerCase() || code
+			, key = kbMap[code] || String.fromCharCode(code).toLowerCase() || code
 
 			// Otherwise IE backspace navigates back
 			if (code == 8 && kbMaps[0].backspace) {
