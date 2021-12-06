@@ -28,7 +28,7 @@
 // MSXML 6.0 has improved XSD, deprecated several legacy features
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
-!function(window, Function) {
+!function(window, Function, setTimeout) {
 	xhr._s = new Date
 	var loaded = {}
 	, urlEscRe = /[+#\s]+/g
@@ -275,5 +275,5 @@
 	/**/
 
 	function nop() {}
-}(this, Function)
+}(this, Function, setTimeout)
 
