@@ -329,6 +329,7 @@
 	patch("some",        b + "return!0;return!1")
 
 	patch("flat",        "return a<1?S.call(t):(b=t.concat.apply([],t))&&a>1&&b.some(X)?b.flat(a-1):b", 0, isArr)
+	patch("flatMap",     "return X.apply(t,A).flat()", 0, O.map)
 	//patch("entries", "a=this;b=-1;return{next:function(){c=a.length<=++b;return{done:c,value:c?void 0:a[b]}}}")
 
 

@@ -1,5 +1,5 @@
 
-describe("Browser test", function() {
+describe("Polyfill test", function() {
 
 	this
 	.test("setTimeout parameters", function(assert) {
@@ -9,7 +9,7 @@ describe("Browser test", function() {
 	})
 	.test("index.js", function(assert, mock) {
 
-		/*
+		//*
 		mock.swap(Object, {
 			assign: null,
 			create: null,
@@ -32,6 +32,7 @@ describe("Browser test", function() {
 			every: null,
 			filter: null,
 			flat: null,
+			flatMap: null,
 			forEach: null,
 			indexOf: null,
 			lastIndexOf: null,
@@ -41,7 +42,6 @@ describe("Browser test", function() {
 			some: null
 		})
 		var lib = require("../polyfill/index.js")
-		, document = lib.document
 
 		/*/
 
@@ -118,6 +118,11 @@ describe("Browser test", function() {
 		assert.equal(tmp.flat(2), [0, 1, 2, [3, 4]])
 		assert.equal(tmp.flat(Infinity), [0, 1, 2, 3, 4])
 
+		tmp = [1, 2, 3, 4]
+		assert.equal(tmp.flatMap(function(x) { return [x, x * 2] }), [1, 2, 2, 4, 3, 6, 4, 8])
+		tmp = [5, 4, -3, 20, 17, -33, -4, 18]
+		assert.equal(tmp.flatMap(function(n) { return (n < 0) ? [] : (n % 2 == 0) ? [n] : [n-1, 1] }), [4, 1, 4, 20, 16, 1, 18])
+
 		tmp = ["a", 1, "2", 3, 1]
 		assert.equal(
 			tmp.concat(2, "b").map(function(i) { return tmp.indexOf(i) }),
@@ -147,12 +152,15 @@ describe("Browser test", function() {
 		})
 
 
+		assert.end()
+
+	})
+	.test("DOM", typeof window === "undefined" ? "No window" : function(assert, mock) {
 		assert.equal(document.body.querySelector.call(document.documentElement, "body").tagName, "BODY")
 		assert.equal(document.body.querySelectorAll.call(document.documentElement, "body").length, 1)
 		assert.equal(document.body.matches("BODY"), true)
 		assert.equal(document.body.matches("HTML"), false)
 		assert.end()
-
 	})
 })
 
