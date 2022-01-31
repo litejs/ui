@@ -424,7 +424,7 @@
 
 	// ie6789
 	// The documentMode is an IE only property, supported from IE8.
-	if (ie678 || document.documentMode <= 9) {
+	if (ie678) {
 		try {
 			// Remove background image flickers on hover in IE6
 			// You could also use CSS
