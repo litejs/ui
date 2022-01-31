@@ -79,6 +79,7 @@
 			, close = view.isOpen && view
 
 			View.route = view.route
+			emit(view, "init")
 
 			for (; tmp; tmp = parent) {
 				emit(syncResume = params._v = tmp, "ping", params, View)
