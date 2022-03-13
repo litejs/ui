@@ -220,7 +220,7 @@
 		}
 		function set(val, e, pos) {
 			load()
-			val = (val < min ? min : val > max ? max : val).step(step)
+			val = (val < min ? min : val > max ? max : val || 0).step(step)
 			if (value !== void 0 && (!drag || pos !== void 0)) {
 				El.css(fill, vert ? "height" : "width", ((pos || (val-min)*px)+knobLen) + "px", 0)
 			}
