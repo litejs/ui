@@ -271,7 +271,8 @@
 		}
 		function openVisible(tag, target) {
 			var el = typeof tag == "string" ? El(tag) : tag
-			El.scope(el, El.scope(target))
+			, scope = El.scope(el, El.scope(target))
+			scope.openTarget = target
 			El.render(el)
 			El.append(document.body, el)
 			El.cls(el, "is-visible", 1, 5)
