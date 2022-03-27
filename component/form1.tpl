@@ -28,7 +28,6 @@
 		display: block;
 		border-radius: 4px;
 		border: 1px solid #aaa;
-		overflow: auto;
 	}
 	.field {
 		width: 100%;
@@ -225,7 +224,7 @@
 
 %el form1-array
 	.col
-		.input.p13
+		.input.p13.cf
 			.left
 				= _(title||name)
 			.input__hint
@@ -237,7 +236,7 @@
 				@click: data.add
 
 %el form1-array-item
-	.input.p3.m2b.js-del
+	.input.p3.m2b.cf.js-del
 		a.right.Form1-del.hand ×
 			;if: !data.noAdd
 			;on: "click", data.del
