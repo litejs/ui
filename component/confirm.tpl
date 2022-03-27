@@ -107,17 +107,22 @@
 			code += num
 			if (num == "CLEAR" || num == "del" || num == "backspace") code = ""
 			El.txt(El.find(el, ".js-body"), code.replace(/./g, "•") || opts.body)
-			// if (code.length == 4 && id && !sent) next(sent = code, id, resolve, reject)
+			if (typeof scope.code == "number" && code.length == scope.code && id && !sent) next(sent = code, id, resolve, reject)
 		}
 		function resolve(e, key) {
 			if (el) {
+				var action = key || El.attr(this, "data-action")
+				, result = {
+					code: code,
+					input: scope.input && El.val(El.find(el, ".js-input")),
+					select: scope.select && El.val(El.find(el, ".js-select"))
+				}
 				El.kill(el, "transparent")
 				El.cls(blurEl, "Confirm--blur", el = 0)
-				var action = key || El.attr(this, "data-action")
 				if (action && next) {
-					if (typeof next === "function") next(action, code)
-					else if (typeof next[action] === "function") next[action](code)
-					else if (next[action]) View.emit(next[action], code)
+					if (typeof next === "function") next(action, result)
+					else if (typeof next[action] === "function") next[action](result)
+					else if (next[action]) View.emit(next[action], result)
 				}
 				if (vibrate) navigator.vibrate(0)
 				if (sound) sound.pause()
@@ -135,6 +140,17 @@
 				;if: code
 				;each: num in [1,2,3,4,5,6,7,8,9,"CLEAR",0]
 				.col.w4>.btn {num}
+			.row
+				;if: input
+				.col>input.field.js-input
+			.row
+				;if: select
+				.col
+					select.field.js-select
+						;list: select, [""]
+						option
+							;val:: item.id
+							;txt:: _(item.name)
 			.col
 				.group ;each: action in actions
 					.btn.js-btn
