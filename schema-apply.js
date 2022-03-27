@@ -46,6 +46,9 @@
 		} else if (type == "string") {
 			if (type !== actualType) data = "" + data
 		} else if (type === "number" || type == "integer") {
+			if (schema["ui:el"] == "date-time") {
+				data = Date.parse(data)
+			}
 			data = (data + "").replace(",", ".")
 			data = type === "number" ? parseFloat(data) : parseInt(data, 10)
 
