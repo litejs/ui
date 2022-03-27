@@ -92,9 +92,11 @@
 		opacity: .6;
 		pointer-events: none;
 	}
+	.group {
+		overflow: auto;
+	}
 	.group > .btn {
 		border-radius: 0;
-		margin-left: -1px;
 		float: left;
 	}
 	.group > .btn:first-child {

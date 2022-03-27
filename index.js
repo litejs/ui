@@ -555,7 +555,8 @@
 		for (k in obj) if (typeof obj[k] == "function" && ignore.indexOf(k) < 0) !function(k) {
 			hooked.push(k, hasOwn.call(obj, k) && obj[k])
 			obj[k] = function() {
-				hooks.push(k, arguments)
+				if (hooks === null) obj[k].apply(this, arguments)
+				else hooks.push(k, arguments)
 				return obj
 			}
 		}(k)
@@ -881,6 +882,7 @@
 			, close = view.isOpen && view
 
 			View.route = view.route
+			emit(view, "init")
 
 			for (; tmp; tmp = parent) {
 				emit(syncResume = params._v = tmp, "ping", params, View)
@@ -1628,6 +1630,7 @@
 	}
 
 	function render(node, _scope) {
+		if (!node) return
 		var bind, fn
 		, scope = elScope(node, 0, _scope)
 		, i = 0
