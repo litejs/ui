@@ -75,7 +75,7 @@
 					return memo
 				}, []) :
 				null
-		} else {
+		} else if (data) {
 			var reqArr = Array.isArray(schema.required) && schema.required
 			Object.each(schema.properties, function(propSchema, prop) {
 				if (data[prop] !== void 0) {
