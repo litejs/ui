@@ -290,6 +290,7 @@
 	a = "c=[];for(b in a)o.call(a,b)&&c.push("
 	b = ");return c"
 	patch("entries", a + "[b,a[b]]" + b)
+	patch("hasOwn", "return!!(a&&o.call(a,b))")
 	oKeys = patch("keys", a + "b" + b)
 	patch("values", a + "a[b]" + b)
 	//patch("fromEntries", "for(a=a.entries(),c={};!(b=a.next()).done;c[b[0]]=b[1]" + b)

@@ -15,6 +15,7 @@ describe("Polyfill test", function() {
 			create: null,
 			entries: null,
 			keys: null,
+			hasOwn: null,
 			values: null,
 			fromEntries: null
 		})
@@ -88,6 +89,8 @@ describe("Polyfill test", function() {
 		assert.strictEqual(Object.assign(tmp, {b:2,c:3}), tmp)
 		assert.equal(tmp, {a:1,b:2,c:3})
 		//assert.equal(Object.fromEntries([["a", 1], ["b", 2]]), obj)
+		assert.ok(Object.hasOwn(tmp, "a"))
+		assert.ok(!Object.hasOwn(Object.create(tmp), "a"))
 		tmp = Object.create(null)
 		assert.equal(tmp.constructor, null)
 		assert.equal(tmp.toString, null)
