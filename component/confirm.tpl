@@ -73,7 +73,7 @@
 		Object.assign(scope, opts)
 		scope.title = title || "Confirm?"
 		if (!scope.actions) scope.actions = [
-			{ action: "close", title: "Close" }
+			{ action: "close", title: "Close", key: "esc" }
 		]
 		for (var a, i = 0; a = scope.actions[i++]; ) {
 			if (typeof a == "string") a = scope.actions[i-1] = {title:a,action:a}
