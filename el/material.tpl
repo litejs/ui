@@ -202,8 +202,8 @@
 		El.near = near
 		function near(source, target, x, y, margin) {
 			var rect = target.getBoundingClientRect()
-			, top  = rect.top
-			, left = rect.left
+			, top  = rect.top + El.scrollTop()
+			, left = rect.left + El.scrollLeft()
 			// svg elements dont have offsetWidth, IE8 does not have rect.width
 			, width = rect.width || target.offsetWidth || 0
 			, height = rect.height || target.offsetHeight || 0
@@ -229,12 +229,15 @@
 			} else if (y == "bottom") {
 				top += height + margin
 				y = " -50%"
+				setTimeout(function(){
+				//document.scrollingElement.scrollHeight
+				var overflow = top + source.offsetHeight - El.scrollTop() - document.documentElement.offsetHeight
+				if (overflow > 0) scrollBy({ top: overflow, left: 0, behavior: "smooth" })
+				}, 400)
 			} else {
 				top += (height / 2) - (source.offsetHeight/2)
 				y = " 50%"
 			}
-			left += El.scrollLeft()
-			top += El.scrollTop()
 			El.css(source, {
 				"transform-origin": x + y,
 				top: (top < 0 ? 0 : top) + "px",
@@ -297,7 +300,7 @@
 				El.cls(menuTarget, "is-active", menuEl = menuTarget = null)
 			}
 		}
-		View.on("resize", closeMenu)
+		View.on("ping", closeMenu)
 		View.on("closeMenu", closeMenu)
 		View.on("showMenu", function(e, target, menu, x, y, margin) {
 			Event.stop(e)
