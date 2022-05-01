@@ -15,7 +15,7 @@
 	, root = document.documentElement
 	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f+|\n+|$)/g
-	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
+	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
@@ -593,7 +593,7 @@
 				scope._m[i] = match
 				match = bindings[name]
 				return (
-					(op == ":" || match && hasOwn.call(match, "once")) ?
+					(op === "::" || match && hasOwn.call(match, "once")) ?
 					"s(this,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
 					""
 				) + (
