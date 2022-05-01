@@ -112,14 +112,14 @@
 			pres = 1
 			val = quotation ? val.slice(1, -1) : val || key
 			pre[op =
-				op == "." ?
+				op === "." ?
 				(fn = "~", "class") :
-				op == "#" ?
+				op === "#" ?
 				"id" :
 				key
 			] = fn && pre[op] ?
-				fn == "^" ? val + pre[op] :
-				pre[op] + (fn == "~" ? " " : "") + val :
+				fn === "^" ? val + pre[op] :
+				pre[op] + (fn === "~" ? " " : "") + val :
 				val
 			return ""
 		}) || "div"
@@ -200,11 +200,11 @@
 
 		/*** ie8 ***/
 		// istanbul ignore next: IE fix
-		if (ie67 && (key == "id" || key == "name" || key == "checked")) {
+		if (ie67 && (key === "id" || key === "name" || key === "checked")) {
 			el.mergeAttributes(document.createElement('<INPUT ' + key + '="' + val + '">'), false)
 		} else
 		/**/
-		if (key == "class") {
+		if (key === "class") {
 			cls(el, val)
 		} else if (val || val === 0) {
 			if (current != val) {
@@ -290,7 +290,7 @@
 		, i = 0
 		, tmp = typeof child
 		if (child) {
-			if (tmp == "string" || tmp == "number") child = document.createTextNode(child)
+			if (tmp === "string" || tmp === "number") child = document.createTextNode(child)
 			else if ( !("nodeType" in child) && "length" in child ) {
 				// document.createDocumentFragment is unsupported in IE5.5
 				// fragment = "createDocumentFragment" in document ? document.createDocumentFragment() : El("div")
@@ -315,7 +315,7 @@
 				/**/
 				tmp.insertBefore(child,
 					(before === true ? tmp.firstChild :
-					typeof before == "number" ? tmp.childNodes[
+					typeof before === "number" ? tmp.childNodes[
 						before < 0 ? tmp.childNodes.length - before - 2 : before
 					] : before) || null
 				)
@@ -468,14 +468,14 @@
 
 	function bindingOn(el, events, selector, data, handler, delay) {
 		var argi = arguments.length
-		if (argi == 3 || argi == 4 && typeof data == "number") {
+		if (argi == 3 || argi == 4 && typeof data === "number") {
 			delay = data
 			handler = selector
 			selector = data = null
-		} else if (argi == 4 || argi == 5 && typeof handler == "number") {
+		} else if (argi == 4 || argi == 5 && typeof handler === "number") {
 			delay = handler
 			handler = data
-			if (typeof selector == "string") {
+			if (typeof selector === "string") {
 				data = null
 			} else {
 				data = selector
@@ -487,7 +487,7 @@
 			return
 		}
 		var fn = (
-			typeof handler == "string" ? function(e) {
+			typeof handler === "string" ? function(e) {
 				var target = selector ? El.closest(e.target, selector) : el
 				if (target) View.emit.apply(View, [handler, e, target].concat(data))
 			} :
@@ -623,7 +623,7 @@
 			render(bind, scope)
 		}
 		/*** ie8 ***/
-		if (ie678 && node.tagName == "SELECT") {
+		if (ie678 && node.tagName === "SELECT") {
 			node.parentNode.insertBefore(node, node)
 		}
 		/**/
@@ -705,16 +705,16 @@
 					append(parent, parent = q = El(name))
 				}
 				if (text && op != "/") {
-					if (op == ">") {
+					if (op === ">") {
 						(indent + " " + text).replace(templateRe, work)
-					} else if (op == "|" || op == "\\") {
+					} else if (op === "|" || op === "\\") {
 						append(parent, text) // + "\n")
 					} else {
-						if (op == "@") {
+						if (op === "@") {
 							text = text.replace(/(\w+):?/, "on:'$1',")
 						} else if (op != ";" && op != "^") {
-							text = (parent.tagName == "INPUT" ? "val" : "txt") + (
-								op == "=" ? ":" + text.replace(/'/g, "\\'") :
+							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
+								op === "=" ? ":" + text.replace(/'/g, "\\'") :
 								":_('" + text.replace(/'/g, "\\'") + "', data)"
 							)
 						}
@@ -730,7 +730,7 @@
 	function appendBind(el, val, sep, q) {
 		var current = getAttr(el, BIND_ATTR)
 		setAttr(el, BIND_ATTR, (current ? (
-			q == "^" ?
+			q === "^" ?
 			val + sep + current :
 			current + sep + val
 		) : val))
@@ -834,7 +834,7 @@
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, name, op, args) {
 						return "(this['" + name + "']" + (
-							typeof view[name] == "function" ?
+							typeof view[name] === "function" ?
 							"(" + (args || "") + ")" :
 							"=" + args
 						) + "),"

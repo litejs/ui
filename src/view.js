@@ -29,7 +29,7 @@
 		var key, name
 		, opts = Object.assign({}, defaults, _opts)
 		for (key in opts) if (hasOwn.call(opts, key)) {
-			if (typeof View[key] == "function") {
+			if (typeof View[key] === "function") {
 				for (name in opts[key]) if (hasOwn.call(opts[key], name)) {
 					View[key](name, opts[key][name])
 				}
@@ -56,7 +56,7 @@
 		view.el = el
 		view.parent = parent && View(parent)
 
-		if (route.charAt(0) != "#") {
+		if (route.charAt(0) !== "#") {
 			var params = "m[" + (view.seq = capture++) + "]?("
 			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
@@ -84,9 +84,9 @@
 			for (; tmp; tmp = parent) {
 				emit(syncResume = params._v = tmp, "ping", params, View)
 				syncResume = null
-				if (lastParams != params) return
+				if (lastParams !== params) return
 				if (parent = tmp.parent) {
-					if (parent.child && parent.child != tmp) {
+					if (parent.child && parent.child !== tmp) {
 						close = parent.child
 					}
 					parent.child = tmp
@@ -100,7 +100,7 @@
 							view.wait(tmp.file = null)
 						)
 					} else {
-						if (tmp.route == "404") {
+						if (tmp.route === "404") {
 							El.txt(tmp = El("h3"), "# Error 404")
 							View("404", tmp, "#body")
 						}
@@ -112,7 +112,7 @@
 
 			if (view !== close) emit(view, "change", close)
 
-			for (tmp in params) if (tmp.charAt(0) != "_") {
+			for (tmp in params) if (tmp.charAt(0) !== "_") {
 				if (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"]) {
 					syncResume.call(view, params[tmp], tmp, params)
 					syncResume = null
@@ -125,7 +125,7 @@
 			var params = lastParams
 			params._p = 1 + (params._p | 0)
 			return function() {
-				if (--params._p || lastParams != params || syncResume) return
+				if (--params._p || lastParams !== params || syncResume) return
 				if (params._d) {
 					bubbleDown(params)
 				} else if (params._v) {
@@ -158,7 +158,7 @@
 		if (params._d = params._v = view.child) {
 			bubbleDown(params, close)
 		}
-		if (lastView == view) {
+		if (lastView === view) {
 			emit(view, "show", params)
 			blur()
 		}
@@ -206,7 +206,7 @@
 		}
 		var params = _params || {}
 		, view = get(url, params)
-		if (!view.isOpen || lastUrl != url) {
+		if (!view.isOpen || lastUrl !== url) {
 			params._u = lastUrl = url
 			view.show(El.data.params = params)
 		}
