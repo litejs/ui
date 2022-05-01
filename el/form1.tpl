@@ -3,12 +3,14 @@
 		border: 0;
 		padding: 0;
 	}
-	.Form1-del {
+	.Form1-del.right {
 		display: block;
 		margin: -10px -10px 0 0;
+		opacity: .2;
+	}
+	.Form1-del {
 		font-size: 20px;
 		font-weight: 700;
-		opacity: .2;
 		border: 1px solid transparent;
 		line-height: 16px;
 		width: 20px;
@@ -241,7 +243,8 @@
 	.input.p3.m2b.cf.js-del
 		a.right.Form1-del.hand ×
 			;if: !data.noAdd
-			;on: "click", data.del
+			;data:: "tooltip", _("Delete")
+			@click: data.del
 		b
 			;if: title
 			;txt: title
