@@ -239,15 +239,14 @@
 		},
 		stringify: function stringify(o) {
 			// IE 8 serializes `undefined` as `"undefined"`
-			var c = typeof o
 			return (
-				c == "string" ? '"' + o.replace(jsonRe, jsonFn) + '"' :
-				o && c == "object" ? (
+				isStr(o) ? '"' + o.replace(jsonRe, jsonFn) + '"' :
+				o && typeof o == "object" ? (
 					isFn(o.toJSON) ? stringify(o.toJSON()) :
 					isArr(o) ? "[" + o.map(stringify) + "]" :
 					"{" + oKeys(o).map(function(a){return stringify(a) + ":" + stringify(o[a])}) + "}"
 				) :
-				c == "number" && !isFinite(o) ? "null" :
+				typeof o == "number" && !isFinite(o) ? "null" :
 				"" + o
 			)
 		}
@@ -304,7 +303,7 @@
 
 	// TODO:2021-02-25:lauri:Accept iterable objects
 	//patch("from", "a=S.call(a);return b?a.map(b,c):a")
-	patch("from", "a=typeof a==='string'?a.split(''):b?a:S.call(a);return b?a.map(b,c):a")
+	patch("from", "a=X(a)?a.split(''):b?a:S.call(a);return b?a.map(b,c):a", 0, isStr)
 	patch("of", "return S.call(A)")
 
 	O = O[P]
@@ -408,7 +407,7 @@
 	}
 	function walk(el, by, sel, first, nextFn) {
 		var out = []
-		if (typeof sel !== "function") sel = selectorFn(sel)
+		if (!isFn(sel)) sel = selectorFn(sel)
 		for (; el; el = el[by] || nextFn && nextFn(el)) if (sel(el)) {
 			if (first === 1) return el
 			out.push(el)
@@ -434,15 +433,18 @@
 		} catch(e){}
 	}
 
-	function isFn(f) {
-		return typeof f === "function"
+	function isFn(value) {
+		return typeof value === "function"
+	}
+	function isStr(value) {
+		return typeof value === "string"
 	}
 	function nop() {}
 
 	function patch(key_, src, force, arg1, arg2) {
 		var key = key_.split(":").pop()
 		return !force && O[key] || (O[patched.push(key_), key] = (
-			typeof src === "string" ?
+			isStr(src) ?
 			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this,A=arguments;" + src + "}")(hasOwn, O[key], P, patched.slice, force, arg1, arg2) :
 			src || {}
 		))
