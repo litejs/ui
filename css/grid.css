@@ -7,8 +7,13 @@ Expects box-sizing: border-box;
 .row {
 	display: block;
 	clear: both;
+	*zoom: 1;
 }
-.row {
+
+.grid:after,
+.row:after {
+	content: " ";
+	display: block;
 	clear: both;
 }
 
@@ -19,13 +24,6 @@ Expects box-sizing: border-box;
 	float: left;
 	min-height: 1px;
 	clear: none;
-}
-
-.grid:after,
-.row:after {
-	content: " ";
-	display: block;
-	clear: both;
 }
 
 .col,

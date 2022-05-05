@@ -9,10 +9,10 @@
 			.col.lg-w6 main
 			.col.md-w6.lg-w3 A
 			.col.md-w6.lg-w3 B
-			.grid.w12
+			.grid.w6.b2
 				.col.w6 C
 				.col.w6 D
-			.col E
+			.col.w6 E
 		h2 Test golden grid
 		.grid.b2.border-white
 			.col.w2g c1
@@ -30,7 +30,7 @@
 		h2 Test tiles
 		.grid.b2.border-white
 			;css: "height", "300px"
-			.grid.w4.h8
+			.grid.b2.w4.h8
 				.col.h6 c1
 				.col.h6 c2
 			.col.w8.h8 c3
