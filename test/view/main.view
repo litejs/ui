@@ -1,12 +1,12 @@
 
-%def #mat ../../ui/component/material.tpl
+%def #mat ../../el/material.tpl
 %def
 	settings %.view,%.css
 	test-form1,test-grid,pointer %.view
 	test-form1 %.view,../../binding/persist.js
-	test-svg #mat,../../ui/component/Pie.tpl,test-svg.view
+	test-svg #mat,../../el/Pie.tpl,test-svg.view
 	testman,+/lcov,+/lcov/{file} %.view
-	test-material-ui #mat,../../ui/component/Slider.tpl,test-material-ui.view
+	test-material-ui #mat,../../el/Slider.tpl,test-material-ui.view
 
 %css
 	.content{ will-change: transform, opacity; }

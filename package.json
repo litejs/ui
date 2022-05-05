@@ -17,9 +17,9 @@
   "files": [
     "*.js",
     "binding",
-    "component",
-    "polyfill",
-    "css"
+    "css",
+    "el",
+    "polyfill"
   ],
   "litejs": {
     "build": "lj b --out=test/index.html test/dev.html"
