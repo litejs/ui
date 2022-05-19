@@ -2,13 +2,13 @@
 /* litejs.com/MIT-LICENSE.txt */
 
 
-!function(window, document, Object, Event, protoStr) {
+!function(window, document, Object, Event, P) {
 	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
 	, isArray = Array.isArray
 	, seq = 0
 	, elCache = El.cache = {}
-	, wrapProto = ElWrap[protoStr] = []
+	, wrapProto = ElWrap[P] = []
 	, slice = wrapProto.slice
 	, hasOwn = elCache.hasOwnProperty
 	, body = document.body
@@ -744,7 +744,7 @@
 		t.el.plugin = t
 	}
 
-	plugin[protoStr] = {
+	plugin[P] = {
 		_done: function() {
 			var t = this
 			, childNodes = t.el.childNodes
@@ -777,15 +777,15 @@
 		t.a = attr1
 	}
 
-	js[protoStr].done = Fn("Function(this.txt)()")
+	js[P].done = Fn("Function(this.txt)()")
 
 	El.plugins = {
-		binding: js.extend({
+		binding: extend(js, {
 			done: function() {
 				Object.assign(bindings, Function("return({" + this.txt + "})")())
 			}
 		}),
-		child: plugin.extend({
+		child: extend(plugin, {
 			done: function() {
 				var key = "@child-" + (++seq)
 				, root = append(this.parent, document.createComment(key))
@@ -794,13 +794,13 @@
 				root._cp = root.childNodes.length - 1
 			}
 		}),
-		css: js.extend({
+		css: extend(js, {
 			done: Fn("xhr.css(this.txt)")
 		}),
-		def: js.extend({
+		def: extend(js, {
 			done: Fn("View.def(this.params||this.txt)")
 		}),
-		each: js.extend({
+		each: extend(js, {
 			done: function() {
 				var txt = this.txt
 
@@ -812,7 +812,7 @@
 		}),
 		el: plugin,
 		js: js,
-		map: js.extend({
+		map: extend(js, {
 			done: function() {
 				var self = this
 				, txt = (self.params + self.txt)
@@ -824,7 +824,7 @@
 			}
 		}),
 		template: plugin,
-		view: plugin.extend({
+		view: extend(plugin,{
 			done: function() {
 				var fn
 				, t = this
@@ -843,7 +843,7 @@
 				}
 			}
 		}),
-		"view-link": plugin.extend({
+		"view-link": extend(plugin, {
 			done: function() {
 				var t = this
 				, arr = t.name.split(splitRe)
@@ -994,5 +994,15 @@
 	addEvent(window, "orientationchange", setBreakpointsRated)
 	addEvent(window, "load", setBreakpointsRated)
 	/**/
+
+	function extend(fn, opts) {
+		function wrapper() {
+			return fn.apply(this, arguments)
+		}
+		wrapper[P] = Object.create(fn[P])
+		Object.assign(wrapper[P], opts)
+		wrapper[P].constructor = wrapper
+		return wrapper
+	}
 }(window, document, Object, Event, "prototype")
 

@@ -23,26 +23,6 @@
 	Fn.wait = wait
 
 
-	// Function extensions
-	// -------------------
-
-	F.extend = function() {
-		var arg
-		, fn = this
-		, i = 0
-
-		function wrapper() {
-			return fn.apply(this, arguments)
-		}
-
-		for (wrapper[P] = Object.create(fn[P]); arg = arguments[i++]; ) {
-			Object.assign(wrapper[P], arg)
-		}
-		wrapper[P].constructor = wrapper
-		return wrapper
-	}
-
-
 	// Non-standard
 	Object.each = function(obj, fn, scope, key) {
 		if (obj) for (key in obj) {
