@@ -211,7 +211,8 @@
 		for (k in obj) if (typeof obj[k] == "function" && ignore.indexOf(k) < 0) !function(k) {
 			hooked.push(k, hasOwn.call(obj, k) && obj[k])
 			obj[k] = function() {
-				hooks.push(k, arguments)
+				if (hooks === null) obj[k].apply(this, arguments)
+				else hooks.push(k, arguments)
 				return obj
 			}
 		}(k)

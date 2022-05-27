@@ -33,6 +33,11 @@
 		html: function(el, html) {
 			el.innerHTML = html
 		},
+		md: El.md = function(el, txt) {
+			txt = txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+			txt = txt.replace(/\n/g, "<br>")
+			el.innerHTML = txt
+		},
 		ref: function(el, name) {
 			this[name] = el
 		},

@@ -13,7 +13,7 @@
 		right: 0;
 		margin: 0 auto;
 		top: 4%;
-		width: 400px;
+		width: 600px;
 		background-color: #fff;
 		box-shadow: 0 2px 10px 2px rgba(255,255,255,.5);
 	}
@@ -106,7 +106,7 @@
 			var num = _num == void 0 ? e.target[El.T] : _num
 			code += num
 			if (num == "CLEAR" || num == "del" || num == "backspace") code = ""
-			El.txt(El.find(el, ".js-body"), code.replace(/./g, "•") || opts.body)
+			El.md(El.find(el, ".js-body"), code.replace(/./g, "•") || opts.body)
 			if (typeof scope.code == "number" && code.length == scope.code && id && !sent) next(sent = code, id, resolve, reject)
 		}
 		function resolve(e, key) {
