@@ -1,0 +1,33 @@
+
+/*
+ * Ensure you use dark text on a white background
+ * Use Borders Instead of Background Colors
+ */
+
+
+@media print {
+	table, img, svg {
+		break-inside: avoid;
+	}
+	img.dark {
+		filter: invert(100%) hue-rotate(180deg) brightness(120%) contrast(150%);
+	}
+
+	/* Not all printers will print in color, add some other style that isn’t too disruptive. */
+	mark {
+		border: 1pt dotted #000;
+	}
+	q:after {
+		content: " (Source: " attr(cite) ")";
+	}
+	a {
+		color: #000;
+	}
+	p a {
+		word-wrap: break-word;
+	}
+	p a[href^="https://"]:after, a[href^="https://"]:after {
+		content: " (" attr(href) ")";
+	}
+}
+

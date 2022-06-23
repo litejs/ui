@@ -1,0 +1,10 @@
+.striped45 {
+	background-color: currentColor;
+	background-image: repeating-linear-gradient(
+		45deg,
+		rgba(255, 255, 255, .5),
+		rgba(255, 255, 255, .5) 4px,
+		transparent 4px,
+		transparent 8px
+	);
+}
