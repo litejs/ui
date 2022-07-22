@@ -115,20 +115,22 @@
 		}
 	}
 
-	bindings.is = function bindingIs(node, model, path, list, state) {
+	bindings.is = function bindingIs(node, model, path, list, state, prefix) {
 		var match
 		, scope = this
 		if (typeof model === "string") {
+			prefix = state
 			state = list
 			list = path
 			path = model
 			model = scope.model
 		}
 		if (model && path) {
+			if (!prefix) prefix = "is-"
 			match = i18n.pick(state !== match ? state : model.get(path), list)
 			path += "-" + list
-			El.cls(node, node["_is-" + path], 0)
-			El.cls(node, node["_is-" + path] = match && "is-" + match)
+			El.cls(node, node[prefix + path], 0)
+			El.cls(node, node[prefix + path] = match && prefix + match)
 		}
 	}
 
