@@ -114,8 +114,9 @@
 				var action = key || El.attr(this, "data-action")
 				, result = {
 					code: code,
-					input: scope.input && El.val(El.find(el, ".js-input")),
-					select: scope.select && El.val(El.find(el, ".js-select"))
+					input: El.val(El.find(el, ".js-input")),
+					inputMd: El.val(El.find(el, ".js-inputMd")),
+					select: El.val(El.find(el, ".js-select"))
 				}
 				El.kill(el, "transparent")
 				El.cls(blurEl, "Confirm--blur", el = 0)
@@ -135,7 +136,7 @@
 		.Confirm-bg.max.abs
 		.Confirm-content.Confirm--blur.grid.p2.anim
 			.col.ts3 ;txt:: _(title, map)
-			.col.js-body ;txt:: _(body, map)
+			.col.js-body ;md:: _(body, map)
 			.row.js-numpad
 				;if: code
 				;each: num in [1,2,3,4,5,6,7,8,9,"CLEAR",0]
@@ -143,6 +144,13 @@
 			.row
 				;if: input
 				.col>input.field.js-input
+			.row
+				;if: typeof inputMd === "string"
+				.col
+					textarea.field.js-inputMd
+						;val:: inputMd
+						@keyup [this.parentNode.nextSibling], "renderMd"
+				.col.p4
 			.row
 				;if: select
 				.col
