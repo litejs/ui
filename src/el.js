@@ -221,6 +221,7 @@
 	}
 
 	function valFn(el, val) {
+		if (!el) return ""
 		var input, step, key, value
 		, i = 0
 		, type = el.type
