@@ -129,6 +129,8 @@
 				if (sound) sound.pause()
 			}
 		}
+		scope.resolve = resolve
+		View.emit("confirm:open", scope)
 	})
 
 %el Confirm
@@ -145,12 +147,14 @@
 				;if: input
 				.col>input.field.js-input
 			.row
-				;if: typeof inputMd === "string"
+				;if: data.inputMd!=null
 				.col
 					textarea.field.js-inputMd
-						;val:: inputMd
-						@keyup [this.parentNode.nextSibling], "renderMd"
-				.col.p4
+						@keyup [this.parentNode.nextSibling.nextSibling], "renderMd"
+						;val: inputMd
+				.col.ts3 Preview
+				.p4
+					;md: inputMd
 			.row
 				;if: select
 				.col
