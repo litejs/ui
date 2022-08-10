@@ -200,7 +200,7 @@
 		/**/
 		var data = {
 			setItem: function(id, val) {
-				return data[id] = String(val)
+				return data[id] = "" + val
 			},
 			getItem: function(id) {
 				return data[id]
