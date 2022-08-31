@@ -54,8 +54,7 @@ describe("load.js", function() {
 			}
 		}
 	}
-	var lib = require("../load.js")
-	, xhr = lib.xhr
+	var lib, xhr
 
 	this.beforeEach = function() {
 		xhrRes = []
@@ -65,6 +64,8 @@ describe("load.js", function() {
 	.should("log errors", function(assert, mock) {
 		assert.setTimeout(2000)
 		mock.time()
+		lib = require("../load.js")
+		xhr = lib.xhr
 		lib.onerror("fault1", "t1.js", 11, 12, {stack:"a\nb"})
 		mock.tick(400)
 		lib.onerror("fault2", "t2.js", 21, 22, {backtrace:"c\nd"})

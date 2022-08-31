@@ -1,5 +1,5 @@
 /*
-* @version  21.11.0
+* @version  22.8.0
 * @author   Lauri Rooden <lauri@rooden.ee>
 * @license  MIT License
 */
@@ -347,26 +347,6 @@
 	Fn.wait = wait
 
 
-	// Function extensions
-	// -------------------
-
-	F.extend = function() {
-		var arg
-		, fn = this
-		, i = 0
-
-		function wrapper() {
-			return fn.apply(this, arguments)
-		}
-
-		for (wrapper[P] = Object.create(fn[P]); arg = arguments[i++]; ) {
-			Object.assign(wrapper[P], arg)
-		}
-		wrapper[P].constructor = wrapper
-		return wrapper
-	}
-
-
 	// Non-standard
 	Object.each = function(obj, fn, scope, key) {
 		if (obj) for (key in obj) {
@@ -649,9 +629,9 @@
 		, emitter = this === exports ? empty : this
 		, _e = emitter._e
 		, arr = _e ? (_e[type] || empty).concat(_e["*"] || empty) : empty
-		if (i = _e = arr.length) {
-			for (args = arr.slice.call(arguments, 1); i--; ) {
-				arr[i--].apply(arr[--i] || emitter, args)
+		if ((_e = arr.length)) {
+			for (i = _e - 1, args = arr.slice.call(arguments, 1); i > 1; i -= 3) {
+				arr[i] && arr[i].apply(arr[i - 2] || emitter, args)
 			}
 		}
 		return _e / 3
@@ -832,7 +812,7 @@
 		var key, name
 		, opts = Object.assign({}, defaults, _opts)
 		for (key in opts) if (hasOwn.call(opts, key)) {
-			if (typeof View[key] == "function") {
+			if (typeof View[key] === "function") {
 				for (name in opts[key]) if (hasOwn.call(opts[key], name)) {
 					View[key](name, opts[key][name])
 				}
@@ -859,7 +839,7 @@
 		view.el = el
 		view.parent = parent && View(parent)
 
-		if (route.charAt(0) != "#") {
+		if (route.charAt(0) !== "#") {
 			var params = "m[" + (view.seq = capture++) + "]?("
 			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
@@ -887,9 +867,9 @@
 			for (; tmp; tmp = parent) {
 				emit(syncResume = params._v = tmp, "ping", params, View)
 				syncResume = null
-				if (lastParams != params) return
+				if (lastParams !== params) return
 				if (parent = tmp.parent) {
-					if (parent.child && parent.child != tmp) {
+					if (parent.child && parent.child !== tmp) {
 						close = parent.child
 					}
 					parent.child = tmp
@@ -903,7 +883,7 @@
 							view.wait(tmp.file = null)
 						)
 					} else {
-						if (tmp.route == "404") {
+						if (tmp.route === "404") {
 							El.txt(tmp = El("h3"), "# Error 404")
 							View("404", tmp, "#body")
 						}
@@ -915,7 +895,7 @@
 
 			if (view !== close) emit(view, "change", close)
 
-			for (tmp in params) if (tmp.charAt(0) != "_") {
+			for (tmp in params) if (tmp.charAt(0) !== "_") {
 				if (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"]) {
 					syncResume.call(view, params[tmp], tmp, params)
 					syncResume = null
@@ -928,7 +908,7 @@
 			var params = lastParams
 			params._p = 1 + (params._p | 0)
 			return function() {
-				if (--params._p || lastParams != params || syncResume) return
+				if (--params._p || lastParams !== params || syncResume) return
 				if (params._d) {
 					bubbleDown(params)
 				} else if (params._v) {
@@ -961,7 +941,7 @@
 		if (params._d = params._v = view.child) {
 			bubbleDown(params, close)
 		}
-		if (lastView == view) {
+		if (lastView === view) {
 			emit(view, "show", params)
 			blur()
 		}
@@ -1009,7 +989,7 @@
 		}
 		var params = _params || {}
 		, view = get(url, params)
-		if (!view.isOpen || lastUrl != url) {
+		if (!view.isOpen || lastUrl !== url) {
 			params._u = lastUrl = url
 			view.show(El.data.params = params)
 		}
@@ -1060,20 +1040,20 @@
 /* litejs.com/MIT-LICENSE.txt */
 
 
-!function(window, document, Object, Event, protoStr) {
+!function(window, document, Object, Event, P) {
 	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
 	, isArray = Array.isArray
 	, seq = 0
 	, elCache = El.cache = {}
-	, wrapProto = ElWrap[protoStr] = []
+	, wrapProto = ElWrap[P] = []
 	, slice = wrapProto.slice
 	, hasOwn = elCache.hasOwnProperty
 	, body = document.body
 	, root = document.documentElement
 	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f+|\n+|$)/g
-	, renderRe = /[;\s]*(\w+)(?:\s*(:?):((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
+	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
@@ -1090,6 +1070,11 @@
 		},
 		html: function(el, html) {
 			el.innerHTML = html
+		},
+		md: El.md = function(el, txt) {
+			txt = txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+			txt = txt.replace(/\n/g, "<br>")
+			el.innerHTML = txt
 		},
 		ref: function(el, name) {
 			this[name] = el
@@ -1170,14 +1155,14 @@
 			pres = 1
 			val = quotation ? val.slice(1, -1) : val || key
 			pre[op =
-				op == "." ?
+				op === "." ?
 				(fn = "~", "class") :
-				op == "#" ?
+				op === "#" ?
 				"id" :
 				key
 			] = fn && pre[op] ?
-				fn == "^" ? val + pre[op] :
-				pre[op] + (fn == "~" ? " " : "") + val :
+				fn === "^" ? val + pre[op] :
+				pre[op] + (fn === "~" ? " " : "") + val :
 				val
 			return ""
 		}) || "div"
@@ -1258,11 +1243,11 @@
 
 		/*** ie8 ***/
 		// istanbul ignore next: IE fix
-		if (ie67 && (key == "id" || key == "name" || key == "checked")) {
+		if (ie67 && (key === "id" || key === "name" || key === "checked")) {
 			el.mergeAttributes(document.createElement('<INPUT ' + key + '="' + val + '">'), false)
 		} else
 		/**/
-		if (key == "class") {
+		if (key === "class") {
 			cls(el, val)
 		} else if (val || val === 0) {
 			if (current != val) {
@@ -1274,6 +1259,7 @@
 	}
 
 	function valFn(el, val) {
+		if (!el) return ""
 		var input, step, key, value
 		, i = 0
 		, type = el.type
@@ -1348,7 +1334,7 @@
 		, i = 0
 		, tmp = typeof child
 		if (child) {
-			if (tmp == "string" || tmp == "number") child = document.createTextNode(child)
+			if (tmp === "string" || tmp === "number") child = document.createTextNode(child)
 			else if ( !("nodeType" in child) && "length" in child ) {
 				// document.createDocumentFragment is unsupported in IE5.5
 				// fragment = "createDocumentFragment" in document ? document.createDocumentFragment() : El("div")
@@ -1373,7 +1359,7 @@
 				/**/
 				tmp.insertBefore(child,
 					(before === true ? tmp.firstChild :
-					typeof before == "number" ? tmp.childNodes[
+					typeof before === "number" ? tmp.childNodes[
 						before < 0 ? tmp.childNodes.length - before - 2 : before
 					] : before) || null
 				)
@@ -1526,14 +1512,14 @@
 
 	function bindingOn(el, events, selector, data, handler, delay) {
 		var argi = arguments.length
-		if (argi == 3 || argi == 4 && typeof data == "number") {
+		if (argi == 3 || argi == 4 && typeof data === "number") {
 			delay = data
 			handler = selector
 			selector = data = null
-		} else if (argi == 4 || argi == 5 && typeof handler == "number") {
+		} else if (argi == 4 || argi == 5 && typeof handler === "number") {
 			delay = handler
 			handler = data
-			if (typeof selector == "string") {
+			if (typeof selector === "string") {
 				data = null
 			} else {
 				data = selector
@@ -1545,7 +1531,7 @@
 			return
 		}
 		var fn = (
-			typeof handler == "string" ? function(e) {
+			typeof handler === "string" ? function(e) {
 				var target = selector ? El.closest(e.target, selector) : el
 				if (target) View.emit.apply(View, [handler, e, target].concat(data))
 			} :
@@ -1651,7 +1637,7 @@
 				scope._m[i] = match
 				match = bindings[name]
 				return (
-					(op == ":" || match && hasOwn.call(match, "once")) ?
+					(op === "::" || match && hasOwn.call(match, "once")) ?
 					"s(this,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
 					""
 				) + (
@@ -1681,7 +1667,7 @@
 			render(bind, scope)
 		}
 		/*** ie8 ***/
-		if (ie678 && node.tagName == "SELECT") {
+		if (ie678 && node.tagName === "SELECT") {
 			node.parentNode.insertBefore(node, node)
 		}
 		/**/
@@ -1763,16 +1749,16 @@
 					append(parent, parent = q = El(name))
 				}
 				if (text && op != "/") {
-					if (op == ">") {
+					if (op === ">") {
 						(indent + " " + text).replace(templateRe, work)
-					} else if (op == "|" || op == "\\") {
+					} else if (op === "|" || op === "\\") {
 						append(parent, text) // + "\n")
 					} else {
-						if (op == "@") {
+						if (op === "@") {
 							text = text.replace(/(\w+):?/, "on:'$1',")
 						} else if (op != ";" && op != "^") {
-							text = (parent.tagName == "INPUT" ? "val" : "txt") + (
-								op == "=" ? ":" + text.replace(/'/g, "\\'") :
+							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
+								op === "=" ? ":" + text.replace(/'/g, "\\'") :
 								":_('" + text.replace(/'/g, "\\'") + "', data)"
 							)
 						}
@@ -1788,7 +1774,7 @@
 	function appendBind(el, val, sep, q) {
 		var current = getAttr(el, BIND_ATTR)
 		setAttr(el, BIND_ATTR, (current ? (
-			q == "^" ?
+			q === "^" ?
 			val + sep + current :
 			current + sep + val
 		) : val))
@@ -1802,7 +1788,7 @@
 		t.el.plugin = t
 	}
 
-	plugin[protoStr] = {
+	plugin[P] = {
 		_done: function() {
 			var t = this
 			, childNodes = t.el.childNodes
@@ -1835,15 +1821,15 @@
 		t.a = attr1
 	}
 
-	js[protoStr].done = Fn("Function(this.txt)()")
+	js[P].done = Fn("Function(this.txt)()")
 
 	El.plugins = {
-		binding: js.extend({
+		binding: extend(js, {
 			done: function() {
 				Object.assign(bindings, Function("return({" + this.txt + "})")())
 			}
 		}),
-		child: plugin.extend({
+		child: extend(plugin, {
 			done: function() {
 				var key = "@child-" + (++seq)
 				, root = append(this.parent, document.createComment(key))
@@ -1852,13 +1838,13 @@
 				root._cp = root.childNodes.length - 1
 			}
 		}),
-		css: js.extend({
+		css: extend(js, {
 			done: Fn("xhr.css(this.txt)")
 		}),
-		def: js.extend({
+		def: extend(js, {
 			done: Fn("View.def(this.params||this.txt)")
 		}),
-		each: js.extend({
+		each: extend(js, {
 			done: function() {
 				var txt = this.txt
 
@@ -1870,7 +1856,7 @@
 		}),
 		el: plugin,
 		js: js,
-		map: js.extend({
+		map: extend(js, {
 			done: function() {
 				var self = this
 				, txt = (self.params + self.txt)
@@ -1882,7 +1868,7 @@
 			}
 		}),
 		template: plugin,
-		view: plugin.extend({
+		view: extend(plugin,{
 			done: function() {
 				var fn
 				, t = this
@@ -1892,7 +1878,7 @@
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, name, op, args) {
 						return "(this['" + name + "']" + (
-							typeof view[name] == "function" ?
+							typeof view[name] === "function" ?
 							"(" + (args || "") + ")" :
 							"=" + args
 						) + "),"
@@ -1901,7 +1887,7 @@
 				}
 			}
 		}),
-		"view-link": plugin.extend({
+		"view-link": extend(plugin, {
 			done: function() {
 				var t = this
 				, arr = t.name.split(splitRe)
@@ -2052,4 +2038,14 @@
 	addEvent(window, "orientationchange", setBreakpointsRated)
 	addEvent(window, "load", setBreakpointsRated)
 	/**/
+
+	function extend(fn, opts) {
+		function wrapper() {
+			return fn.apply(this, arguments)
+		}
+		wrapper[P] = Object.create(fn[P])
+		Object.assign(wrapper[P], opts)
+		wrapper[P].constructor = wrapper
+		return wrapper
+	}
 }(window, document, Object, Event, "prototype")
