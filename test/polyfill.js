@@ -35,6 +35,7 @@ describe("Polyfill test", function() {
 			flat: null,
 			flatMap: null,
 			forEach: null,
+			includes: null,
 			indexOf: null,
 			lastIndexOf: null,
 			map: null,
@@ -126,14 +127,22 @@ describe("Polyfill test", function() {
 		tmp = [5, 4, -3, 20, 17, -33, -4, 18]
 		assert.equal(tmp.flatMap(function(n) { return (n < 0) ? [] : (n % 2 == 0) ? [n] : [n-1, 1] }), [4, 1, 4, 20, 16, 1, 18])
 
-		tmp = ["a", 1, "2", 3, 1]
+		assert.equal([1, 2, 1].indexOf(1), 0)
+		assert.equal([1, 2, 1].indexOf(2), 1)
+		assert.equal([1, 2, 1].indexOf(1, 0), 0)
+		assert.equal([1, 2, 1].indexOf(1, 1), 2)
+		tmp = ["a", 1, "2", 3, NaN, 1]
 		assert.equal(
 			tmp.concat(2, "b").map(function(i) { return tmp.indexOf(i) }),
-			[0, 1, 2, 3, 1, -1, -1]
+			[0, 1, 2, 3, -1, 1, -1, -1]
 		)
 		assert.equal(
 			tmp.concat(2, "b").map(function(i) { return tmp.lastIndexOf(i) }),
-			[0, 4, 2, 3, 4, -1, -1]
+			[0, 5, 2, 3, -1, 5, -1, -1]
+		)
+		assert.equal(
+			tmp.concat(2, "b").map(function(i) { return tmp.includes(i) }),
+			[true, true, true, true, true, true, false, false]
 		)
 		assert.equal(tmp.filter(function(i) { return typeof i === "string" }), ["a", "2"])
 		assert.equal(tmp.some(function(i) { return i === 1 }), true)

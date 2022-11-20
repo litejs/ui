@@ -308,8 +308,10 @@
 
 	O = O[P]
 	a = "var l=t.length,o=[],i=-1;"
+	b = "i+=b|0;while(++i<l)"
 	c = "if(t[i]===a)return i;return -1"
-	patch("indexOf",     a + "i+=b|0;while(++i<l)" + c)
+	patch("includes",    a + b + "if(t[i]===a||(a!==a&&t[i]!==t[i]))return!0;return!1")
+	patch("indexOf",     a + b + c)
 	patch("lastIndexOf", a + "i=(b|0)||l;i>--l&&(i=l)||i<0&&(i+=l);++i;while(--i>-1)" + c)
 
 	b = a + "if(A.length<2)b=t"
