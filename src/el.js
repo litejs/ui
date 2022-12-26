@@ -101,14 +101,10 @@
 	 * <input id="12" class="nice class" type="checkbox" checked="checked" disabled="disabled" data-lang="en">
 	 */
 
-	function isObject(obj) {
-		return obj && obj.constructor === Object
-	}
-
 	window.El = El
 
 	function El(name) {
-		if (typeof name != "string") {
+		if (!isString(name)) {
 			return new ElWrap(name)
 		}
 		var el, pres
@@ -292,11 +288,10 @@
 		if (!el.nodeType) {
 			return el.append ? el.append(child, before) : el
 		}
-		var fragment
+		var fragment, tmp
 		, i = 0
-		, tmp = typeof child
 		if (child) {
-			if (tmp === "string" || tmp === "number") child = document.createTextNode(child)
+			if (isString(child) || typeof child === "number") child = document.createTextNode(child)
 			else if ( !("nodeType" in child) && "length" in child ) {
 				// document.createDocumentFragment is unsupported in IE5.5
 				// fragment = "createDocumentFragment" in document ? document.createDocumentFragment() : El("div")
@@ -386,7 +381,7 @@
 	function hasClass(el, name) {
 		var current = el.className || ""
 
-		if (typeof current !== "string") {
+		if (!isString(current)) {
 			current = el.getAttribute("class") || ""
 		}
 
@@ -395,7 +390,7 @@
 
 	function cls(el, name, set) {
 		var current = el.className || ""
-		, useAttr = typeof current !== "string"
+		, useAttr = !isString(current)
 
 		if (useAttr) {
 			current = el.getAttribute("class") || ""
@@ -481,7 +476,7 @@
 		} else if (argi == 4 || argi == 5 && typeof handler === "number") {
 			delay = handler
 			handler = data
-			if (typeof selector === "string") {
+			if (isString(selector)) {
 				data = null
 			} else {
 				data = selector
@@ -493,7 +488,7 @@
 			return
 		}
 		var fn = (
-			typeof handler === "string" ? function(e) {
+			isString(handler) ? function(e) {
 				var target = selector ? El.closest(e.target, selector) : el
 				if (target) View.emit.apply(View, [handler, e, target].concat(data))
 			} :
@@ -909,7 +904,7 @@
 			map.bubble
 		););
 		if (fn) {
-			typeof fn === "string" ? View.emit(fn, e, chr, el) : fn(e, chr, el)
+			isString(fn) ? View.emit(fn, e, chr, el) : fn(e, chr, el)
 		}
 	}
 
@@ -1009,6 +1004,14 @@
 		Object.assign(wrapper[P], opts)
 		wrapper[P].constructor = wrapper
 		return wrapper
+	}
+
+	function isObject(obj) {
+		return !!obj && obj.constructor === Object
+	}
+
+	function isString(str) {
+		return typeof str === "string"
 	}
 }(window, document, Object, Event, "prototype")
 
