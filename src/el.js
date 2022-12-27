@@ -291,7 +291,7 @@
 		var fragment, tmp
 		, i = 0
 		if (child) {
-			if (isString(child) || typeof child === "number") child = document.createTextNode(child)
+			if (isString(child) || isNumber(child)) child = document.createTextNode(child)
 			else if ( !("nodeType" in child) && "length" in child ) {
 				// document.createDocumentFragment is unsupported in IE5.5
 				// fragment = "createDocumentFragment" in document ? document.createDocumentFragment() : El("div")
@@ -316,7 +316,7 @@
 				/**/
 				tmp.insertBefore(child,
 					(before === true ? tmp.firstChild :
-					typeof before === "number" ? tmp.childNodes[
+					isNumber(before) ? tmp.childNodes[
 						before < 0 ? tmp.childNodes.length - before - 2 : before
 					] : before) || null
 				)
@@ -469,11 +469,11 @@
 
 	function bindingOn(el, events, selector, data, handler, delay) {
 		var argi = arguments.length
-		if (argi == 3 || argi == 4 && typeof data === "number") {
+		if (argi == 3 || argi == 4 && isNumber(data)) {
 			delay = data
 			handler = selector
 			selector = data = null
-		} else if (argi == 4 || argi == 5 && typeof handler === "number") {
+		} else if (argi == 4 || argi == 5 && isNumber(handler)) {
 			delay = handler
 			handler = data
 			if (isString(selector)) {
@@ -1004,6 +1004,10 @@
 		Object.assign(wrapper[P], opts)
 		wrapper[P].constructor = wrapper
 		return wrapper
+	}
+
+	function isNumber(num) {
+		return typeof num === "number"
 	}
 
 	function isObject(obj) {
