@@ -225,8 +225,6 @@
 		, checkbox = type === "checkbox" || type === "radio"
 
 		if (el.tagName === "FORM") {
-			opts = {}
-
 			// Disabled controls do not receive focus,
 			// are skipped in tabbing navigation, cannot be successfully posted.
 			//
@@ -235,15 +233,11 @@
 			//
 			// Read-only checkboxes can be changed by the user
 
-			for (; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
+			for (opts = {}; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
 				value = valFn(input)
 				if (value !== UNDEF) {
 					step = opts
-					key.replace(/\[(.*?)\]/g, function(_, _key, offset) {
-						if (step == opts) key = key.slice(0, offset)
-						step = step[key] || (step[key] = step[key] === null || _key && +_key != _key ? {} : [])
-						key = _key
-					})
+					key.replace(/\[(.*?)\]/g, replacer)
 					step[key || step.length] = value
 				}
 			}
@@ -282,6 +276,12 @@
 		return checkbox && !el.checked ?
 		(type === "radio" ? UNDEF : null) :
 		el.valObject !== UNDEF ? el.valObject : el.value
+
+		function replacer(_, _key, offset) {
+			if (step == opts) key = key.slice(0, offset)
+			step = step[key] || (step[key] = step[key] === null || _key && +_key != _key ? {} : [])
+			key = _key
+		}
 	}
 
 	function append(el, child, before) {
