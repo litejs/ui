@@ -29,7 +29,7 @@
 			.right
 				%child
 			.right.lang ;each: lng in _.list
-				a.hand - {lng.upper()} -
+				a.hand - {lng.toUpperCase()} -
 					@click: [lng], "setLang"
 					;cls: "selected", lng == _.current
 					;cls: "lang-" + lng

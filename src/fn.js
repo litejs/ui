@@ -5,6 +5,7 @@
 	var undef
 	, P = "prototype"
 	, A = Array[P]
+	, F = Function[P]
 	, S = String[P]
 	, N = Number[P]
 	, slice = Function[P].call.bind(A.slice)
@@ -179,6 +180,56 @@
 		}
 	}
 
+	// Time to live - Run *onTimeout* if Function not called on time
+	F.ttl = function(ms, onTimeout, scope) {
+		var fn = this
+		, tick = setTimeout(function() {
+			ms = 0
+			if (onTimeout) onTimeout.call(scope)
+		}, ms)
+
+		return function() {
+			clearTimeout(tick)
+			if (ms) fn.apply(scope === undef ? this : scope, arguments)
+		}
+	}
+
+	// Run Function one time after last call
+	F.once = function(ms, scope) {
+		var tick, args
+		, fn = this
+		return function() {
+			if (scope === undef) scope = this
+			clearTimeout(tick)
+			args = arguments
+			tick = setTimeout(function() {
+				fn.apply(scope, args)
+			}, ms)
+		}
+	}
+
+	// Maximum call rate for Function
+	// leading edge, trailing edge
+	F.rate = function(ms, last_call, scope) {
+		var tick, args
+		, fn = this
+		, next = 0
+		if (last_call && typeof last_call !== "function") last_call = fn
+		return function() {
+			if (scope === undef) scope = this
+			var now = Date.now()
+			clearTimeout(tick)
+			if (now >= next) {
+				next = now + ms
+				fn.apply(scope, arguments)
+			} else if (last_call) {
+				args = arguments
+				tick = setTimeout(function() {
+					last_call.apply(scope, args)
+				}, next - now)
+			}
+		}
+	}
 }(this, Object)
 
 
