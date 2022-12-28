@@ -1,5 +1,5 @@
 /*
-* @version  22.8.0
+* @version  22.12.0
 * @author   Lauri Rooden <lauri@rooden.ee>
 * @license  MIT License
 */
@@ -329,10 +329,9 @@
 	var undef
 	, P = "prototype"
 	, A = Array[P]
-	, F = Function[P]
 	, S = String[P]
 	, N = Number[P]
-	, slice = F.call.bind(A.slice)
+	, slice = Function[P].call.bind(A.slice)
 	, fns = {}
 	, hasOwn = fns.hasOwnProperty
 	, fnRe = /('|")(?:\\?.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
@@ -381,6 +380,13 @@
 
 	A.pushUniq = function(item) {
 		return this.indexOf(item) < 0 && this.push(item)
+	}
+
+	A.pluck = function(name) {
+		for (var arr = this, i = arr.length, out = []; i--; ) {
+			out[i] = arr[i][name]
+		}
+		return out
 	}
 
 	// THANKS: Oliver Steele - Functional Javascript [http://www.osteele.com/sources/javascript/functional/]
@@ -433,21 +439,6 @@
 		return "" + this
 	}
 
-	S.safe = function() {
-		return this
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/\"/g, "&quot;")
-	}
-
-	S.capitalize = function() {
-		return this.charAt(0).toUpperCase() + this.slice(1)
-	}
-
-	S.lower = S.toLowerCase
-	S.upper = S.toUpperCase
-
 	N.step = function(a, add) {
 		var x = ("" + a).split(".")
 		, steps = this / a
@@ -460,57 +451,6 @@
 			return (+num).step(a, add)
 		})
 	}
-
-	N.scale = words([1000, 1000, 1000], ["","k","M","G"], {"default": "{n}{u}"})
-
-	S.scale = function() {
-		return this.replace(numbersRe, function(num) {
-			return (+num).scale()
-		})
-	}
-
-	S.pick = N.pick = function() {
-		var val = this + "="
-		for (var s, a = arguments, i = 0, len = a.length; i < len;) {
-			s = a[i++]
-			if (s.indexOf(val) == 0) {
-				s = s.slice(val.length)
-				i = len
-			}
-		}
-		return s.replace("#", this)
-	}
-
-	S.plural = N.plural = function() {
-		// Plural-Forms: nplurals=2; plural=n != 1;
-		// http://www.gnu.org/software/gettext/manual/html_mono/gettext.html#Plural-forms
-		return arguments[ +Fn("n->" + (String.plural || "n!=1"))( parseFloat(this) ) ].replace("#", this)
-	}
-
-	A.pluck = function(name) {
-		for (var arr = this, i = arr.length, out = []; i--; ) {
-			out[i] = arr[i][name]
-		}
-		return out
-	}
-
-	function words(steps, units, strings, overflow) {
-		return function(input) {
-			var n = +(arguments.length ? input : this)
-			, i = 0
-			, s = strings || {"default": "{n} {u}{s}"}
-
-			for (; n>=steps[i]; ) {
-				n /= steps[i++]
-			}
-			if (i == steps.length && overflow) {
-				return overflow(this)
-			}
-			i = units[i]
-			return (s[n < 2 ? i : i + "s"] || s["default"]).format({n: n, u: i, s: n < 2 ? "" : "s"})
-		}
-	}
-	Fn.words = words
 
 	function wait(fn) {
 		var pending = 1
@@ -1139,14 +1079,10 @@
 	 * <input id="12" class="nice class" type="checkbox" checked="checked" disabled="disabled" data-lang="en">
 	 */
 
-	function isObject(obj) {
-		return obj && obj.constructor === Object
-	}
-
 	window.El = El
 
 	function El(name) {
-		if (typeof name != "string") {
+		if (!isString(name)) {
 			return new ElWrap(name)
 		}
 		var el, pres
@@ -1267,8 +1203,6 @@
 		, checkbox = type === "checkbox" || type === "radio"
 
 		if (el.tagName === "FORM") {
-			opts = {}
-
 			// Disabled controls do not receive focus,
 			// are skipped in tabbing navigation, cannot be successfully posted.
 			//
@@ -1277,15 +1211,11 @@
 			//
 			// Read-only checkboxes can be changed by the user
 
-			for (; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
+			for (opts = {}; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
 				value = valFn(input)
 				if (value !== UNDEF) {
 					step = opts
-					key.replace(/\[(.*?)\]/g, function(_, _key, offset) {
-						if (step == opts) key = key.slice(0, offset)
-						step = step[key] || (step[key] = step[key] === null || _key && +_key != _key ? {} : [])
-						key = _key
-					})
+					key.replace(/\[(.*?)\]/g, replacer)
 					step[key || step.length] = value
 				}
 			}
@@ -1324,17 +1254,22 @@
 		return checkbox && !el.checked ?
 		(type === "radio" ? UNDEF : null) :
 		el.valObject !== UNDEF ? el.valObject : el.value
+
+		function replacer(_, _key, offset) {
+			if (step == opts) key = key.slice(0, offset)
+			step = step[key] || (step[key] = step[key] === null || _key && +_key != _key ? {} : [])
+			key = _key
+		}
 	}
 
 	function append(el, child, before) {
 		if (!el.nodeType) {
 			return el.append ? el.append(child, before) : el
 		}
-		var fragment
+		var fragment, tmp
 		, i = 0
-		, tmp = typeof child
 		if (child) {
-			if (tmp === "string" || tmp === "number") child = document.createTextNode(child)
+			if (isString(child) || isNumber(child)) child = document.createTextNode(child)
 			else if ( !("nodeType" in child) && "length" in child ) {
 				// document.createDocumentFragment is unsupported in IE5.5
 				// fragment = "createDocumentFragment" in document ? document.createDocumentFragment() : El("div")
@@ -1359,7 +1294,7 @@
 				/**/
 				tmp.insertBefore(child,
 					(before === true ? tmp.firstChild :
-					typeof before === "number" ? tmp.childNodes[
+					isNumber(before) ? tmp.childNodes[
 						before < 0 ? tmp.childNodes.length - before - 2 : before
 					] : before) || null
 				)
@@ -1424,7 +1359,7 @@
 	function hasClass(el, name) {
 		var current = el.className || ""
 
-		if (typeof current !== "string") {
+		if (!isString(current)) {
 			current = el.getAttribute("class") || ""
 		}
 
@@ -1433,7 +1368,7 @@
 
 	function cls(el, name, set) {
 		var current = el.className || ""
-		, useAttr = typeof current !== "string"
+		, useAttr = !isString(current)
 
 		if (useAttr) {
 			current = el.getAttribute("class") || ""
@@ -1512,14 +1447,14 @@
 
 	function bindingOn(el, events, selector, data, handler, delay) {
 		var argi = arguments.length
-		if (argi == 3 || argi == 4 && typeof data === "number") {
+		if (argi == 3 || argi == 4 && isNumber(data)) {
 			delay = data
 			handler = selector
 			selector = data = null
-		} else if (argi == 4 || argi == 5 && typeof handler === "number") {
+		} else if (argi == 4 || argi == 5 && isNumber(handler)) {
 			delay = handler
 			handler = data
-			if (typeof selector === "string") {
+			if (isString(selector)) {
 				data = null
 			} else {
 				data = selector
@@ -1531,7 +1466,7 @@
 			return
 		}
 		var fn = (
-			typeof handler === "string" ? function(e) {
+			isString(handler) ? function(e) {
 				var target = selector ? El.closest(e.target, selector) : el
 				if (target) View.emit.apply(View, [handler, e, target].concat(data))
 			} :
@@ -1947,7 +1882,7 @@
 			map.bubble
 		););
 		if (fn) {
-			typeof fn === "string" ? View.emit(fn, e, chr, el) : fn(e, chr, el)
+			isString(fn) ? View.emit(fn, e, chr, el) : fn(e, chr, el)
 		}
 	}
 
@@ -2047,5 +1982,17 @@
 		Object.assign(wrapper[P], opts)
 		wrapper[P].constructor = wrapper
 		return wrapper
+	}
+
+	function isNumber(num) {
+		return typeof num === "number"
+	}
+
+	function isObject(obj) {
+		return !!obj && obj.constructor === Object
+	}
+
+	function isString(str) {
+		return typeof str === "string"
 	}
 }(window, document, Object, Event, "prototype")
