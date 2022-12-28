@@ -186,9 +186,9 @@
 		div
 			;if: Math.random() > .5
 			;txt: "If"
-		.time ="Init '\" " + started.date()
+		.time ="Init '\" " + started
 		.time
-			;txt: "Load " + new Date().date()
+			;txt: "Load " + new Date()
 
 
 %view users #private

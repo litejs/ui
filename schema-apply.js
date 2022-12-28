@@ -63,8 +63,6 @@
 			}
 		} else if (type == "boolean" ) {
 			data = data ? true : required ? false : null
-		} else if (type == "date-time") {
-			data = data.date()
 		} else if (schema.type == "array" ) {
 			var itemSchema = Array.isArray(schema.items) && schema.items
 

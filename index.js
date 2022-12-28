@@ -1,334 +1,8 @@
-/*
-* @version  22.12.0
-* @author   Lauri Rooden <lauri@rooden.ee>
-* @license  MIT License
-*/
-
-
-
-!function(Date, proto) {
-	var Date$prototype = Date[proto]
-	, String$prototype = String[proto]
-	, Number$prototype = Number[proto]
-	, maskRe = /(\[)((?:\\?.)*?)\]|([YMD])\3\3\3?|([YMDHhmsWSZ])(\4?)|[uUASwoQ]|(["\\\n\r\u2028\u2029])/g
-	, dateRe = /(\d+)[-.\/](\d+)[-.\/](\d+)/
-	, timeRe = /(\d+):(\d+)(?::(\d+))?(\.\d+)?(?:\s*(?:(a)|(p))\.?m\.?)?(\s*(?:Z|GMT|UTC)?(?:([-+]\d\d):?(\d\d)?)?)?/i
-	, fns = Object.create(null)
-	, aliases = {
-		sec: "s",
-		second: "s",
-		seconds: "s",
-		min: "m",
-		minute: "m",
-		minutes: "m",
-		hr: "h",
-		hour: "h",
-		hours: "h",
-		day: "D",
-		days: "D",
-		week: "W",
-		weeks: "W",
-		month: "M",
-		months: "M",
-		year: "Y",
-		years: "Y"
-	}
-	, units = {
-		S: 1,
-		s: 1000,
-		m: 60000,
-		h: 3600000,
-		D: 86400000,
-		W: 604800000
-	}
-	, tmp1 = new Date()
-	, tmp2 = new Date()
-	, sinceFrom = new Date()
-	, map = Date.fnMap = {
-		w: "Day()||7",
-		Y: "FullYear()%100",
-		M: "Month()+1",
-		D: "Date()",
-		h: "Hours()",
-		H: "Hours()%12||12",
-		m: "Minutes()",
-		s: "Seconds()",
-		S: "Milliseconds()"
-	}
-	, locales = Date.locales = {
-		en: {
-			am: "AM",
-			pm: "PM",
-			names: "JanFebMarAprMayJunJulAugSepOctNovDecJanuaryFebruaryMarchAprilMayJuneJulyAugustSeptemberOctoberNovemberDecemberSunMonTueWedThuFriSatSundayMondayTuesdayWednesdayThursdayFridaySaturday".match(/.[a-z]+/g),
-			masks: {
-				LT:   "hh:mm",
-				LTS:  "hh:mm:ss",
-				L:    "DD/MM/YYYY",
-				LL:   "D MMMM YYYY",
-				LLL:  "D MMMM YYYY hh:mm",
-				LLLL: "DDDD, D MMMM YYYY hh:mm"
-			}
-		}
-	}
-	, masks = Date.masks = {
-		"iso": "UTC:YYYY-MM-DD[T]hh:mm:ss[Z]"
-	}
-
-
-	Date.makeStr = makeStr
-	function makeStr(mask, utc) {
-		var get = "d.get" + (utc ? "UTC" : "")
-		, setA = "a.setTime(+d+((4-(" + get + map.w + "))*864e5))"
-		return (utc ? mask.slice(4) : mask).replace(maskRe, function(match, quote, text, MD, single, pad, esc) {
-			var str = (
-				esc            ? escape(esc).replace(/%u/g, "\\u").replace(/%/g, "\\x") :
-				quote          ? text :
-				MD == "Y"      ? get + "FullYear()" :
-				MD             ? "l.names[" + get + (MD == "M" ? "Month" : "Day" ) + "()+" + (match == "DDD" ? 24 : MD == "D" ? 31 : match == "MMM" ? 0 : 12) + "]" :
-				match == "u"   ? "(d/1000)>>>0" :
-				match == "U"   ? "+d" :
-				match == "Q"   ? "((" + get + "Month()/3)|0)+1" :
-				match == "A"   ? "l[" + get + map.h + ">11?'pm':'am']" :
-				match == "o"   ? setA + ",a" + get.slice(1) + "FullYear()" :
-				single == "Z"  ? "(t=o)?(t<0?((t=-t),'-'):'+')+(t<600?'0':'')+(0|(t/60))" + (pad ? "" : "+':'") + "+((t%=60)>9?t:'0'+t):'Z'" :
-				single == "W"  ? "Math.ceil(((" + setA + "-a.s" + get.slice(3) + "Month(0,1))/864e5+1)/7)" :
-				get + map[single || match]
-			)
-			return quote || esc ? str : '"+(' + (
-				match == "SS" ? "(t=" + str + ")>9?t>99?t:'0'+t:'00'+t" :
-				pad && single != "Z" ? "(t=" + str + ")>9?t:'0'+t" :
-				str
-			) + ')+"'
-		})
-	}
-
-	Date$prototype.date = function(_mask, _zone) {
-		var offset, undef
-		, date = this
-		, locale = locales[date._locale || Date._locale || "en"] || locales.en
-		, mask = locale.masks && locale.masks[_mask] || masks[_mask] || _mask || masks.iso
-		, zone = _zone != undef ? _zone : date._tz != undef ? date._tz : Date._tz != undef ? Date._tz : undef
-		, utc = mask.slice(0, 4) == "UTC:"
-		if (zone != undef && !utc) {
-			offset = 60 * zone
-			tmp1.setTime(+date + offset * 6e4)
-			utc = mask = "UTC:" + mask
-		} else {
-			offset = utc ? 0 : -date.getTimezoneOffset()
-			tmp1.setTime(+date)
-		}
-		return isNaN(+date) ? "" + date : (
-			fns[mask] || (fns[mask] = Function("d,a,o,l", 'var t;return "' + makeStr(mask, utc) + '"')))(
-			tmp1,
-			tmp2,
-			offset,
-			locale
-		)
-	}
-
-	addFn("add", function(amount, _unit, mask) {
-		var date = this
-		, unit = aliases[_unit] || _unit
-		if (unit == "M" || unit == "Y" && (amount *= 12)) {
-			unit = date.getUTCDate()
-			date.setUTCMonth(date.getUTCMonth() + amount)
-			if (unit > (unit = date.getUTCDate())) {
-				date.add(-unit, "D")
-			}
-		} else if (amount) {
-			date.setTime(date.getTime() + (amount * (units[unit] || 1)))
-		}
-		return mask ? date.date(mask) : date
-	})
-
-	addFn("startOf", function(_unit, mask) {
-		var ms
-		, date = this
-		, unit = aliases[_unit] || _unit
-		, zone = date._tz != ms ? date._tz : Date._tz != ms ? Date._tz : ms
-		if (unit == "Y") {
-			if (zone === 0) date.setUTCMonth(0, 1)
-			else date.setMonth(0, 1)
-			unit = "D"
-		} else if (unit == "M") {
-			if (zone === 0) date.setUTCDate(1)
-			else date.setDate(1)
-			unit = "D"
-		} else if (unit == "W") {
-			ms = date.getDay()
-			if (ms != 1) date.setHours(-24 * (ms ? ms - 1 : 6))
-			unit = "D"
-		}
-		zone = zone < 36 ? 3600000 * zone : -date.getTimezoneOffset() * 60000
-		ms = date.getTime() + zone
-		date.setTime(
-			ms -
-			(ms % (units[unit] || 1)) -
-			zone
-		)
-		return mask ? date.date(mask) : date
-	})
-
-	addFn("endOf", function(unit, mask) {
-		return this.add(1, unit).startOf(unit).add(-1, "S", mask)
-	})
-
-	addFn("since", function(from, _unit) {
-		var diff
-		, date = this
-		, unit = aliases[_unit] || _unit
-		if (typeof from == "string") {
-			from = aliases[from] ? (sinceFrom.setTime(+date), sinceFrom.tz(date._tz).startOf(from)) : from.date()
-		}
-		if (units[unit]) {
-			diff = (date - from) / units[unit]
-		} else {
-			diff = date.since("month", "S") - from.since("month", "S")
-			if (diff) {
-				tmp1.setTime(+date)
-				diff /= units.D * tmp1.endOf("M").getUTCDate()
-			}
-			diff += 12 * (date.getUTCFullYear() - from.getUTCFullYear()) + date.getUTCMonth() - from.getUTCMonth()
-			if (unit == "Y") {
-				diff /= 12
-			}
-		}
-
-		return diff
-	})
-
-	//*/
-
-
-	/*
-	 * // In Chrome Date.parse("01.02.2001") is Jan
-	 * num = +date || Date.parse(date) || ""+date;
-	 */
-
-	String$prototype.date = function(mask, zoneOut, zoneIn) {
-		var undef, date, match, year, month
-		, str = this
-		if (isNaN(+str)) {
-			if (match = str.match(dateRe)) {
-				// Big endian date, starting with the year, eg. 2011-01-31
-				// Middle endian date, starting with the month, eg. 01/31/2011
-				// Little endian date, starting with the day, eg. 31.01.2011
-				year = match[1] > 99 ? 1 : 3
-				month = Date.middleEndian ? 4 - year : 2
-				date = new Date(match[year], match[month] - 1, match[6 - month - year])
-			} else {
-				date = new Date()
-			}
-
-			// Time
-			match = str.match(timeRe) || [0, 0, 0]
-			date.setHours(
-				match[6] && match[1] < 12 ? +match[1] + 12 :
-				match[5] && match[1] == 12 ? 0 : match[1],
-				match[2], match[3]|0, (1000 * match[4])|0
-			)
-
-			// Timezone
-			if (match[7]) {
-				zoneIn = (match[8]|0) + ((match[9]|0)/(match[8]<0?-60:60))
-			}
-
-			if (zoneIn != undef) {
-				date.tz(zoneIn)
-				date.setTime(date - (60 * zoneIn + date.getTimezoneOffset()) * 60000)
-			}
-			return mask ? date.date(mask, zoneOut) : date
-		}
-		return (+str).date(mask, zoneOut, zoneIn)
-	}
-
-	Number$prototype.date = function(mask, zoneOut, zoneIn) {
-		var date
-		, num = this
-		if (num < 4294967296) num *= 1000
-		date = new Date(
-			zoneIn != date ?
-			tmp1.setTime(num) - (60 * zoneIn + tmp1.getTimezoneOffset()) * 60000 :
-			num
-		)
-
-		return mask ? date.date(mask, zoneOut) : date
-	}
-
-	function addFn(method, fn) {
-		Date$prototype[method] = fn
-		String$prototype[method] = Number$prototype[method] = function(a, b, c) {
-			return this.date()[method](a, b, c)
-		}
-	}
-
-	function makeSetter(method) {
-		Date[method] = Date$prototype[method] = function(value, mask) {
-			var date = this
-			date["_" + method] = value
-			return mask ? date.date(mask) : date
-		}
-	}
-
-	makeSetter("tz")
-	makeSetter("locale")
-}(Date, "prototype")
-!function(F, undef) {
-	// Time to live - Run *onTimeout* if Function not called on time
-	F.ttl = function(ms, onTimeout, scope) {
-		var fn = this
-		, tick = setTimeout(function() {
-			ms = 0
-			if (onTimeout) onTimeout.call(scope)
-		}, ms)
-
-		return function() {
-			clearTimeout(tick)
-			if (ms) fn.apply(scope === undef ? this : scope, arguments)
-		}
-	}
-
-	// Run Function one time after last call
-	F.once = function(ms, scope) {
-		var tick, args
-		, fn = this
-		return function() {
-			if (scope === undef) scope = this
-			clearTimeout(tick)
-			args = arguments
-			tick = setTimeout(function() {
-				fn.apply(scope, args)
-			}, ms)
-		}
-	}
-
-	// Maximum call rate for Function
-	// leading edge, trailing edge
-	F.rate = function(ms, last_call, scope) {
-		var tick, args
-		, fn = this
-		, next = 0
-		if (last_call && typeof last_call !== "function") last_call = fn
-		return function() {
-			if (scope === undef) scope = this
-			var now = Date.now()
-			clearTimeout(tick)
-			if (now >= next) {
-				next = now + ms
-				fn.apply(scope, arguments)
-			} else if (last_call) {
-				args = arguments
-				tick = setTimeout(function() {
-					last_call.apply(scope, args)
-				}, next - now)
-			}
-		}
-	}
-}(Function.prototype)
 !function(exports, Object) {
 	var undef
 	, P = "prototype"
 	, A = Array[P]
+	, F = Function[P]
 	, S = String[P]
 	, N = Number[P]
 	, slice = Function[P].call.bind(A.slice)
@@ -503,6 +177,56 @@
 		}
 	}
 
+	// Time to live - Run *onTimeout* if Function not called on time
+	F.ttl = function(ms, onTimeout, scope) {
+		var fn = this
+		, tick = setTimeout(function() {
+			ms = 0
+			if (onTimeout) onTimeout.call(scope)
+		}, ms)
+
+		return function() {
+			clearTimeout(tick)
+			if (ms) fn.apply(scope === undef ? this : scope, arguments)
+		}
+	}
+
+	// Run Function one time after last call
+	F.once = function(ms, scope) {
+		var tick, args
+		, fn = this
+		return function() {
+			if (scope === undef) scope = this
+			clearTimeout(tick)
+			args = arguments
+			tick = setTimeout(function() {
+				fn.apply(scope, args)
+			}, ms)
+		}
+	}
+
+	// Maximum call rate for Function
+	// leading edge, trailing edge
+	F.rate = function(ms, last_call, scope) {
+		var tick, args
+		, fn = this
+		, next = 0
+		if (last_call && typeof last_call !== "function") last_call = fn
+		return function() {
+			if (scope === undef) scope = this
+			var now = Date.now()
+			clearTimeout(tick)
+			if (now >= next) {
+				next = now + ms
+				fn.apply(scope, arguments)
+			} else if (last_call) {
+				args = arguments
+				tick = setTimeout(function() {
+					last_call.apply(scope, args)
+				}, next - now)
+			}
+		}
+	}
 }(this, Object)
 !function(exports) {
 	var empty = []

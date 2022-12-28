@@ -103,11 +103,9 @@ var app = LiteJS({
 	function setLang(lang) {
 		html.lang = lang = i18n.use(lang)
 		xhr.load("lang/" + lang + ".js", function() {
-			Date.names = i18n("__date").split(" ")
 			String.alphabet = i18n("__alphabet")
 			String.ordinal = i18n("__ordinal")
 			String.plural = i18n("__plural")
-			Object.assign(Date.masks, i18n("__dateMasks"))
 			body.dir = i18n("dir")
 
 			El.render(body)
