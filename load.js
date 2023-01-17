@@ -31,7 +31,6 @@
 !function(window, Function, setTimeout) {
 	xhr._s = new Date
 	var loaded = {}
-	, urlEscRe = /[+#\s]+/g
 	/*** activex ***/
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
 	/**/
@@ -118,11 +117,7 @@
 		// if (sessionID) xhr.setRequestHeader("Cookie", sessionID);
 		// if (xhr.getResponseHeader("Set-Cookie")) sessionID = xhr.getResponseHeader("Set-Cookie");
 
-
-		// encodeURI("A + B").replace(/%5[BD]/g, decodeURI).replace(/\+/g, "%2B").replace(/%20/g, "+")
-		// unescape("A+%2B+B".replace(/\+/g, " "))
-		xhr.open(method, url.replace(urlEscRe, encodeURIComponent).replace(/%20/g, "+"), next !== true)
-
+		xhr.open(method, url, next !== true)
 
 		// With IE 8 XMLHttpRequest gains the timeout property.
 		// With the timeout property, Web developers can specify
