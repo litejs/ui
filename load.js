@@ -29,7 +29,7 @@
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
 !function(window, Function, setTimeout) {
-	xhr._s = new Date
+	xhr._s = new Date()
 	var loaded = {}
 	/*** activex ***/
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
@@ -242,7 +242,7 @@
 		function exec() {
 			if (res[pos]) {
 				try {
-					;(xhr[files[pos].split("?")[0].split(".").pop()] || execScript)(res[pos])
+					;(xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
 				} catch(e) {
 					onerror(e, files[pos])
 				}
