@@ -21,6 +21,8 @@
 		<p id=p></p>
 		<p id=r></p>
 		<script src="../load.js"></script>
+		<script src="../polyfill/index.js"></script>
+		<script src="../../cli/test.js"></script>
 <script>
 
 var b
@@ -43,15 +45,12 @@ i.innerHTML = "# " + [
 	"ie6789: " + ie6789
 ].join("<br># ")
 
-xhr.load(["../polyfill/index.js", "../../cli/test.js", "../../ua/index.js"], function() {
-	var arr = xhr._p || []
-	, br = ua(navigator.userAgent)
-	p.innerHTML = "# Patched: " + arr.length + "<br># " + arr.join(", ") + "<br># " + JSON.stringify(br)
-	describe.onend = function() {
-		r.innerHTML = describe.output.replace(/\n/g, "<br>")
-	}
-	xhr.load("polyfill.js")
-})
+p.innerHTML = "# Patched: " + xhr._p.length + "<br># " + xhr._p.join(", ")
+describe.env = "browser"
+describe.onend = function() {
+	r.innerHTML = describe.output.replace(/\n/g, "<br>")
+}
+xhr.load("polyfill.js")
 </script>
 <noscript>No script</noscript>
 </body></html>

@@ -9,46 +9,44 @@ describe("Polyfill test", function() {
 	})
 	.test("index.js", function(assert, mock) {
 
-		//*
-		mock.swap(Object, {
-			assign: null,
-			create: null,
-			entries: null,
-			keys: null,
-			hasOwn: null,
-			values: null,
-			fromEntries: null
-		})
-		mock.swap(Function.prototype, "bind", null)
-		mock.swap(String.prototype, "trim", null)
-		mock.swap(Date, "now", null)
-		mock.swap(Date.prototype, { toJSON: null, toISOString: null })
-		mock.swap(Array, {
-			from: null,
-			isArray: null,
-			of: null
-		})
-		mock.swap(Array.prototype, {
-			entries: null,
-			every: null,
-			filter: null,
-			flat: null,
-			flatMap: null,
-			forEach: null,
-			includes: null,
-			indexOf: null,
-			lastIndexOf: null,
-			map: null,
-			reduce: null,
-			reduceRight: null,
-			some: null
-		})
-		var lib = require("../polyfill/index.js")
-
-		/*/
-
-		var lib = window
-		//*/
+		if (describe.env === "browser") {
+			var lib = window
+		} else {
+			mock.swap(Object, {
+				assign: null,
+				create: null,
+				entries: null,
+				keys: null,
+				hasOwn: null,
+				values: null,
+				fromEntries: null
+			})
+			mock.swap(Function.prototype, "bind", null)
+			mock.swap(String.prototype, "trim", null)
+			mock.swap(Date, "now", null)
+			mock.swap(Date.prototype, { toJSON: null, toISOString: null })
+			mock.swap(Array, {
+				from: null,
+				isArray: null,
+				of: null
+			})
+			mock.swap(Array.prototype, {
+				entries: null,
+				every: null,
+				filter: null,
+				flat: null,
+				flatMap: null,
+				forEach: null,
+				includes: null,
+				indexOf: null,
+				lastIndexOf: null,
+				map: null,
+				reduce: null,
+				reduceRight: null,
+				some: null
+			})
+			var lib = require("../polyfill/index.js")
+		}
 
 
 		var tmp, undef
@@ -76,6 +74,7 @@ describe("Polyfill test", function() {
 		assert.equal(lib.sessionStorage.getItem("a"), "1")
 
 		assert.equal(lib.escape("a", 0), "a")
+		assert.equal([1, 2].reverse(), [2, 1])
 
 		assert.type(lib.requestAnimationFrame, "function")
 		assert.type(lib.cancelAnimationFrame, "function")

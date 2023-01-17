@@ -278,7 +278,6 @@
 	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4
 	patch("bind", "b=S.call(A,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(S.call(arguments)))};if(t[P])c[P]=t[P];return c")
 
-
 	O = Object
 	patch("assign", "for(var k,i=1,l=A.length;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 	patch("create", "X[P]=a||Y;return new X", 0, nop, {
@@ -318,6 +317,9 @@
 	c = "b=a.call(null,b,t[i],i,t);return b"
 	patch("reduce",      b + "[++i];while(++i<l)" + c)
 	patch("reduceRight", b + "[--l];i=l;while(i--)" + c)
+
+	// Safari12 bug, any modification to the original array before calling `reverse` makes bug disappear
+	patch("reverse",     "if(X(t))t.length=t.length;return O.call(t)", "2,1" != [1, 2].reverse(), isArr)
 
 	b = a + "while(++i<l)if(i in t)"
 	patch("every",       b + "if(!a.call(b,t[i],i,t))return!1;return!0")
