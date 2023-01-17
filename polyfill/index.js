@@ -280,7 +280,7 @@
 
 
 	O = Object
-	patch("assign", "var k,i=1,l=A.length;for(;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
+	patch("assign", "for(var k,i=1,l=A.length;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 	patch("create", "X[P]=a||Y;return new X", 0, nop, {
 		// oKeys is undefined at this point
 		constructor: oKeys, hasOwnProperty: oKeys, isPrototypeOf: oKeys, propertyIsEnumerable: oKeys,
