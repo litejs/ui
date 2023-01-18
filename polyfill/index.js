@@ -253,7 +253,7 @@
 	})
 
 	/*** ie9 ***/
-	patch("matchMedia", "b=a||'all';return{media:b,matches:X?X.matchMedium(b):!1,addEventListener:Y}", 0, window.styleMedia || window.media, nop)
+	patch("matchMedia", "b=a||'all';return{media:b,matches:X?X.matchMedium(b):!1,addListener:Y}", 0, window.styleMedia || window.media, nop)
 	/**/
 
 	O = patch("performance")
