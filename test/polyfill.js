@@ -75,6 +75,8 @@ describe("Polyfill test", function() {
 
 		assert.equal(lib.escape("a", 0), "a")
 		assert.equal([1, 2].reverse(), [2, 1])
+		assert.equal([1, 2].splice(0), [1, 2])
+		assert.equal([1, 2].splice(0, null), [])
 
 		assert.type(lib.requestAnimationFrame, "function")
 		assert.type(lib.cancelAnimationFrame, "function")

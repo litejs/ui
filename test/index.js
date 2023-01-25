@@ -1,6 +1,6 @@
 
 
 require("./load.js")
-//require("./polyfill.js")
+require("./polyfill.js")
 
 

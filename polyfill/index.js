@@ -321,6 +321,9 @@
 	// Safari12 bug, any modification to the original array before calling `reverse` makes bug disappear
 	patch("reverse",     "if(X(t))t.length=t.length;return O.call(t)", "2,1" != [1, 2].reverse(), isArr)
 
+	// In ES3 standard the second deleteCount argument is required, IE<=8 requires deleteCount
+	patch("splice",      "if(b===Y)A[1]=t.length-a;return O.apply(t,A)", "1,2" != [1, 2].splice(0))
+
 	b = a + "while(++i<l)if(i in t)"
 	patch("every",       b + "if(!a.call(b,t[i],i,t))return!1;return!0")
 	patch("forEach",     b + "a.call(b,t[i],i,t)")
