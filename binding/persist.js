@@ -3,6 +3,7 @@
 
 
 
+/* global El */
 !function(bindings, window) {
 	bindings.persist = bindingPersist
 
@@ -19,5 +20,5 @@
 		})
 	}
 	bindingPersist.once = bindingPersist
-}(El.bindings, window)
+}(El.bindings, window) // jshint ignore:line
 

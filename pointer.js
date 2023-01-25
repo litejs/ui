@@ -1,4 +1,5 @@
 
+/* global El */
 !function(Event, document) {
 	var firstEl, lastDist, lastAngle, pinchThreshhold, mode
 	, TOUCH_FLAG = "-tf"
@@ -167,6 +168,6 @@
 	supportsPointer = 'onpointermove' in window.document;
 	supportsTouchForceChange = 'ontouchforcechange' in window.document;
 	*/
-}(Event, document)
+}(Event, document) // jshint ignore:line
 
 

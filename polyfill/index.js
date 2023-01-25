@@ -19,6 +19,8 @@
 // Event, assign, entries, values, from, sendBeacon, matches, closest
 
 
+/* global El, xhr */
+/* c8 ignore start */
 !function(window, Function) {
 
 	// Array#flat()         - Chrome69, Edge79, Firefox62, Safari12
@@ -32,7 +34,7 @@
 	, O = window
 	, patched = (window.xhr || window)._p = []
 	, jsonRe = /[\x00-\x1f\x22\x5c]/g
-	, JSONmap = {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t",'"':'\\"',"\\":"\\\\"}
+	, JSONmap = {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t","\"":"\\\"","\\":"\\\\"}
 	, hasOwn = JSONmap.hasOwnProperty
 	, esc = escape
 	, document = patch("document", {body:{}})
@@ -40,9 +42,9 @@
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	// The documentMode is an IE only property, supported from IE8
 	, a = document.documentMode | 0, b, c
-	, ie678 = !+"\v1" && a < 9
+	, ie678 = !+"\v1" && a < 9 // jshint ignore:line
 	, ie6789 = ie678 || a == 9
-	, ie67 = ie678 && a < 8
+	//, ie67 = ie678 && a < 8
 	, EV = "Event"
 	, Event = patch(
 		EV,
@@ -143,7 +145,7 @@
 					, preventDefault = e.preventDefault.bind(e)
 					, stopPropagation = e.stopPropagation.bind(e)
 					, i = 0
-					for (; touch = touches[i++]; ) {
+					for (; (touch = touches[i++]); ) {
 						touch.pointerId = touch.identifier + 2
 						touch.pointerType = "touch"
 						touch.width = 2 * (touch.radiusX || touch.webkitRadiusX || 0)
@@ -200,7 +202,7 @@
 		/**/
 		var data = {
 			setItem: function(id, val) {
-				return data[id] = "" + val
+				return (data[id] = "" + val)
 			},
 			getItem: function(id) {
 				return data[id]
@@ -240,7 +242,7 @@
 		stringify: function stringify(o) {
 			// IE 8 serializes `undefined` as `"undefined"`
 			return (
-				isStr(o) ? '"' + o.replace(jsonRe, jsonFn) + '"' :
+				isStr(o) ? "\"" + o.replace(jsonRe, jsonFn) + "\"" :
 				o && typeof o == "object" ? (
 					isFn(o.toJSON) ? stringify(o.toJSON()) :
 					isArr(o) ? "[" + o.map(stringify) + "]" :
@@ -282,7 +284,9 @@
 	patch("assign", "for(var k,i=1,l=A.length;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 	patch("create", "X[P]=a||Y;return new X", 0, nop, {
 		// oKeys is undefined at this point
-		constructor: oKeys, hasOwnProperty: oKeys, isPrototypeOf: oKeys, propertyIsEnumerable: oKeys,
+		constructor: oKeys,
+		hasOwnProperty: oKeys, // jshint ignore:line
+		isPrototypeOf: oKeys, propertyIsEnumerable: oKeys,
 		toLocaleString: oKeys, toString: oKeys, valueOf: oKeys
 	})
 	a = "c=[];for(b in a)o.call(a,b)&&c.push("
@@ -319,7 +323,8 @@
 	patch("reduceRight", b + "[--l];i=l;while(i--)" + c)
 
 	// Safari12 bug, any modification to the original array before calling `reverse` makes bug disappear
-	patch("reverse",     "if(X(t))t.length=t.length;return O.call(t)", "2,1" != [1, 2].reverse(), isArr)
+	// Fixed in Safari 12.0.1 and iOS 12.1 on October 30, 2018
+	// patch("reverse",     "if(X(t))t.length=t.length;return O.call(t)", "2,1" != [1, 2].reverse(), isArr)
 
 	// In ES3 standard the second deleteCount argument is required, IE<=8 requires deleteCount
 	patch("splice",      "if(b===Y)A[1]=t.length-a;return O.apply(t,A)", "1,2" != [1, 2].splice(0))
@@ -456,7 +461,8 @@
 			src || {}
 		))
 	}
-}(this, Function)
+}(this, Function) // jshint ignore:line
+/* c8 ignore stop */
 
 
 

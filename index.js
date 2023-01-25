@@ -65,7 +65,7 @@
 		, arr = _e ? (_e[type] || empty).concat(_e["*"] || empty) : empty
 		if ((_e = arr.length)) {
 			for (i = _e - 1, args = arr.slice.call(arguments, 1); i > 1; i -= 3) {
-				arr[i] && arr[i].apply(arr[i - 2] || emitter, args)
+				if (arr[i]) arr[i].apply(arr[i - 2] || emitter, args)
 			}
 		}
 		return _e / 3
@@ -292,8 +292,8 @@
 	View.prototype = {
 		show: function(_params) {
 			var parent
-			, params = lastParams = _params || {}
-			, view = lastView = this
+			, params = lastParams = _params || {} // jshint ignore:line
+			, view = lastView = this // jshint ignore:line
 			, tmp = params._v || view
 			, close = view.isOpen && view
 
@@ -477,7 +477,7 @@
 /* litejs.com/MIT-LICENSE.txt */
 
 
-/* global Fn, View, xhr */
+/* global View, xhr */
 !function(window, document, Object, Event, P) {
 	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
@@ -1113,7 +1113,9 @@
 	El.kill = kill
 	El.render = render
 
-	for (var key in El) !function(key) {
+	for (var key in El) wrap(key)
+
+	function wrap(key) {
 		wrapProto[key] = function wrap() {
 			var i = 0
 			, self = this
@@ -1126,7 +1128,7 @@
 			}
 			return self
 		}
-	}(key)
+	}
 
 	wrapProto.append = function(el) {
 		var elWrap = this
@@ -1160,6 +1162,7 @@
 
 			for (q = indent.length; q <= stack[0]; ) {
 				if (parent.plugin) {
+					if (parent.plugin.content && !parent.plugin.el.childNodes[0]) break
 					parent.plugin.done()
 				}
 				parent = parentStack.pop()
@@ -1290,7 +1293,9 @@
 				})
 			}
 		}),
-		el: plugin,
+		el: extend(plugin, {
+			content: 1,
+		}),
 		js: js,
 		map: extend(js, {
 			done: function() {
@@ -1303,8 +1308,8 @@
 				)
 			}
 		}),
-		template: plugin,
 		view: extend(plugin, {
+			content: 1,
 			done: function() {
 				var fn
 				, t = this
@@ -1444,7 +1449,7 @@
 		// document.documentElement.clientWidth is 0 in IE5
 		var key, next
 		, width = root.offsetWidth
-		, map = breakpoints = _breakpoints || breakpoints
+		, map = breakpoints = _breakpoints || breakpoints // jshint ignore:line
 
 		for (key in map) {
 			if (map[key] > width) break

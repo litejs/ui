@@ -43,7 +43,7 @@
 			if (!done) {
 				promise._s = state || false
 				promise._v = val
-				for (done = 0; val = promise._d[done++]; ) {
+				for (done = 0; (val = promise._d[done++]); ) {
 					handle(promise, val)
 				}
 			}
@@ -53,7 +53,7 @@
 				if (val === promise)
 					end(TypeError("A promise resolved with itself"))
 				if (!done) try {
-					if (done = getThen(val)) {
+					if ((done = getThen(val))) {
 						resolve(promise, done)
 					} else {
 						end(val, state = true)
@@ -100,7 +100,7 @@
 			}
 			function resolveThen(i, then) {
 				try {
-					if (then = getThen(arr[i]))
+					if ((then = getThen(arr[i])))
 						then(function (val) {
 							arr[i] = val
 							resolveThen(i)
@@ -131,11 +131,11 @@
 
 	Promise.race = function (values) {
 		return new Promise(function (resolve, reject, val, i) {
-			for (i = 0; val = values[i++]; ) {
+			for (i = 0; (val = values[i++]); ) {
 				val.then(resolve, reject)
 			}
 		})
 	}
-}(this)
+}(this) /* jshint -W030 */
 
 

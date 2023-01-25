@@ -3,6 +3,7 @@
 
 
 
+/* global El, xhr */
 !function(exports) {
 	var fn, lastView, lastStr, lastUrl, syncResume
 	, isArray = Array.isArray
@@ -73,8 +74,8 @@
 	View.prototype = {
 		show: function(_params) {
 			var parent
-			, params = lastParams = _params || {}
-			, view = lastView = this
+			, params = lastParams = _params || {} // jshint ignore:line
+			, view = lastView = this // jshint ignore:line
 			, tmp = params._v || view
 			, close = view.isOpen && view
 
@@ -85,7 +86,7 @@
 				emit(syncResume = params._v = tmp, "ping", params, View)
 				syncResume = null
 				if (lastParams !== params) return
-				if (parent = tmp.parent) {
+				if ((parent = tmp.parent)) {
 					if (parent.child && parent.child !== tmp) {
 						close = parent.child
 					}
@@ -113,7 +114,7 @@
 			if (view !== close) emit(view, "change", close)
 
 			for (tmp in params) if (tmp.charAt(0) !== "_") {
-				if (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"]) {
+				if ((syncResume = hasOwn.call(paramCb, tmp)) && paramCb[tmp] || paramCb["*"]) {
 					syncResume.call(view, params[tmp], tmp, params)
 					syncResume = null
 				}
@@ -155,10 +156,10 @@
 			if (view.kb) El.addKb(view.kb)
 			close = null
 		}
-		if (params._d = params._v = view.child) {
+		if ((params._d = params._v = view.child)) {
 			bubbleDown(params, close)
 		}
-		if (lastView === view) {
+		if ((lastView === view)) {
 			emit(view, "show", params)
 			blur()
 		}
@@ -212,20 +213,21 @@
 		}
 	}
 
-	View.param = function(name, cb, re) {
+	View.param = function(name, cb) {
 		;(isArray(name) ? name : name.split(/\s+/)).forEach(function(n) {
 			paramCb[n] = cb
 		})
 	}
 
 	View.def = function(str) {
-		for (var match, re = /(\S+) (\S+)/g; match = re.exec(str);) {
-			match[1].split(",").map(function(view) {
-				view = View(expand(view, lastStr))
-				view.file = (view.file ? view.file + "," : "") +
-				match[2].split(",").map(function(file) {
-					return views[file] ? views[file].file : expand(file, lastStr)
-				})
+		for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
+			match[1].split(",").map(def)
+		}
+		function def(view) {
+			view = View(expand(view, lastStr))
+			view.file = (view.file ? view.file + "," : "") +
+			match[2].split(",").map(function(file) {
+				return views[file] ? views[file].file : expand(file, lastStr)
 			})
 		}
 	}
@@ -253,5 +255,5 @@
 		)
 	}
 
-}(this)
+}(this) // jshint ignore:line
 

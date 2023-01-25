@@ -256,7 +256,7 @@
 				/**/
 				else {
 					if (next) next()
-					if (res = cb.x) {
+					if ((res = cb.x)) {
 						for (i = 0; res[i];) res[i++](0, "", res[i++], res[i++])
 					}
 				}
@@ -270,5 +270,5 @@
 	/**/
 
 	function nop() {}
-}(this, Function, setTimeout)
+}(this, Function, setTimeout) // jshint ignore:line
 

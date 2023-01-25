@@ -21,25 +21,26 @@
     "el",
     "polyfill"
   ],
+  "scripts": {
+    "test": "TZ='Europe/Tallinn' c8 -r lcov -r html -r text-summary lj test test/index.js --brief && jshint --verbose *.js src/*.js binding/*.js polyfill/*.js"
+  },
   "litejs": {
     "build": "lj b --out=test/index.html test/dev.html"
   },
   "jshintConfig": {
     "asi": true,
+    "browser": true,
+    "esversion": 5,
+    "evil": true,
+    "latedef": "nofunc",
     "laxcomma": true,
     "maxdepth": 6,
-    "quotmark": "double"
-  },
-  "c8": {
-    "check-coverage": true,
-    "branches": 100,
-    "lines": 100,
-    "functions": 100,
-    "statements": 100,
-    "reporter": [
-      "lcov",
-      "text",
-      "html"
-    ]
+    "node": true,
+    "nonbsp": true,
+    "nonstandard": true,
+    "quotmark": "double",
+    "shadow": "inner",
+    "undef": true,
+    "unused": true
   }
 }

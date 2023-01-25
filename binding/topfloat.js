@@ -1,11 +1,12 @@
 
+/* global El */
 El.bindings.topFloat = function(el, offset) {
 	var h = el.offsetHeight + offset
 	, lastAbs = 0
 	, lastTop = 0
 	, toFix = 0
 
-	El.on(window, "scroll", function(e) {
+	El.on(window, "scroll", function() {
 		var pos
 		, top = El.scrollTop()
 

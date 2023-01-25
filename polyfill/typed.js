@@ -15,7 +15,7 @@
 	, proto = Array.prototype
 
 	for (; i--; ) {
-		if (t = exports[typed[i]]) {
+		if ((t = exports[typed[i]])) {
 			for (k in Array) if (!t[k]) {
 				t[k] = Array[k]
 			}
@@ -27,5 +27,5 @@
 			exports[typed[i]] = Array
 		}
 	}
-}(this, Array)
+}(this, Array) /* jshint -W030 */
 

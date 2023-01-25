@@ -19,7 +19,7 @@
 	// In earlier versions, the expression "\v" === "v" returns true.
 	// In Internet Explorer 9 standards mode, Internet Explorer 10 standards mode,
 	// and win8_appname_long apps, the expression returns false.
-	, ie6_7 = !+"\v1" && (document.documentMode | 0) < 8
+	, ie67 = !+"\v1" && (document.documentMode | 0) < 8 // jshint ignore:line
 
 	function getUrl(_loc) {
 		return (
@@ -95,18 +95,18 @@
 			window.onpopstate = checkUrl
 		} else
 		/**/
-			if ("onhashchange" in window && !ie6_7) {
+			if ("onhashchange" in window && !ie67) {
 			// There are onhashchange in IE7 but its not get emitted
 			//
 			// Basic support:
 			// Chrome 5.0, Firefox 3.6, IE 8, Opera 10.6, Safari 5.0
 			window.onhashchange = checkUrl
 		} else {
-			if (ie6_7 && !iframe) {
+			if (ie67 && !iframe) {
 				// IE<9 encounters the Mixed Content warning when the URI javascript: is used.
 				// IE5/6 additionally encounters the Mixed Content warning when the URI about:blank is used.
 				// src="//:"
-				iframe = document.body.appendChild(document.createElement('<iframe style="display:none" tabindex="-1">')).contentWindow
+				iframe = document.body.appendChild(document.createElement("<iframe tabindex=-1 style=display:none>")).contentWindow
 			}
 			clearInterval(tick)
 			tick = setInterval(function(){
@@ -114,13 +114,14 @@
 				if (iframe && last === cur) cur = getUrl(iframe.location)
 				if (last !== cur) {
 					last = cur
-					iframe ? setUrl(cur) : checkUrl()
+					if (iframe) setUrl(cur)
+					else checkUrl()
 				}
 			}, 60)
 		}
 		checkUrl()
 	}
-}(this, document, history, location)
+}(this, document, history, location) // jshint ignore:line
 
 
 

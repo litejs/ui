@@ -2,6 +2,7 @@
 /* litejs.com/MIT-LICENSE.txt */
 
 
+/* global View, xhr */
 !function(window, document, Object, Event, P) {
 	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
@@ -76,7 +77,7 @@
 	/*** ie8 ***/
 
 	// JScript engine in IE<9 does not recognize vertical tabulation character
-	, ie678 = !+"\v1"
+	, ie678 = !+"\v1" // jshint ignore:line
 	, ie67 = ie678 && (document.documentMode | 0) < 8
 
 	El.matches = function(el, sel) {
@@ -202,7 +203,7 @@
 		/*** ie8 ***/
 		// istanbul ignore next: IE fix
 		if (ie67 && (key === "id" || key === "name" || key === "checked")) {
-			el.mergeAttributes(document.createElement('<INPUT ' + key + '="' + val + '">'), false)
+			el.mergeAttributes(document.createElement("<INPUT " + key + "='" + val + "'>"), false)
 		} else
 		/**/
 		if (key === "class") {
@@ -233,7 +234,7 @@
 			//
 			// Read-only checkboxes can be changed by the user
 
-			for (opts = {}; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
+			for (opts = {}; (input = el.elements[i++]); ) if (!input.disabled && (key = input.name || input.id)) {
 				value = valFn(input)
 				if (value !== UNDEF) {
 					step = opts
@@ -248,20 +249,22 @@
 		if (arguments.length > 1) {
 			if (opts) {
 				value = (isArray(val) ? val : [ val ]).map(String)
-				for (; input = opts[i++]; ) {
+				for (; (input = opts[i++]); ) {
 					input.selected = value.indexOf(input.value) > -1
 				}
 			} else if (el.val) {
 				el.val(val)
+			} else if (checkbox) {
+				el.checked = !!val
 			} else {
-				checkbox ? (el.checked = !!val) : (el.value = val)
+				el.value = val
 			}
 			return
 		}
 
 		if (opts) {
 			if (type === "select-multiple") {
-				for (val = []; input = opts[i++]; ) {
+				for (val = []; (input = opts[i++]); ) {
 					if (input.selected && !input.disabled) {
 						val.push(input.valObject || input.value)
 					}
@@ -304,7 +307,7 @@
 
 			if (child.nodeType) {
 				tmp = el.insertBefore ? el : el[el.length - 1]
-				if (i = getAttr(tmp, "data-child")) {
+				if ((i = getAttr(tmp, "data-child"))) {
 					before = findCom(tmp, i) || tmp
 					tmp = before.parentNode
 					// TODO:2016-07-05:lauri:handle numeric befores
@@ -344,6 +347,7 @@
 					})
 					return
 				}
+				var i
 				if (isObject(name)) {
 					for (i in name) {
 						if (hasOwn.call(name, i)) f(el, i, name[i], val)
@@ -351,8 +355,8 @@
 					return
 				}
 				var names = isArray(name) ? name : name.split(splitRe)
-				, i = 0
 				, len = names.length
+				i = 0
 
 				if (arguments.length < 3) {
 					if (getter) return getter(el, name)
@@ -422,7 +426,7 @@
 	, prefix = window[addEv] ? "" : (addEv = "attachEvent", remEv = "detachEvent", "on")
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
-	, emitter = new Event.Emitter
+	, emitter = new Event.Emitter()
 
 	if (iOS) {
 		// iOS doesn't support beforeunload, use pagehide instead
@@ -519,12 +523,12 @@
 		return el
 	}
 
-	El.emit = function(el, ev) {
+	El.emit = function(el) {
 		emitter.emit.apply(el, slice.call(arguments, 1))
 	}
 
 	function empty(el) {
-		for (var node; node = el.firstChild; kill(node));
+		for (var node; (node = el.firstChild); kill(node));
 		return el
 	}
 
@@ -567,7 +571,7 @@
 	}
 
 	function closestScope(node) {
-		for (; node = node.parentNode; ) {
+		for (; (node = node.parentNode); ) {
 			if (node._scope) return elScope[node._scope]
 		}
 	}
@@ -579,11 +583,11 @@
 		, i = 0
 
 		if (node.nodeType != 1) {
-			node.render ? node.render(scope) : node
+			if (node.render) node.render(scope)
 			return
 		}
 
-		if (bind = getAttr(node, BIND_ATTR)) {
+		if ((bind = getAttr(node, BIND_ATTR))) {
 			scope._m = bindMatch
 			scope._t = bind
 			// i18n(bind, lang).format(scope)
@@ -634,7 +638,9 @@
 	El.kill = kill
 	El.render = render
 
-	for (var key in El) !function(key) {
+	for (var key in El) wrap(key)
+
+	function wrap(key) {
 		wrapProto[key] = function wrap() {
 			var i = 0
 			, self = this
@@ -647,7 +653,7 @@
 			}
 			return self
 		}
-	}(key)
+	}
 
 	wrapProto.append = function(el) {
 		var elWrap = this
@@ -907,7 +913,8 @@
 			map.bubble
 		););
 		if (fn) {
-			isString(fn) ? View.emit(fn, e, chr, el) : fn(e, chr, el)
+			if (isString(fn)) View.emit(fn, e, chr, el)
+			else fn(e, chr, el)
 		}
 	}
 
@@ -967,7 +974,7 @@
 		// document.documentElement.clientWidth is 0 in IE5
 		var key, next
 		, width = root.offsetWidth
-		, map = breakpoints = _breakpoints || breakpoints
+		, map = breakpoints = _breakpoints || breakpoints // jshint ignore:line
 
 		for (key in map) {
 			if (map[key] > width) break
@@ -986,7 +993,7 @@
 			cls(root, lastOrient = next)
 		}
 
-		if (next = window.View) next.emit("resize")
+		if ((next = window.View)) next.emit("resize")
 	}
 	El.setBreakpoints = setBreakpoints
 
@@ -1040,5 +1047,5 @@
 	function isString(str) {
 		return typeof str === "string"
 	}
-}(window, document, Object, Event, "prototype")
+}(window, document, Object, Event, "prototype") // jshint ignore:line
 

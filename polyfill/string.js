@@ -94,5 +94,5 @@
 			return decodeURIComponent(escape(fromCharCode.apply(null, arr)))
 		}
 	}
-}(this)
+}(this) /* jshint -W030 */
 

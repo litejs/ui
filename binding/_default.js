@@ -2,7 +2,7 @@
 /* litejs.com/MIT-LICENSE.txt */
 
 
-
+/* global El, View, i18n */
 !function(bindings) {
 	var hasOwn = Object.prototype.hasOwnProperty
 	, slice = Array.prototype.slice
@@ -47,7 +47,7 @@
 			for (; len; len--) {
 				remove(len)
 			}
-			_list = typeof list === "string" ? data.model.get(list, []) : list
+			var _list = typeof list === "string" ? data.model.get(list, []) : list
 			if (typeof _list === "string") _list.split(",")
 			Object.each(_list, add, (
 				_list.constructor === Object ? Object.keys(_list) : _list
@@ -100,7 +100,7 @@
 		var parent = el.parentNode
 		, scope = this
 		if (enabled) {
-			parent || el._ifComm && el._ifComm.parentNode.replaceChild(el, el._ifComm)
+			if (!parent && el._ifComm) el._ifComm.parentNode.replaceChild(el, el._ifComm)
 		} else {
 			if (parent) {
 				if (!el._ifComm) {
@@ -147,7 +147,7 @@
 		var child
 		, childs = node._childs
 		if (!childs) {
-			for (node._childs = childs = []; child = node.firstChild;) {
+			for (node._childs = childs = []; (child = node.firstChild); ) {
 				childs.push(child);
 				node.removeChild(child)
 			}
@@ -161,18 +161,18 @@
 		var node = el
 		, child = getChilds(node)[0]
 		, match = /^\s*(\w+) in (\w*)(.*)/.exec(expr)
-		, fn = "with(data){var out=[],loop={i:0,offset:0},_1,_2=" + match[2]
-		+ match[3].replace(/ (limit|offset):\s*(\d+)/ig, ";loop.$1=$2")
-		+ ";if(_2)for(_1 in _2)if(hasOwn.call(_2,_1)&&!(loop.offset&&loop.offset--)){"
-		+     "loop.i++;"
-		+     "if(loop.limit&&loop.i-loop.offset>loop.limit)break;"
-		+     "var clone=el.cloneNode(true)"
-		+     ",scope=El.scope(clone,data);"
-		+     "scope.loopKey=loop.key=_1;"
-		+     "scope.loop=loop;"
-		+     "scope." + match[1] + "=_2[_1];"
-		+     "out.push(clone);"
-		+ "};return out}"
+		, fn = "with(data){var out=[],loop={i:0,offset:0},_1,_2=" + match[2] +
+			match[3].replace(/ (limit|offset):\s*(\d+)/ig, ";loop.$1=$2") +
+			";if(_2)for(_1 in _2)if(hasOwn.call(_2,_1)&&!(loop.offset&&loop.offset--)){" +
+			"loop.i++;" +
+			"if(loop.limit&&loop.i-loop.offset>loop.limit)break;" +
+			"var clone=el.cloneNode(true)" +
+			",scope=El.scope(clone,data);" +
+			"scope.loopKey=loop.key=_1;" +
+			"scope.loop=loop;" +
+			"scope." + match[1] + "=_2[_1];" +
+			"out.push(clone);" +
+			"};return out}"
 
 		var childs = Function("hasOwn,el,data", fn)(hasOwn, child, this)
 
@@ -191,5 +191,5 @@
 			El.attr(el, "href", chr === "+" || chr === "%" ? "#" + View.expand(url) : url)
 		}
 	}
-}(El.bindings)
+}(El.bindings) // jshint ignore:line
 
