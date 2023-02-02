@@ -827,7 +827,6 @@
 				)
 			}
 		}),
-		template: plugin,
 		view: extend(plugin, {
 			content: 1,
 			done: function() {
