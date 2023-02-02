@@ -590,22 +590,22 @@
 			// document.documentElement.lang
 			// document.getElementsByTagName('html')[0].getAttribute('lang')
 
-			fn = "data b s B r->data&&(" + bind.replace(renderRe, function(match, name, op, args) {
+			fn = "data&&(" + bind.replace(renderRe, function(match, name, op, args) {
 				scope._m[i] = match
 				match = bindings[name]
 				return (
 					(op === "::" || match && hasOwn.call(match, "once")) ?
-					"s(this,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
+					"s(n,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
 					""
 				) + (
 					match ?
-					"b['" + name + "'].call(data,this" + (match.raw ? ",'" + args + "'" : args ? "," + args : "") :
-					"s(this,'" + name + "'," + args
+					"b['" + name + "'].call(data,n" + (match.raw ? ",'" + args + "'" : args ? "," + args : "") :
+					"s(n,'" + name + "'," + args
 				) + ")||"
 			}) + "r)"
 
 			try {
-				if (Fn(fn, node, scope)(scope, bindings, setAttr, BIND_ATTR)) {
+				if (Function("n,data,b,s,B,r", "with(data||{})return " + fn).call(node, node, scope, bindings, setAttr, BIND_ATTR)) {
 					return
 				}
 			} catch (e) {
@@ -716,7 +716,7 @@
 						} else if (op != ";" && op != "^") {
 							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
 								op === "=" ? ":" + text.replace(/'/g, "\\'") :
-								":_('" + text.replace(/'/g, "\\'") + "', data)"
+								":_('" + text.replace(/'/g, "\\'") + "',data)"
 							)
 						}
 						appendBind(parent, text, ";", op)
@@ -778,7 +778,7 @@
 		t.a = attr1
 	}
 
-	js[P].done = Fn("Function(this.txt)()")
+	js[P].done = Function("Function(this.txt)()")
 
 	El.plugins = {
 		binding: extend(js, {
@@ -796,10 +796,10 @@
 			}
 		}),
 		css: extend(js, {
-			done: Fn("xhr.css(this.txt)")
+			done: Function("xhr.css(this.txt)")
 		}),
 		def: extend(js, {
-			done: Fn("View.def(this.params||this.txt)")
+			done: Function("View.def(this.params||this.txt)")
 		}),
 		each: extend(js, {
 			done: function() {
@@ -825,7 +825,7 @@
 			}
 		}),
 		template: plugin,
-		view: extend(plugin,{
+		view: extend(plugin, {
 			done: function() {
 				var fn
 				, t = this
@@ -840,7 +840,7 @@
 							"=" + args
 						) + "),"
 					}) + "1"
-					Fn(fn, view, scopeData)()
+					Function(fn).call(view)
 				}
 			}
 		}),
@@ -958,9 +958,7 @@
 		md: 601,
 		lg: 1025
 	}
-	, setBreakpointsRated = function() {
-		setBreakpoints()
-	}.rate(100, true)
+	, setBreakpointsRated = rate(setBreakpoints, 100, true)
 
 	function setBreakpoints(_breakpoints) {
 		// document.documentElement.clientWidth is 0 in IE5
@@ -1004,6 +1002,28 @@
 		Object.assign(wrapper[P], opts)
 		wrapper[P].constructor = wrapper
 		return wrapper
+	}
+
+	// Maximum call rate for Function
+	// leading edge, trailing edge
+	function rate(fn, ms, last_call, scope) {
+		var tick, args
+		, next = 0
+		if (last_call && typeof last_call !== "function") last_call = fn
+		return function() {
+			if (scope === UNDEF) scope = this
+			var now = Date.now()
+			clearTimeout(tick)
+			if (now >= next) {
+				next = now + ms
+				fn.apply(scope, arguments)
+			} else if (last_call) {
+				args = arguments
+				tick = setTimeout(function() {
+					last_call.apply(scope, args)
+				}, next - now)
+			}
+		}
 	}
 
 	function isNumber(num) {

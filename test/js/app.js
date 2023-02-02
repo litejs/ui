@@ -126,7 +126,6 @@ var app = LiteJS({
 	window._ = i18n
 
 	El.data.window = window
-	El.data.Fn = Fn
 	El.data._ = i18n
 	El.data.console = console
 	El.data.window = window
@@ -209,7 +208,7 @@ var app = LiteJS({
 
 
 
-	xhr.load(El.findAll(body, "script[type='litejs/view']").pluck("src"), function() {
+	xhr.load(El.findAll(body, "script[type='litejs/view']").map(function(el){return el.src}), function() {
 		// Start a router to show views
 		history.start(View.show)
 	})

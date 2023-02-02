@@ -5,9 +5,12 @@
 
 	// JSON.parse and sessionStorage IE8
 
-	Object.each({ DELETE: "del", GET: 0, PATCH: 0, POST: 0, PUT:0 }, addMethod)
+	addMethod("DELETE", "del")
+	addMethod("GET")
+	addMethod("PATCH")
+	addMethod("POST")
+	addMethod("PUT")
 
-	xhr.addMethod = addMethod
 	xhr.hello = hello
 
 	function hello(data, next) {
@@ -60,7 +63,7 @@
 		if (events.length) navigator.sendBeacon("/events", JSON.stringify(events))
 	})
 
-	function addMethod(name, method) {
+	function addMethod(method, name) {
 		xhr[name || method.toLowerCase()] = xhr[method] = xhrReq.bind(null, method)
 	}
 

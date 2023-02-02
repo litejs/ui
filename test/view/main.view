@@ -177,10 +177,7 @@
 	anim-page
 		h2 Home
 		div _welcome
-			;on: "click", Fn("this.style.fontStyle = this.style.fontStyle == 'italic' ? '' : 'italic'")
 		div ;txt: _("_welcome")
-			;on: "mouseover", Fn("El.cls(this,'bg3'),El.txt(this, El.txt(this) == _('_welcome') ? 'Over!' : _('_welcome'))")
-			;on: "mouseout", Fn("El.cls(this,'bg3',0),El.txt(this, _('_welcome'))")
 		div ;txt: _(welcomeText)
 		div ;txt: _(nonExistingWelcomeText)
 		div

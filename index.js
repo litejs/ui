@@ -1,233 +1,3 @@
-!function(exports, Object) {
-	var undef
-	, P = "prototype"
-	, A = Array[P]
-	, F = Function[P]
-	, S = String[P]
-	, N = Number[P]
-	, slice = Function[P].call.bind(A.slice)
-	, fns = {}
-	, hasOwn = fns.hasOwnProperty
-	, fnRe = /('|")(?:\\?.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
-	, formatRe = /{(?!\\)((?:("|')(?:\\?.)*?\2|\\}|[^}])*)}/g
-	, numbersRe = /-?\d+\.?\d*/g
-	, wordRe = /\b[a-z_$][\w$]*/ig
-	, unescapeRe = /{\\/g
-
-
-	exports.Fn = Fn
-	Fn.hold = hold
-	Fn.wait = wait
-
-
-	// Non-standard
-	Object.each = function(obj, fn, scope, key) {
-		if (obj) for (key in obj) {
-			hasOwn.call(obj, key) && fn.call(scope, obj[key], key, obj)
-		}
-	}
-
-	// Non-standard
-	// IE<9 bug: [1,2].splice(0).join("") == "" but should be "12"
-	A.remove = arrayRemove
-	function arrayRemove() {
-		var arr = this
-		, len = arr.length
-		, o = slice(arguments)
-		, lastId = -1
-
-		for (; len--; ) if (~o.indexOf(arr[len])) {
-			arr.splice(lastId = len, 1)
-		}
-		return lastId
-	}
-
-	A.each = A.forEach
-	// uniq
-	// first item preserved
-	A.uniq = function() {
-		for (var a = this, i = a.length; i--; ) {
-			if (a.indexOf(a[i]) !== i) a.splice(i, 1)
-		}
-		return a
-	}
-
-	A.pushUniq = function(item) {
-		return this.indexOf(item) < 0 && this.push(item)
-	}
-
-	A.pluck = function(name) {
-		for (var arr = this, i = arr.length, out = []; i--; ) {
-			out[i] = arr[i][name]
-		}
-		return out
-	}
-
-	// THANKS: Oliver Steele - Functional Javascript [http://www.osteele.com/sources/javascript/functional/]
-	function Fn(expr /*, scope, mask1, ..maskN */) {
-		var args = []
-		, arr = expr.match(/[^"']+?->|[\s\S]+$/g)
-		, scope = slice(arguments, 1)
-		, key = scope.length + ":" + expr
-		, fn = fns[key]
-
-		if (!fn) {
-			fn = expr.replace(fnRe, "").match(wordRe) || []
-			for (; arr.length > 1; ) {
-				expr = arr.pop()
-				args = arr.pop().match(/\w+/g) || []
-				arrayRemove.apply(fn, args)
-				if (arr.length) {
-					arr.push("function(" + args + "){return(" + expr + ")}" + (scope[0] ? ".bind(this)" : ""))
-				}
-			}
-			expr = "return(" + expr + ")"
-
-			if (scope[0]) {
-				arr = Object.keys(scope).map(Fn("a->'__'+a"))
-				arr[0] = "this"
-				expr = (
-					fn[0] ?
-					"var " + fn.uniq().join("='',") + "='';" :
-					""
-				) + "with(" + arr.join(")with(") + "){" + expr + "}"
-				args = arr.slice(1).concat(args)
-			}
-
-			fn = fns[key] = Function(args, expr)
-		}
-
-		return scope.length ? fn.bind.apply(fn, scope) : fn
-	}
-
-	S.format = function() {
-		var args = A.slice.call(arguments)
-		args.unshift(0)
-		return this.replace(formatRe, function(_, arg) {
-			args[0] = arg.replace(/\\}/g, "}")
-			return Fn.apply(null, args)()
-		}).replace(unescapeRe, "{")
-	}
-
-	N.format = function(data) {
-		return "" + this
-	}
-
-	N.step = function(a, add) {
-		var x = ("" + a).split(".")
-		, steps = this / a
-		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (add == undef ? .5 : add === 1 && steps == (steps|0) ? 0 : +add))) * a
-		return "" + (1 in x ? n.toFixed(x[1].length) : n)
-	}
-
-	S.step = function(a, add) {
-		return this.replace(numbersRe, function(num) {
-			return (+num).step(a, add)
-		})
-	}
-
-	function wait(fn) {
-		var pending = 1
-		function resume() {
-			if (!--pending && fn) fn.call(this)
-		}
-		resume.wait = function() {
-			pending++
-			return resume
-		}
-		return resume
-	}
-
-	function hold(ignore) {
-		var k
-		, obj = this
-		, hooks = []
-		, hooked = []
-		, _resume = wait(resume)
-		ignore = ignore || obj.syncMethods || []
-
-		for (k in obj) if (typeof obj[k] == "function" && ignore.indexOf(k) < 0) !function(k) {
-			hooked.push(k, hasOwn.call(obj, k) && obj[k])
-			obj[k] = function() {
-				if (hooks === null) obj[k].apply(this, arguments)
-				else hooks.push(k, arguments)
-				return obj
-			}
-		}(k)
-
-		/**
-		 * `wait` is already in hooked array,
-		 * so override hooked method
-		 * that will be cleared on resume.
-		 */
-		obj.wait = _resume.wait
-
-		return _resume
-
-		function resume() {
-			for (var v, scope = obj, i = hooked.length; i--; i--) {
-				if (hooked[i]) obj[hooked[i-1]] = hooked[i]
-				else delete obj[hooked[i-1]]
-			}
-			// i == -1 from previous loop
-			for (; v = hooks[++i]; ) {
-				scope = scope[v].apply(scope, hooks[++i]) || scope
-			}
-			hooks = hooked = null
-		}
-	}
-
-	// Time to live - Run *onTimeout* if Function not called on time
-	F.ttl = function(ms, onTimeout, scope) {
-		var fn = this
-		, tick = setTimeout(function() {
-			ms = 0
-			if (onTimeout) onTimeout.call(scope)
-		}, ms)
-
-		return function() {
-			clearTimeout(tick)
-			if (ms) fn.apply(scope === undef ? this : scope, arguments)
-		}
-	}
-
-	// Run Function one time after last call
-	F.once = function(ms, scope) {
-		var tick, args
-		, fn = this
-		return function() {
-			if (scope === undef) scope = this
-			clearTimeout(tick)
-			args = arguments
-			tick = setTimeout(function() {
-				fn.apply(scope, args)
-			}, ms)
-		}
-	}
-
-	// Maximum call rate for Function
-	// leading edge, trailing edge
-	F.rate = function(ms, last_call, scope) {
-		var tick, args
-		, fn = this
-		, next = 0
-		if (last_call && typeof last_call !== "function") last_call = fn
-		return function() {
-			if (scope === undef) scope = this
-			var now = Date.now()
-			clearTimeout(tick)
-			if (now >= next) {
-				next = now + ms
-				fn.apply(scope, arguments)
-			} else if (last_call) {
-				args = arguments
-				tick = setTimeout(function() {
-					last_call.apply(scope, args)
-				}, next - now)
-			}
-		}
-	}
-}(this, Object)
 !function(exports) {
 	var empty = []
 	, Event = exports.Event || exports
@@ -344,7 +114,7 @@
 	// In earlier versions, the expression "\v" === "v" returns true.
 	// In Internet Explorer 9 standards mode, Internet Explorer 10 standards mode,
 	// and win8_appname_long apps, the expression returns false.
-	, ie6_7 = !+"\v1" && (document.documentMode | 0) < 8
+	, ie67 = !+"\v1" && (document.documentMode | 0) < 8 // jshint ignore:line
 
 	function getUrl(_loc) {
 		return (
@@ -420,18 +190,18 @@
 			window.onpopstate = checkUrl
 		} else
 		/**/
-			if ("onhashchange" in window && !ie6_7) {
+			if ("onhashchange" in window && !ie67) {
 			// There are onhashchange in IE7 but its not get emitted
 			//
 			// Basic support:
 			// Chrome 5.0, Firefox 3.6, IE 8, Opera 10.6, Safari 5.0
 			window.onhashchange = checkUrl
 		} else {
-			if (ie6_7 && !iframe) {
+			if (ie67 && !iframe) {
 				// IE<9 encounters the Mixed Content warning when the URI javascript: is used.
 				// IE5/6 additionally encounters the Mixed Content warning when the URI about:blank is used.
 				// src="//:"
-				iframe = document.body.appendChild(document.createElement('<iframe style="display:none" tabindex="-1">')).contentWindow
+				iframe = document.body.appendChild(document.createElement("<iframe tabindex=-1 style=display:none>")).contentWindow
 			}
 			clearInterval(tick)
 			tick = setInterval(function(){
@@ -439,17 +209,19 @@
 				if (iframe && last === cur) cur = getUrl(iframe.location)
 				if (last !== cur) {
 					last = cur
-					iframe ? setUrl(cur) : checkUrl()
+					if (iframe) setUrl(cur)
+					else checkUrl()
 				}
 			}, 60)
 		}
 		checkUrl()
 	}
-}(this, document, history, location)
+}(this, document, history, location) // jshint ignore:line
 /* litejs.com/MIT-LICENSE.txt */
 
 
 
+/* global El, xhr */
 !function(exports) {
 	var fn, lastView, lastStr, lastUrl, syncResume
 	, isArray = Array.isArray
@@ -532,7 +304,7 @@
 				emit(syncResume = params._v = tmp, "ping", params, View)
 				syncResume = null
 				if (lastParams !== params) return
-				if (parent = tmp.parent) {
+				if ((parent = tmp.parent)) {
 					if (parent.child && parent.child !== tmp) {
 						close = parent.child
 					}
@@ -560,7 +332,7 @@
 			if (view !== close) emit(view, "change", close)
 
 			for (tmp in params) if (tmp.charAt(0) !== "_") {
-				if (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"]) {
+				if ((syncResume = hasOwn.call(paramCb, tmp)) && paramCb[tmp] || paramCb["*"]) {
 					syncResume.call(view, params[tmp], tmp, params)
 					syncResume = null
 				}
@@ -602,10 +374,10 @@
 			if (view.kb) El.addKb(view.kb)
 			close = null
 		}
-		if (params._d = params._v = view.child) {
+		if ((params._d = params._v = view.child)) {
 			bubbleDown(params, close)
 		}
-		if (lastView === view) {
+		if ((lastView === view)) {
 			emit(view, "show", params)
 			blur()
 		}
@@ -659,20 +431,21 @@
 		}
 	}
 
-	View.param = function(name, cb, re) {
+	View.param = function(name, cb) {
 		;(isArray(name) ? name : name.split(/\s+/)).forEach(function(n) {
 			paramCb[n] = cb
 		})
 	}
 
 	View.def = function(str) {
-		for (var match, re = /(\S+) (\S+)/g; match = re.exec(str);) {
-			match[1].split(",").map(function(view) {
-				view = View(expand(view, lastStr))
-				view.file = (view.file ? view.file + "," : "") +
-				match[2].split(",").map(function(file) {
-					return views[file] ? views[file].file : expand(file, lastStr)
-				})
+		for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
+			match[1].split(",").map(def)
+		}
+		function def(view) {
+			view = View(expand(view, lastStr))
+			view.file = (view.file ? view.file + "," : "") +
+			match[2].split(",").map(function(file) {
+				return views[file] ? views[file].file : expand(file, lastStr)
 			})
 		}
 	}
@@ -700,10 +473,11 @@
 		)
 	}
 
-}(this)
+}(this) // jshint ignore:line
 /* litejs.com/MIT-LICENSE.txt */
 
 
+/* global Fn, View, xhr */
 !function(window, document, Object, Event, P) {
 	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
@@ -778,7 +552,7 @@
 	/*** ie8 ***/
 
 	// JScript engine in IE<9 does not recognize vertical tabulation character
-	, ie678 = !+"\v1"
+	, ie678 = !+"\v1" // jshint ignore:line
 	, ie67 = ie678 && (document.documentMode | 0) < 8
 
 	El.matches = function(el, sel) {
@@ -904,7 +678,7 @@
 		/*** ie8 ***/
 		// istanbul ignore next: IE fix
 		if (ie67 && (key === "id" || key === "name" || key === "checked")) {
-			el.mergeAttributes(document.createElement('<INPUT ' + key + '="' + val + '">'), false)
+			el.mergeAttributes(document.createElement("<INPUT " + key + "='" + val + "'>"), false)
 		} else
 		/**/
 		if (key === "class") {
@@ -935,7 +709,7 @@
 			//
 			// Read-only checkboxes can be changed by the user
 
-			for (opts = {}; input = el.elements[i++]; ) if (!input.disabled && (key = input.name || input.id)) {
+			for (opts = {}; (input = el.elements[i++]); ) if (!input.disabled && (key = input.name || input.id)) {
 				value = valFn(input)
 				if (value !== UNDEF) {
 					step = opts
@@ -950,20 +724,22 @@
 		if (arguments.length > 1) {
 			if (opts) {
 				value = (isArray(val) ? val : [ val ]).map(String)
-				for (; input = opts[i++]; ) {
+				for (; (input = opts[i++]); ) {
 					input.selected = value.indexOf(input.value) > -1
 				}
 			} else if (el.val) {
 				el.val(val)
+			} else if (checkbox) {
+				el.checked = !!val
 			} else {
-				checkbox ? (el.checked = !!val) : (el.value = val)
+				el.value = val
 			}
 			return
 		}
 
 		if (opts) {
 			if (type === "select-multiple") {
-				for (val = []; input = opts[i++]; ) {
+				for (val = []; (input = opts[i++]); ) {
 					if (input.selected && !input.disabled) {
 						val.push(input.valObject || input.value)
 					}
@@ -1006,7 +782,7 @@
 
 			if (child.nodeType) {
 				tmp = el.insertBefore ? el : el[el.length - 1]
-				if (i = getAttr(tmp, "data-child")) {
+				if ((i = getAttr(tmp, "data-child"))) {
 					before = findCom(tmp, i) || tmp
 					tmp = before.parentNode
 					// TODO:2016-07-05:lauri:handle numeric befores
@@ -1046,6 +822,7 @@
 					})
 					return
 				}
+				var i
 				if (isObject(name)) {
 					for (i in name) {
 						if (hasOwn.call(name, i)) f(el, i, name[i], val)
@@ -1053,8 +830,8 @@
 					return
 				}
 				var names = isArray(name) ? name : name.split(splitRe)
-				, i = 0
 				, len = names.length
+				i = 0
 
 				if (arguments.length < 3) {
 					if (getter) return getter(el, name)
@@ -1124,7 +901,7 @@
 	, prefix = window[addEv] ? "" : (addEv = "attachEvent", remEv = "detachEvent", "on")
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
-	, emitter = new Event.Emitter
+	, emitter = new Event.Emitter()
 
 	if (iOS) {
 		// iOS doesn't support beforeunload, use pagehide instead
@@ -1221,12 +998,12 @@
 		return el
 	}
 
-	El.emit = function(el, ev) {
+	El.emit = function(el) {
 		emitter.emit.apply(el, slice.call(arguments, 1))
 	}
 
 	function empty(el) {
-		for (var node; node = el.firstChild; kill(node));
+		for (var node; (node = el.firstChild); kill(node));
 		return el
 	}
 
@@ -1269,7 +1046,7 @@
 	}
 
 	function closestScope(node) {
-		for (; node = node.parentNode; ) {
+		for (; (node = node.parentNode); ) {
 			if (node._scope) return elScope[node._scope]
 		}
 	}
@@ -1281,33 +1058,33 @@
 		, i = 0
 
 		if (node.nodeType != 1) {
-			node.render ? node.render(scope) : node
+			if (node.render) node.render(scope)
 			return
 		}
 
-		if (bind = getAttr(node, BIND_ATTR)) {
+		if ((bind = getAttr(node, BIND_ATTR))) {
 			scope._m = bindMatch
 			scope._t = bind
 			// i18n(bind, lang).format(scope)
 			// document.documentElement.lang
 			// document.getElementsByTagName('html')[0].getAttribute('lang')
 
-			fn = "data b s B r->data&&(" + bind.replace(renderRe, function(match, name, op, args) {
+			fn = "data&&(" + bind.replace(renderRe, function(match, name, op, args) {
 				scope._m[i] = match
 				match = bindings[name]
 				return (
 					(op === "::" || match && hasOwn.call(match, "once")) ?
-					"s(this,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
+					"s(n,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
 					""
 				) + (
 					match ?
-					"b['" + name + "'].call(data,this" + (match.raw ? ",'" + args + "'" : args ? "," + args : "") :
-					"s(this,'" + name + "'," + args
+					"b['" + name + "'].call(data,n" + (match.raw ? ",'" + args + "'" : args ? "," + args : "") :
+					"s(n,'" + name + "'," + args
 				) + ")||"
 			}) + "r)"
 
 			try {
-				if (Fn(fn, node, scope)(scope, bindings, setAttr, BIND_ATTR)) {
+				if (Function("n,data,b,s,B,r", "with(data||{})return " + fn).call(node, node, scope, bindings, setAttr, BIND_ATTR)) {
 					return
 				}
 			} catch (e) {
@@ -1418,7 +1195,7 @@
 						} else if (op != ";" && op != "^") {
 							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
 								op === "=" ? ":" + text.replace(/'/g, "\\'") :
-								":_('" + text.replace(/'/g, "\\'") + "', data)"
+								":_('" + text.replace(/'/g, "\\'") + "',data)"
 							)
 						}
 						appendBind(parent, text, ";", op)
@@ -1480,7 +1257,7 @@
 		t.a = attr1
 	}
 
-	js[P].done = Fn("Function(this.txt)()")
+	js[P].done = Function("Function(this.txt)()")
 
 	El.plugins = {
 		binding: extend(js, {
@@ -1498,10 +1275,10 @@
 			}
 		}),
 		css: extend(js, {
-			done: Fn("xhr.css(this.txt)")
+			done: Function("xhr.css(this.txt)")
 		}),
 		def: extend(js, {
-			done: Fn("View.def(this.params||this.txt)")
+			done: Function("View.def(this.params||this.txt)")
 		}),
 		each: extend(js, {
 			done: function() {
@@ -1527,7 +1304,7 @@
 			}
 		}),
 		template: plugin,
-		view: extend(plugin,{
+		view: extend(plugin, {
 			done: function() {
 				var fn
 				, t = this
@@ -1542,7 +1319,7 @@
 							"=" + args
 						) + "),"
 					}) + "1"
-					Fn(fn, view, scopeData)()
+					Function(fn).call(view)
 				}
 			}
 		}),
@@ -1606,7 +1383,8 @@
 			map.bubble
 		););
 		if (fn) {
-			isString(fn) ? View.emit(fn, e, chr, el) : fn(e, chr, el)
+			if (isString(fn)) View.emit(fn, e, chr, el)
+			else fn(e, chr, el)
 		}
 	}
 
@@ -1660,9 +1438,7 @@
 		md: 601,
 		lg: 1025
 	}
-	, setBreakpointsRated = function() {
-		setBreakpoints()
-	}.rate(100, true)
+	, setBreakpointsRated = rate(setBreakpoints, 100, true)
 
 	function setBreakpoints(_breakpoints) {
 		// document.documentElement.clientWidth is 0 in IE5
@@ -1687,7 +1463,7 @@
 			cls(root, lastOrient = next)
 		}
 
-		if (next = window.View) next.emit("resize")
+		if ((next = window.View)) next.emit("resize")
 	}
 	El.setBreakpoints = setBreakpoints
 
@@ -1708,6 +1484,28 @@
 		return wrapper
 	}
 
+	// Maximum call rate for Function
+	// leading edge, trailing edge
+	function rate(fn, ms, last_call, scope) {
+		var tick, args
+		, next = 0
+		if (last_call && typeof last_call !== "function") last_call = fn
+		return function() {
+			if (scope === UNDEF) scope = this
+			var now = Date.now()
+			clearTimeout(tick)
+			if (now >= next) {
+				next = now + ms
+				fn.apply(scope, arguments)
+			} else if (last_call) {
+				args = arguments
+				tick = setTimeout(function() {
+					last_call.apply(scope, args)
+				}, next - now)
+			}
+		}
+	}
+
 	function isNumber(num) {
 		return typeof num === "number"
 	}
@@ -1719,4 +1517,4 @@
 	function isString(str) {
 		return typeof str === "string"
 	}
-}(window, document, Object, Event, "prototype")
+}(window, document, Object, Event, "prototype") // jshint ignore:line
