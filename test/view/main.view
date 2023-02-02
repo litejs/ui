@@ -12,60 +12,61 @@
 	.content{ will-change: transform, opacity; }
 
 %el anim-page
-	.content.loader
+.content.loader
 
 %el form-js
-	form[action="javascript:"][method=POST]
+form[action="javascript:"][method=POST]
 
 %el svg-icon
-	svg[viewBox="0 0 24 24"][width=24px][height=24px][aria-hidden=true][focusable=false]
+svg[viewBox="0 0 24 24"][width=24px][height=24px][aria-hidden=true][focusable=false]
 
 %el svg-flag
-	svg[viewBox="0 0 4 3"][width=32px][height=24px]
+svg[viewBox="0 0 4 3"][width=32px][height=24px]
 
 %el top
-	.bg-1
-		.top.t-1.App-row
-			.right
-				%child
-			.right.lang ;each: lng in _.list
-				a.hand - {lng.toUpperCase()} -
-					@click: [lng], "setLang"
-					;cls: "selected", lng == _.current
-					;cls: "lang-" + lng
-			a[href="#home"].home-link Header
-			span.sizeHint Responsive
+.bg-1
+	.top.t-1.App-row
+		.right
+			%child
+		.right.lang ;each: lng in _.list
+			a.hand - {lng.toUpperCase()} -
+				@click: [lng], "setLang"
+				;cls: "selected", lng == _.current
+				;cls: "lang-" + lng
+		a[href="#home"].home-link Header
+		span.sizeHint Responsive
+
 %el Menu
-	.bg-2
-		.Menu.App-row.js-viewRender
-			%el nav-row
-				a.Menu-item.waves
-					;cls: "selected", (params._u || View.home).indexOf(this.href.split("#")[1]) == 0
-			nav-row[href="#home"]
-				svg-icon>path[d="M12,2L1,12h3v9h5V14h6v7h5V12h3z"]
-				svg-icon>path[d="M12,2L1,12h3v9h5V14h9V2h-3V21h5V12h3z"]
-				svg-icon>path[d="M4.5,18a1.5,1.5 0,1,0 3,0a1.5,1.5 0,1,0 -3,0m5.5 0a4,4 0,1,1 -4,-4L9.5,9.5a6,6 0,0,1 8.5,-6.5l-3 3a2,2 0,0,0 3,3l3 -3a6,6 0,0,1 -6.5,8.5z"]
-				svg-icon>path[d="M2,12a10,10 0,1,1 4,8a1,1 0,0,1 1.3,-1.6a8,8 0,1,0 -3.2,-6.4h-4l3,3l3,-3zM11,6h2v5.5h3v2h-5z"]
-			nav-row[href="#users"] Users ❌⚙
-			nav-row[href="#settings"] Settings
-			nav-row[href="#test"] Test
+.bg-2
+	.Menu.App-row.js-viewRender
+		%el nav-row
+		a.Menu-item.waves
+			;cls: "selected", (params._u || View.home).indexOf(this.href.split("#")[1]) == 0
+		nav-row[href="#home"]
+			svg-icon>path[d="M12,2L1,12h3v9h5V14h6v7h5V12h3z"]
+			svg-icon>path[d="M12,2L1,12h3v9h5V14h9V2h-3V21h5V12h3z"]
+			svg-icon>path[d="M4.5,18a1.5,1.5 0,1,0 3,0a1.5,1.5 0,1,0 -3,0m5.5 0a4,4 0,1,1 -4,-4L9.5,9.5a6,6 0,0,1 8.5,-6.5l-3 3a2,2 0,0,0 3,3l3 -3a6,6 0,0,1 -6.5,8.5z"]
+			svg-icon>path[d="M2,12a10,10 0,1,1 4,8a1,1 0,0,1 1.3,-1.6a8,8 0,1,0 -3.2,-6.4h-4l3,3l3,-3zM11,6h2v5.5h3v2h-5z"]
+		nav-row[href="#users"] Users ❌⚙
+		nav-row[href="#settings"] Settings
+		nav-row[href="#test"] Test
 
 
 %el Footer
-	.bg-1
-		.Footer.App-row.grid-3.c2
-			.Footer-item.col-4
-				dt litejs.com
-				dd>a[href="#help"] How to use
-				dd>a[href="#privacy"] Privacy
-			.Footer-item.col-4
-				dt Contacts
-				dd>a[href="mailto:mail@to.com"] email
-				dd>a[href="https://fb.com/LiteJS#info"] Fb
-			svg-flag
-				path[d="M0 0h4v1H0z"][fill="#0072CE"]
-				path[d="M0 1h4v1H0z"][fill="#000"]
-				path[d="M0 2h4v1H0z"][fill="#fff"]
+.bg-1
+	.Footer.App-row.grid-3.c2
+		.Footer-item.col-4
+			dt litejs.com
+			dd>a[href="#help"] How to use
+			dd>a[href="#privacy"] Privacy
+		.Footer-item.col-4
+			dt Contacts
+			dd>a[href="mailto:mail@to.com"] email
+			dd>a[href="https://fb.com/LiteJS#info"] Fb
+		svg-flag
+			path[d="M0 0h4v1H0z"][fill="#0072CE"]
+			path[d="M0 1h4v1H0z"][fill="#000"]
+			path[d="M0 2h4v1H0z"][fill="#fff"]
 
 %css
 	.scroll-up {
@@ -162,67 +163,67 @@
 	Footer
 
 %view svg public
-	anim-page
-		/ 210° = r-Math.sqrt(3)/2*r
-		/ 225° = r-Math.sqrt(2)/2*r
-		svg-icon[width=800][height=800]>path[d="M2,12a10,10 0,1,1 4,8a1,1 0,0,1 1.3,-1.6a8,8 0,1,0 -3.2,-6.4h-4l3,3l3,-3zM11,6h2v5.5h3v2h-5z"]
+anim-page
+	/ 210° = r-Math.sqrt(3)/2*r
+	/ 225° = r-Math.sqrt(2)/2*r
+	svg-icon[width=800][height=800]>path[d="M2,12a10,10 0,1,1 4,8a1,1 0,0,1 1.3,-1.6a8,8 0,1,0 -3.2,-6.4h-4l3,3l3,-3zM11,6h2v5.5h3v2h-5z"]
 
 %view 404 public
-  anim-page
-    h2 Error 404
-    \ Page not found.
-    \ Maybe you want to look something else?
+anim-page
+h2 Error 404
+\ Page not found.
+\ Maybe you want to look something else?
 
 %view home public
-	anim-page
-		h2 Home
-		div _welcome
-		div ;txt: _("_welcome")
-		div ;txt: _(welcomeText)
-		div ;txt: _(nonExistingWelcomeText)
-		div
-			;if: Math.random() > .5
-			;txt: "If"
-		.time ="Init '\" " + started
-		.time
-			;txt: "Load " + new Date()
+anim-page
+	h2 Home
+	div _welcome
+	div ;txt: _("_welcome")
+	div ;txt: _(welcomeText)
+	div ;txt: _(nonExistingWelcomeText)
+	div
+		;if: Math.random() > .5
+		;txt: "If"
+	.time ="Init '\" " + started
+	.time
+		;txt: "Load " + new Date()
 
 
 %view users #private
-	anim-page
-		h2 Users
-		ul.users ;list: Data("users")
-			li
-				a
-					;txt: item.name
-					;title: _("_welcome")
-					;href: "#users/" + item.id
+anim-page
+	h2 Users
+	ul.users ;list: Data("users")
+		li
+			a
+				;txt: item.name
+				;title: _("_welcome")
+				;href: "#users/" + item.id
 
 %view users/{userId} #private
-	anim-page
-		form-js
-			;schemaToForm: "../test/ui/schema/user.json", "edit", "form1"
+anim-page
+	form-js
+		;schemaToForm: "../test/ui/schema/user.json", "edit", "form1"
 
 %view users/{userId}/{pageId} public
-	anim-page
-		h3 {page.get("name")}
+anim-page
+	h3 {page.get("name")}
 
 %view login public
-	anim-page
-		form[action="javascript:"][method=POST]
-			;emitForm:"login"
-			fieldset.grid-2.login
-				legend Login
-				.error {params.error||""}
-				label.row
-					.col-12.col-md-4.login__label Username
-					.col-12.col-md-8>input[name=name]
-				label.row
-					.col-12.col-md-4.login__label Password
-					.col-12.col-md-8>input[name=pass][type=password]
-				.row
-					.col-12.col-md-4
-					.col-12.col-md-8>input.btn[type=submit] Log In
+anim-page
+	form[action="javascript:"][method=POST]
+		;emitForm:"login"
+		fieldset.grid-2.login
+			legend Login
+			.error {params.error||""}
+			label.row
+				.col-12.col-md-4.login__label Username
+				.col-12.col-md-8>input[name=name]
+			label.row
+				.col-12.col-md-4.login__label Password
+				.col-12.col-md-8>input[name=pass][type=password]
+			.row
+				.col-12.col-md-4
+				.col-12.col-md-8>input.btn[type=submit] Log In
 
 
 %view ok public

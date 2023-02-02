@@ -681,6 +681,7 @@
 
 			for (q = indent.length; q <= stack[0]; ) {
 				if (parent.plugin) {
+					if (parent.plugin.content && !parent.plugin.el.childNodes[0]) break
 					parent.plugin.done()
 				}
 				parent = parentStack.pop()
@@ -811,7 +812,9 @@
 				})
 			}
 		}),
-		el: plugin,
+		el: extend(plugin, {
+			content: 1,
+		}),
 		js: js,
 		map: extend(js, {
 			done: function() {
@@ -826,6 +829,7 @@
 		}),
 		template: plugin,
 		view: extend(plugin, {
+			content: 1,
 			done: function() {
 				var fn
 				, t = this
