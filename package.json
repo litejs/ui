@@ -1,6 +1,6 @@
 {
   "name": "@litejs/ui",
-  "version": "22.12.0",
+  "version": "23.2.0",
   "description": "UI engine for LiteJS full-stack framework",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -23,6 +23,11 @@
   ],
   "scripts": {
     "test": "TZ='Europe/Tallinn' c8 -r lcov -r html -r text-summary lj test test/index.js --brief && jshint --verbose *.js src/*.js binding/*.js polyfill/*.js"
+  },
+  "devDependencies": {
+    "@litejs/cli": "23.2.0",
+    "c8": "7.12.0",
+    "jshint": "2.13.6"
   },
   "litejs": {
     "build": "lj b --out=test/index.html test/dev.html"
