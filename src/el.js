@@ -968,7 +968,7 @@
 		md: 601,
 		lg: 1025
 	}
-	, setBreakpointsRated = rate(setBreakpoints, 100, true)
+	, setBreakpointsRated = rate(setBreakpoints, 100)
 
 	function setBreakpoints(_breakpoints) {
 		// document.documentElement.clientWidth is 0 in IE5
@@ -1016,22 +1016,17 @@
 
 	// Maximum call rate for Function
 	// leading edge, trailing edge
-	function rate(fn, ms, last_call, scope) {
-		var tick, args
+	function rate(fn, ms) {
+		var tick
 		, next = 0
-		if (last_call && typeof last_call !== "function") last_call = fn
 		return function() {
-			if (scope === UNDEF) scope = this
 			var now = Date.now()
 			clearTimeout(tick)
 			if (now >= next) {
 				next = now + ms
-				fn.apply(scope, arguments)
-			} else if (last_call) {
-				args = arguments
-				tick = setTimeout(function() {
-					last_call.apply(scope, args)
-				}, next - now)
+				fn()
+			} else {
+				tick = setTimeout(fn, next - now)
 			}
 		}
 	}
