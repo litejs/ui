@@ -51,7 +51,7 @@
 
 	/*** onerror ***/
 	, lastError
-	, unsentErrors = []
+	, unsentErrors = xhr._e = []
 	, onerror = window.onerror = function(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
 		// file = document.currentScript.src || import.meta.url
@@ -62,10 +62,9 @@
 			, message
 			].join(":")
 		) && 1 == unsentErrors.push(
-			[ lastError
-			// Error().stacktrace in Opera
+			[ +new Date()
+			, lastError
 			, error && (error.stack || error.stacktrace) || "-"
-			, +new Date()
 			, "" + location
 			]
 		)) setTimeout(sendErrors, 307)
