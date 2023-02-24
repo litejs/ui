@@ -1,13 +1,12 @@
-
 /* litejs.com/MIT-LICENSE.txt */
 
 
+/* global View */
 !function(window, screen) {
 	var nameData
 	, body = document.body
 	, started = new Date()
-	, layout
-	, QY
+	, qy
 
 	try {
 		nameData = JSON.parse(window.name)
@@ -16,7 +15,7 @@
 	try {
 		// Chrome69, Opera56, Edge79
 		navigator.keyboard.getLayoutMap().then(function(k) {
-			QY = k.get("KeyQ") + k.get("KeyY")
+			qy = k.get("KeyQ") + k.get("KeyY")
 			//layout = { "'f":"Dvorak", "b!":"Bepo", ay:"Azerty", qj:"Colemak", qy:"Qwerty", qz:"Qwertz" }[k.get("KeyQ") + k.get("KeyY")]
 		})
 	} catch(e) {}
@@ -43,6 +42,7 @@
 		var stat = {
 			start: started,
 			end: new Date(),
+			qy: qy,
 			screen: screen.width + "x" + screen.height,
 			content: (window.innerWidth || body.offsetWidth) +
 				"x" + (window.innerHeight || body.offsetHeight),
@@ -52,8 +52,7 @@
 
 		console.log("Stat", stat)
 	})
-	var seq = 0
-	, events = []
+	var events = []
 	, stat = {}
 	, keys = {}
 	, key = 0
@@ -101,7 +100,7 @@
 				el.tagName +
 				(el.id ? "#" + el.id : "") +
 				(c > 1 ? "(" + c + ")" : "")  +
-				(el.className ? "." + el.className.replace(/\s+/g, ".") : '') +
+				(el.className ? "." + el.className.replace(/\s+/g, ".") : "") +
 				(path.length === 0 && !el.firstElementChild ? "[" + el.textContent+ "]" : "") +
 				(el._e && el._e[e.type] && el._e[e.type].length ? "@" + (el._e.click.length/3) : "")
 			)
@@ -109,7 +108,7 @@
 		path = path.join(">")
 		return keys[path] || (keys[path] = ++key)
 	}
-}(this, screen)
+}(this, screen) // jshint ignore:line
 
 
 
