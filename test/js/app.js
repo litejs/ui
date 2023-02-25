@@ -56,7 +56,7 @@ var app = LiteJS({
 })
 
 
-!function(window, document, navigator, View, i18n) {
+!function(window, document, navigator, View) {
 	i18n.def({
 		"ar": "Arabic",
 		"et": "Eesti keeles",
