@@ -7,7 +7,6 @@ Expects box-sizing: border-box;
 .row {
 	display: block;
 	clear: both;
-	contain: content;
 	*zoom: 1;
 }
 
