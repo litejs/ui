@@ -71,9 +71,8 @@
 		<link rel="shortcut icon" href="favicon.ico">
 		<link rel="apple-touch-icon" href="apple-touch-icon.png">
 		-->
-		<link rel="stylesheet" href="app.css" drop="ie7 ie8" min="min/0.css">
+		<link rel="stylesheet" href="app.css" drop="ie7 ie8">
 		<link rel="stylesheet" title="Default look" href="css/theme/blue.css">
-		<link rel="alternate stylesheet" title="New look" href="css/theme/new.css">
 	</head>
 	<body>
 		<!--
@@ -81,22 +80,22 @@
 		so there is no need for waiting DOMContentLoaded
 		-->
 		<script src="../load.js" inline drop="reuse,require"></script>
-		<script src="min/up.js" min="min/0.js?{hash}"
+		<script src="min/up.js" min="min/0-{h}.js"
 			banner="litejs.com/MIT-LICENSE.txt"
 			if="!window.PointerEvent||![].flat"
 			cat="
 				../polyfill/index.js
 		"></script>
-		<script type=build src="../index.js" min="min/1.js?h={hash}"
+		<script type=build src="../index.js" min="min/1-{h}.js"
 			banner="litejs.com/MIT-LICENSE.txt"
 			cat="
 		"></script>
-		<script src="../../litejs/event.js" min></script>
-		<script src="../src/history.js" min></script>
-		<script src="../src/view.js" min></script>
-		<script src="../src/el.js" min></script>
+		<script src="../../litejs/event.js" cat></script>
+		<script src="../src/history.js" cat></script>
+		<script src="../src/view.js" cat></script>
+		<script src="../src/el.js" cat></script>
 		<script src="js/debug.js" exclude></script>
-		<script src="../pointer.js" min="min/2.js?{hash}"></script>
+		<script src="../pointer.js" min="min/2-{h}.js"></script>
 		<script src="../binding/_default.js" min></script>
 		<script src="../binding/list.js" min></script>
 		<script src="../svg.js" min></script>
@@ -107,7 +106,7 @@
 		<script src="view/main.view" type="litejs/view" min></script>
 		<script src="../../litejs/json.js" min></script>
 		<script src="../../litejs/i18n.js" min></script>
-		<script src="../../old/model/index.js" min="min/3.js?{hash}"></script>
+		<script src="../../old/model/index.js" min="min/3-{h}.js"></script>
 		<script src="js/data.js" min></script>
 		<script type=x src="js/stat.js" min></script>
 		<script src="js/app.js" min></script>

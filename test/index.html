@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="initial-scale=1,maximum-scale=1"><meta name=mobile-web-app-capable content=yes><meta name=application-name content=App><meta name=msapplication-tooltip content=App><title>App</title><link rel=icon type="image/png" href="data:image/png;base64,"><link rel=stylesheet title="Default look" href="css/theme/blue.css"><link rel="alternate stylesheet" title="New look" href="css/theme/new.css"></head><body><script>
+<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="initial-scale=1,maximum-scale=1"><meta name=mobile-web-app-capable content=yes><meta name=application-name content=App><meta name=msapplication-tooltip content=App><title>App</title><link rel=icon type=image/png href=data:image/png;base64,><link rel=stylesheet href=app.css drop="ie7 ie8"><link rel=stylesheet title="Default look" href=css/theme/blue.css></head><body><script>
 /* litejs.com/MIT-LICENSE.txt */
 
 
@@ -45,13 +45,13 @@
 		eval
 	/**/
 
-	/*** reuse ***
+	/*** reuse ***/
 	, xhrs = []
 	/**/
 
 	/*** onerror ***/
 	, lastError
-	, unsentErrors = []
+	, unsentErrors = xhr._e = []
 	, onerror = window.onerror = function(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
 		// file = document.currentScript.src || import.meta.url
@@ -62,10 +62,9 @@
 			, message
 			].join(":")
 		) && 1 == unsentErrors.push(
-			[ lastError
-			// Error().stacktrace in Opera
+			[ +new Date()
+			, lastError
 			, error && (error.stack || error.stacktrace) || "-"
-			, +new Date()
 			, "" + location
 			]
 		)) setTimeout(sendErrors, 307)
@@ -90,7 +89,7 @@
 
 	window.xhr = xhr
 	function xhr(method, url, next, attr1, attr2) {
-		var xhr = /*** reuse *** xhrs.pop() || /**/ new XMLHttpRequest()
+		var xhr = /*** reuse ***/ xhrs.pop() || /**/ new XMLHttpRequest()
 
 		// To be able to reuse the XHR object properly,
 		// use the open method first and set onreadystatechange later.
@@ -170,7 +169,7 @@
 					attr2
 				)
 				xhr.onreadystatechange = next = nop
-				/*** reuse ***
+				/*** reuse ***/
 				xhrs.push(xhr)
 				/**/
 			}
@@ -179,7 +178,7 @@
 	}
 
 
-	/*** require ***
+	/*** require ***/
 	var modules = {}
 	, process = window.process = {
 		env: {}
@@ -265,7 +264,7 @@
 	}
 
 	load([
-		"min/0.css",(!window.PointerEvent||![].flat)&&"min/0.js?1675366266183","min/1.js?h=1675366266183","min/2.js?1675366266183","min/3.js?1675366266183"
+		(!window.PointerEvent||![].flat)&&"min/0-9186.js","min/1-5d11.js","min/2-2491.js","min/3-6065.js"
 	])
 	/**/
 

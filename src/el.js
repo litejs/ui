@@ -722,8 +722,8 @@
 							text = text.replace(/(\w+):?/, "on:'$1',")
 						} else if (op != ";" && op != "^") {
 							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
-								op === "=" ? ":" + text.replace(/'/g, "\\'") :
-								":_('" + text.replace(/'/g, "\\'") + "',data)"
+								op === "=" ? ":" + text.replace(/\\|'/g, "\\$&") :
+								":_('" + text.replace(/\\|'/g, "\\$&") + "',data)"
 							)
 						}
 						appendBind(parent, text, ";", op)
@@ -1035,7 +1035,7 @@
 	function step(num, factor, mid) {
 		var x = ("" + factor).split(".")
 		, steps = num / factor
-		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (mid == UNDEF ? .5 : mid === 1 && steps == (steps|0) ? 0 : +mid))) * factor
+		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (mid == UNDEF ? 0.5 : mid === 1 && steps == (steps|0) ? 0 : +mid))) * factor
 		return "" + (1 in x ? n.toFixed(x[1].length) : n)
 	}
 

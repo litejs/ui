@@ -1,3 +1,5 @@
+/*! litejs.com/MIT-LICENSE.txt */
+
 !function(exports) {
 	var empty = []
 	, Event = exports.Event || exports
@@ -94,6 +96,9 @@
 
 // `this` refers to the `window` in browser and to the `exports` in Node.js.
 }(this) // jshint ignore:line
+
+
+
 /* litejs.com/MIT-LICENSE.txt */
 
 
@@ -217,6 +222,11 @@
 		checkUrl()
 	}
 }(this, document, history, location) // jshint ignore:line
+
+
+
+
+
 /* litejs.com/MIT-LICENSE.txt */
 
 
@@ -474,6 +484,9 @@
 	}
 
 }(this) // jshint ignore:line
+
+
+
 /* litejs.com/MIT-LICENSE.txt */
 
 
@@ -490,9 +503,9 @@
 	, body = document.body
 	, root = document.documentElement
 	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
-	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\?.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f+|\n+|$)/g
-	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\?.)*?\3|[^;])*))?/g
-	, selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
+	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
+	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
+	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
 	, bindings = El.bindings = {
@@ -1197,8 +1210,8 @@
 							text = text.replace(/(\w+):?/, "on:'$1',")
 						} else if (op != ";" && op != "^") {
 							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
-								op === "=" ? ":" + text.replace(/'/g, "\\'") :
-								":_('" + text.replace(/'/g, "\\'") + "',data)"
+								op === "=" ? ":" + text.replace(/\\|'/g, "\\$&") :
+								":_('" + text.replace(/\\|'/g, "\\$&") + "',data)"
 							)
 						}
 						appendBind(parent, text, ";", op)
@@ -1443,7 +1456,7 @@
 		md: 601,
 		lg: 1025
 	}
-	, setBreakpointsRated = rate(setBreakpoints, 100, true)
+	, setBreakpointsRated = rate(setBreakpoints, 100)
 
 	function setBreakpoints(_breakpoints) {
 		// document.documentElement.clientWidth is 0 in IE5
@@ -1489,26 +1502,29 @@
 		return wrapper
 	}
 
+	El.rate = rate
 	// Maximum call rate for Function
 	// leading edge, trailing edge
-	function rate(fn, ms, last_call, scope) {
-		var tick, args
+	function rate(fn, ms) {
+		var tick
 		, next = 0
-		if (last_call && typeof last_call !== "function") last_call = fn
 		return function() {
-			if (scope === UNDEF) scope = this
 			var now = Date.now()
 			clearTimeout(tick)
 			if (now >= next) {
 				next = now + ms
-				fn.apply(scope, arguments)
-			} else if (last_call) {
-				args = arguments
-				tick = setTimeout(function() {
-					last_call.apply(scope, args)
-				}, next - now)
+				fn()
+			} else {
+				tick = setTimeout(fn, next - now)
 			}
 		}
+	}
+	El.step = step
+	function step(num, factor, mid) {
+		var x = ("" + factor).split(".")
+		, steps = num / factor
+		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (mid == UNDEF ? 0.5 : mid === 1 && steps == (steps|0) ? 0 : +mid))) * factor
+		return "" + (1 in x ? n.toFixed(x[1].length) : n)
 	}
 
 	function isNumber(num) {
@@ -1523,3 +1539,4 @@
 		return typeof str === "string"
 	}
 }(window, document, Object, Event, "prototype") // jshint ignore:line
+
