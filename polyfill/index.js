@@ -362,20 +362,28 @@
 	// patch("head", document.getElementsByTagName("head")[0])
 	// HTMLElement (IE9) -> Element (IE8)
 	O = document.body
-	var selectorRe = /([.#:[])([-\w]+)(?:\((.+?)\)|([~^$*|]?)=(("|')(?:\\?.)*?\6|[-\w]+))?]?/g
-	, selectorLastRe = /([~\s>+]*)(?:("|')(?:\\?.)*?\2|\(.+?\)|[^\s+>])+$/
-	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\?.)*?"|'(?:\\?.)*?'|\(.+?\))+$)/
-	, selectorCache = {}
+	var selectorCache = {}
+	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
+	, selectorLastRe = /([\s>+~]*)(?:("|')(?:\\.|[^\\])*?\2|\((?:[^()]|\([^()]+\))+?\)|~=|[^'"()\s>+~])+$/
+	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\.|[^\\"])*?"|'(?:\\.|[^\\'])*?'|\((?:[^()]|\([^()]+\))+?\))+$)/
 	, selectorMap = {
+		"empty": "!_.lastChild",
+		"enabled": "!m(_,':disabled')",
 		"first-child": "(a=_.parentNode)&&a.firstChild==_",
+		"lang": "m(c(_,'[lang]'),'[lang|='+v+']')",
 		"last-child": "(a=_.parentNode)&&a.lastChild==_",
+		"link": "m(_,'a[href]')",
+		"only-child": "(a=_.parentNode)&&a.firstChild==a.lastChild",
 		".": "~_.className.split(/\\s+/).indexOf(a)",
 		"#": "_.id==a",
 		"^": "!a.indexOf(v)",
 		"|": "a.split('-')[0]==v",
 		"$": "a.slice(-v.length)==v",
 		"~": "~a.split(/\\s+/).indexOf(v)",
-		"*": "~a.indexOf(v)"
+		"*": "~a.indexOf(v)",
+		">>": "m(_.parentNode,v)",
+		"++": "m(_.previousSibling,v)",
+		"": "c(_.parentNode,v)"
 	}
 	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
 	, closest = patch("closest", "return X(t,'parentNode',a,1)", 0, walk)
@@ -387,8 +395,8 @@
 	//patch("removeEventListener")
 
 	function selectorFn(str) {
-		// jshint evil:true
-		return selectorCache[str] ||
+		if (str != null && typeof str !== "string") throw Error("Invalid selector")
+		return selectorCache[str || ""] ||
 		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
 			str.split(selectorSplitRe).map(function(sel) {
 				var relation, from
@@ -401,12 +409,12 @@
 				, tag = sel.slice(from).replace(selectorRe, function(_, op, key, subSel, fn, val, quotation) {
 					rules.push(
 						"((v='" +
-						(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/'/g, "\\'") +
+						(subSel || (quotation ? val.slice(1, -1) : val) || "").replace(/[\\']/g, "\\$&") +
 						"'),(a='" + key + "'),1)"
 						,
 						selectorMap[op == ":" ? key : op] ||
 						"(a=_.getAttribute(a))" +
-						(fn ? "&&" + selectorMap[fn] : val ? "==v" : "")
+						(fn ? "&&" + selectorMap[fn] : val ? "==v" : "!==null")
 					)
 					return ""
 				})
