@@ -2,7 +2,6 @@
 %css
 	.mat-Menu,
 	.tooltip {
-		font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 		border-radius: 2px;
 		position: absolute;
 		margin: 0;
@@ -117,7 +116,6 @@
 	.Checkbox,
 	.Fab,
 	.material {
-		font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 		font-size: 14px;
 		font-weight: 500;
 		position: relative;
