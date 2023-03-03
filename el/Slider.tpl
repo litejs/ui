@@ -150,7 +150,7 @@
 		, track = el.firstChild
 		, fill = track.firstChild
 		, knob = fill.lastChild
-		, emit = El.emit.bind(el, el, "change").rate(500, true)
+		, emit = El.rate(El.emit.bind(el, el, "change"), 500)
 		on(window, "blur", stop)
 		on(el, "pointerdown", start)
 		el.val = set
@@ -220,7 +220,7 @@
 		}
 		function set(val, e, pos) {
 			load()
-			val = (val < min ? min : val > max ? max : val || 0).step(step)
+			val = El.step(val < min ? min : val > max ? max : val || 0, step)
 			if (value !== void 0 && (!drag || pos !== void 0)) {
 				El.css(fill, vert ? "height" : "width", ((pos || (val-min)*px)+knobLen) + "px", 0)
 			}

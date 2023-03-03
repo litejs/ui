@@ -1014,6 +1014,7 @@
 		return wrapper
 	}
 
+	El.rate = rate
 	// Maximum call rate for Function
 	// leading edge, trailing edge
 	function rate(fn, ms) {
@@ -1029,6 +1030,13 @@
 				tick = setTimeout(fn, next - now)
 			}
 		}
+	}
+	El.step = step
+	function step(num, factor, mid) {
+		var x = ("" + factor).split(".")
+		, steps = num / factor
+		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (mid == UNDEF ? .5 : mid === 1 && steps == (steps|0) ? 0 : +mid))) * factor
+		return "" + (1 in x ? n.toFixed(x[1].length) : n)
 	}
 
 	function isNumber(num) {
