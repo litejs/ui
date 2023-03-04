@@ -21,7 +21,6 @@ describe("Polyfill test", function() {
 				values: null,
 				fromEntries: null
 			})
-			mock.swap(Function.prototype, "bind", null)
 			mock.swap(String.prototype, "trim", null)
 			mock.swap(Date, "now", null)
 			mock.swap(Date.prototype, { toJSON: null, toISOString: null })
@@ -45,6 +44,7 @@ describe("Polyfill test", function() {
 				reduceRight: null,
 				some: null
 			})
+			mock.swap(Function.prototype, "bind", null)
 			var lib = require("../polyfill/index.js")
 		}
 
