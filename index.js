@@ -98,6 +98,7 @@
 }(this) // jshint ignore:line
 
 
+/*! litejs.com/MIT-LICENSE.txt */
 
 /* litejs.com/MIT-LICENSE.txt */
 
@@ -226,6 +227,7 @@
 
 
 
+/*! litejs.com/MIT-LICENSE.txt */
 
 /* litejs.com/MIT-LICENSE.txt */
 
@@ -486,6 +488,7 @@
 }(this) // jshint ignore:line
 
 
+/*! litejs.com/MIT-LICENSE.txt */
 
 /* litejs.com/MIT-LICENSE.txt */
 

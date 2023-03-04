@@ -1,6 +1,6 @@
 {
   "name": "@litejs/ui",
-  "version": "23.2.0",
+  "version": "23.3.0",
   "description": "UI engine for LiteJS full-stack framework",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -32,19 +32,16 @@
     "build": "lj b --out=test/index.html test/dev.html"
   },
   "jshintConfig": {
-    "asi": true,
-    "browser": true,
     "esversion": 5,
+    "asi": true,
     "evil": true,
-    "latedef": "nofunc",
     "laxcomma": true,
     "maxdepth": 6,
     "node": true,
     "nonbsp": true,
-    "nonstandard": true,
-    "quotmark": "double",
-    "shadow": "inner",
     "undef": true,
-    "unused": true
+    "unused": true,
+    "shadow": "outer",
+    "quotmark": "double"
   }
 }

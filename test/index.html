@@ -45,7 +45,7 @@
 		eval
 	/**/
 
-	/*** reuse ***/
+	/*** reuse ***
 	, xhrs = []
 	/**/
 
@@ -89,7 +89,7 @@
 
 	window.xhr = xhr
 	function xhr(method, url, next, attr1, attr2) {
-		var xhr = /*** reuse ***/ xhrs.pop() || /**/ new XMLHttpRequest()
+		var xhr = /*** reuse *** xhrs.pop() || /**/ new XMLHttpRequest()
 
 		// To be able to reuse the XHR object properly,
 		// use the open method first and set onreadystatechange later.
@@ -169,7 +169,7 @@
 					attr2
 				)
 				xhr.onreadystatechange = next = nop
-				/*** reuse ***/
+				/*** reuse ***
 				xhrs.push(xhr)
 				/**/
 			}
@@ -178,7 +178,7 @@
 	}
 
 
-	/*** require ***/
+	/*** require ***
 	var modules = {}
 	, process = window.process = {
 		env: {}
@@ -264,7 +264,7 @@
 	}
 
 	load([
-		(!window.PointerEvent||![].flat)&&"min/0-9186.js","min/1-5d11.js","min/2-2491.js","min/3-6065.js"
+		(!window.PointerEvent||![].flat)&&"min/0-bc8d.js","min/1-1fad.js","min/2-2491.js","min/3-6065.js"
 	])
 	/**/
 
