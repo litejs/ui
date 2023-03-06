@@ -47,6 +47,7 @@
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
 		// In case of local execution `e('eval')` returns undefined
 		Function("e,eval", "try{return e('eval')}catch(e){}")(eval) ||
+		/* ignore next */
 		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
 	/*/
 		eval
@@ -219,7 +220,14 @@
 		function exec() {
 			if (res[pos]) {
 				try {
-					;(xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
+					var execResult = (xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
+					if (execResult && execResult.then) {
+						res[pos] = 0
+						return execResult.then(function() {
+							res[pos] = ""
+							exec()
+						})
+					}
 				} catch(e) {
 					onerror(e, files[pos])
 				}

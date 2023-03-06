@@ -13,7 +13,8 @@ describe("load.js", function() {
 		"i.js": { text: "var i" },
 		"j.js": { text: "var j" },
 		"k.js": { text: "var k" },
-		"l.js": { text: "var l" }
+		"l.js": { text: "var l" },
+		"m.thenable": { text: "var m" }
 	}
 	, xhrRes = []
 	global.location = "http://"
@@ -125,6 +126,23 @@ describe("load.js", function() {
 		})
 		xhr.load(["d.js","g.js"], function() {
 			assert.equal(xhrRes, ["var d", "var e"])
+			assert.end()
+		})
+		mock.tick(500)
+	})
+	.should("handle promise-like response", function(assert, mock) {
+		mock.time()
+		xhrReset()
+		xhr.thenable = function(str) {
+			return { then: function(cb) {
+				setTimeout(function() {
+					xhrRes.push(str)
+					cb()
+				}, 1)
+			}}
+		}
+		xhr.load(["m.thenable"], function() {
+			assert.equal(xhrRes, ["var m"])
 			assert.end()
 		})
 		mock.tick(500)
