@@ -235,7 +235,7 @@
 			// Read-only checkboxes can be changed by the user
 
 			for (opts = {}; (input = el.elements[i++]); ) if (!input.disabled && (key = input.name || input.id)) {
-				value = valFn(input)
+				value = valFn(input, val != UNDEF ? val[key] : UNDEF)
 				if (value !== UNDEF) {
 					step = opts
 					key.replace(/\[(.*?)\]/g, replacer)
@@ -246,7 +246,7 @@
 			return opts
 		}
 
-		if (arguments.length > 1) {
+		if (val !== UNDEF) {
 			if (opts) {
 				value = (isArray(val) ? val : [ val ]).map(String)
 				for (; (input = opts[i++]); ) {
