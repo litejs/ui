@@ -52,6 +52,19 @@ describe("Polyfill test", function() {
 		var tmp, undef
 		, obj = {a:1,b:2}
 
+		var call = args.call
+		, hasOwn = call.bind({}.hasOwnProperty)
+		, slice = call.bind([].slice)
+		, replace = call.bind("".replace)
+
+		assert.equal(hasOwn({a:1}, "a"), true)
+		assert.equal(hasOwn({a:1}, "b"), false)
+		assert.equal(args(0, 1, 2), [1, 2])
+		assert.equal(replace("ab", "b", "c"), "ac")
+
+		function args() {
+			return slice(arguments, 1)
+		}
 		/*
 		assert.equal(lib._patched || xhr._patched, [
 			"document","navigator","Event","pointer",
