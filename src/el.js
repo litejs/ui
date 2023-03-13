@@ -580,14 +580,30 @@
 		if (!node) return
 		var bind, fn
 		, scope = elScope(node, 0, _scope)
-		, i = 0
 
 		if (node.nodeType != 1) {
 			if (node.render) node.render(scope)
 			return
 		}
 
-		if ((bind = getAttr(node, BIND_ATTR))) {
+		hydrate(node, BIND_ATTR, scope)
+		for (bind = node.firstChild; bind; bind = fn) {
+			fn = bind.nextSibling
+			render(bind, scope)
+		}
+		hydrate(node, "data-out", scope)
+
+		/*** ie8 ***/
+		if (ie678 && node.tagName === "SELECT") {
+			node.parentNode.insertBefore(node, node)
+		}
+		/**/
+	}
+
+	function hydrate(node, attr, scope) {
+		var bind, fn
+		, i = 0
+		if ((bind = getAttr(node, attr))) {
 			scope._m = bindMatch
 			scope._t = bind
 			// i18n(bind, lang).format(scope)
@@ -609,7 +625,7 @@
 			}) + "r)"
 
 			try {
-				if (Function("n,data,b,s,B,r", "with(data||{})return " + fn).call(node, node, scope, bindings, setAttr, BIND_ATTR)) {
+				if (Function("n,data,b,s,B,r", "with(data||{})return " + fn).call(node, node, scope, bindings, setAttr, attr)) {
 					return
 				}
 			} catch (e) {
@@ -622,17 +638,8 @@
 				}
 			}
 		}
-
-		for (bind = node.firstChild; bind; bind = fn) {
-			fn = bind.nextSibling
-			render(bind, scope)
-		}
-		/*** ie8 ***/
-		if (ie678 && node.tagName === "SELECT") {
-			node.parentNode.insertBefore(node, node)
-		}
-		/**/
 	}
+
 
 	El.empty = empty
 	El.kill = kill
