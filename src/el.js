@@ -644,6 +644,11 @@
 	El.empty = empty
 	El.kill = kill
 	El.render = render
+	El.replace = replace
+	function replace(oldEl, newEl) {
+		var parent = oldEl && oldEl.parentNode
+		if (parent && newEl) return parent.replaceChild(oldEl, newEl)
+	}
 
 	for (var key in El) wrap(key)
 
