@@ -742,8 +742,8 @@
 							text = text.replace(/(\w+):?/, "on:'$1',")
 						} else if (op != ";" && op != "^") {
 							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
-								op === "=" ? ":" + text.replace(/\\|'/g, "\\$&") :
-								":_('" + text.replace(/\\|'/g, "\\$&") + "',data)"
+								op === "=" ? ":" + text.replace(/'/g, "\\'") :
+								":_('" + text.replace(/'/g, "\\'") + "',data)"
 							)
 						}
 						appendBind(parent, text, ";", op)
