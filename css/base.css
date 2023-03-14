@@ -231,13 +231,24 @@ button,
 	float: right !important;
 }
 
+.sm .sm-t-left,
+.md .md-t-left,
+.lg .md-t-left,
+.lg .lg-t-left,
 .t-left {
 	text-align: left;
 }
-
+.sm .sm-t-center,
+.md .md-t-center,
+.lg .md-t-center,
+.lg .lg-t-center,
 .t-center {
 	text-align: center;
 }
+.sm .sm-t-right,
+.md .md-t-right,
+.lg .md-t-right,
+.lg .lg-t-right,
 .t-right {
 	text-align: right;
 }
