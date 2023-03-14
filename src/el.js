@@ -18,6 +18,8 @@
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
+	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
+	, wordRe = /\b[a-z_$][\w$]*/ig
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
 	, bindings = El.bindings = {
@@ -625,7 +627,13 @@
 			}) + "r)"
 
 			try {
-				if (Function("n,data,b,s,B,r", "with(data||{})return " + fn).call(node, node, scope, bindings, setAttr, attr)) {
+				var vars = fn.replace(fnRe, "").match(wordRe) || []
+				for (i = vars.length; i--; ) if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
+				if (Function(
+					"n,data,b,s,B,r",
+					(vars[0] ? "var " + vars.join("='',") + "='';" : "") +
+					"with(data||{})return " + fn
+				).call(node, node, scope, bindings, setAttr, attr)) {
 					return
 				}
 			} catch (e) {
