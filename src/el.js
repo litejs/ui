@@ -130,7 +130,8 @@
 
 		// NOTE: IE-s cloneNode consolidates the two text nodes together as one
 		// http://brooknovak.wordpress.com/2009/08/23/ies-clonenode-doesnt-actually-clone/
-		el = (elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true)
+		el = (name = elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true)
+		el._s = name._s
 
 		if (pres) {
 			setAttr(el, pre)
@@ -309,8 +310,12 @@
 
 			if (child.nodeType) {
 				tmp = el.insertBefore ? el : el[el.length - 1]
-				if ((i = getAttr(tmp, "data-child"))) {
-					before = findCom(tmp, i) || tmp
+				if ((i = getAttr(child, "slot"))) {
+					child.removeAttribute("slot")
+					before = findCom(tmp, "%slot-" + i) || tmp
+					tmp = before.parentNode
+				} else if ((i = getAttr(tmp, "data-slot"))) {
+					before = findCom(tmp, "%slot-" + i) || tmp
 					tmp = before.parentNode
 					// TODO:2016-07-05:lauri:handle numeric befores
 				}
@@ -677,10 +682,8 @@
 
 	wrapProto.append = function(el) {
 		var elWrap = this
-		if (elWrap._ca > -1) {
-			append(elWrap[elWrap._ca], el)
-		// } else if (elWrap._cb > -1) {
-		// elWrap.splice(elWrap._cb, 0, el)
+		if (elWrap._s) {
+			append(elWrap[elWrap._s[getAttr(el, "slot") || elWrap._s._] || 0], el)
 		} else {
 			elWrap.push(el)
 		}
@@ -689,8 +692,7 @@
 
 	wrapProto.cloneNode = function(deep) {
 		deep = new ElWrap(this, deep)
-		deep._ca = this._ca
-		//deep._cb = this._cb
+		deep._s = this._s
 		return deep
 	}
 
@@ -780,8 +782,10 @@
 			, el = childNodes[1] ? new ElWrap(childNodes) : childNodes[0]
 
 			if (i > -1) {
-				if (childNodes[i].nodeType == 1) setAttr(childNodes[el._ca = i], "data-child", t.el._ck)
-				// else el._cb = i
+				if (childNodes[i].nodeType == 1 && t.el._sk) {
+					setAttr(childNodes[i], "data-slot", t.el._sk)
+				}
+				el._s = t.el._s
 			}
 
 			t.el.plugin = t.el = t.parent = null
@@ -813,12 +817,14 @@
 				Object.assign(bindings, Function("return({" + this.txt + "})")())
 			}
 		}),
-		child: extend(plugin, {
+		slot: extend(plugin, {
 			done: function() {
-				var key = "@child-" + (++seq)
+				var name = this.name || ++seq
+				var key = "%slot-" + name
 				, root = append(this.parent, document.createComment(key))
 				for (; root.parentNode; root = root.parentNode);
-				root._ck = key
+				;(root._s || (root._s = {}))[name] = root.childNodes.length - 1
+				if (!this.name) root._s._ = root._sk = name
 				root._cp = root.childNodes.length - 1
 			}
 		}),
@@ -884,6 +890,7 @@
 			}
 		})
 	}
+	El.plugins.child = El.plugins.slot
 
 	xhr.view = xhr.tpl = El.tpl = parseTemplate
 	xhr.css = function(str) {

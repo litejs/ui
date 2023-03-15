@@ -1,0 +1,30 @@
+
+%el slot-test1
+	.grid
+		.row
+			.col.w6 1
+			.col.w6 > %slot
+		.row
+			.col.w6 2
+			.col.w6 > %slot second
+
+%el slot-test2
+	.row
+		.col.w6 3
+		.col.w6 > %slot first
+	.row
+		.col.w6 4
+		.col.w6 > %slot
+
+
+%view slot #body
+.p4
+	h2 Slot test
+	slot-test1
+		h6 First1
+		h6[slot=second] Second1
+	.grid
+		slot-test2
+			h6[slot=first] First2
+			h6 Second2
+
