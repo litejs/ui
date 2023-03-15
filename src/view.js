@@ -6,6 +6,7 @@
 /* global El, xhr */
 !function(exports) {
 	var fn, lastView, lastStr, lastUrl, syncResume
+	, body = document.body
 	, isArray = Array.isArray
 	, capture = 1
 	, fnStr = ""
@@ -19,16 +20,17 @@
 	, defaults = {
 		base: "view/",
 		home: "home",
-		root: document.body
+		root: body
 	}
 
 	exports.View = View
 	exports.LiteJS = LiteJS
 
 
-	function LiteJS(_opts) {
+	function LiteJS(opts) {
+		opts = Object.assign({}, defaults, opts)
 		var key, name
-		, opts = Object.assign({}, defaults, _opts)
+		, root = opts.root
 		for (key in opts) if (hasOwn.call(opts, key)) {
 			if (typeof View[key] === "function") {
 				for (name in opts[key]) if (hasOwn.call(opts[key], name)) {
@@ -38,7 +40,13 @@
 				View[key] = opts[key]
 			}
 		}
-		View("#", opts.root)
+		View("#", root)
+		View.$ = function(sel, start) {
+			return body.querySelector.call(start || root, sel)
+		}
+		View.$$ = function(sel, start) {
+			return Array.from(body.querySelectorAll.call(start || root, sel))
+		}
 		return View
 	}
 
