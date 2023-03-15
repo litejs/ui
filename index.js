@@ -506,6 +506,8 @@
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
+	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
+	, wordRe = /\b[a-z_$][\w$]*/ig
 	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
 	, bindings = El.bindings = {
@@ -616,7 +618,8 @@
 
 		// NOTE: IE-s cloneNode consolidates the two text nodes together as one
 		// http://brooknovak.wordpress.com/2009/08/23/ies-clonenode-doesnt-actually-clone/
-		el = (elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true)
+		el = (name = elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true)
+		el._s = name._s
 
 		if (pres) {
 			setAttr(el, pre)
@@ -723,7 +726,7 @@
 			// Read-only checkboxes can be changed by the user
 
 			for (opts = {}; (input = el.elements[i++]); ) if (!input.disabled && (key = input.name || input.id)) {
-				value = valFn(input)
+				value = valFn(input, val != UNDEF ? val[key] : UNDEF)
 				if (value !== UNDEF) {
 					step = opts
 					key.replace(/\[(.*?)\]/g, replacer)
@@ -734,7 +737,7 @@
 			return opts
 		}
 
-		if (arguments.length > 1) {
+		if (val !== UNDEF) {
 			if (opts) {
 				value = (isArray(val) ? val : [ val ]).map(String)
 				for (; (input = opts[i++]); ) {
@@ -795,8 +798,12 @@
 
 			if (child.nodeType) {
 				tmp = el.insertBefore ? el : el[el.length - 1]
-				if ((i = getAttr(tmp, "data-child"))) {
-					before = findCom(tmp, i) || tmp
+				if ((i = getAttr(child, "slot"))) {
+					child.removeAttribute("slot")
+					before = findCom(tmp, "%slot-" + i) || tmp
+					tmp = before.parentNode
+				} else if ((i = getAttr(tmp, "data-slot"))) {
+					before = findCom(tmp, "%slot-" + i) || tmp
 					tmp = before.parentNode
 					// TODO:2016-07-05:lauri:handle numeric befores
 				}
@@ -1068,14 +1075,30 @@
 		if (!node) return
 		var bind, fn
 		, scope = elScope(node, 0, _scope)
-		, i = 0
 
 		if (node.nodeType != 1) {
 			if (node.render) node.render(scope)
 			return
 		}
 
-		if ((bind = getAttr(node, BIND_ATTR))) {
+		hydrate(node, BIND_ATTR, scope)
+		for (bind = node.firstChild; bind; bind = fn) {
+			fn = bind.nextSibling
+			render(bind, scope)
+		}
+		hydrate(node, "data-out", scope)
+
+		/*** ie8 ***/
+		if (ie678 && node.tagName === "SELECT") {
+			node.parentNode.insertBefore(node, node)
+		}
+		/**/
+	}
+
+	function hydrate(node, attr, scope) {
+		var bind, fn
+		, i = 0
+		if ((bind = getAttr(node, attr))) {
 			scope._m = bindMatch
 			scope._t = bind
 			// i18n(bind, lang).format(scope)
@@ -1097,7 +1120,13 @@
 			}) + "r)"
 
 			try {
-				if (Function("n,data,b,s,B,r", "with(data||{})return " + fn).call(node, node, scope, bindings, setAttr, BIND_ATTR)) {
+				var vars = fn.replace(fnRe, "").match(wordRe) || []
+				for (i = vars.length; i--; ) if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
+				if (Function(
+					"n,data,b,s,B,r",
+					(vars[0] ? "var " + vars.join("='',") + "='';" : "") +
+					"with(data||{})return " + fn
+				).call(node, node, scope, bindings, setAttr, attr)) {
 					return
 				}
 			} catch (e) {
@@ -1110,21 +1139,17 @@
 				}
 			}
 		}
-
-		for (bind = node.firstChild; bind; bind = fn) {
-			fn = bind.nextSibling
-			render(bind, scope)
-		}
-		/*** ie8 ***/
-		if (ie678 && node.tagName === "SELECT") {
-			node.parentNode.insertBefore(node, node)
-		}
-		/**/
 	}
+
 
 	El.empty = empty
 	El.kill = kill
 	El.render = render
+	El.replace = replace
+	function replace(oldEl, newEl) {
+		var parent = oldEl && oldEl.parentNode
+		if (parent && newEl) return parent.replaceChild(oldEl, newEl)
+	}
 
 	for (var key in El) wrap(key)
 
@@ -1145,10 +1170,8 @@
 
 	wrapProto.append = function(el) {
 		var elWrap = this
-		if (elWrap._ca > -1) {
-			append(elWrap[elWrap._ca], el)
-		// } else if (elWrap._cb > -1) {
-		// elWrap.splice(elWrap._cb, 0, el)
+		if (elWrap._s) {
+			append(elWrap[elWrap._s[getAttr(el, "slot") || elWrap._s._] || 0], el)
 		} else {
 			elWrap.push(el)
 		}
@@ -1157,8 +1180,7 @@
 
 	wrapProto.cloneNode = function(deep) {
 		deep = new ElWrap(this, deep)
-		deep._ca = this._ca
-		//deep._cb = this._cb
+		deep._s = this._s
 		return deep
 	}
 
@@ -1210,8 +1232,8 @@
 							text = text.replace(/(\w+):?/, "on:'$1',")
 						} else if (op != ";" && op != "^") {
 							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
-								op === "=" ? ":" + text.replace(/\\|'/g, "\\$&") :
-								":_('" + text.replace(/\\|'/g, "\\$&") + "',data)"
+								op === "=" ? ":" + text.replace(/'/g, "\\'") :
+								":_('" + text.replace(/'/g, "\\'") + "',data)"
 							)
 						}
 						appendBind(parent, text, ";", op)
@@ -1248,8 +1270,10 @@
 			, el = childNodes[1] ? new ElWrap(childNodes) : childNodes[0]
 
 			if (i > -1) {
-				if (childNodes[i].nodeType == 1) setAttr(childNodes[el._ca = i], "data-child", t.el._ck)
-				// else el._cb = i
+				if (childNodes[i].nodeType == 1 && t.el._sk) {
+					setAttr(childNodes[i], "data-slot", t.el._sk)
+				}
+				el._s = t.el._s
 			}
 
 			t.el.plugin = t.el = t.parent = null
@@ -1281,12 +1305,14 @@
 				Object.assign(bindings, Function("return({" + this.txt + "})")())
 			}
 		}),
-		child: extend(plugin, {
+		slot: extend(plugin, {
 			done: function() {
-				var key = "@child-" + (++seq)
+				var name = this.name || ++seq
+				var key = "%slot-" + name
 				, root = append(this.parent, document.createComment(key))
 				for (; root.parentNode; root = root.parentNode);
-				root._ck = key
+				;(root._s || (root._s = {}))[name] = root.childNodes.length - 1
+				if (!this.name) root._s._ = root._sk = name
 				root._cp = root.childNodes.length - 1
 			}
 		}),
@@ -1352,6 +1378,7 @@
 			}
 		})
 	}
+	El.plugins.child = El.plugins.slot
 
 	xhr.view = xhr.tpl = El.tpl = parseTemplate
 	xhr.css = function(str) {
