@@ -99,7 +99,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		transform: translate(8px,10px) rotate(45deg);
 	}
 
-%view public #body
+%view public #
 	;kb: {
 		h: history.setUrl.bind(null, "home"),
 		u: history.setUrl.bind(null, "users"),
@@ -126,7 +126,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 			})
 		}
 
-%view #private #body
+%view #private #
 	;on: "ping", function() {
 		var user
 		View.on("login", function(e, data) {

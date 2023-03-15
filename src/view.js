@@ -38,7 +38,7 @@
 				View[key] = opts[key]
 			}
 		}
-		View("#body", opts.root)
+		View("#", opts.root)
 		return View
 	}
 
@@ -103,7 +103,7 @@
 					} else {
 						if (tmp.route === "404") {
 							El.txt(tmp = El("h3"), "# Error 404")
-							View("404", tmp, "#body")
+							View("404", tmp, "#")
 						}
 						View("404").show({origin:params})
 					}

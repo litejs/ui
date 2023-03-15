@@ -17,7 +17,7 @@
 		.col.w6 > %slot
 
 
-%view slot #body
+%view slot #
 .p4
 	h2 Slot test
 	slot-test1
