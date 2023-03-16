@@ -588,18 +588,18 @@
 			return
 		}
 
-		hydrate(node, BIND_ATTR, scope)
-		for (bind = node.firstChild; bind; bind = fn) {
-			fn = bind.nextSibling
-			render(bind, scope)
-		}
-		hydrate(node, "data-out", scope)
-
 		/*** ie8 ***/
 		if (ie678 && node.tagName === "SELECT") {
 			node.parentNode.insertBefore(node, node)
 		}
 		/**/
+
+		if (hydrate(node, BIND_ATTR, scope)) return
+		for (bind = node.firstChild; bind; bind = fn) {
+			fn = bind.nextSibling
+			render(bind, scope)
+		}
+		hydrate(node, "data-out", scope)
 	}
 
 	function hydrate(node, attr, scope) {
@@ -634,7 +634,7 @@
 					(vars[0] ? "var " + vars.join("='',") + "='';" : "") +
 					"with(data||{})return " + fn
 				).call(node, node, scope, bindings, setAttr, attr)) {
-					return
+					return true
 				}
 			} catch (e) {
 				/*** debug ***/
