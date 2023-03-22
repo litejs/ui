@@ -234,6 +234,7 @@
 /* global El, xhr */
 !function(exports) {
 	var fn, lastView, lastStr, lastUrl, syncResume
+	, body = document.body
 	, isArray = Array.isArray
 	, capture = 1
 	, fnStr = ""
@@ -247,16 +248,17 @@
 	, defaults = {
 		base: "view/",
 		home: "home",
-		root: document.body
+		root: body
 	}
 
 	exports.View = View
 	exports.LiteJS = LiteJS
 
 
-	function LiteJS(_opts) {
+	function LiteJS(opts) {
+		opts = Object.assign({}, defaults, opts)
 		var key, name
-		, opts = Object.assign({}, defaults, _opts)
+		, root = opts.root
 		for (key in opts) if (hasOwn.call(opts, key)) {
 			if (typeof View[key] === "function") {
 				for (name in opts[key]) if (hasOwn.call(opts[key], name)) {
@@ -266,7 +268,13 @@
 				View[key] = opts[key]
 			}
 		}
-		View("#body", opts.root)
+		View("#", root)
+		View.$ = function(sel, start) {
+			return body.querySelector.call(start || root, sel)
+		}
+		View.$$ = function(sel, start) {
+			return Array.from(body.querySelectorAll.call(start || root, sel))
+		}
 		return View
 	}
 
@@ -331,7 +339,7 @@
 					} else {
 						if (tmp.route === "404") {
 							El.txt(tmp = El("h3"), "# Error 404")
-							View("404", tmp, "#body")
+							View("404", tmp, "#")
 						}
 						View("404").show({origin:params})
 					}
@@ -523,11 +531,6 @@
 		},
 		html: function(el, html) {
 			el.innerHTML = html
-		},
-		md: El.md = function(el, txt) {
-			txt = txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
-			txt = txt.replace(/\n/g, "<br>")
-			el.innerHTML = txt
 		},
 		ref: function(el, name) {
 			this[name] = el
@@ -1081,18 +1084,18 @@
 			return
 		}
 
-		hydrate(node, BIND_ATTR, scope)
-		for (bind = node.firstChild; bind; bind = fn) {
-			fn = bind.nextSibling
-			render(bind, scope)
-		}
-		hydrate(node, "data-out", scope)
-
 		/*** ie8 ***/
 		if (ie678 && node.tagName === "SELECT") {
 			node.parentNode.insertBefore(node, node)
 		}
 		/**/
+
+		if (hydrate(node, BIND_ATTR, scope)) return
+		for (bind = node.firstChild; bind; bind = fn) {
+			fn = bind.nextSibling
+			render(bind, scope)
+		}
+		hydrate(node, "data-out", scope)
 	}
 
 	function hydrate(node, attr, scope) {
@@ -1127,7 +1130,7 @@
 					(vars[0] ? "var " + vars.join("='',") + "='';" : "") +
 					"with(data||{})return " + fn
 				).call(node, node, scope, bindings, setAttr, attr)) {
-					return
+					return true
 				}
 			} catch (e) {
 				/*** debug ***/
@@ -1207,10 +1210,10 @@
 			if (parent._r) {
 				parent.txt += all + "\n"
 			} else if (plugin || mapStart && (name = "map")) {
-				if (El.plugins[name]) {
+				if (plugins[name]) {
 					parentStack.push(parent)
 					stack.unshift(q)
-					parent = (new El.plugins[name](parent, op + text, mapEnd ? "" : ";")).el
+					parent = (new plugins[name](parent, op + text, mapEnd ? "" : ";")).el
 				} else {
 					append(parent, all)
 				}
@@ -1256,7 +1259,9 @@
 
 	function plugin(parent, name) {
 		var t = this
-		t.name = name
+		, arr = name.split(splitRe)
+		t.name = arr[0]
+		t.attr = arr.slice(1)
 		t.parent = parent
 		t.el = El("div")
 		t.el.plugin = t
@@ -1278,12 +1283,6 @@
 
 			t.el.plugin = t.el = t.parent = null
 			return el
-		},
-		done: function() {
-			var t = this
-			, parent = t.parent
-			elCache[t.name] = t._done()
-			return parent
 		}
 	}
 
@@ -1299,7 +1298,7 @@
 
 	js[P].done = Function("Function(this.txt)()")
 
-	El.plugins = {
+	var plugins = El.plugins = {
 		binding: extend(js, {
 			done: function() {
 				Object.assign(bindings, Function("return({" + this.txt + "})")())
@@ -1334,6 +1333,16 @@
 		}),
 		el: extend(plugin, {
 			content: 1,
+			done: function() {
+				var t = this
+				, parent = t.parent
+				, arr = t.attr
+				t = elCache[t.name] = t._done()
+				if (arr[0]) {
+					// TODO:2023-03-22:lauri:Add new scope
+				}
+				return parent
+			}
 		}),
 		js: js,
 		map: extend(js, {
@@ -1352,9 +1361,9 @@
 			done: function() {
 				var fn
 				, t = this
-				, arr = t.name.split(splitRe)
+				, arr = t.attr
 				, bind = getAttr(t.el, BIND_ATTR)
-				, view = View(arr[0], t._done(), arr[1], arr[2])
+				, view = View(t.name, t._done(), arr[0], arr[1])
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, name, op, args) {
 						return "(this['" + name + "']" + (
@@ -1370,15 +1379,15 @@
 		"view-link": extend(plugin, {
 			done: function() {
 				var t = this
-				, arr = t.name.split(splitRe)
-				View(arr[0], null, arr[2])
+				, arr = t.attr
+				View(t.name, null, arr[1])
 				.on("ping", function(opts) {
-					View.show(arr[1].format(opts))
+					View.show(arr[0].format(opts))
 				})
 			}
 		})
 	}
-	El.plugins.child = El.plugins.slot
+	plugins.child = plugins.slot
 
 	xhr.view = xhr.tpl = El.tpl = parseTemplate
 	xhr.css = function(str) {
