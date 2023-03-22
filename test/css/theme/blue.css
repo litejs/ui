@@ -105,8 +105,8 @@ img {
 }
 
 .bg-1 {
-	background-image: linear-gradient(#257, #27b);
-	border-bottom: 1px solid #257;
+	background-image: linear-gradient(var(--bg1), var(--bg2));
+	border-bottom: 1px solid var(--bg1);
 }
 
 .bg-2 {

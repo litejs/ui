@@ -20,6 +20,9 @@
  * @see http://smacss.com/book/categorizing
  */
 
+/* @import rules must be before any other rules (except @charset and @layer) or they will be ignored. */
+
+@import url("css/variables.css");
 @import url("../css/base.css");             /* 1 */
 @import url("../css/grid.css");             /* 3 */
 @import url("../css/grid-golden.css");      /* 3 */
