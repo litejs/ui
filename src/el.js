@@ -714,10 +714,10 @@
 			if (parent._r) {
 				parent.txt += all + "\n"
 			} else if (plugin || mapStart && (name = "map")) {
-				if (El.plugins[name]) {
+				if (plugins[name]) {
 					parentStack.push(parent)
 					stack.unshift(q)
-					parent = (new El.plugins[name](parent, op + text, mapEnd ? "" : ";")).el
+					parent = (new plugins[name](parent, op + text, mapEnd ? "" : ";")).el
 				} else {
 					append(parent, all)
 				}
@@ -763,7 +763,9 @@
 
 	function plugin(parent, name) {
 		var t = this
-		t.name = name
+		, arr = name.split(splitRe)
+		t.name = arr[0]
+		t.attr = arr.slice(1)
 		t.parent = parent
 		t.el = El("div")
 		t.el.plugin = t
@@ -785,12 +787,6 @@
 
 			t.el.plugin = t.el = t.parent = null
 			return el
-		},
-		done: function() {
-			var t = this
-			, parent = t.parent
-			elCache[t.name] = t._done()
-			return parent
 		}
 	}
 
@@ -806,7 +802,7 @@
 
 	js[P].done = Function("Function(this.txt)()")
 
-	El.plugins = {
+	var plugins = El.plugins = {
 		binding: extend(js, {
 			done: function() {
 				Object.assign(bindings, Function("return({" + this.txt + "})")())
@@ -841,6 +837,16 @@
 		}),
 		el: extend(plugin, {
 			content: 1,
+			done: function() {
+				var t = this
+				, parent = t.parent
+				, arr = t.attr
+				t = elCache[t.name] = t._done()
+				if (arr[0]) {
+					// TODO:2023-03-22:lauri:Add new scope
+				}
+				return parent
+			}
 		}),
 		js: js,
 		map: extend(js, {
@@ -859,9 +865,9 @@
 			done: function() {
 				var fn
 				, t = this
-				, arr = t.name.split(splitRe)
+				, arr = t.attr
 				, bind = getAttr(t.el, BIND_ATTR)
-				, view = View(arr[0], t._done(), arr[1], arr[2])
+				, view = View(t.name, t._done(), arr[0], arr[1])
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, name, op, args) {
 						return "(this['" + name + "']" + (
@@ -877,15 +883,15 @@
 		"view-link": extend(plugin, {
 			done: function() {
 				var t = this
-				, arr = t.name.split(splitRe)
-				View(arr[0], null, arr[2])
+				, arr = t.attr
+				View(t.name, null, arr[1])
 				.on("ping", function(opts) {
-					View.show(arr[1].format(opts))
+					View.show(arr[0].format(opts))
 				})
 			}
 		})
 	}
-	El.plugins.child = El.plugins.slot
+	plugins.child = plugins.slot
 
 	xhr.view = xhr.tpl = El.tpl = parseTemplate
 	xhr.css = function(str) {

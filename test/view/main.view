@@ -53,7 +53,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		nav-row[href="#test"] Test
 
 
-%el Footer
+%el Footer kala,name
 .bg-1
 	.Footer.App-row.grid-3.c2
 		.Footer-item.col-4
