@@ -31,6 +31,9 @@
 !function(window, Function, setTimeout) {
 	xhr._s = new Date()
 	var loaded = {}
+	, rewrite = {
+		//!{loadRewrite}
+	}
 	/*** activex ***/
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
 	/**/
@@ -219,7 +222,7 @@
 		, len = files && files.length
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file]) {
+		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file = rewrite[file] || file]) {
 			if (loaded[file]) {
 				// Same file requested again
 				;(loaded[file].x || (loaded[file].x = [])).push(cb, file, i)
