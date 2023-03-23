@@ -119,7 +119,7 @@
 		// if (sessionID) xhr.setRequestHeader("Cookie", sessionID);
 		// if (xhr.getResponseHeader("Set-Cookie")) sessionID = xhr.getResponseHeader("Set-Cookie");
 
-		xhr.open(method, url, next !== true)
+		xhr.open(method, rewrite[url] || url, next !== true)
 
 		// With IE 8 XMLHttpRequest gains the timeout property.
 		// With the timeout property, Web developers can specify
@@ -222,7 +222,7 @@
 		, len = files && files.length
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file = rewrite[file] || file]) {
+		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file]) {
 			if (loaded[file]) {
 				// Same file requested again
 				;(loaded[file].x || (loaded[file].x = [])).push(cb, file, i)
