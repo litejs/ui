@@ -385,7 +385,7 @@
 		"": "c(_.parentNode,v)"
 	}
 	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
-	, closest = patch("closest", "return X(t,'parentNode',a,1)", 0, walk)
+	, closest = walk.bind(window, "parentNode", 1)
 
 	// Note: querySelector in IE8 supports only CSS 2.1 selectors
 	patch((b="querySelector"), (a = "return X(t,a,") + "1)", ie678, find)
@@ -424,18 +424,18 @@
 			}).join("||") + "}"
 		)(matches, closest))
 	}
-	function walk(el, by, sel, first, nextFn) {
-		var out = []
-		if (!isFn(sel)) sel = selectorFn(sel)
-		for (; el; el = el[by] || nextFn && nextFn(el)) if (sel(el)) {
-			if (first === 1) return el
+	function walk(next, first, el, sel, nextFn) {
+		sel = selectorFn(sel)
+		for (var out = []; el; el = el[next] || nextFn && nextFn(el)) if (sel(el)) {
+			if (first) return el
 			out.push(el)
 		}
-		return first === 1? null : out
+		return first ? null : out
 	}
+
 	function find(node, sel, first) {
-		return walk(node.firstChild, "firstChild", sel, first, function(el) {
-			for (var next = el.nextSibling; !next && ((el = el.parentNode) !== node);) next = el.nextSibling
+		return walk("firstChild", first, node.firstChild, sel, function(el) {
+			for (var next = el.nextSibling; !next && ((el = el.parentNode) !== node); ) next = el.nextSibling
 			return next
 		})
 	}
