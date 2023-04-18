@@ -21,7 +21,7 @@
 
 /* global El, xhr */
 /* c8 ignore start */
-!function(window, Function) {
+!function(window, Function, P) {
 
 	// Array#flat()         - Chrome69, Edge79, Firefox62, Safari12
 	// window.PointerEvent  - Chrome55, Edge12, Firefox59, Safari13,   IE11
@@ -30,7 +30,6 @@
 	// queueMicrotask       - Chrome71, Edge79, Firefox69, Safari12.1
 
 	var isArr, oKeys
-	, P = "prototype"
 	, O = window
 	, patched = (window.xhr || window)._p = []
 	, jsonRe = /[\x00-\x1f\x22\x5c]/g
@@ -173,7 +172,7 @@
 		try {
 			// FF4-beta with dom.storage.enabled=false throws for accessing windows.localStorage
 			// iOS5 private browsing throws for localStorage.setItem()
-			return window[name].setItem(name, name)
+			return window[name += "Storage"].setItem(name, name)
 		} catch(e){}
 		/***
 		} else if (el.addBehavior) {
@@ -217,8 +216,8 @@
 		patch(name, data, 1)
 	}
 
-	createStorage("sessionStorage")    // Chrome5, FF2, IE8, Safari4
-	createStorage("localStorage")      // Chrome5, FF3.5, IE8, Safari4
+	createStorage("session")    // Chrome5, FF2, IE8, Safari4
+	createStorage("local")      // Chrome5, FF3.5, IE8, Safari4
 
 	// 20 fps is good enough
 	patch("requestAnimationFrame", "return setTimeout(a,50)")
@@ -469,7 +468,7 @@
 			src || {}
 		))
 	}
-}(this, Function) // jshint ignore:line
+}(this, Function, "prototype") // jshint ignore:line
 /* c8 ignore stop */
 
 
