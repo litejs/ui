@@ -168,12 +168,15 @@ describe("Polyfill test", function() {
 		assert.end()
 
 	})
-	.test("DOM query: {0}", [
+})
+
+describe("DOM tests", typeof window === "undefined" ? "No window" : function() {
+	this.test("selector: {0}", [
 		[ ".red", "BODY", 1 ],
 		[ "[name='viewport']", "META", 1 ],
 		[ "body", "BODY", 1 ],
 		[ "meta", "META", 3 ]
-	], typeof window === "undefined" ? "No window" : function(query, tag, count, assert) {
+	], function(query, tag, count, assert) {
 		// Expects test.litejs.com DOM
 		var root = document.documentElement
 		, first = document.body.querySelector.call(root, query)
