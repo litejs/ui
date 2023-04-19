@@ -21,7 +21,7 @@
 
 /* global El, xhr */
 /* c8 ignore start */
-!function(window, Function, P) {
+!function(window, Function, Infinity, P) {
 
 	// Array#flat()         - Chrome69, Edge79, Firefox62, Safari12
 	// window.PointerEvent  - Chrome55, Edge12, Firefox59, Safari13,   IE11
@@ -246,12 +246,14 @@
 			// IE 8 serializes `undefined` as `"undefined"`
 			return (
 				isStr(o) ? "\"" + o.replace(jsonRe, jsonFn) + "\"" :
-				o && typeof o == "object" ? (
+				o !== o || o == null || o === Infinity || o === -Infinity ? "null" :
+				typeof o == "object" ? (
 					isFn(o.toJSON) ? stringify(o.toJSON()) :
 					isArr(o) ? "[" + o.map(stringify) + "]" :
-					"{" + oKeys(o).map(function(a){return stringify(a) + ":" + stringify(o[a])}) + "}"
+					"{" + oKeys(o).flatMap(function(a){
+						return o[a] === void 0 ? [] : stringify(a) + ":" + stringify(o[a])
+					}) + "}"
 				) :
-				typeof o == "number" && !isFinite(o) ? "null" :
 				"" + o
 			)
 		}
@@ -329,7 +331,7 @@
 	// IE6-9 silently fails to write to the arguments object, make it to array first.
 	patch("splice",      "if(b===Y){A=S.call(A);A[1]=t.length-a}return O.apply(t,A)", "1,2" != [1, 2].splice(0))
 
-	b = a + "while(++i<l)if(i in t)"
+	b = a + "while(++i<l)"
 	patch("every",       b + "if(!a.call(b,t[i],i,t))return!1;return!0")
 	patch("forEach",     b + "a.call(b,t[i],i,t)")
 
@@ -469,7 +471,7 @@
 			src || {}
 		))
 	}
-}(this, Function, "prototype") // jshint ignore:line
+}(this, Function, Infinity, "prototype") // jshint ignore:line
 /* c8 ignore stop */
 
 

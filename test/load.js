@@ -124,7 +124,7 @@ describe("load.js", function() {
 	})
 	.should("fall back to injection", function(assert, mock) {
 		xhrRes = []
-		mock.swap(global, "eval", mock.fn(1))
+		mock.swap(global, "eval", mock.fn(null))
 		mock.swap(global, "document", {
 			createElement: function(tag) { return {} },
 			body: {

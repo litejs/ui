@@ -52,19 +52,6 @@ describe("Polyfill test", function() {
 		var tmp, undef
 		, obj = {a:1,b:2}
 
-		var call = args.call
-		, hasOwn = call.bind({}.hasOwnProperty)
-		, slice = call.bind([].slice)
-		, replace = call.bind("".replace)
-
-		assert.equal(hasOwn({a:1}, "a"), true)
-		assert.equal(hasOwn({a:1}, "b"), false)
-		assert.equal(args(0, 1, 2), [1, 2])
-		assert.equal(replace("ab", "b", "c"), "ac")
-
-		function args() {
-			return slice(arguments, 1)
-		}
 		/*
 		assert.equal(lib._patched || xhr._patched, [
 			"document","navigator","Event","pointer",
@@ -78,10 +65,10 @@ describe("Polyfill test", function() {
 
 		assert.type(lib.Event, "function")
 
-		tmp = '{"a":1,"cb":"2\\n3\\\\","d":[-1,0,1,2,{"g\\b":true},false,"",null,null,1],"e":{"f":null}}'
-		assert.equal(lib.JSON.stringify({a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", NaN, Infinity, {toJSON:function(){return 1}}],e:{f:null}}), tmp)
-		assert.equal(JSON.stringify({a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", NaN, Infinity, {toJSON:function(){return 1}}],e:{f:null}}), tmp)
-		assert.equal(lib.JSON.parse(tmp), {a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", null, null, 1],e:{f:null}})
+		tmp = '{"a":1,"cb":"2\\n3\\\\","d":[-1,0,1,2,{"g\\b":true},false,"",null,null,null,1],"e":{"f":null}}'
+		assert.equal(lib.JSON.stringify({a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", NaN, Infinity, undef, {toJSON:function(){return 1}}],e:{f:null,o:undef}}), tmp)
+		assert.equal(    JSON.stringify({a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", NaN, Infinity, undef, {toJSON:function(){return 1}}],e:{f:null,o:undef}}), tmp)
+		assert.equal(lib.JSON.parse(tmp), {a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", null, null, null, 1],e:{f:null}})
 
 		lib.sessionStorage.setItem("a", 1)
 		assert.equal(lib.sessionStorage.getItem("a"), "1")
@@ -181,12 +168,54 @@ describe("Polyfill test", function() {
 		assert.end()
 
 	})
-	.test("DOM", typeof window === "undefined" ? "No window" : function(assert, mock) {
-		assert.equal(document.body.querySelector.call(document.documentElement, "body").tagName, "BODY")
-		assert.equal(document.body.querySelectorAll.call(document.documentElement, "body").length, 1)
-		assert.equal(document.body.matches("BODY"), true)
-		assert.equal(document.body.matches("HTML"), false)
+	.test("DOM query: {0}", [
+		[ ".red", "BODY", 1 ],
+		[ "[name='viewport']", "META", 1 ],
+		[ "body", "BODY", 1 ],
+		[ "meta", "META", 3 ]
+	], typeof window === "undefined" ? "No window" : function(query, tag, count, assert) {
+		// Expects test.litejs.com DOM
+		var root = document.documentElement
+		, first = document.body.querySelector.call(root, query)
+		, all = document.body.querySelectorAll.call(root, query)
+		assert.equal(first.tagName, tag)
+		assert.equal(all.length, count)
+		assert.equal(document.body.matches.call(first, query), true)
+		assert.equal(document.body.matches.call(first, tag), true)
+		assert.equal(document.body.matches.call(root, query), tag === "HTML")
+		assert.equal(document.body.matches.call(root, tag), tag === "HTML")
 		assert.end()
 	})
 })
+
+describe("Custom code", function() {
+	var VERSION = "0.0.0"
+	, FN_CACHE = {}
+	, assign = Object.assign
+	, create = Object.create
+	, isArray = Array.isArray
+	, empty = []
+	, bind = Date.bind.bind(Date.call)
+	, hasOwn = bind(FN_CACHE.hasOwnProperty)
+	, push = bind(empty.push)
+	, sliceA = bind(empty.slice)
+	, sliceS = bind(VERSION.slice)
+	, toStr = bind(FN_CACHE.toString)
+	, replace = bind(VERSION.replace)
+
+	it("should ", function(assert) {
+
+		assert.equal(hasOwn({a:1}, "a"), true)
+		assert.equal(hasOwn({a:1}, "b"), false)
+		assert.equal(args(0, 1, 2), [1, 2])
+		assert.equal(replace("ab", "b", "c"), "ac")
+
+		assert.end()
+
+		function args() {
+			return sliceA(arguments, 1)
+		}
+	})
+})
+
 
