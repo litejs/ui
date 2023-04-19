@@ -28,9 +28,11 @@
 // MSXML 6.0 has improved XSD, deprecated several legacy features
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
-!function(window, Function, setTimeout) {
+!function(window, Function) {
 	xhr._s = new Date()
 	var loaded = {}
+	// IE9, move setTimeout from window.prototype to window object cache, so you can override it later
+	, setTimeout_ = (window.setTimeout = window.setTimeout) || setTimeout
 	, rewrite = {
 		//!{loadRewrite}
 	}
@@ -70,14 +72,14 @@
 			, error && (error.stack || error.stacktrace) || "-"
 			, "" + location
 			]
-		)) setTimeout(sendErrors, 307)
+		)) setTimeout_(sendErrors, 307)
 	}
 
 	function sendErrors() {
 		if (xhr.err) {
 			xhr.err(unsentErrors)
 		} else {
-			setTimeout(sendErrors, 1307)
+			setTimeout_(sendErrors, 1307)
 		}
 	}
 	/*/
@@ -254,7 +256,7 @@
 				if (++pos < len) exec()
 				/*** inject ***/
 				// inject can be async
-				else if (pos === len) setTimeout(exec, 1)
+				else if (pos === len) setTimeout_(exec, 1)
 				/**/
 				else {
 					if (next) next()
@@ -272,5 +274,5 @@
 	/**/
 
 	function nop() {}
-}(this, Function, setTimeout) // jshint ignore:line
+}(this, Function) // jshint ignore:line
 
