@@ -44,7 +44,7 @@
 		window.execScript ||
 	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
-		Function("e,eval", "try{return e('eval')==e&&e}catch(e){}")(eval) ||
+		Function("e,eval", "try{return e('eval')}catch(e){}")(eval) ||
 		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
 	/*/
 		eval
