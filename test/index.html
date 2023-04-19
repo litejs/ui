@@ -28,9 +28,11 @@
 // MSXML 6.0 has improved XSD, deprecated several legacy features
 // What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
-!function(window, Function, setTimeout) {
+!function(window, Function) {
 	xhr._s = new Date()
 	var loaded = {}
+	// IE9, move setTimeout from window.prototype to window object cache, so you can override it later
+	, setTimeout_ = (window.setTimeout = window.setTimeout) || setTimeout
 	, rewrite = {
 		//!{loadRewrite}
 	}
@@ -42,7 +44,7 @@
 		window.execScript ||
 	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
-		Function("e,eval", "try{return e('eval')==e&&e}catch(e){}")(eval) ||
+		Function("e,eval", "try{return e('eval')}catch(e){}")(eval) ||
 		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
 	/*/
 		eval
@@ -70,14 +72,14 @@
 			, error && (error.stack || error.stacktrace) || "-"
 			, "" + location
 			]
-		)) setTimeout(sendErrors, 307)
+		)) setTimeout_(sendErrors, 307)
 	}
 
 	function sendErrors() {
 		if (xhr.err) {
 			xhr.err(unsentErrors)
 		} else {
-			setTimeout(sendErrors, 1307)
+			setTimeout_(sendErrors, 1307)
 		}
 	}
 	/*/
@@ -254,7 +256,7 @@
 				if (++pos < len) exec()
 				/*** inject ***/
 				// inject can be async
-				else if (pos === len) setTimeout(exec, 1)
+				else if (pos === len) setTimeout_(exec, 1)
 				/**/
 				else {
 					if (next) next()
@@ -267,10 +269,10 @@
 	}
 
 	load([
-		(!window.PointerEvent||![].flat)&&"min/0-bc8d.js","min/1-3888.js","min/2-b05a.js","min/3-bea8.js"
+		(!Object.hasOwn)&&"min/0-4a80.js","min/1-9db9.js","min/2-b05a.js","min/3-f2f0.js"
 	])
 	/**/
 
 	function nop() {}
-}(this, Function, setTimeout) // jshint ignore:line
+}(this, Function) // jshint ignore:line
 </script><noscript><h1>Error</h1>This application requires JavaScript</noscript></body></html>
