@@ -229,6 +229,10 @@
 	// IE8 has console, however, the console object does not exist if the console is not opened.
 	patch("console", {log: nop, error: nop})
 
+	/*** ie9 ***/
+	patch("matchMedia", "b=a||'all';return{media:b,matches:X?X.matchMedium(b):!1,addListener:Y}", 0, window.styleMedia || window.media, nop)
+	/**/
+
 
 	function jsonFn(str) {
 		return JSONmap[str] || esc(str).replace(/%u/g, "\\u").replace(/%/g, "\\x")
@@ -252,10 +256,6 @@
 			)
 		}
 	})
-
-	/*** ie9 ***/
-	patch("matchMedia", "b=a||'all';return{media:b,matches:X?X.matchMedium(b):!1,addListener:Y}", 0, window.styleMedia || window.media, nop)
-	/**/
 
 	O = patch("performance")
 	patch("p:now", (a = "return+new Date") + "-X", 0, new Date())
