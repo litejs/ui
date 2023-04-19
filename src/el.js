@@ -840,11 +840,11 @@
 			done: function() {
 				var t = this
 				, parent = t.parent
-				, arr = t.attr
-				t = elCache[t.name] = t._done()
-				if (arr[0]) {
-					// TODO:2023-03-22:lauri:Add new scope
-				}
+				elCache[t.name] = t._done()
+				//, arr = t.attr
+				//if (arr[0]) {
+				//	// TODO:2023-03-22:lauri:Add new scope
+				//}
 				return parent
 			}
 		}),
