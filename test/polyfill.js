@@ -192,7 +192,8 @@ describe("DOM tests", typeof window === "undefined" ? "No window" : function() {
 })
 
 describe("Custom code", function() {
-	var VERSION = "0.0.0"
+	var UNDEF
+	, VERSION = "0.0.0"
 	, FN_CACHE = {}
 	, assign = Object.assign
 	, create = Object.create
@@ -205,6 +206,29 @@ describe("Custom code", function() {
 	, sliceS = bind(VERSION.slice)
 	, toStr = bind(FN_CACHE.toString)
 	, replace = bind(VERSION.replace)
+	, isStr = bind(isType, isType, "string")
+	, isFn = bind(isType, isType, "function")
+
+	var xml = describe.global.ActiveXObject ? new ActiveXObject('Msxml2.DOMDocument.3.0') : {};
+	var allTypes = [UNDEF, VERSION, isType, null, NaN, 0, 1, Infinity, {}, empty, xml]
+
+	it("should test type: {0}", [
+		[ "isStr", isStr, VERSION ],
+		[ "isFn", isFn, isType ]
+	], function(name, fn, ok, assert) {
+
+		// trigger JIT
+		for (var count = 500; count--; ) assert.equal(fn(ok), true)
+
+		setTimeout(function() {
+			assert.equal(fn(ok), true)
+
+			allTypes.forEach(function(i){
+				assert.equal(fn(i), i === ok, name + ":" + i)
+			})
+			assert.end()
+		}, 1)
+	})
 
 	it("should ", function(assert) {
 
@@ -219,6 +243,10 @@ describe("Custom code", function() {
 			return sliceA(arguments, 1)
 		}
 	})
+
+	function isType(type, target) {
+		return type === typeof target // || false
+	}
 })
 
 
