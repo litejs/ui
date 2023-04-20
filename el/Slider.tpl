@@ -263,6 +263,6 @@
 		;fixReadonlyCheckbox
 		input[type=checkbox].hide
 			;readonly: row && !row.write
-			;checked: model && !!model.get(row.path)
+			;checked: model && (row && row.opts ? row.opts === model.get(row.path) : !!model.get(row.path))
 		.Toggle-knob.anim
 
