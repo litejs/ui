@@ -1,6 +1,6 @@
 {
   "name": "@litejs/ui",
-  "version": "23.4.0",
+  "version": "23.4.1",
   "description": "UI engine for LiteJS full-stack framework",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -25,7 +25,7 @@
     "test": "TZ='Europe/Tallinn' lj test test/index.js --brief --coverage && jshint --verbose *.js src/*.js binding/*.js polyfill/*.js"
   },
   "devDependencies": {
-    "@litejs/cli": "23.4.0",
+    "@litejs/cli": "23.4.3",
     "jshint": "2.13.6"
   },
   "litejs": {
