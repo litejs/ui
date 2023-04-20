@@ -1,8 +1,7 @@
 
-require("../..").describe
-.test("ui/polyfill/string", function(assert) {
+it("ui/polyfill/string", function(assert) {
 	var textEncoder
-	, fn = require("../../../ui/polyfill/string.js")
+	, fn = require("../../../polyfill/string.js")
 
 	assert.equal(fn.startsWith.call("aaa", "ab"), false)
 	assert.equal(fn.startsWith.call("aba", "ab"), true)

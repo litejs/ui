@@ -348,6 +348,8 @@
 
 
 	O = String[P]
+	patch("endsWith", "return(a+='')===t.slice(-a.length)")
+	patch("startsWith", "return t.lastIndexOf(a,0)===0")
 	patch("trim", "return t.replace(/^\\s+|\\s+$/g,'')")
 
 

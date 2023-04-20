@@ -2,10 +2,15 @@
 describe("Polyfill test", function() {
 
 	this
-	.test("setTimeout parameters", function(assert) {
-		setTimeout(function(a) {
-			assert.equal(a, 2).end()
+	.test("setTimeout additional parameters", function(assert) {
+		assert.plan(2)
+		var interval = setInterval(function(a) {
+			assert.equal(a, 2)
+			clearInterval(interval)
 		}, 1, 2)
+		setTimeout(function(a) {
+			assert.equal(a, 3)
+		}, 1, 3)
 	})
 	.test("index.js", function(assert, mock) {
 
@@ -21,7 +26,11 @@ describe("Polyfill test", function() {
 				values: null,
 				fromEntries: null
 			})
-			mock.swap(String.prototype, "trim", null)
+			mock.swap(String.prototype, {
+				endsWith: null,
+				//startsWith: null,
+				trim: null
+			})
 			mock.swap(Date, "now", null)
 			mock.swap(Date.prototype, { toJSON: null, toISOString: null })
 			mock.swap(Array, {
@@ -64,11 +73,6 @@ describe("Polyfill test", function() {
 		*/
 
 		assert.type(lib.Event, "function")
-
-		tmp = '{"a":1,"cb":"2\\n3\\\\","d":[-1,0,1,2,{"g\\b":true},false,"",null,null,null,1],"e":{"f":null}}'
-		assert.equal(lib.JSON.stringify({a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", NaN, Infinity, undef, {toJSON:function(){return 1}}],e:{f:null,o:undef}}), tmp)
-		assert.equal(    JSON.stringify({a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", NaN, Infinity, undef, {toJSON:function(){return 1}}],e:{f:null,o:undef}}), tmp)
-		assert.equal(lib.JSON.parse(tmp), {a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", null, null, null, 1],e:{f:null}})
 
 		lib.sessionStorage.setItem("a", 1)
 		assert.equal(lib.sessionStorage.getItem("a"), "1")
@@ -151,6 +155,11 @@ describe("Polyfill test", function() {
 		assert.equal(tmp.every(function(i) { return i !== 4 }), true)
 		assert.equal(tmp.every(function(i) { return i === 1 }), false)
 
+		assert.equal("aaa".startsWith("ab"), false)
+		assert.equal("aba".startsWith("ab"), true)
+		assert.equal("aaa".endsWith("ba"), false)
+		assert.equal("aba".endsWith("ba"), true)
+
 		assert.equal(" a	".trim(), "a")
 
 		assert.equal(new Date(6e13-1).toISOString(),  "3871-04-29T10:39:59.999Z")
@@ -167,6 +176,19 @@ describe("Polyfill test", function() {
 
 		assert.end()
 
+	})
+	.test("JSON", function(assert) {
+		var undef
+		, lib = describe.env === "browser" ? window : require("../polyfill/index.js")
+		, str1 = '{"a":1,"cb":"2\\n3\\\\","d":[-1,0,1,2,{"g\\b":true},false,"",null,null,null,1],"e":{"f":null}}'
+		, obj1 = {a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", NaN, Infinity, undef, {toJSON:function(){return 1}}],e:{f:null,o:undef}}
+		, obj2 = {a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", null, null, null, 1],e:{f:null}}
+
+		assert.equal(lib.JSON.parse(str1), obj2)
+		assert.equal(    JSON.parse(str1), obj2)
+		assert.equal(lib.JSON.stringify(obj1), str1)
+		assert.equal(    JSON.stringify(obj1), str1)
+		assert.end()
 	})
 })
 
