@@ -30,7 +30,7 @@
 
 !function(window, Function) {
 	xhr._s = new Date()
-	var loaded = {}
+	var loaded = xhr._l = {}
 	// IE9, move setTimeout from window.prototype to window object cache, so you can override it later
 	, setTimeout_ = (window.setTimeout = window.setTimeout) || setTimeout
 	, rewrite = {
@@ -224,7 +224,7 @@
 		, len = files && files.length
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file]) {
+		for (; i < len; i++) if ((file = files[i]) && typeof loaded[file] != "object") {
 			if (loaded[file]) {
 				// Same file requested again
 				;(loaded[file].x || (loaded[file].x = [])).push(exec, res, i)
@@ -239,14 +239,14 @@
 		pos = 0
 
 		function cb(err, str, file, i) {
-			loaded[file] = 2
-			res[i] = err ? (onerror(err, file), "") : str
+			loaded[file] = { h: this.getAllResponseHeaders(), b: str }
+			res[i] = err ? (onerror(err, file), "") : loaded[file]
 			exec()
 		}
 		function exec() {
 			if (res[pos]) {
 				try {
-					;(xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
+					;(xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos].b)
 				} catch(e) {
 					onerror(e, files[pos])
 				}

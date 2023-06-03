@@ -1,6 +1,7 @@
 
 describe("load.js", function() {
 	var xhrMap = {
+		"err": { text: "404" },
 		"a.js": { text: "var a" },
 		"b.js": { text: "var b", status: 0 },
 		"c.js": { text: "var c" },
@@ -33,7 +34,7 @@ describe("load.js", function() {
 		xhr.open = function(method, url, async) {
 			this.readyState = 1
 			delete this.onreadystatechange
-			res = xhrMap[url]
+			res = xhrMap[url] || xhrMap.err
 			if (async === false) response()
 		}
 		xhr.send = function() {
@@ -56,8 +57,11 @@ describe("load.js", function() {
 	}
 	var lib, xhr
 
-	this.beforeEach = function() {
+	function xhrReset() {
 		xhrRes = []
+		Object.keys(xhr._l).forEach(function(key) {
+			delete xhr._l[key]
+		})
 	}
 
 	this
@@ -77,31 +81,33 @@ describe("load.js", function() {
 		assert.equal(log.calls[0].args[0].length, 3)
 		assert.end()
 	})
-	.should("load nothing", function(assert) {
-		xhrRes = []
-		xhr.load([])
-		xhr.load("", function() {
-			assert.equal(xhrRes, [])
+	.should("load {0}", [
+		[ "empty array", [], [] ],
+		[ "empty string", "", [] ],
+		[ "null", null, [] ],
+		[ "undefined", undefined, [] ],
+		[ "array of falsy", [ null, undefined, "" ], [] ],
+		[ "one file", "a.js", [ "var a" ] ],
+		[ "one file in array", [ "a.js" ], [ "var a" ] ],
+		[ "two files in array", [ "a.js", "b.js" ], [ "var a", "var b" ] ],
+		[ "array with null's", [ null, "c.js", null ], [ "var c" ] ],
+	], function(name, files, expected, assert) {
+		xhrReset()
+		xhr.load(files, function() {
+			assert.equal(xhrRes, expected)
 			assert.end()
 		})
 	})
-	.should("load one file", function(assert) {
-		xhrRes = []
+	.should("load one file multiple times", function(assert) {
+		xhrReset()
 		xhr.load("a.js")
 		xhr.load("a.js", function() {
 			assert.equal(xhrRes, ["var a"])
 			assert.end()
 		})
 	})
-	.should("load array with one file", function(assert) {
-		xhrRes = []
-		xhr.load(["b.js"], function() {
-			assert.equal(xhrRes, ["var b"])
-			assert.end()
-		})
-	})
 	.should("load array with null's", function(assert) {
-		xhrRes = []
+		xhrReset()
 		xhr.load([null, "c.js", null], function() {
 			assert.equal(xhrRes, ["var c"])
 			assert.end()
@@ -109,7 +115,7 @@ describe("load.js", function() {
 	})
 	.should("load one file twice", function(assert, mock) {
 		mock.time()
-		xhrRes = []
+		xhrReset()
 		xhr.load(["d.js", "e.js", "f.js", "h.js"], function() {
 			assert.equal(xhrRes, ["var d", "var e"])
 		})
@@ -123,7 +129,7 @@ describe("load.js", function() {
 		mock.tick(500)
 	})
 	.should("fall back to injection", function(assert, mock) {
-		xhrRes = []
+		xhrReset()
 		mock.swap(global, "eval", mock.fn(null))
 		mock.swap(global, "document", {
 			createElement: function(tag) { return {} },
