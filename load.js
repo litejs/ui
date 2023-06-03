@@ -227,7 +227,7 @@
 		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file]) {
 			if (loaded[file]) {
 				// Same file requested again
-				;(loaded[file].x || (loaded[file].x = [])).push(cb, file, i)
+				;(loaded[file].x || (loaded[file].x = [])).push(exec, res, i)
 			} else {
 				// FireFox 3 throws on `xhr.send()` without arguments
 				xhr("GET", file, loaded[file] = cb, i).send(null)
@@ -260,8 +260,8 @@
 				/**/
 				else {
 					if (next) next()
-					if ((res = cb.x)) {
-						for (i = 0; res[i];) res[i++](0, "", res[i++], res[i++])
+					if ((next = cb.x)) {
+						for (i = 0; next[i]; ) next[i++](next[i++][next[i++]] = "")
 					}
 				}
 			}
