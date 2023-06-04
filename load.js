@@ -31,11 +31,12 @@
 !function(window, Function) {
 	xhr._s = new Date()
 	var loaded = xhr._l = {}
-	// IE9, move setTimeout from window.prototype to window object cache, so you can override it later
-	, setTimeout_ = (window.setTimeout = window.setTimeout) || setTimeout
 	, rewrite = {
 		//!{loadRewrite}
 	}
+	// IE9, move setTimeout from window.prototype to window object, so you can patch it later
+	// `|| setTimeout` is for testing
+	, setTimeout_ = (window.setTimeout = window.setTimeout) || setTimeout
 	/*** activex ***/
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
 	/**/
@@ -44,6 +45,7 @@
 		window.execScript ||
 	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
+		// In case of local execution `e('eval')` returns undefined
 		Function("e,eval", "try{return e('eval')}catch(e){}")(eval) ||
 		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
 	/*/
@@ -51,6 +53,7 @@
 	/**/
 
 	/*** reuse ***/
+	// XHR memory leak mitigation
 	, xhrs = []
 	/**/
 
@@ -66,7 +69,7 @@
 			, col || (window.event || unsentErrors).errorCharacter || "?"
 			, message
 			].join(":")
-		) && 1 == unsentErrors.push(
+		) && 2 > unsentErrors.push(
 			[ +new Date()
 			, lastError
 			, error && (error.stack || error.stacktrace) || "-"
@@ -132,7 +135,7 @@
 		//xhr.ontimeout = timeoutRaised
 
 		if (next !== true) xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4) {
+			if (xhr.readyState > 3) {
 				// From the XMLHttpRequest spec:
 				//
 				// > For 304 Not Modified responses
