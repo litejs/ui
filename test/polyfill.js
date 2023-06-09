@@ -217,6 +217,7 @@ describe("Polyfill test", function() {
 		assert.equal(new Date(-6e13-1).toISOString(), "0068-09-03T13:19:59.999Z")
 		assert.equal(new Date(-8e13-1).toISOString(), "-000566-11-26T01:46:39.999Z")
 		assert.equal(new Date(864e13).toISOString(),  "+275760-09-13T00:00:00.000Z")
+		assert.equal(new Date(864e13).toJSON(),       "+275760-09-13T00:00:00.000Z")
 		assert.equal(new Date(864e12).toISOString(),  "+029349-01-26T00:00:00.000Z")
 		assert.equal(new Date(-864e12).toISOString(), "-025410-12-06T00:00:00.000Z")
 		assert.equal(new Date(-864e13).toISOString(), "-271821-04-20T00:00:00.000Z")
@@ -279,16 +280,15 @@ describe("Custom code", function() {
 	, sliceS = bind(VERSION.slice)
 	, toStr = bind(FN_CACHE.toString)
 	, replace = bind(VERSION.replace)
-	, isStr = bind(isType, isType, "string")
-	, isFn = bind(isType, isType, "function")
 
 	var xml = describe.global.ActiveXObject ? new ActiveXObject('Msxml2.DOMDocument.3.0') : {};
-	var allTypes = [UNDEF, VERSION, isType, null, NaN, 0, 1, Infinity, {}, empty, xml]
+	var allTypes = [UNDEF, VERSION, isFn, null, NaN, 0, 1, Infinity, {}, empty, xml]
 
 	it("should test type: {0}", [
 		[ "isStr", isStr, VERSION ],
-		[ "isFn", isFn, isType ]
+		[ "isFn", isFn, isFn ]
 	], function(name, fn, ok, assert) {
+		assert.setTimeout(5000)
 
 		// trigger JIT
 		for (var count = 500; count--; ) assert.equal(fn(ok), true)
@@ -317,8 +317,11 @@ describe("Custom code", function() {
 		}
 	})
 
-	function isType(type, target) {
-		return type === typeof target // || false
+	function isStr(str) {
+		return typeof str === "string" // || false
+	}
+	function isFn(fn) {
+		return typeof fn === "function"
 	}
 })
 

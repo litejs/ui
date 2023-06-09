@@ -21,7 +21,7 @@
 
 /* global El, xhr */
 /* c8 ignore start */
-!function(window, Function, Infinity, P) {
+!function(window, Date, Function, Infinity, P) {
 
 	// Array#flat()         - Chrome69, Edge79, Firefox62, Safari12
 	// window.PointerEvent  - Chrome55, Edge12, Firefox59, Safari13,   IE11
@@ -261,7 +261,7 @@
 	patch("escape", "return X(a)", esc("a", 0) != "a", esc)
 
 	// From Chrome23/Firefox21 parseInt parses leading-zero strings as decimal, not octal
-	b = patch("parseInt", "return X(a,(b>>>0)||(Y.test(''+a)?16:10))", _parseInt("08") !== 8, _parseInt, /^\s*[-+]?0[xX]/)
+	b = patch("g:parseInt", "return X(a,(b>>>0)||(Y.test(''+a)?16:10))", _parseInt("08") !== 8, _parseInt, /^\s*[-+]?0[xX]/)
 
 
 	O = patch("performance")
@@ -281,12 +281,17 @@
 	/*** toISOString ***/
 	O = O[P]
 	// IE8 toJSON does not return milliseconds
-	// ISO 8601 format is always 24 or 27 characters long,
-	// YYYY-MM-DDTHH:mm:ss.sssZ or ±YYYYYY-MM-DDTHH:mm:ss.sssZ
-	patch("toISOString", patch("toJSON", [
+	// FF37 returns invalid extended ISO-8601, `29349-01-26T00:00:00.000Z` instead of `+029349-01-26T00:00:00.000Z`
+	b = ie678 || (O[a = "toISOString"] && new Date(8e14)[a]().length < 27)
+	patch(a, patch("toJSON", [
 		"a=t.getUTCFullYear();if(a!==a)throw RangeError('Invalid time');return(b=a<0?'-':a>9999?'+':'')+X(a<0?-a:a,'-',b?6:4", "Month()+1,'-'", "Date(),'T'",
 		"Hours(),':'", "Minutes(),':'", "Seconds(),'.'", "Milliseconds(),'Z',3)"
-	].join(")+X(t.getUTC"), ie678, function(a, b, c){ return ("00000" + a).slice(-c || -2) + b }))
+	].join(")+X(t.getUTC"),
+		b,
+		function(a, b, c) {
+			return ("00000" + a).slice(-c || -2) + b
+		}
+	), b)
 	/**/
 
 	O = Function[P]
@@ -485,7 +490,7 @@
 			src || {}
 		))
 	}
-}(this, Function, Infinity, "prototype") // jshint ignore:line
+}(this, Date, Function, Infinity, "prototype") // jshint ignore:line
 /* c8 ignore stop */
 
 
