@@ -274,7 +274,7 @@
 
 	function getUrl(_loc) {
 		return (
-			/*** PUSH ***/
+			/*** pushState ***/
 			histBase ? location.pathname.slice(histBase.length) :
 			/**/
 			// bug in Firefox where location.hash is decoded
@@ -288,7 +288,7 @@
 	}
 
 	function setUrl(url, replace) {
-		/*** PUSH ***/
+		/*** pushState ***/
 		if (histBase) {
 			history[replace ? "replaceState" : "pushState"](null, null, histBase + url)
 		} else {
@@ -299,7 +299,7 @@
 			if (iframe && getUrl() !== getUrl(iframe.location) ) {
 				iframe.location[replace ? "replace" : iframe.document.open().close(), "assign"]("#" + url)
 			}
-		/*** PUSH ***/
+		/*** pushState ***/
 		}
 		/**/
 		return checkUrl()
@@ -315,9 +315,9 @@
 	history.getUrl = getUrl
 	history.setUrl = setUrl
 
-	history.start = function(_cb) {
-		histCb = _cb
-		/*** PUSH ***/
+	LiteJS.start = function(cb) {
+		histCb = cb
+		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var url
 		, _base = document.documentElement.getElementsByTagName("base")[0]
@@ -370,7 +370,10 @@
 				}
 			}, 60)
 		}
-		checkUrl()
+
+		xhr.load(View.$$("script[type='litejs/view']", body).map(function(el) {
+			return el.src
+		}), checkUrl)
 	}
 }(this, document, history, location) // jshint ignore:line
 

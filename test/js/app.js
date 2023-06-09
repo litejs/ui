@@ -205,13 +205,7 @@ var app = LiteJS({
 	})
 
 
-
-
-
-	xhr.load(El.findAll(body, "script[type='litejs/view']").map(function(el){return el.src}), function() {
-		// Start a router to show views
-		history.start(View.show)
-	})
+	LiteJS.start(app.show)
 
 	El.on(body, "click", function(e) {
 		var el = e.target
