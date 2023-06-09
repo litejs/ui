@@ -36,6 +36,7 @@
 	, JSONmap = {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t","\"":"\\\"","\\":"\\\\"}
 	, hasOwn = JSONmap.hasOwnProperty
 	, esc = escape
+	, _parseInt = parseInt
 	, document = patch("document", {body:{}})
 	, navigator = patch("navigator")
 	// JScript engine in IE<9 does not recognize vertical tabulation character
@@ -160,14 +161,6 @@
 		}
 	}
 
-	// Ignore FF3 escape second non-standard argument
-	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
-	patch("escape", "return X(a)", esc("a", 0) != "a", esc)
-
-	// Patch parameters support for setTimeout callback
-	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFn)
-	patch("setInterval", a, ie6789, isFn)
-
 	function createStorage(name) {
 		try {
 			// FF4-beta with dom.storage.enabled=false throws for accessing windows.localStorage
@@ -258,6 +251,14 @@
 			)
 		}
 	})
+
+	// Patch parameters support for setTimeout callback
+	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFn)
+	patch("setInterval", a, ie6789, isFn)
+
+	// Ignore FF3 escape second non-standard argument
+	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
+	patch("escape", "return X(a)", esc("a", 0) != "a", esc)
 
 	O = patch("performance")
 	patch("p:now", (a = "return+new Date") + "-X", 0, new Date())
