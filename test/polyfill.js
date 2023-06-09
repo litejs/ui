@@ -31,6 +31,14 @@ describe("Polyfill test", function() {
 				//startsWith: null,
 				trim: null
 			})
+			mock.swap(Number, {
+				isFinite: null,
+				isInteger: null,
+				isNaN: null,
+				isSafeInteger: null,
+				parseFloat: null,
+				parseInt: null
+			})
 			mock.swap(Date, "now", null)
 			mock.swap(Date.prototype, { toJSON: null, toISOString: null })
 			mock.swap(Array, {
@@ -161,6 +169,49 @@ describe("Polyfill test", function() {
 		assert.equal("aba".endsWith("ba"), true)
 
 		assert.equal(" a	".trim(), "a")
+
+		assert.equal(
+			[ 0, 1, -100000, 99999999999999999999999, 5.0, 5.0000000000000001, 4500000000000000.1 ].every(Number.isInteger),
+			true
+		)
+		assert.equal(
+			[ 0.1, Math.PI, NaN, Infinity, -Infinity, "10", true, false, [1], 5.000000000000001 ].some(Number.isInteger),
+			false
+		)
+		assert.equal(
+			[ 0, 2e64 ].every(Number.isFinite),
+			true
+		)
+		assert.equal(
+			[ Infinity, NaN, -Infinity, "0", null ].some(Number.isFinite),
+			false
+		)
+
+		assert.equal(Number.isNaN(NaN), true)
+		assert.equal(
+			[ "NaN", undefined, {}, "blabla", true, null, "37", "37.37", "", " " ].some(Number.isNaN),
+			false
+		)
+		;[
+			[ "0xF",    16 ],
+			[ "F",      16 ],
+			[ "FXX123", 16 ],
+			[ "17",      8 ],
+			[ "015",    10 ],
+			[ "15,123", 10 ],
+			[ "15 * 3", 10 ],
+			[ "15e2",   10 ],
+			[ "15px",   10 ],
+			[ "12",     13 ],
+			[ "1111",    2 ]
+		].forEach(function(a) {
+			assert.equal(parseInt(a[0], a[1]), 15)
+			assert.equal(Number.parseInt(a[0], a[1]), 15)
+		})
+		assert.equal(Number.parseFloat("1.2"), parseFloat("1.2"))
+		assert.strictEqual(Number.MAX_SAFE_INTEGER, 9007199254740991)
+		assert.equal(Number.isSafeInteger(9007199254740991), true)
+		assert.equal(Number.isSafeInteger(9007199254740992), false)
 
 		assert.equal(new Date(6e13-1).toISOString(),  "3871-04-29T10:39:59.999Z")
 		assert.equal(new Date(-6e13-1).toISOString(), "0068-09-03T13:19:59.999Z")

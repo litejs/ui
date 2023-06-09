@@ -268,6 +268,13 @@
 	patch("p:now", (a = "return+new Date") + "-X", 0, new Date())
 	patch("timing")
 
+	O = Number
+	patch("parseInt", b)
+	patch("parseFloat", parseFloat)
+	patch("isNaN", "return a!==a")
+	patch("isInteger", "return X(a)&&Math.floor(a)===a", 0, patch("isFinite", "return typeof a==='number'&&isFinite(a)"))
+	patch("isSafeInteger", "return a<=X", 0, patch("MAX_SAFE_INTEGER", 9007199254740991))
+
 	O = Date
 	patch("d:now", a)
 
