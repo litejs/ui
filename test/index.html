@@ -30,12 +30,13 @@
 
 !function(window, Function) {
 	xhr._s = new Date()
-	var loaded = {}
-	// IE9, move setTimeout from window.prototype to window object cache, so you can override it later
-	, setTimeout_ = (window.setTimeout = window.setTimeout) || setTimeout
+	var loaded = xhr._l = {}
 	, rewrite = {
 		//!{loadRewrite}
 	}
+	// IE9, move setTimeout from window.prototype to window object, so you can patch it later
+	// `|| setTimeout` is for testing
+	, setTimeout_ = (window.setTimeout = window.setTimeout) || setTimeout
 	/*** activex ***/
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
 	/**/
@@ -44,6 +45,7 @@
 		window.execScript ||
 	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
+		// In case of local execution `e('eval')` returns undefined
 		Function("e,eval", "try{return e('eval')}catch(e){}")(eval) ||
 		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
 	/*/
@@ -51,6 +53,7 @@
 	/**/
 
 	/*** reuse ***
+	// XHR memory leak mitigation
 	, xhrs = []
 	/**/
 
@@ -66,7 +69,7 @@
 			, col || (window.event || unsentErrors).errorCharacter || "?"
 			, message
 			].join(":")
-		) && 1 == unsentErrors.push(
+		) && 2 > unsentErrors.push(
 			[ +new Date()
 			, lastError
 			, error && (error.stack || error.stacktrace) || "-"
@@ -132,7 +135,7 @@
 		//xhr.ontimeout = timeoutRaised
 
 		if (next !== true) xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4) {
+			if (xhr.readyState > 3) {
 				// From the XMLHttpRequest spec:
 				//
 				// > For 304 Not Modified responses
@@ -183,37 +186,6 @@
 	}
 
 
-	/*** require ***
-	var modules = {}
-	, process = window.process = {
-		env: {}
-	}
-
-	//process.memoryUsage = function() {
-	//	return (window.performance || {}).memory || {}
-	//}
-
-	window.require = require
-	function require(name) {
-		var mod = modules[name]
-		if (!mod) throw Error("Module not found: " + name)
-		if (typeof mod == "string") {
-			var exports = modules[name] = {}
-			, module = { id: name, filename: name, exports: exports }
-			Function("exports,require,module,process,global", mod).call(
-				exports, exports, require, module, process, window
-			)
-			mod = modules[name] = module.exports
-		}
-		return mod
-	}
-
-	require.def = function(map, key) {
-		for (key in map) modules[key] = map[key]
-	}
-	/**/
-
-
 	/*** load ***/
 	xhr.load = load
 	function load(files, next) {
@@ -224,10 +196,10 @@
 		, len = files && files.length
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) && 2 !== loaded[file]) {
+		for (; i < len; i++) if ((file = files[i]) && typeof loaded[file] != "object") {
 			if (loaded[file]) {
 				// Same file requested again
-				;(loaded[file].x || (loaded[file].x = [])).push(cb, file, i)
+				;(loaded[file].x || (loaded[file].x = [])).push(exec, res, i)
 			} else {
 				// FireFox 3 throws on `xhr.send()` without arguments
 				xhr("GET", file, loaded[file] = cb, i).send(null)
@@ -239,14 +211,14 @@
 		pos = 0
 
 		function cb(err, str, file, i) {
-			loaded[file] = 2
-			res[i] = err ? (onerror(err, file), "") : str
+			loaded[file] = { h: this.getAllResponseHeaders(), b: str }
+			res[i] = err ? (onerror(err, file), "") : loaded[file]
 			exec()
 		}
 		function exec() {
 			if (res[pos]) {
 				try {
-					;(xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
+					;(xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos].b)
 				} catch(e) {
 					onerror(e, files[pos])
 				}
@@ -260,8 +232,8 @@
 				/**/
 				else {
 					if (next) next()
-					if ((res = cb.x)) {
-						for (i = 0; res[i];) res[i++](0, "", res[i++], res[i++])
+					if ((next = cb.x)) {
+						for (i = 0; next[i]; ) next[i++](next[i++][next[i++]] = "")
 					}
 				}
 			}
@@ -269,7 +241,7 @@
 	}
 
 	load([
-		(!Object.hasOwn)&&"min/0-5e87.js","min/1-9db9.js","min/2-b05a.js","min/3-f2f0.js"
+		(!Object.hasOwn)&&"min/0-5e87.js","min/1-2874.js","min/2-b05a.js","min/3-8640.js"
 	])
 	/**/
 
