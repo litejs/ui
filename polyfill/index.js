@@ -260,6 +260,10 @@
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
 	patch("escape", "return X(a)", esc("a", 0) != "a", esc)
 
+	// From Chrome23/Firefox21 parseInt parses leading-zero strings as decimal, not octal
+	b = patch("parseInt", "return X(a,(b>>>0)||(Y.test(''+a)?16:10))", _parseInt("08") !== 8, _parseInt, /^\s*[-+]?0[xX]/)
+
+
 	O = patch("performance")
 	patch("p:now", (a = "return+new Date") + "-X", 0, new Date())
 	patch("timing")
