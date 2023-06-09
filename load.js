@@ -30,7 +30,7 @@
 
 !function(window, Function) {
 	xhr._s = new Date()
-	var loaded = xhr._l = {}
+	var pending = {}
 	, rewrite = {
 		//!{loadRewrite}
 	}
@@ -196,13 +196,13 @@
 		, len = files && files.length
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) && typeof loaded[file] != "object") {
-			if (loaded[file]) {
+		for (; i < len; i++) if ((file = files[i]) && pending[file] !== 2) {
+			if (pending[file]) {
 				// Same file requested again
-				;(loaded[file].x || (loaded[file].x = [])).push(exec, res, i)
+				;(pending[file].x || (pending[file].x = [])).push(exec, res, i)
 			} else {
 				// FireFox 3 throws on `xhr.send()` without arguments
-				xhr("GET", file, loaded[file] = cb, i).send(null)
+				xhr("GET", file, pending[file] = cb, i).send(null)
 			}
 			pos++
 		}
@@ -211,14 +211,15 @@
 		pos = 0
 
 		function cb(err, str, file, i) {
-			loaded[file] = { h: this.getAllResponseHeaders(), b: str }
-			res[i] = err ? (onerror(err, file), "") : loaded[file]
+			;(xhr._l || (xhr._l =  {}))[file] = { h: this.getAllResponseHeaders(), b: str }
+			pending[file] = 2
+			res[i] = err ? (onerror(err, file), "") : str
 			exec()
 		}
 		function exec() {
 			if (res[pos]) {
 				try {
-					;(xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos].b)
+					;(xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
 				} catch(e) {
 					onerror(e, files[pos])
 				}
