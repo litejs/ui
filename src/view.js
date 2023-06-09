@@ -18,7 +18,7 @@
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 	, defaults = {
-		base: "view/",
+		base: "",
 		home: "home",
 		root: body
 	}
