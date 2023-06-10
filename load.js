@@ -30,7 +30,7 @@
 
 !function(window, Function) {
 	xhr._s = new Date()
-	var pending = {}
+	var pending = xhr._p = {}
 	, rewrite = {
 		//!{loadRewrite}
 	}
@@ -198,7 +198,7 @@
 
 		for (; i < len; i++) if ((file = files[i]) && pending[file] !== 2) {
 			if (pending[file]) {
-				// Same file requested again
+				// Same file requested again before responce
 				;(pending[file].x || (pending[file].x = [])).push(exec, res, i)
 			} else {
 				// FireFox 3 throws on `xhr.send()` without arguments
@@ -211,7 +211,7 @@
 		pos = 0
 
 		function cb(err, str, file, i) {
-			;(xhr._l || (xhr._l =  {}))[file] = { h: this.getAllResponseHeaders(), b: str }
+			;(xhr._l || (xhr._l = [])).push(file)
 			pending[file] = 2
 			res[i] = err ? (onerror(err, file), "") : str
 			exec()
