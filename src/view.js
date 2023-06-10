@@ -306,13 +306,12 @@
 	}
 
 	function checkUrl() {
-		if (histRoute != (histRoute = getUrl())) {
+		if (histRoute != (histRoute = LiteJS.url = getUrl())) {
 			if (histCb) histCb(histRoute)
 			return true
 		}
 	}
 
-	history.getUrl = getUrl
 	history.setUrl = setUrl
 
 	LiteJS.start = function(cb) {
