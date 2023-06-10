@@ -173,10 +173,10 @@ var app = LiteJS({
 
 
 	El.addKb({
-		H: history.setUrl.bind(null, "home"),
-		U: history.setUrl.bind(null, "users"),
-		S: history.setUrl.bind(null, "settings"),
-		T: history.setUrl.bind(null, "test")
+		H: LiteJS.go.bind(null, "home"),
+		U: LiteJS.go.bind(null, "users"),
+		S: LiteJS.go.bind(null, "settings"),
+		T: LiteJS.go.bind(null, "test")
 	})
 
 
@@ -212,7 +212,7 @@ var app = LiteJS({
 		, link = !(e.altKey || e.shiftKey) && el.tagName == "A" && el.href.split("#")
 
 		if (link && link[0] == (base || location.href.split("#")[0])) {
-			if (e[El.kbMod] ? window.open(el.href, "_blank") : !history.setUrl(link[1])) {
+			if (e[El.kbMod] ? window.open(el.href, "_blank") : !LiteJS.go(link[1])) {
 				return Event.stop(e)
 			}
 		}

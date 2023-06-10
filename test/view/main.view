@@ -101,9 +101,9 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 
 %view public #
 	;kb: {
-		h: history.setUrl.bind(null, "home"),
-		u: history.setUrl.bind(null, "users"),
-		"shift+s": history.setUrl.bind(null, "settings")
+		h: LiteJS.go.bind(null, "home"),
+		u: LiteJS.go.bind(null, "users"),
+		"shift+s": LiteJS.go.bind(null, "settings")
 	}
 	.App.max-height
 		top
