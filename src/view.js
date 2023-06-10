@@ -312,8 +312,7 @@
 		}
 	}
 
-	history.setUrl = setUrl
-
+	LiteJS.go = setUrl
 	LiteJS.start = function(cb) {
 		histCb = cb
 		/*** pushState ***/
@@ -346,7 +345,7 @@
 		} else
 		/**/
 			if ("onhashchange" in window && !ie67) {
-			// There are onhashchange in IE7 but its not get emitted
+			// There is onhashchange in IE7 but its not get emitted
 			//
 			// Basic support:
 			// Chrome 5.0, Firefox 3.6, IE 8, Opera 10.6, Safari 5.0
