@@ -1,8 +1,11 @@
-/*! litejs.com/MIT-LICENSE.txt */
 
-!function(exports) {
+/* litejs.com/MIT-LICENSE.txt */
+
+/* global xhr */
+
+!function(window, document, history, location) {
 	var empty = []
-	, Event = exports.Event || exports
+	, Event = window.Event || window
 
 	Event.Emitter = EventEmitter
 	Event.asEmitter = asEmitter
@@ -20,7 +23,7 @@
 	asEmitter(EventEmitter.prototype)
 
 	function on(type, fn, scope, _origin) {
-		var emitter = this === exports ? empty : this
+		var emitter = this === window ? empty : this
 		, events = emitter._e || (emitter._e = Object.create(null))
 		if (type && fn) {
 			if (typeof fn === "string") fn = emit.bind(emitter, fn)
@@ -32,7 +35,7 @@
 
 	function off(type, fn, scope) {
 		var i, args
-		, emitter = this === exports ? empty : this
+		, emitter = this === window ? empty : this
 		, events = emitter._e && emitter._e[type]
 		if (events) {
 			for (i = events.length - 2; i > 0; i -= 3) {
@@ -47,7 +50,7 @@
 	}
 
 	function one(type, fn, scope) {
-		var emitter = this === exports ? empty : this
+		var emitter = this === window ? empty : this
 		function remove() {
 			off.call(emitter, type, fn, scope)
 			off.call(emitter, type, remove, scope)
@@ -62,7 +65,7 @@
 
 	function emit(type) {
 		var args, i
-		, emitter = this === exports ? empty : this
+		, emitter = this === window ? empty : this
 		, _e = emitter._e
 		, arr = _e ? (_e[type] || empty).concat(_e["*"] || empty) : empty
 		if ((_e = arr.length)) {
@@ -94,17 +97,6 @@
 		return this
 	}
 
-// `this` refers to the `window` in browser and to the `exports` in Node.js.
-}(this) // jshint ignore:line
-
-
-
-/* litejs.com/MIT-LICENSE.txt */
-
-
-
-/* global El, xhr */
-!function(window, document, history, location) {
 	var histCb, histBase, histRoute, iframe, iframeTick, iframeUrl
 	, cleanRe = /^[#\/\!]+|[\s\/]+$/g
 
@@ -197,10 +189,10 @@
 			, close = view.isOpen && view
 
 			View.route = view.route
-			emit(view, "init")
+			viewEmit(view, "init")
 
 			for (; tmp; tmp = parent) {
-				emit(syncResume = params._v = tmp, "ping", params, View)
+				viewEmit(syncResume = params._v = tmp, "ping", params, View)
 				syncResume = null
 				if (lastParams !== params) return
 				if ((parent = tmp.parent)) {
@@ -228,7 +220,7 @@
 				}
 			}
 
-			if (view !== close) emit(view, "change", close)
+			if (view !== close) viewEmit(view, "change", close)
 
 			for (tmp in params) if (tmp.charAt(0) !== "_") {
 				if ((syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
@@ -268,8 +260,8 @@
 			)
 			El.append(tmp, view.isOpen)
 			El.render(view.isOpen)
-			emit(parent, "openChild", view, close)
-			emit(view, "open", params)
+			viewEmit(parent, "openChild", view, close)
+			viewEmit(view, "open", params)
 			if (view.kb) El.addKb(view.kb)
 			close = null
 		}
@@ -277,29 +269,29 @@
 			bubbleDown(params, close)
 		}
 		if ((lastView === view)) {
-			emit(view, "show", params)
+			viewEmit(view, "show", params)
 			blur()
 		}
 	}
 
 	function closeView(view, open) {
 		if (view && view.isOpen) {
-			emit(view.parent, "closeChild", view, open)
+			viewEmit(view.parent, "closeChild", view, open)
 			closeView(view.child)
 			El.kill(view.isOpen)
 			view.isOpen = null
 			if (view.kb) El.rmKb(view.kb)
-			emit(view, "close")
+			viewEmit(view, "close")
 		}
 	}
 
-	function emit(view, event, a, b) {
+	function viewEmit(view, event, a, b) {
 		view.emit(event, a, b)
 		View.emit(event, view, a, b)
 	}
 
-	Event.asEmitter(View)
-	Event.asEmitter(View.prototype)
+	asEmitter(View)
+	asEmitter(View.prototype)
 
 	View.get = get
 	function get(url, params) {
@@ -406,30 +398,28 @@
 	}
 
 	function checkUrl() {
-		if (histRoute != (histRoute = getUrl())) {
+		if (histRoute != (histRoute = LiteJS.url = getUrl())) {
 			if (histCb) histCb(histRoute)
 			return true
 		}
 	}
 
-	history.getUrl = getUrl
-	history.setUrl = setUrl
-
+	LiteJS.go = setUrl
 	LiteJS.start = function(cb) {
 		histCb = cb
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var url
-		, _base = document.documentElement.getElementsByTagName("base")[0]
-		if (_base) _base = _base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
-		if (_base && !history.pushState) {
-			url = location.pathname.slice(_base.length)
+		, base = document.documentElement.getElementsByTagName("base")[0]
+		if (base) base = base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
+		if (base && !history.pushState) {
+			url = location.pathname.slice(base.length)
 			if (url) {
-				location.replace(_base + "#" + url)
+				location.replace(base + "#" + url)
 			}
 		}
-		if (_base && history.pushState) {
-			histBase = _base
+		if (base && history.pushState) {
+			histBase = base
 
 			url = location.href.split("#")[1]
 			if (url && !getUrl()) {
@@ -447,7 +437,7 @@
 		} else
 		/**/
 			if ("onhashchange" in window && !ie67) {
-			// There are onhashchange in IE7 but its not get emitted
+			// There is onhashchange in IE7 but its not get emitted
 			//
 			// Basic support:
 			// Chrome 5.0, Firefox 3.6, IE 8, Opera 10.6, Safari 5.0
@@ -477,12 +467,6 @@
 	}
 }(this, document, history, location) // jshint ignore:line
 
-
-
-/* litejs.com/MIT-LICENSE.txt */
-
-
-/* global View, xhr */
 !function(window, document, Object, Event, P) {
 	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
