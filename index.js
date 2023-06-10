@@ -1,10 +1,39 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global xhr */
+/* global xhr, getComputedStyle, navigator, requestAnimationFrame */
 
-!function(window, document, history, location) {
-	var empty = []
+!function(window, document, history, location, Object) {
+	var histCb, histBase, histRoute, iframe, iframeTick, iframeUrl
+	, defaults = {
+		base: "",
+		home: "home",
+		root: body
+	}
+	, hasOwn = defaults.hasOwnProperty
+	, cleanRe = /^[#\/\!]+|[\s\/]+$/g
+	, body = document.body
+	, isArray = Array.isArray
+	, P = "prototype"
+
+	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
+	// http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
+	//
+	// The documentMode is an IE only property, supported in IE8 and up.
+	, ie678 = !+"\v1" // jshint ignore:line
+	, ie67 = ie678 && (document.documentMode | 0) < 8 // jshint ignore:line
+
+	, viewFn, lastView, lastStr, lastUrl, syncResume
+	, capture = 1
+	, fnStr = ""
+	, reStr = ""
+	, views = View.views = {}
+	, paramCb = {}
+	, lastParams = paramCb
+	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
+	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
+
+	, emptyArr = []
 	, Event = window.Event || window
 
 	Event.asEmitter = asEmitter
@@ -18,10 +47,10 @@
 	}
 
 	function on(type, fn, scope, _origin) {
-		var emitter = this === window ? empty : this
+		var emitter = this === window ? emptyArr : this
 		, events = emitter._e || (emitter._e = Object.create(null))
 		if (type && fn) {
-			if (typeof fn === "string") fn = emit.bind(emitter, fn)
+			if (isString(fn)) fn = emit.bind(emitter, fn)
 			emit.call(emitter, "newListener", type, fn, scope, _origin)
 			;(events[type] || (events[type] = [])).unshift(scope, _origin, fn)
 		}
@@ -30,7 +59,7 @@
 
 	function off(type, fn, scope) {
 		var i, args
-		, emitter = this === window ? empty : this
+		, emitter = this === window ? emptyArr : this
 		, events = emitter._e && emitter._e[type]
 		if (events) {
 			for (i = events.length - 2; i > 0; i -= 3) {
@@ -45,7 +74,7 @@
 	}
 
 	function one(type, fn, scope) {
-		var emitter = this === window ? empty : this
+		var emitter = this === window ? emptyArr : this
 		function remove() {
 			off.call(emitter, type, fn, scope)
 			off.call(emitter, type, remove, scope)
@@ -60,9 +89,9 @@
 
 	function emit(type) {
 		var args, i
-		, emitter = this === window ? empty : this
+		, emitter = this === window ? emptyArr : this
 		, _e = emitter._e
-		, arr = _e ? (_e[type] || empty).concat(_e["*"] || empty) : empty
+		, arr = _e ? (_e[type] || emptyArr).concat(_e["*"] || emptyArr) : emptyArr
 		if ((_e = arr.length)) {
 			for (i = _e - 1, args = arr.slice.call(arguments, 1); i > 1; i -= 3) {
 				if (arr[i]) arr[i].apply(arr[i - 2] || emitter, args)
@@ -92,43 +121,15 @@
 		return this
 	}
 
-	var histCb, histBase, histRoute, iframe, iframeTick, iframeUrl
-	, cleanRe = /^[#\/\!]+|[\s\/]+$/g
-
-	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
-	// http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
-	//
-	// The documentMode is an IE only property, supported in IE8 and up.
-	, ie67 = !+"\v1" && (document.documentMode | 0) < 8 // jshint ignore:line
-
-	, fn, lastView, lastStr, lastUrl, syncResume
-	, body = document.body
-	, isArray = Array.isArray
-	, capture = 1
-	, fnStr = ""
-	, reStr = ""
-	, views = View.views = {}
-	, paramCb = {}
-	, lastParams = paramCb
-	, hasOwn = views.hasOwnProperty
-	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
-	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
-	, defaults = {
-		base: "",
-		home: "home",
-		root: body
-	}
-
 	window.View = View
 	window.LiteJS = LiteJS
-
 
 	function LiteJS(opts) {
 		opts = Object.assign({}, defaults, opts)
 		var key, name
 		, root = opts.root
 		for (key in opts) if (hasOwn.call(opts, key)) {
-			if (typeof View[key] === "function") {
+			if (isFunction(View[key])) {
 				for (name in opts[key]) if (hasOwn.call(opts[key], name)) {
 					View[key](name, opts[key][name])
 				}
@@ -171,7 +172,7 @@
 
 			fnStr += params + "'" + route + "'):"
 			reStr += (reStr ? "|(" : "(") + _re + ")"
-			fn = 0
+			viewFn = 0
 		}
 	}
 
@@ -249,15 +250,15 @@
 		}
 		if (parent && !view.isOpen || view === close) {
 			closeView(close, view)
-			El.scope(
+			elScope(
 				view.isOpen = view.el.cloneNode(true),
-				El.scope(tmp = parent.isOpen || parent.el)
+				elScope(tmp = parent.isOpen || parent.el)
 			)
-			El.append(tmp, view.isOpen)
-			El.render(view.isOpen)
+			append(tmp, view.isOpen)
+			render(view.isOpen)
 			viewEmit(parent, "openChild", view, close)
 			viewEmit(view, "open", params)
-			if (view.kb) El.addKb(view.kb)
+			if (view.kb) addKb(view.kb)
 			close = null
 		}
 		if ((params._d = params._v = view.child)) {
@@ -273,9 +274,9 @@
 		if (view && view.isOpen) {
 			viewEmit(view.parent, "closeChild", view, open)
 			closeView(view.child)
-			El.kill(view.isOpen)
+			kill(view.isOpen)
 			view.isOpen = null
-			if (view.kb) El.rmKb(view.kb)
+			if (view.kb) rmKb(view.kb)
 			viewEmit(view, "close")
 		}
 	}
@@ -290,13 +291,13 @@
 
 	View.get = get
 	function get(url, params) {
-		if (!fn) {
-			fn = Function(
+		if (!viewFn) {
+			viewFn = Function(
 				"var r=/^\\/?(?:" + reStr + ")[\\/\\s]*$/;" +
 				"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
 			)()
 		}
-		return View(url ? fn(url, params || {}, "404") : View.home)
+		return View(url ? viewFn(url, params || {}, "404") : View.home)
 	}
 
 	View.ping = function(name, fn) {
@@ -313,7 +314,7 @@
 		, view = get(url, params)
 		if (!view.isOpen || lastUrl !== url) {
 			params._u = lastUrl = url
-			view.show(El.data.params = params)
+			view.show(scopeData.params = params)
 		}
 	}
 
@@ -460,19 +461,14 @@
 			return el.src
 		}), checkUrl)
 	}
-}(this, document, history, location) // jshint ignore:line
 
-!function(window, document, Object, Event, P) {
 	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
-	, isArray = Array.isArray
 	, seq = 0
 	, elCache = El.cache = {}
 	, wrapProto = ElWrap[P] = []
 	, slice = wrapProto.slice
-	, hasOwn = elCache.hasOwnProperty
-	, body = document.body
-	, root = document.documentElement
+	, docEl = document.documentElement
 	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
@@ -531,10 +527,6 @@
 	// || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 
 	/*** ie8 ***/
-
-	// JScript engine in IE<9 does not recognize vertical tabulation character
-	, ie678 = !+"\v1" // jshint ignore:line
-	, ie67 = ie678 && (document.documentMode | 0) < 8
 
 	El.matches = function(el, sel) {
 		return el && body.matches.call(el, sel)
@@ -887,7 +879,6 @@
 	, prefix = window[addEv] ? "" : (addEv = "attachEvent", remEv = "detachEvent", "on")
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
-	, emitter = new Event.Emitter()
 
 	if (iOS) {
 		// iOS doesn't support beforeunload, use pagehide instead
@@ -909,7 +900,7 @@
 			el[addEv](prefix + (fixEv[ev] || ev), fix, false)
 		}
 
-		emitter.on.call(el, ev, fix, el, _fn)
+		on.call(el, ev, fix, el, _fn)
 	}
 
 	function rmEvent(el, ev, fn) {
@@ -955,7 +946,7 @@
 		var fn = (
 			isString(handler) ? function(e) {
 				var target = selector ? El.closest(e.target, selector) : el
-				if (target) View.emit.apply(View, [handler, e, target].concat(data))
+				if (target) emit.apply(View, [handler, e, target].concat(data))
 			} :
 			selector ? function(e) {
 				if (El.matches(e.target, selector)) handler(e)
@@ -985,7 +976,7 @@
 	}
 
 	El.emit = function(el) {
-		emitter.emit.apply(el, slice.call(arguments, 1))
+		emit.apply(el, slice.call(arguments, 1))
 	}
 
 	function empty(el) {
@@ -1003,7 +994,7 @@
 				if ("on" + tr in el) return addEvent(el, tr, kill.bind(el, el, el = null))
 			}
 			if (el._e) {
-				emitter.emit.call(el, "kill")
+				emit.call(el, "kill")
 				for (id in el._e) rmEvent(el, id)
 			}
 			if (el.parentNode) {
@@ -1117,7 +1108,7 @@
 		if (parent && newEl) return parent.replaceChild(oldEl, newEl)
 	}
 
-	for (var key in El) wrap(key)
+	for (var fnName in El) wrap(fnName)
 
 	function wrap(key) {
 		wrapProto[key] = function wrap() {
@@ -1330,7 +1321,7 @@
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, name, op, args) {
 						return "(this['" + name + "']" + (
-							typeof view[name] === "function" ?
+							isFunction(view[name]) ?
 							"(" + (args || "") + ")" :
 							"=" + args
 						) + "),"
@@ -1365,12 +1356,12 @@
 
 	El.scrollLeft = scrollLeft
 	function scrollLeft() {
-		return window.pageXOffset || root.scrollLeft || body.scrollLeft || 0
+		return window.pageXOffset || docEl.scrollLeft || body.scrollLeft || 0
 	}
 
 	El.scrollTop = scrollTop
 	function scrollTop() {
-		return window.pageYOffset || root.scrollTop || body.scrollTop || 0
+		return window.pageYOffset || docEl.scrollTop || body.scrollTop || 0
 	}
 
 	/*** kb ***/
@@ -1430,11 +1421,12 @@
 		}
 	}
 
-	El.addKb = function(map, killEl) {
+	El.addKb = addKb
+	function addKb(map, killEl) {
 		if (map) {
 			kbMaps.unshift(map)
 			if (killEl) {
-				emitter.on.call(killEl, "kill", rmKb.bind(map, map))
+				on.call(killEl, "kill", rmKb.bind(map, map))
 			}
 		}
 	}
@@ -1460,7 +1452,7 @@
 	function setBreakpoints(_breakpoints) {
 		// document.documentElement.clientWidth is 0 in IE5
 		var key, next
-		, width = root.offsetWidth
+		, width = docEl.offsetWidth
 		, map = breakpoints = _breakpoints || breakpoints // jshint ignore:line
 
 		for (key in map) {
@@ -1469,15 +1461,15 @@
 		}
 
 		if ( next != lastSize ) {
-			cls(root, lastSize, 0)
-			cls(root, lastSize = next)
+			cls(docEl, lastSize, 0)
+			cls(docEl, lastSize = next)
 		}
 
-		next = width > root.offsetHeight ? "landscape" : "portrait"
+		next = width > docEl.offsetHeight ? "landscape" : "portrait"
 
 		if ( next != lastOrient) {
-			cls(root, lastOrient, 0)
-			cls(root, lastOrient = next)
+			cls(docEl, lastOrient, 0)
+			cls(docEl, lastOrient = next)
 		}
 
 		if ((next = window.View)) next.emit("resize")
@@ -1526,16 +1518,18 @@
 		return "" + (1 in x ? n.toFixed(x[1].length) : n)
 	}
 
+
+	function isFunction(fn) {
+		return typeof fn === "function"
+	}
 	function isNumber(num) {
 		return typeof num === "number"
 	}
-
 	function isObject(obj) {
 		return !!obj && obj.constructor === Object
 	}
-
 	function isString(str) {
 		return typeof str === "string"
 	}
-}(window, document, Object, Event, "prototype") // jshint ignore:line
+}(this, document, history, location, Object) // jshint ignore:line
 
