@@ -7,11 +7,7 @@
 	var empty = []
 	, Event = window.Event || window
 
-	Event.Emitter = EventEmitter
 	Event.asEmitter = asEmitter
-
-	function EventEmitter() {}
-
 	function asEmitter(obj) {
 		obj.on = on
 		obj.off = off
@@ -20,7 +16,6 @@
 		obj.listen = listen
 		obj.unlisten = unlisten
 	}
-	asEmitter(EventEmitter.prototype)
 
 	function on(type, fn, scope, _origin) {
 		var emitter = this === window ? empty : this
