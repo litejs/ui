@@ -56,7 +56,7 @@ var app = LiteJS({
 })
 
 
-!function(window, document, navigator, View) {
+!function(window, document, navigator) {
 	i18n.def({
 		"ar": "Arabic",
 		"et": "Eesti keeles",
@@ -147,21 +147,21 @@ var app = LiteJS({
 
 	var user
 
-	View.on("timerTest", function(e, el) {
+	app.on("timerTest", function(e, el) {
 		setTimeout(function() {
 			El.txt(el, arguments.length)
 		}, 1000, 1, 2, 3)
 	})
 
-	View.on("toggleClass", function(e, el, clName, target) {
+	app.on("toggleClass", function(e, el, clName, target) {
 		El.cls(el, clName, !El.hasClass(el, clName))
 	})
 
-	View.on("reload", function() {
+	app.on("reload", function() {
 		location.reload(true)
 	})
 
-	View.on("logForm", function(e, el) {
+	app.on("logForm", function(e, el) {
 		var data = El.val(el)
 		, matches = El.attr(el, "data-expect") == JSON.stringify(data)
 		if (matches) {
@@ -180,7 +180,7 @@ var app = LiteJS({
 	})
 
 
-	View("#body")
+	app("#body")
 	.on("ping", function() {
 		El.data.user = user
 		El.findAll(body, ".Menu,.lang").render()
@@ -189,12 +189,12 @@ var app = LiteJS({
 	//var lower = "Back", upper = "Forward"
 	var lower = "Left", upper = "Right"
 
-	View("public")
+	app("public")
 	.on("openChild", function(open, close) {
 		if (close) El.cls(open.isOpen, close.seq < open.seq ? "from" + upper : "from" + lower)
 	})
 
-	View("public")
+	app("public")
 	.on("closeChild", function(close, open) {
 		var isOpen = close.isOpen
 		close.isOpen = null
@@ -218,7 +218,7 @@ var app = LiteJS({
 		}
 	})
 
-	if (window.console && console.log) {
+	if (window.console && console.warn) {
 		link.toString = function() {
 			return "https://en.wikipedia.org/wiki/Self-XSS"
 		}
@@ -229,6 +229,6 @@ var app = LiteJS({
 			link
 		)
 	}
-}(this, document, navigator, View, i18n)
+}(this, document, navigator)
 
 

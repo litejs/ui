@@ -12,6 +12,7 @@
 	}
 	, hasOwn = defaults.hasOwnProperty
 	, cleanRe = /^[#\/\!]+|[\s\/]+$/g
+	, splitRe = /[,\s]+/
 	, body = document.body
 	, isArray = Array.isArray
 	, P = "prototype"
@@ -318,8 +319,8 @@
 		}
 	}
 
-	View.param = function(name, cb) {
-		;(isArray(name) ? name : name.split(/\s+/)).forEach(function(n) {
+	View.param = function(names, cb) {
+		;("" + names).split(splitRe).forEach(function(n) {
 			paramCb[n] = cb
 		})
 	}
@@ -475,7 +476,6 @@
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /\b[a-z_$][\w$]*/ig
-	, splitRe = /[,\s]+/
 	, camelRe = /\-([a-z])/g
 	, bindings = El.bindings = {
 		attr: El.attr = acceptMany(setAttr, getAttr),
@@ -791,39 +791,39 @@
 	}
 
 	function acceptMany(fn, getter) {
-		return function f(el, name, val, delay) {
-			if (el && name) {
+		return function f(el, names, val, delay) {
+			if (el && names) {
 				if (delay >= 0) {
-					if (delay > 0) setTimeout(f, delay, el, name, val)
+					if (delay > 0) setTimeout(f, delay, el, names, val)
 					else requestAnimationFrame(function() {
-						f(el, name, val)
+						f(el, names, val)
 					})
 					return
 				}
 				var i
-				if (isObject(name)) {
-					for (i in name) {
-						if (hasOwn.call(name, i)) f(el, i, name[i], val)
+				if (isObject(names)) {
+					for (i in names) {
+						if (hasOwn.call(names, i)) f(el, i, names[i], val)
 					}
 					return
 				}
-				var names = isArray(name) ? name : name.split(splitRe)
-				, len = names.length
+				var nameArr = ("" + names).split(splitRe)
+				, len = nameArr.length
 				i = 0
 
 				if (arguments.length < 3) {
-					if (getter) return getter(el, name)
-					for (; i < len; ) fn(el, names[i++])
+					if (getter) return getter(el, names)
+					for (; i < len; ) fn(el, nameArr[i++])
 				} else {
 					/*
 					if (isArray(val)) {
-						for (; i < len; ) fn(el, names[i], val[i++])
+						for (; i < len; ) fn(el, nameArr[i], val[i++])
 					} else {
-						for (; i < len; ) fn(el, names[i++], val)
+						for (; i < len; ) fn(el, nameArr[i++], val)
 					}
 					/*/
 					for (; i < len; ) {
-						fn(el, names[i++], isArray(val) ? val[i - 1] : val)
+						fn(el, nameArr[i++], isArray(val) ? val[i - 1] : val)
 					}
 					//*/
 				}
@@ -953,12 +953,12 @@
 			} :
 			handler
 		)
-		, names = isArray(events) ? events : events.split(splitRe)
+		, nameArr = ("" + events).split(splitRe)
 		, i = 0
-		, len = names.length
+		, len = nameArr.length
 
 		for (; i < len; ) {
-			addEvent(el, names[i++], fn)
+			addEvent(el, nameArr[i++], fn)
 		}
 	}
 	bindingOn.once = 1
