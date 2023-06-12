@@ -188,6 +188,7 @@ anim-page
 	.time ="Init '\" " + started
 	.time
 		;txt: "Load " + new Date()
+	ul>li+li+li
 
 
 %view users #private

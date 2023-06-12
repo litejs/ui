@@ -1180,8 +1180,8 @@
 					append(parent, parent = q = El(name))
 				}
 				if (text && op != "/") {
-					if (op === ">") {
-						(indent + " " + text).replace(templateRe, work)
+					if (op === ">" || op === "+") {
+						(op === "+" ? indent + text : indent + " " + text).replace(templateRe, work)
 					} else if (op === "|" || op === "\\") {
 						append(parent, text) // + "\n")
 					} else {
