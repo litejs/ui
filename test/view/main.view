@@ -171,9 +171,9 @@ anim-page
 
 %view 404 public
 anim-page
-h2 Error 404
-\ Page not found.
-\ Maybe you want to look something else?
+	h2 Error 404
+	\ Page not found.
+	\ Maybe you want to look something else?
 
 %view home public
 anim-page

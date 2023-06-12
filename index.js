@@ -4,16 +4,19 @@
 /* global xhr, getComputedStyle, navigator, requestAnimationFrame */
 
 !function(window, document, history, location, Object) {
-	var histCb, histBase, histRoute, iframe, iframeTick, iframeUrl
+	var html = document.documentElement
+	, body = document.body
 	, defaults = {
 		base: "",
 		home: "home",
 		root: body
 	}
 	, hasOwn = defaults.hasOwnProperty
-	, cleanRe = /^[#\/\!]+|[\s\/]+$/g
+	, histCb, histBase, histRoute, iframe, iframeTick, iframeUrl
 	, splitRe = /[,\s]+/
-	, body = document.body
+	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
+	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
+	, txtAttr = "textContent" in body ? "textContent" : "innerText"
 	, isArray = Array.isArray
 	, P = "prototype"
 
@@ -139,11 +142,11 @@
 			}
 		}
 		View("#", root)
-		View.$ = function(sel, start) {
-			return body.querySelector.call(start || root, sel)
+		View.$ = function(selector, startNode) {
+			return body.querySelector.call(startNode || root, selector)
 		}
-		View.$$ = function(sel, start) {
-			return Array.from(body.querySelectorAll.call(start || root, sel))
+		View.$$ = function(selector, startNode) {
+			return Array.from(body.querySelectorAll.call(startNode || root, selector))
 		}
 		return View
 	}
@@ -373,7 +376,7 @@
 			// https://bugs.webkit.org/show_bug.cgi?id=30225
 			// https://github.com/documentcloud/backbone/pull/967
 			(_loc || location).href.split("#")[1] || ""
-		).replace(cleanRe, "")
+		).replace(/^[#\/\!]+|[\s\/]+$/g, "")
 	}
 
 	function setUrl(url, replace) {
@@ -407,7 +410,7 @@
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var url
-		, base = document.documentElement.getElementsByTagName("base")[0]
+		, base = html.getElementsByTagName("base")[0]
 		if (base) base = base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
 		if (base && !history.pushState) {
 			url = location.pathname.slice(base.length)
@@ -444,7 +447,7 @@
 				// IE<9 encounters the Mixed Content warning when the URI javascript: is used.
 				// IE5/6 additionally encounters the Mixed Content warning when the URI about:blank is used.
 				// src="//:"
-				iframe = document.body.appendChild(document.createElement("<iframe tabindex=-1 style=display:none>")).contentWindow
+				iframe = body.appendChild(document.createElement("<iframe tabindex=-1 style=display:none>")).contentWindow
 			}
 			clearInterval(iframeTick)
 			iframeTick = setInterval(function(){
@@ -469,9 +472,7 @@
 	, elCache = El.cache = {}
 	, wrapProto = ElWrap[P] = []
 	, slice = wrapProto.slice
-	, docEl = document.documentElement
-	, txtAttr = El.T = "textContent" in body ? "textContent" : "innerText"
-	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
+	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([+>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
@@ -495,12 +496,6 @@
 			this[name] = el
 		},
 		txt: El.txt = function(el, txt) {
-			// In Safari 2.x, innerText results an empty string
-			// when style.display=="none" or node is not in dom
-			//
-			// innerText is implemented in IE4, textContent in IE9
-			// Opera 9-10 have Node.text
-
 			if (el[txtAttr] !== txt) el[txtAttr] = txt
 		},
 		val: El.val = valFn,
@@ -1261,8 +1256,7 @@
 		slot: extend(plugin, {
 			done: function() {
 				var name = this.name || ++seq
-				var key = "%slot-" + name
-				, root = append(this.parent, document.createComment(key))
+				, root = append(this.parent, document.createComment("%slot-" + name))
 				for (; root.parentNode; root = root.parentNode);
 				;(root._s || (root._s = {}))[name] = root.childNodes.length - 1
 				if (!this.name) root._s._ = root._sk = name
@@ -1356,12 +1350,12 @@
 
 	El.scrollLeft = scrollLeft
 	function scrollLeft() {
-		return window.pageXOffset || docEl.scrollLeft || body.scrollLeft || 0
+		return window.pageXOffset || html.scrollLeft || body.scrollLeft || 0
 	}
 
 	El.scrollTop = scrollTop
 	function scrollTop() {
-		return window.pageYOffset || docEl.scrollTop || body.scrollTop || 0
+		return window.pageYOffset || html.scrollTop || body.scrollTop || 0
 	}
 
 	/*** kb ***/
@@ -1452,7 +1446,7 @@
 	function setBreakpoints(_breakpoints) {
 		// document.documentElement.clientWidth is 0 in IE5
 		var key, next
-		, width = docEl.offsetWidth
+		, width = html.offsetWidth
 		, map = breakpoints = _breakpoints || breakpoints // jshint ignore:line
 
 		for (key in map) {
@@ -1461,18 +1455,18 @@
 		}
 
 		if ( next != lastSize ) {
-			cls(docEl, lastSize, 0)
-			cls(docEl, lastSize = next)
+			cls(html, lastSize, 0)
+			cls(html, lastSize = next)
 		}
 
-		next = width > docEl.offsetHeight ? "landscape" : "portrait"
+		next = width > html.offsetHeight ? "landscape" : "portrait"
 
 		if ( next != lastOrient) {
-			cls(docEl, lastOrient, 0)
-			cls(docEl, lastOrient = next)
+			cls(html, lastOrient, 0)
+			cls(html, lastOrient = next)
 		}
 
-		if ((next = window.View)) next.emit("resize")
+		View.emit("resize")
 	}
 	El.setBreakpoints = setBreakpoints
 
