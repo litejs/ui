@@ -461,10 +461,9 @@
 			}, 60)
 		}
 
-		xhr.load(View.$$("script[type='litejs/view']", body).map(function(el) {
-			return el.src
-		}), checkUrl)
+		xhr.load(findTemplates(), checkUrl)
 	}
+
 
 	var UNDEF, styleNode
 	, BIND_ATTR = "data-bind"
@@ -1195,6 +1194,13 @@
 		}
 		str.replace(templateRe, work)
 		work("", "")
+		if (parent.childNodes[0]) {
+			/*** debug ***/
+			console.warn("Outside view defined elements are rendered immediately into body")
+			/**/
+			append(body, parent.childNodes)
+			render(body)
+		}
 	}
 
 	function appendBind(el, val, sep, q) {
@@ -1525,5 +1531,13 @@
 	function isString(str) {
 		return typeof str === "string"
 	}
+
+	function findTemplates() {
+		return Array.from(body.querySelectorAll.call(body, "script[type='litejs/view']")).map(function(el) {
+			return el.src || parseTemplate(el.textContent)
+		})
+	}
+
+	xhr.load(findTemplates())
 }(this, document, history, location, Object) // jshint ignore:line
 
