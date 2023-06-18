@@ -1218,6 +1218,9 @@
 		t.name = arr[0]
 		t.attr = arr.slice(1)
 		t.parent = parent
+		if (t.content) {
+			elCache = Object.create(t.c = elCache)
+		}
 		t.el = El("div")
 		t.el.plugin = t
 	}
@@ -1235,7 +1238,7 @@
 				}
 				el._s = t.el._s
 			}
-
+			if (t.c) elCache = t.c
 			t.el.plugin = t.el = t.parent = null
 			return el
 		}
@@ -1290,7 +1293,8 @@
 			done: function() {
 				var t = this
 				, parent = t.parent
-				elCache[t.name] = t._done()
+				, el = t._done()
+				elCache[t.name] = el
 				//, arr = t.attr
 				//if (arr[0]) {
 				//	// TODO:2023-03-22:lauri:Add new scope
