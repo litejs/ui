@@ -141,6 +141,7 @@
 				View[key] = opts[key]
 			}
 		}
+		addKb(opts.kb)
 		View("#", root)
 		View.$ = function(selector, startNode) {
 			return body.querySelector.call(startNode || root, selector)
@@ -1394,10 +1395,8 @@
 			!(fn = !input || map.input ? map[code] || map[chr] || map.num && code > 47 && code < 58 && (chr|=0, map.num) || map.all : fn) &&
 			map.bubble
 		););
-		if (fn) {
-			if (isString(fn)) View.emit(fn, e, chr, el)
-			else fn(e, chr, el)
-		}
+		if (isString(fn)) setUrl(fn)
+		if (isFunction(fn)) fn(e, chr, el)
 	}
 
 	function kbDown(e) {

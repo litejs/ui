@@ -100,11 +100,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 	}
 
 %view public #
-	;kb: {
-		h: LiteJS.go.bind(null, "home"),
-		u: LiteJS.go.bind(null, "users"),
-		"shift+s": LiteJS.go.bind(null, "settings")
-	}
+	;tr: ".page,.header"
 	.App.max-height
 		top
 		Menu

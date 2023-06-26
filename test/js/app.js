@@ -16,6 +16,10 @@ var app = LiteJS({
 	base: "view/",
 	home: "home",
 	root: document.body,
+	kb: {
+		h: "home",
+		u: "users"
+	},
 	on: {
 		show: function(params, view) {
 			// Re-render all .js-viewHook elements on each View change
@@ -171,13 +175,6 @@ var app = LiteJS({
 		}
 	})
 
-
-	El.addKb({
-		H: LiteJS.go.bind(null, "home"),
-		U: LiteJS.go.bind(null, "users"),
-		S: LiteJS.go.bind(null, "settings"),
-		T: LiteJS.go.bind(null, "test")
-	})
 
 
 	app("#body")
