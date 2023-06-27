@@ -84,11 +84,11 @@
 		El.append(body, el)
 		El.render(el, scope)
 		if (scope.code) {
-			El.findAll(el, ".js-numpad").on("click", numpad)
+			El.$$(".js-numpad", el).on("click", numpad)
 			kbMap.backspace = kbMap.del = kbMap.num = numpad
 		}
 		El.addKb(kbMap, el)
-		El.findAll(el, ".js-btn").on("click", resolve)
+		El.$$(".js-btn", el).on("click", resolve)
 		View.one("navigation", resolve)
 		if (scope.bgClose) El.on(el, "click", resolve)
 		El.on(el, "wheel", Event.stop)
@@ -106,7 +106,7 @@
 			var num = _num == void 0 ? e.target[El.T] : _num
 			code += num
 			if (num == "CLEAR" || num == "del" || num == "backspace") code = ""
-			El.md(El.find(el, ".js-body"), code.replace(/./g, "•") || opts.body)
+			El.md(El.$(".js-body", el), code.replace(/./g, "•") || opts.body)
 			if (typeof scope.code == "number" && code.length == scope.code && id && !sent) next(sent = code, id, resolve, reject)
 		}
 		function resolve(e, key) {
@@ -114,9 +114,9 @@
 				var action = key || El.attr(this, "data-action")
 				, result = {
 					code: code,
-					input: El.val(El.find(el, ".js-input")),
-					inputMd: El.val(El.find(el, ".js-inputMd")),
-					select: El.val(El.find(el, ".js-select"))
+					input: El.val(El.$(".js-input", el)),
+					inputMd: El.val(El.$(".js-inputMd", el)),
+					select: El.val(El.$(".js-select". el))
 				}
 				El.kill(el, "transparent")
 				El.cls(blurEl, "Confirm--blur", el = 0)

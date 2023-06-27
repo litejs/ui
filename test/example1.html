@@ -84,10 +84,10 @@ View.on("show", function() {
                 if (tag == "A" || tag == "BUTTON") el.blur()
         } catch(e) {}
         // Re-render all .js-viewHook elements on each View change
-        El.findAll(document.body, ".js-viewHook").render()
+        El.$$(".js-viewHook").render()
 })
 // Start a router to showing views
-history.start(View.show)
+LiteJS.start(View.show)
 </script>
 <noscript><h1>Error</h1>This application requires JavaScript</noscript>
 </body></html>

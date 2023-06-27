@@ -23,7 +23,7 @@ var app = LiteJS({
 	on: {
 		show: function(params, view) {
 			// Re-render all .js-viewHook elements on each View change
-			El.findAll(this.root, ".js-viewRender").render()
+			El.$$(".js-viewRender").render()
 			scroll(0, 1)
 		},
 		"xhr:406": function(body, method, url, data, onResponse, send) {
@@ -180,7 +180,7 @@ var app = LiteJS({
 	app("#body")
 	.on("ping", function() {
 		El.data.user = user
-		El.findAll(body, ".Menu,.lang").render()
+		El.$$(".Menu,.lang").render()
 	})
 
 	//var lower = "Back", upper = "Forward"

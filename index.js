@@ -143,12 +143,6 @@
 		}
 		addKb(opts.kb)
 		View("#", root)
-		View.$ = function(selector, startNode) {
-			return body.querySelector.call(startNode || root, selector)
-		}
-		View.$$ = function(selector, startNode) {
-			return Array.from(body.querySelectorAll.call(startNode || root, selector))
-		}
 		return View
 	}
 
@@ -529,11 +523,11 @@
 	El.closest = function(el, sel) {
 		return el && body.closest.call(el.closest ? el : el.parentNode, sel)
 	}
-	El.find = function(el, sel) {
-		return body.querySelector.call(el, sel)
+	El.$ = function(sel, startNode) {
+		return body.querySelector.call(startNode || body, sel)
 	}
-	El.findAll = function(el, sel) {
-		return new ElWrap(body.querySelectorAll.call(el, sel))
+	El.$$ = function(sel, startNode) {
+		return new ElWrap(body.querySelectorAll.call(startNode || body, sel))
 	}
 
 	/**
@@ -1528,7 +1522,7 @@
 	}
 
 	function findTemplates() {
-		return Array.from(body.querySelectorAll.call(body, "script[type='litejs/view']")).map(function(el) {
+		return El.$$("script[type='litejs/view']").map(function(el) {
 			return el.src || parseTemplate(el.textContent)
 		})
 	}
