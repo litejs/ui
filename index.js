@@ -1122,7 +1122,8 @@
 		} catch(e) {}
 	}
 
-	function parseTemplate(str) {
+	function parseTemplate(str, el) {
+		kill(el)
 		var parent = El("div")
 		, stack = [-1]
 		, parentStack = []
@@ -1185,6 +1186,9 @@
 			append(body, parent.childNodes)
 			render(body)
 		}
+		if (parent._i) {
+			LiteJS.start(LiteJS().show)
+		}
 	}
 
 	function appendBind(el, val, sep, q) {
@@ -1241,6 +1245,11 @@
 	js[P].done = Function("Function(this.txt)()")
 
 	var plugins = El.plugins = {
+		start: extend(js, {
+			done: function() {
+				this.parent._i = 1
+			}
+		}),
 		binding: extend(js, {
 			done: function() {
 				Object.assign(bindings, Function("return({" + this.txt + "})")())
@@ -1520,7 +1529,7 @@
 
 	function findTemplates() {
 		return El.$$("script[type='litejs/view']").map(function(el) {
-			return el.src || parseTemplate(el.textContent)
+			return el.src || parseTemplate(el.textContent, el)
 		})
 	}
 
