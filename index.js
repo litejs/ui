@@ -14,10 +14,9 @@
 	, hasOwn = defaults.hasOwnProperty
 	, histCb, histBase, histRoute, iframe, iframeTick, iframeUrl
 	, splitRe = /[,\s]+/
-	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
-	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
-	, txtAttr = "textContent" in body ? "textContent" : "innerText"
+	, emptyArr = []
 	, isArray = Array.isArray
+	, slice = emptyArr.slice
 	, P = "prototype"
 
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
@@ -37,7 +36,6 @@
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 
-	, emptyArr = []
 	, Event = window.Event || window
 
 	Event.asEmitter = asEmitter
@@ -97,7 +95,7 @@
 		, _e = emitter._e
 		, arr = _e ? (_e[type] || emptyArr).concat(_e["*"] || emptyArr) : emptyArr
 		if ((_e = arr.length)) {
-			for (i = _e - 1, args = arr.slice.call(arguments, 1); i > 1; i -= 3) {
+			for (i = _e - 1, args = slice.call(arguments, 1); i > 1; i -= 3) {
 				if (arr[i]) arr[i].apply(arr[i - 2] || emitter, args)
 			}
 		}
@@ -454,13 +452,15 @@
 	, seq = 0
 	, elCache = El.cache = {}
 	, wrapProto = ElWrap[P] = []
-	, slice = wrapProto.slice
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([+>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /\b[a-z_$][\w$]*/ig
 	, camelRe = /\-([a-z])/g
+	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
+	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
+	, txtAttr = "textContent" in body ? "textContent" : "innerText"
 	, bindings = El.bindings = {
 		attr: El.attr = acceptMany(setAttr, getAttr),
 		cls: El.cls = acceptMany(cls),
@@ -1117,8 +1117,7 @@
 	function blur() {
 		// IE8 can throw an exception for document.activeElement.
 		try {
-			var el = document.activeElement
-			, tag = el && el.tagName
+			var tag = document.activeElement.tagName
 			if (tag === "A" || tag === "BUTTON") el.blur()
 		} catch(e) {}
 	}
