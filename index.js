@@ -336,17 +336,6 @@
 		}
 	}
 
-	View.blur = blur
-	function blur() {
-		// When a View completes, blur focused link
-		// IE8 can throw an exception for document.activeElement.
-		try {
-			var el = document.activeElement
-			, tag = el && el.tagName
-			if (tag === "A" || tag === "BUTTON") el.blur()
-		} catch(e) {}
-	}
-
 	View.expand = expand
 	function expand(str, _last) {
 		var chr = str.charAt(0)
@@ -1123,7 +1112,17 @@
 	}
 
 	El.append = append
+	El.blur = blur
 	El.scope = elScope
+
+	function blur() {
+		// IE8 can throw an exception for document.activeElement.
+		try {
+			var el = document.activeElement
+			, tag = el && el.tagName
+			if (tag === "A" || tag === "BUTTON") el.blur()
+		} catch(e) {}
+	}
 
 	function parseTemplate(str) {
 		var parent = El("div")

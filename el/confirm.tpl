@@ -58,7 +58,7 @@
 //   ]
 %js
 	View.on("confirm", function(title, opts, next) {
-		View.blur()
+		El.blur()
 		if (!next && typeof opts === "function") {
 			next = opts
 			opts = null
