@@ -496,7 +496,6 @@
 		_: String,
 		_b: bindings,
 		El: El,
-		history: history,
 		View: View
 	}
 	// After iOS 13 iPad with default enabled "desktop" option

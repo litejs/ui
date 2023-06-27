@@ -4,7 +4,7 @@
 	, GLOBAL = {}
 
 	assert.goto = function(url, replace) {
-		history.setUrl(url, replace)
+		LiteJS.go(url, replace)
 		return this
 	}
 
