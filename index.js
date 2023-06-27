@@ -1242,7 +1242,7 @@
 		t.a = attr1
 	}
 
-	js[P].done = Function("Function(this.txt)()")
+	js[P].done = Function("Function(this.params+this.txt)()")
 
 	var plugins = El.plugins = {
 		start: extend(js, {
@@ -1266,7 +1266,7 @@
 			}
 		}),
 		css: extend(js, {
-			done: Function("xhr.css(this.txt)")
+			done: Function("xhr.css(this.params+this.txt)")
 		}),
 		def: extend(js, {
 			done: Function("View.def(this.params||this.txt)")
