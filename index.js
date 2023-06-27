@@ -735,18 +735,13 @@
 		if (!el.nodeType) {
 			return el.append ? el.append(child, before) : el
 		}
-		var fragment, tmp
+		var tmp
 		, i = 0
 		if (child) {
 			if (isString(child) || isNumber(child)) child = document.createTextNode(child)
-			else if ( !("nodeType" in child) && "length" in child ) {
-				// document.createDocumentFragment is unsupported in IE5.5
-				// fragment = "createDocumentFragment" in document ? document.createDocumentFragment() : El("div")
-				for (
-					tmp = child.length
-					, fragment = document.createDocumentFragment();
-					i < tmp; ) append(fragment, child[i++])
-				child = fragment
+			else if ( !child.nodeType && (i = child.length) ) {
+				for (tmp = document.createDocumentFragment(); i--; ) append(tmp, child[i], 0)
+				child = tmp
 			}
 
 			if (child.nodeType) {
