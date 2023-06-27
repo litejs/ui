@@ -760,12 +760,9 @@
 					console.error("NAMESPACE CHANGE!", tmp.namespaceURI, child.namespaceURI, child)
 				}
 				/**/
-				tmp.insertBefore(child,
-					(before === true ? tmp.firstChild :
-					isNumber(before) ? tmp.childNodes[
-						before < 0 ? tmp.childNodes.length - before - 2 : before
-					] : before) || null
-				)
+				tmp.insertBefore(child, (isNumber(before) ? tmp.childNodes[
+					before < 0 ? tmp.childNodes.length - before - 2 : before
+				] : before) || null)
 			}
 		}
 		return el
