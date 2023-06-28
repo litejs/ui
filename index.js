@@ -451,7 +451,6 @@
 	, BIND_ATTR = "data-bind"
 	, seq = 0
 	, elCache = El.cache = {}
-	, wrapProto = ElWrap[P] = []
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([+>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
@@ -506,7 +505,7 @@
 		return body.querySelector.call(startNode || body, sel)
 	}
 	, $$ = El.$$ = function(sel, startNode) {
-		return new ElWrap(body.querySelectorAll.call(startNode || body, sel))
+		return ElWrap(body.querySelectorAll.call(startNode || body, sel))
 	}
 
 
@@ -530,7 +529,7 @@
 
 	function El(name) {
 		if (!isString(name)) {
-			return new ElWrap(name)
+			return ElWrap(name)
 		}
 		var el, pres
 		, pre = {}
@@ -563,21 +562,16 @@
 	}
 
 	function ElWrap(nodes, clone) {
-		var wrap = this
+		var wrap = []
 		, i = nodes.length
-		/**
-		 *  1. Extended array size will not updated
-		 *     when array elements set directly in Android 2.2.
-		 */
 		if (i) {
-			wrap.length = i /* 1 */
 			for (; i--; ) {
 				wrap[i] = clone < 2 ? nodes[i].cloneNode(clone) : nodes[i]
 			}
 		} else if (i == null) {
-			wrap.length = 1 /* 1 */
 			wrap[0] = nodes
 		}
+		return Object.assign(wrap, elArr)
 	}
 
 	function camelFn(_, a) {
@@ -1076,10 +1070,26 @@
 		if (parent && newEl) return parent.replaceChild(oldEl, newEl)
 	}
 
+	var elArr = {
+		append: function(el) {
+			var elWrap = this
+			if (elWrap._s) {
+				append(elWrap[elWrap._s[getAttr(el, "slot") || elWrap._s._] || 0], el)
+			} else {
+				elWrap.push(el)
+			}
+			return elWrap
+		},
+		cloneNode: function(deep) {
+			deep = ElWrap(this, deep)
+			deep._s = this._s
+			return deep
+		}
+	}
 	for (var fnName in El) wrap(fnName)
 
 	function wrap(key) {
-		wrapProto[key] = function wrap() {
+		elArr[key] = function wrap() {
 			var i = 0
 			, self = this
 			, len = self.length
@@ -1093,21 +1103,6 @@
 		}
 	}
 
-	wrapProto.append = function(el) {
-		var elWrap = this
-		if (elWrap._s) {
-			append(elWrap[elWrap._s[getAttr(el, "slot") || elWrap._s._] || 0], el)
-		} else {
-			elWrap.push(el)
-		}
-		return elWrap
-	}
-
-	wrapProto.cloneNode = function(deep) {
-		deep = new ElWrap(this, deep)
-		deep._s = this._s
-		return deep
-	}
 
 	El.append = append
 	El.blur = blur
@@ -1217,7 +1212,7 @@
 			var t = this
 			, childNodes = t.el.childNodes
 			, i = t.el._cp
-			, el = childNodes[1] ? new ElWrap(childNodes) : childNodes[0]
+			, el = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
 
 			if (i > -1) {
 				if (childNodes[i].nodeType == 1 && t.el._sk) {
