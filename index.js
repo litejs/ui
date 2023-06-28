@@ -156,7 +156,7 @@
 		view = this
 		if (!(view instanceof View)) return new View(route, el, parent)
 		views[view.route = route] = view
-		view.el = el
+		view.el = isString(el) ? $(el) : el
 		view.parent = parent && View(parent)
 
 		if (route.charAt(0) !== "#") {
@@ -502,20 +502,19 @@
 	// is the only Macintosh with multi-touch
 	, iOS = /^(Mac|iP)/.test(navigator.platform)
 	// || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+	, $ = El.$ = function(sel, startNode) {
+		return body.querySelector.call(startNode || body, sel)
+	}
+	, $$ = El.$$ = function(sel, startNode) {
+		return new ElWrap(body.querySelectorAll.call(startNode || body, sel))
+	}
 
-	/*** ie8 ***/
 
 	El.matches = function(el, sel) {
 		return el && body.matches.call(el, sel)
 	}
 	El.closest = function(el, sel) {
 		return el && body.closest.call(el.closest ? el : el.parentNode, sel)
-	}
-	El.$ = function(sel, startNode) {
-		return body.querySelector.call(startNode || body, sel)
-	}
-	El.$$ = function(sel, startNode) {
-		return new ElWrap(body.querySelectorAll.call(startNode || body, sel))
 	}
 
 	/**
