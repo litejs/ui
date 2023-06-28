@@ -4,7 +4,12 @@
 /* global xhr, getComputedStyle, navigator, requestAnimationFrame */
 
 !function(window, document, history, location, Object) {
-	var html = document.documentElement
+	window.El = El
+	window.LiteJS = LiteJS
+	window.View = View
+
+	var UNDEF, styleNode
+	, html = document.documentElement
 	, body = document.body
 	, defaults = {
 		base: "",
@@ -36,9 +41,105 @@
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 
+	, BIND_ATTR = "data-bind"
+	, seq = 0
+	, elCache = {}
+	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([+>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
+	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
+	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
+	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
+	, wordRe = /\b[a-z_$][\w$]*/ig
+	, camelRe = /\-([a-z])/g
+	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
+	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
+	, txtAttr = "textContent" in body ? "textContent" : "innerText"
+	, bindings = {
+		attr: El.attr = acceptMany(setAttr, getAttr),
+		cls: El.cls = acceptMany(cls),
+		css: El.css = acceptMany(function(el, key, val) {
+			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
+		}, function(el, key) {
+			return getComputedStyle(el).getPropertyValue(key)
+		}),
+		data: function(el, key, val) {
+			setAttr(el, "data-" + key, val)
+		},
+		html: function(el, html) {
+			el.innerHTML = html
+		},
+		ref: function(el, name) {
+			this[name] = el
+		},
+		txt: El.txt = function(el, txt) {
+			if (el[txtAttr] !== txt) el[txtAttr] = txt
+		},
+		val: El.val = valFn,
+		"with": function(el, map) {
+			var scope = elScope(el, this)
+			Object.assign(scope, map)
+			if (scope !== this) {
+				render(el)
+				return true
+			}
+		}
+	}
+	, bindMatch = []
+	, scopeData = {
+		_: String,
+		_b: bindings,
+		El: El,
+		View: View
+	}
+	, elArr = {
+		append: function(el) {
+			var elWrap = this
+			if (elWrap._s) {
+				append(elWrap[elWrap._s[getAttr(el, "slot") || elWrap._s._] || 0], el)
+			} else {
+				elWrap.push(el)
+			}
+			return elWrap
+		},
+		cloneNode: function(deep) {
+			deep = ElWrap(this, deep)
+			deep._s = this._s
+			return deep
+		}
+	}
+	// After iOS 13 iPad with default enabled "desktop" option
+	// is the only Macintosh with multi-touch
+	, iOS = /^(Mac|iP)/.test(navigator.platform)
+	// || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+
+	// The addEventListener is supported in Internet Explorer from version 9.
+	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
+	// - IE8 always prevents the default of the mousewheel event.
+	, addEv = "addEventListener"
+	, remEv = "removeEventListener"
+	, prefix = window[addEv] ? "" : (addEv = "attachEvent", remEv = "detachEvent", "on")
 	, Event = window.Event || window
+	, fixEv = Event.fixEv || (Event.fixEv = {})
+	, fixFn = Event.fixFn || (Event.fixFn = {})
 
 	Event.asEmitter = asEmitter
+	Event.stop = stopEvent
+
+	if (iOS) {
+		// iOS doesn't support beforeunload, use pagehide instead
+		fixEv.beforeunload = "pagehide"
+	}
+
+	xhr.view = xhr.tpl = El.tpl = parseTemplate
+	xhr.css = function(str) {
+		if (!styleNode) {
+			// Safari and IE6-8 requires dynamically created
+			// <style> elements to be inserted into the <head>
+			append(document.getElementsByTagName("head")[0], styleNode = El("style"))
+		}
+		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
+		else append(styleNode, str)
+	}
+
 	function asEmitter(obj) {
 		obj.on = on
 		obj.off = off
@@ -46,6 +147,7 @@
 		obj.emit = emit
 		obj.listen = listen
 		obj.unlisten = unlisten
+		// emitNext, emitLate
 	}
 
 	function on(type, fn, scope, _origin) {
@@ -86,9 +188,6 @@
 		return this
 	}
 
-	// emitNext
-	// emitLate
-
 	function emit(type) {
 		var args, i
 		, emitter = this === window ? emptyArr : this
@@ -123,8 +222,43 @@
 		return this
 	}
 
-	window.View = View
-	window.LiteJS = LiteJS
+	function addEvent(el, ev, _fn) {
+		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
+		, fix = prefix ? function() {
+			var e = new Event(ev)
+			if (e.clientX !== UNDEF) {
+				e.pageX = e.clientX + scrollLeft()
+				e.pageY = e.clientY + scrollTop()
+			}
+			fn.call(el, e)
+		} : fn
+
+		if (fixEv[ev] !== "") {
+			el[addEv](prefix + (fixEv[ev] || ev), fix, false)
+		}
+
+		on.call(el, ev, fix, el, _fn)
+	}
+
+	function rmEvent(el, ev, fn) {
+		var evs = el._e && el._e[ev]
+		, id = evs && evs.indexOf(fn)
+		if (id > -1) {
+			if (fn !== evs[id + 1] && evs[id + 1]._rm) {
+				evs[id + 1]._rm()
+			}
+			el[remEv](prefix + (fixEv[ev] || ev), evs[id + 1])
+			evs.splice(id - 1, 3)
+		}
+	}
+
+	function stopEvent(e) {
+		if (e && e.preventDefault) {
+			e.stopPropagation()
+			e.preventDefault()
+		}
+		return false
+	}
 
 	function LiteJS(opts) {
 		opts = Object.assign({}, defaults, opts)
@@ -238,6 +372,9 @@
 		}
 	}
 
+	asEmitter(View)
+	asEmitter(View.prototype)
+
 	function bubbleDown(params, close) {
 		var tmp
 		, view = params._v
@@ -282,9 +419,6 @@
 		view.emit(event, a, b)
 		View.emit(event, view, a, b)
 	}
-
-	asEmitter(View)
-	asEmitter(View.prototype)
 
 	View.get = get
 	function get(url, params) {
@@ -447,85 +581,11 @@
 	}
 
 
-	var UNDEF, styleNode
-	, BIND_ATTR = "data-bind"
-	, seq = 0
-	, elCache = El.cache = {}
-	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([+>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
-	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
-	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
-	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
-	, wordRe = /\b[a-z_$][\w$]*/ig
-	, camelRe = /\-([a-z])/g
-	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
-	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
-	, txtAttr = "textContent" in body ? "textContent" : "innerText"
-	, bindings = El.bindings = {
-		attr: El.attr = acceptMany(setAttr, getAttr),
-		cls: El.cls = acceptMany(cls),
-		css: El.css = acceptMany(function(el, key, val) {
-			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
-		}, function(el, key) {
-			return getComputedStyle(el).getPropertyValue(key)
-		}),
-		data: function(el, key, val) {
-			setAttr(el, "data-" + key, val)
-		},
-		html: function(el, html) {
-			el.innerHTML = html
-		},
-		ref: function(el, name) {
-			this[name] = el
-		},
-		txt: El.txt = function(el, txt) {
-			if (el[txtAttr] !== txt) el[txtAttr] = txt
-		},
-		val: El.val = valFn,
-		"with": function(el, map) {
-			var scope = elScope(el, this)
-			Object.assign(scope, map)
-			if (scope !== this) {
-				render(el)
-				return true
-			}
-		}
-	}
-	, bindMatch = []
-	, scopeData = El.data = {
-		_: String,
-		_b: bindings,
-		El: El,
-		View: View
-	}
-	// After iOS 13 iPad with default enabled "desktop" option
-	// is the only Macintosh with multi-touch
-	, iOS = /^(Mac|iP)/.test(navigator.platform)
-	// || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-	, $ = El.$ = function(sel, startNode) {
-		return body.querySelector.call(startNode || body, sel)
-	}
-	, $$ = El.$$ = function(sel, startNode) {
-		return ElWrap(body.querySelectorAll.call(startNode || body, sel))
-	}
-
-
-	El.matches = function(el, sel) {
-		return el && body.matches.call(el, sel)
-	}
-	El.closest = function(el, sel) {
-		return el && body.closest.call(el.closest ? el : el.parentNode, sel)
-	}
-
 	/**
 	 * Turns CSS selector like syntax to DOM Node
-	 * @returns {Node}
-	 *
-	 * @example
 	 * El("input#12.nice[type=checkbox]:checked:disabled[data-lang=en].class")
 	 * <input id="12" class="nice class" type="checkbox" checked="checked" disabled="disabled" data-lang="en">
 	 */
-
-	window.El = El
 
 	function El(name) {
 		if (!isString(name)) {
@@ -574,9 +634,56 @@
 		return Object.assign(wrap, elArr)
 	}
 
-	function camelFn(_, a) {
-		return a.toUpperCase()
+	El.empty = empty
+	El.kill = kill
+	El.render = render
+
+	Object.keys(El).forEach(function(key) {
+		elArr[key] = function() {
+			var i = 0
+			, self = this
+			, len = self.length
+			, arr = slice.call(arguments)
+			arr.unshift(1)
+			for (; i < len; ) {
+				arr[0] = self[i++]
+				El[key].apply(El, arr)
+			}
+			return self
+		}
+	})
+
+	El.$ = $
+	El.$$ = $$
+	El.append = append
+	El.bindings = bindings
+	El.blur = blur
+	El.cache = elCache
+	El.closest = closest
+	El.data = scopeData
+	El.hasClass = hasClass
+	El.matches = matches
+	El.rate = rate
+	El.replace = replace
+	El.scope = elScope
+	El.scrollLeft = scrollLeft
+	El.scrollTop = scrollTop
+	El.step = step
+	El.on = bindings.on = bindingOn
+	El.off = acceptMany(rmEvent)
+	El.one = function(el, ev, fn) {
+		function remove() {
+			rmEvent(el, ev, fn)
+			rmEvent(el, ev, remove)
+		}
+		addEvent(el, ev, fn)
+		addEvent(el, ev, remove)
+		return el
 	}
+	El.emit = function(el) {
+		emit.apply(el, slice.call(arguments, 1))
+	}
+
 
 	function getAttr(el, key) {
 		return el && el.getAttribute && el.getAttribute(key)
@@ -634,6 +741,43 @@
 		} else if (current) {
 			el.removeAttribute(key)
 		}
+	}
+
+	function append(el, child, before) {
+		if (!el.nodeType) {
+			return el.append ? el.append(child, before) : el
+		}
+		var tmp
+		, i = 0
+		if (child) {
+			if (isString(child) || isNumber(child)) child = document.createTextNode(child)
+			else if ( !child.nodeType && (i = child.length) ) {
+				for (tmp = document.createDocumentFragment(); i--; ) append(tmp, child[i], 0)
+				child = tmp
+			}
+
+			if (child.nodeType) {
+				tmp = el.insertBefore ? el : el[el.length - 1]
+				if ((i = getAttr(child, "slot"))) {
+					child.removeAttribute("slot")
+					before = findCom(tmp, "%slot-" + i) || tmp
+					tmp = before.parentNode
+				} else if ((i = getAttr(tmp, "data-slot"))) {
+					before = findCom(tmp, "%slot-" + i) || tmp
+					tmp = before.parentNode
+					// TODO:2016-07-05:lauri:handle numeric befores
+				}
+				/*** debug ***/
+				if (tmp.namespaceURI && child.namespaceURI && tmp.namespaceURI !== child.namespaceURI && child.tagName !== "svg") {
+					console.error("NAMESPACE CHANGE!", tmp.namespaceURI, child.namespaceURI, child)
+				}
+				/**/
+				tmp.insertBefore(child, (isNumber(before) ? tmp.childNodes[
+					before < 0 ? tmp.childNodes.length - before - 2 : before
+				] : before) || null)
+			}
+		}
+		return el
 	}
 
 	function valFn(el, val) {
@@ -706,97 +850,6 @@
 		}
 	}
 
-	function append(el, child, before) {
-		if (!el.nodeType) {
-			return el.append ? el.append(child, before) : el
-		}
-		var tmp
-		, i = 0
-		if (child) {
-			if (isString(child) || isNumber(child)) child = document.createTextNode(child)
-			else if ( !child.nodeType && (i = child.length) ) {
-				for (tmp = document.createDocumentFragment(); i--; ) append(tmp, child[i], 0)
-				child = tmp
-			}
-
-			if (child.nodeType) {
-				tmp = el.insertBefore ? el : el[el.length - 1]
-				if ((i = getAttr(child, "slot"))) {
-					child.removeAttribute("slot")
-					before = findCom(tmp, "%slot-" + i) || tmp
-					tmp = before.parentNode
-				} else if ((i = getAttr(tmp, "data-slot"))) {
-					before = findCom(tmp, "%slot-" + i) || tmp
-					tmp = before.parentNode
-					// TODO:2016-07-05:lauri:handle numeric befores
-				}
-				/*** debug ***/
-				if (tmp.namespaceURI && child.namespaceURI && tmp.namespaceURI !== child.namespaceURI && child.tagName !== "svg") {
-					console.error("NAMESPACE CHANGE!", tmp.namespaceURI, child.namespaceURI, child)
-				}
-				/**/
-				tmp.insertBefore(child, (isNumber(before) ? tmp.childNodes[
-					before < 0 ? tmp.childNodes.length - before - 2 : before
-				] : before) || null)
-			}
-		}
-		return el
-	}
-
-	function findCom(node, val) {
-		for (var next, el = node.firstChild; el; ) {
-			if (el.nodeType === 8 && el.nodeValue == val) return el
-			next = el.firstChild || el.nextSibling
-			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
-			el = next
-		}
-	}
-
-	function acceptMany(fn, getter) {
-		return function f(el, names, val, delay) {
-			if (el && names) {
-				if (delay >= 0) {
-					if (delay > 0) setTimeout(f, delay, el, names, val)
-					else requestAnimationFrame(function() {
-						f(el, names, val)
-					})
-					return
-				}
-				var i
-				if (isObject(names)) {
-					for (i in names) {
-						if (hasOwn.call(names, i)) f(el, i, names[i], val)
-					}
-					return
-				}
-				var nameArr = ("" + names).split(splitRe)
-				, len = nameArr.length
-				i = 0
-
-				if (arguments.length < 3) {
-					if (getter) return getter(el, names)
-					for (; i < len; ) fn(el, nameArr[i++])
-				} else {
-					/*
-					if (isArray(val)) {
-						for (; i < len; ) fn(el, nameArr[i], val[i++])
-					} else {
-						for (; i < len; ) fn(el, nameArr[i++], val)
-					}
-					/*/
-					for (; i < len; ) {
-						fn(el, nameArr[i++], isArray(val) ? val[i - 1] : val)
-					}
-					//*/
-				}
-			}
-		}
-	}
-
-	// setAttribute("class") is broken in IE7
-	// className is object in SVGElements
-
-	El.hasClass = hasClass
 	function hasClass(el, name) {
 		var current = el.className || ""
 
@@ -808,6 +861,8 @@
 	}
 
 	function cls(el, name, set) {
+		// setAttribute("class") is broken in IE7
+		// className is object on SVGElements
 		var current = el.className || ""
 		, useAttr = !isString(current)
 
@@ -832,59 +887,6 @@
 		}
 	}
 
-	// The addEventListener is supported in Internet Explorer from version 9.
-	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
-	// - IE8 always prevents the default of the mousewheel event.
-
-	var addEv = "addEventListener"
-	, remEv = "removeEventListener"
-	, prefix = window[addEv] ? "" : (addEv = "attachEvent", remEv = "detachEvent", "on")
-	, fixEv = Event.fixEv || (Event.fixEv = {})
-	, fixFn = Event.fixFn || (Event.fixFn = {})
-
-	if (iOS) {
-		// iOS doesn't support beforeunload, use pagehide instead
-		fixEv.beforeunload = "pagehide"
-	}
-
-	function addEvent(el, ev, _fn) {
-		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
-		, fix = prefix ? function() {
-			var e = new Event(ev)
-			if (e.clientX !== UNDEF) {
-				e.pageX = e.clientX + scrollLeft()
-				e.pageY = e.clientY + scrollTop()
-			}
-			fn.call(el, e)
-		} : fn
-
-		if (fixEv[ev] !== "") {
-			el[addEv](prefix + (fixEv[ev] || ev), fix, false)
-		}
-
-		on.call(el, ev, fix, el, _fn)
-	}
-
-	function rmEvent(el, ev, fn) {
-		var evs = el._e && el._e[ev]
-		, id = evs && evs.indexOf(fn)
-		if (id > -1) {
-			if (fn !== evs[id + 1] && evs[id + 1]._rm) {
-				evs[id + 1]._rm()
-			}
-			el[remEv](prefix + (fixEv[ev] || ev), evs[id + 1])
-			evs.splice(id - 1, 3)
-		}
-	}
-
-	Event.stop = function(e) {
-		if (e && e.preventDefault) {
-			e.stopPropagation()
-			e.preventDefault()
-		}
-		return false
-	}
-
 	function bindingOn(el, events, selector, data, handler, delay) {
 		var argi = arguments.length
 		if (argi == 3 || argi == 4 && isNumber(data)) {
@@ -907,11 +909,11 @@
 		}
 		var fn = (
 			isString(handler) ? function(e) {
-				var target = selector ? El.closest(e.target, selector) : el
+				var target = selector ? closest(e.target, selector) : el
 				if (target) emit.apply(View, [handler, e, target].concat(data))
 			} :
 			selector ? function(e) {
-				if (El.matches(e.target, selector)) handler(e)
+				if (matches(e.target, selector)) handler(e)
 			} :
 			handler
 		)
@@ -924,22 +926,6 @@
 		}
 	}
 	bindingOn.once = 1
-	El.on = bindings.on = bindingOn
-	El.off = acceptMany(rmEvent)
-
-	El.one = function(el, ev, fn) {
-		function remove() {
-			rmEvent(el, ev, fn)
-			rmEvent(el, ev, remove)
-		}
-		addEvent(el, ev, fn)
-		addEvent(el, ev, remove)
-		return el
-	}
-
-	El.emit = function(el) {
-		emit.apply(el, slice.call(arguments, 1))
-	}
 
 	function empty(el) {
 		for (var node; (node = el.firstChild); kill(node));
@@ -981,7 +967,6 @@
 			(((fb = elScope[node._scope = ++seq] = Object.create(parent))._super = parent), fb) :
 			closestScope(node)
 		) || scopeData
-
 	}
 
 	function closestScope(node) {
@@ -1060,60 +1045,17 @@
 		}
 	}
 
-
-	El.empty = empty
-	El.kill = kill
-	El.render = render
-	El.replace = replace
-	function replace(oldEl, newEl) {
-		var parent = oldEl && oldEl.parentNode
-		if (parent && newEl) return parent.replaceChild(oldEl, newEl)
-	}
-
-	var elArr = {
-		append: function(el) {
-			var elWrap = this
-			if (elWrap._s) {
-				append(elWrap[elWrap._s[getAttr(el, "slot") || elWrap._s._] || 0], el)
-			} else {
-				elWrap.push(el)
-			}
-			return elWrap
-		},
-		cloneNode: function(deep) {
-			deep = ElWrap(this, deep)
-			deep._s = this._s
-			return deep
-		}
-	}
-	for (var fnName in El) wrap(fnName)
-
-	function wrap(key) {
-		elArr[key] = function wrap() {
-			var i = 0
-			, self = this
-			, len = self.length
-			, arr = slice.call(arguments)
-			arr.unshift(1)
-			for (; i < len; ) {
-				arr[0] = self[i++]
-				El[key].apply(null, arr)
-			}
-			return self
-		}
-	}
-
-
-	El.append = append
-	El.blur = blur
-	El.scope = elScope
-
 	function blur() {
 		// IE8 can throw an exception for document.activeElement.
 		try {
 			var tag = document.activeElement.tagName
 			if (tag === "A" || tag === "BUTTON") el.blur()
 		} catch(e) {}
+	}
+
+	function replace(oldEl, newEl) {
+		var parent = oldEl && oldEl.parentNode
+		if (parent && newEl) return parent.replaceChild(oldEl, newEl)
 	}
 
 	function parseTemplate(str, el) {
@@ -1334,27 +1276,6 @@
 	}
 	plugins.child = plugins.slot
 
-	xhr.view = xhr.tpl = El.tpl = parseTemplate
-	xhr.css = function(str) {
-		if (!styleNode) {
-			// Safari and IE6-8 requires dynamically created
-			// <style> elements to be inserted into the <head>
-			append(document.getElementsByTagName("head")[0], styleNode = El("style"))
-		}
-		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
-		else append(styleNode, str)
-	}
-
-	El.scrollLeft = scrollLeft
-	function scrollLeft() {
-		return window.pageXOffset || html.scrollLeft || body.scrollLeft || 0
-	}
-
-	El.scrollTop = scrollTop
-	function scrollTop() {
-		return window.pageYOffset || html.scrollTop || body.scrollTop || 0
-	}
-
 	/*** kb ***/
 	var kbMaps = []
 	, kbMod = El.kbMod = iOS ? "metaKey" : "ctrlKey"
@@ -1370,8 +1291,22 @@
 		112: "f1",      113: "f2",   114: "f3",   115: "f4",  116: "f5",  117: "f6",
 		118: "f7",      119: "f8",   120: "f9",   121: "f10", 122: "f11", 123: "f12"
 	}
+	El.addKb = addKb
+	El.rmKb = rmKb
 
-	function kbRun(e, code, chr) {
+	function addKb(map, killEl) {
+		if (map) {
+			kbMaps.unshift(map)
+			if (killEl) {
+				on.call(killEl, "kill", rmKb.bind(map, map))
+			}
+		}
+	}
+	function rmKb(map) {
+		map = kbMaps.indexOf(map || kbMaps[0])
+		if (map > -1) kbMaps.splice(map, 1)
+	}
+	function runKb(e, code, chr) {
 		var fn, map
 		, i = 0
 		, el = e.target || e.srcElement
@@ -1385,7 +1320,7 @@
 		if (isFunction(fn)) fn(e, chr, el)
 	}
 
-	function kbDown(e) {
+	addEvent(document, "keydown", function(e) {
 		if (kbMaps[0]) {
 			var c = e.keyCode || e.which
 			, numpad = c > 95 && c < 106
@@ -1394,38 +1329,21 @@
 
 			// Otherwise IE backspace navigates back
 			if (code == 8 && kbMaps[0].backspace) {
-				Event.stop(e)
+				stopEvent(e)
 			}
-			kbRun(e, code, key)
-			if (e.shiftKey && code != 16) kbRun(e, code, "shift+" + key)
+			runKb(e, code, key)
+			if (e.shiftKey && code != 16) runKb(e, code, "shift+" + key)
 			// people in Poland use Right-Alt+S to type in Ś.
 			// Right-Alt+S is mapped internally to Ctrl+Alt+S.
 			// THANKS: Marcin Wichary - disappearing Polish Ś [https://medium.engineering/fa398313d4df]
 			if (e.altKey) {
-				if (code != 18) kbRun(e, code, "alt+" + key)
+				if (code != 18) runKb(e, code, "alt+" + key)
 			} else if (code != 17) {
-				if (e.ctrlKey) kbRun(e, code, "ctrl+" + key)
-				if (e[kbMod] && code != 91) kbRun(e, code, "mod+" + key)
+				if (e.ctrlKey) runKb(e, code, "ctrl+" + key)
+				if (e[kbMod] && code != 91) runKb(e, code, "mod+" + key)
 			}
 		}
-	}
-
-	El.addKb = addKb
-	function addKb(map, killEl) {
-		if (map) {
-			kbMaps.unshift(map)
-			if (killEl) {
-				on.call(killEl, "kill", rmKb.bind(map, map))
-			}
-		}
-	}
-	El.rmKb = rmKb
-	function rmKb(map) {
-		map = kbMaps.indexOf(map || kbMaps[0])
-		if (map > -1) kbMaps.splice(map, 1)
-	}
-
-	addEvent(document, "keydown", kbDown)
+	})
 	/**/
 
 
@@ -1438,6 +1356,7 @@
 	}
 	, setBreakpointsRated = rate(setBreakpoints, 100)
 
+	El.setBreakpoints = setBreakpoints
 	function setBreakpoints(_breakpoints) {
 		// document.documentElement.clientWidth is 0 in IE5
 		var key, next
@@ -1463,15 +1382,28 @@
 
 		View.emit("resize")
 	}
-	El.setBreakpoints = setBreakpoints
 
 	setBreakpointsRated()
-
 	addEvent(window, "resize", setBreakpointsRated)
 	addEvent(window, "orientationchange", setBreakpointsRated)
 	addEvent(window, "load", setBreakpointsRated)
 	/**/
 
+	function $(sel, startNode) {
+		return body.querySelector.call(startNode || body, sel)
+	}
+	function $$(sel, startNode) {
+		return ElWrap(body.querySelectorAll.call(startNode || body, sel))
+	}
+	function matches(el, sel) {
+		return el && body.matches.call(el, sel)
+	}
+	function closest(el, sel) {
+		return el && body.closest.call(el.closest ? el : el.parentNode, sel)
+	}
+	function camelFn(_, a) {
+		return a.toUpperCase()
+	}
 	function extend(fn, opts) {
 		function wrapper() {
 			return fn.apply(this, arguments)
@@ -1481,8 +1413,78 @@
 		wrapper[P].constructor = wrapper
 		return wrapper
 	}
+	function findCom(node, val) {
+		for (var next, el = node.firstChild; el; ) {
+			if (el.nodeType === 8 && el.nodeValue == val) return el
+			next = el.firstChild || el.nextSibling
+			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
+			el = next
+		}
+	}
+	function acceptMany(fn, getter) {
+		return function f(el, names, val, delay) {
+			if (el && names) {
+				if (delay >= 0) {
+					if (delay > 0) setTimeout(f, delay, el, names, val)
+					else requestAnimationFrame(function() {
+						f(el, names, val)
+					})
+					return
+				}
+				var i
+				if (isObject(names)) {
+					for (i in names) {
+						if (hasOwn.call(names, i)) f(el, i, names[i], val)
+					}
+					return
+				}
+				var nameArr = ("" + names).split(splitRe)
+				, len = nameArr.length
+				i = 0
 
-	El.rate = rate
+				if (arguments.length < 3) {
+					if (getter) return getter(el, names)
+					for (; i < len; ) fn(el, nameArr[i++])
+				} else {
+					/*
+					if (isArray(val)) {
+						for (; i < len; ) fn(el, nameArr[i], val[i++])
+					} else {
+						for (; i < len; ) fn(el, nameArr[i++], val)
+					}
+					/*/
+					for (; i < len; ) {
+						fn(el, nameArr[i++], isArray(val) ? val[i - 1] : val)
+					}
+					//*/
+				}
+			}
+		}
+	}
+	function scrollLeft() {
+		return window.pageXOffset || html.scrollLeft || body.scrollLeft || 0
+	}
+	function scrollTop() {
+		return window.pageYOffset || html.scrollTop || body.scrollTop || 0
+	}
+	function step(num, factor, mid) {
+		var x = ("" + factor).split(".")
+		, steps = num / factor
+		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (mid == UNDEF ? 0.5 : mid === 1 && steps == (steps|0) ? 0 : +mid))) * factor
+		return "" + (1 in x ? n.toFixed(x[1].length) : n)
+	}
+	function isFunction(fn) {
+		return typeof fn === "function"
+	}
+	function isNumber(num) {
+		return typeof num === "number"
+	}
+	function isObject(obj) {
+		return !!obj && obj.constructor === Object
+	}
+	function isString(str) {
+		return typeof str === "string"
+	}
 	// Maximum call rate for Function
 	// leading edge, trailing edge
 	function rate(fn, ms) {
@@ -1499,34 +1501,12 @@
 			}
 		}
 	}
-	El.step = step
-	function step(num, factor, mid) {
-		var x = ("" + factor).split(".")
-		, steps = num / factor
-		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (mid == UNDEF ? 0.5 : mid === 1 && steps == (steps|0) ? 0 : +mid))) * factor
-		return "" + (1 in x ? n.toFixed(x[1].length) : n)
-	}
-
-
-	function isFunction(fn) {
-		return typeof fn === "function"
-	}
-	function isNumber(num) {
-		return typeof num === "number"
-	}
-	function isObject(obj) {
-		return !!obj && obj.constructor === Object
-	}
-	function isString(str) {
-		return typeof str === "string"
-	}
 
 	function findTemplates() {
 		return $$("script[type=ui]").map(function(el) {
 			return el.src || parseTemplate(el.textContent, el)
 		})
 	}
-
 	xhr.load(findTemplates())
 }(this, document, history, location, Object) // jshint ignore:line
 
