@@ -213,6 +213,7 @@ describe("Polyfill test", function() {
 		assert.equal(Number.isSafeInteger(9007199254740991), true)
 		assert.equal(Number.isSafeInteger(9007199254740992), false)
 
+		assert.equal(new Date(6e13-1).toJSON(),  "3871-04-29T10:39:59.999Z")
 		assert.equal(new Date(6e13-1).toISOString(),  "3871-04-29T10:39:59.999Z")
 		assert.equal(new Date(-6e13-1).toISOString(), "0068-09-03T13:19:59.999Z")
 		assert.equal(new Date(-8e13-1).toISOString(), "-000566-11-26T01:46:39.999Z")

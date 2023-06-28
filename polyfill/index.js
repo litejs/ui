@@ -9,14 +9,8 @@
 //  - RegExp lookahead /(?=a)/ and non-greedy modifiers /a+?/
 //  - if ("key" in map) and hasOwnProperty
 
-// IE5.5-IE7 Patched: 41
-// Event, pointer, setTimeout, setInterval, sessionStorage, localStorage, requestAnimationFrame, cancelAnimationFrame, console, JSON, matchMedia, performance, p:now, timing, d:now, toJSON, toISOString, bind, assign, create, entries, keys, values, toString, isArray, from, indexOf, lastIndexOf, reduce, reduceRight, every, forEach, map, filter, some, trim, sendBeacon, matches, closest, querySelector, querySelectorAll
-// IE8 Patched: 38
-// Event, pointer, setTimeout, setInterval, requestAnimationFrame, cancelAnimationFrame, console, matchMedia, performance, p:now, timing, d:now, toJSON, toISOString, bind, assign, create, entries, keys, values, toString, isArray, from, indexOf, lastIndexOf, reduce, reduceRight, every, forEach, map, filter, some, trim, sendBeacon, matches, closest, querySelector, querySelectorAll
-// IE10 Patched: 9
-// Event, pointer:MS, assign, entries, values, from, sendBeacon, matches, closest
-// IE11 Patched: 8
-// Event, assign, entries, values, from, sendBeacon, matches, closest
+// IE5.5-IE7 patched 56
+// "Event","pointer","sessionStorage","localStorage","requestAnimationFrame","cancelAnimationFrame","console","matchMedia","JSON","setTimeout","setInterval","g:parseInt","performance","p:now","timing","parseInt","parseFloat","isNaN","isFinite","isInteger","MAX_SAFE_INTEGER","isSafeInteger","d:now","toJSON","toISOString","bind","assign","create","entries","hasOwn","keys","values","toString","isArray","from","of","includes","indexOf","lastIndexOf","reduce","reduceRight","splice","every","forEach","map","filter","some","flat","flatMap","endsWith","startsWith","trim","sendBeacon","matches","querySelector","querySelectorAll"
 
 
 /* global El, xhr */
@@ -282,7 +276,7 @@
 	O = O[P]
 	// IE8 toJSON does not return milliseconds
 	// FF37 returns invalid extended ISO-8601, `29349-01-26T00:00:00.000Z` instead of `+029349-01-26T00:00:00.000Z`
-	b = ie678 || (O[a = "toISOString"] && new Date(8e14)[a]().length < 27)
+	b = O[a = "toISOString"] && new Date(8e14)[a]().length < 27 || ie678
 	patch(a, patch("toJSON", [
 		"a=t.getUTCFullYear();if(a!==a)throw RangeError('Invalid time');return(b=a<0?'-':a>9999?'+':'')+X(a<0?-a:a,'-',b?6:4", "Month()+1,'-'", "Date(),'T'",
 		"Hours(),':'", "Minutes(),':'", "Seconds(),'.'", "Milliseconds(),'Z',3)"
