@@ -1527,7 +1527,7 @@
 	}
 
 	function findTemplates() {
-		return El.$$("script[type='litejs/view']").map(function(el) {
+		return $$("script[type=ui]").map(function(el) {
 			return el.src || parseTemplate(el.textContent, el)
 		})
 	}
