@@ -1274,7 +1274,6 @@
 			}
 		})
 	}
-	plugins.child = plugins.slot
 
 	/*** kb ***/
 	var kbMaps = []

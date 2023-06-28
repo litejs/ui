@@ -28,7 +28,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 .bg-1
 	.top.t-1.App-row
 		.right
-			%child
+			%slot
 		.right.lang ;each: lng in _.list
 			a.hand - {lng.toUpperCase()} -
 				@click: [lng], "setLang"
@@ -105,7 +105,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		top
 		Menu
 		.rel.App-row
-			%child
+			%slot
 		.Footer-spacer
 	Footer
 	.scroll-up
@@ -155,7 +155,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 					@click: "logout"
 		Menu
 		.rel.App-row
-			%child
+			%slot
 		.Footer-spacer
 	Footer
 
