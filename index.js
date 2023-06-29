@@ -150,7 +150,9 @@
 	}
 
 	xhr.view = xhr.tpl = El.tpl = parseTemplate
-	xhr.css = function(str) {
+	xhr.css = injectCss
+
+	function injectCss(str) {
 		if (!styleNode) {
 			// Safari and IE6-8 requires dynamically created
 			// <style> elements to be inserted into the <head>
@@ -1191,7 +1193,7 @@
 			root._cp = root.childNodes.length - 1
 		}
 	})
-	addPlugin("css",  { _r: xhr.css })
+	addPlugin("css",  { _r: injectCss })
 	addPlugin("def",  { _r: viewDef })
 	addPlugin("js",   { _r: eval })
 	addPlugin("each", {
