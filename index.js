@@ -759,7 +759,7 @@
 		if (!el.nodeType) {
 			return el.append ? el.append(child, before) : el
 		}
-		var tmp
+		var next, tmp
 		, i = 0
 		if (child) {
 			if (isString(child) || isNumber(child)) child = document.createTextNode(child)
@@ -773,7 +773,16 @@
 					(i = getAttr(child, "slot")) && (setAttr(child, "slot", 0), 1) ||
 					(i = getAttr(el, "data-slot"))
 				) {
-					el = findCom(el, "%slot-" + i) || el
+					i = "%slot-" + i
+					for (tmp = el.firstChild; tmp; tmp = next) {
+						if (tmp.nodeType === 8 && tmp.nodeValue === i) {
+							el = tmp
+							break
+						}
+						for (next = tmp.firstChild || tmp.nextSibling; !next && tmp !== el; next = tmp.nextSibling) {
+							tmp = tmp.parentNode
+						}
+					}
 				}
 				if (el.nodeType === 8) {
 					before = el
@@ -1383,14 +1392,6 @@
 	}
 	function camelFn(_, a) {
 		return a.toUpperCase()
-	}
-	function findCom(node, val) {
-		for (var next, el = node.firstChild; el; ) {
-			if (el.nodeType === 8 && el.nodeValue == val) return el
-			next = el.firstChild || el.nextSibling
-			while (!next && ((el = el.parentNode) !== node)) next = el.nextSibling
-			el = next
-		}
 	}
 	function acceptMany(fn, getter) {
 		return function f(el, names, val, delay) {
