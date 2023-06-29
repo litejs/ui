@@ -454,7 +454,8 @@
 		})
 	}
 
-	View.def = function(str) {
+	View.def = viewDef
+	function viewDef(str) {
 		for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
 			match[1].split(",").map(def)
 		}
@@ -1168,7 +1169,10 @@
 		t.a = attr1
 	}
 
-	js[P].done = Function("Function(this.params+this.txt)()")
+	js[P] = {
+		done: Function("this.f(this.params||this.txt)"),
+		f: eval
+	}
 
 	var plugins = El.plugins = {
 		start: extend(js, {
@@ -1192,15 +1196,14 @@
 			}
 		}),
 		css: extend(js, {
-			done: Function("xhr.css(this.params+this.txt)")
+			f: xhr.css
 		}),
 		def: extend(js, {
-			done: Function("View.def(this.params||this.txt)")
+			f: viewDef
 		}),
 		each: extend(js, {
 			done: function() {
 				var txt = this.txt
-
 				JSON.parse(this.params)
 				.each(function(val) {
 					parseTemplate(txt.format(isObject(val) ? val : { item: val }))
