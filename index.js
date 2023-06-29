@@ -1162,7 +1162,7 @@
 	function js(parent, params, attr1) {
 		var t = this
 		// Raw text mode
-		t._r = t.parent = parent
+		t.parent = parent
 		t.txt = ""
 		t.plugin = t.el = t
 		t.params = params
@@ -1170,8 +1170,8 @@
 	}
 
 	js[P] = {
-		done: Function("this.f(this.params||this.txt)"),
-		f: eval
+		done: Function("this._r(this.params||this.txt)"),
+		_r: eval
 	}
 
 	var plugins = El.plugins = {
@@ -1196,18 +1196,16 @@
 			}
 		}),
 		css: extend(js, {
-			f: xhr.css
+			_r: xhr.css
 		}),
 		def: extend(js, {
-			f: viewDef
+			_r: viewDef
 		}),
 		each: extend(js, {
-			done: function() {
+			_r: function(params) {
 				var txt = this.txt
-				JSON.parse(this.params)
-				.each(function(val) {
-					parseTemplate(txt.format(isObject(val) ? val : { item: val }))
-				})
+				, fn = txt.replace.bind(txt, /{key}/g)
+				params.split(splitRe).map(fn).forEach(parseTemplate)
 			}
 		}),
 		el: extend(plugin, {
