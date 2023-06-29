@@ -34,7 +34,7 @@
 	, viewSeq = 1
 	, fnStr = ""
 	, reStr = ""
-	, views = View.views = {}
+	, views = {}
 	, paramCb = {}
 	, lastParams = paramCb
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
