@@ -1,55 +1,45 @@
 <!DOCTYPE html>
-<html><body>
-<script id="index" type="text/tpl">
-%el menu
-	ul
-		%el row
-			li.my-row
-				i.icon
-				b
-					%slot
-		row.first
-			a[href="#home"] Home
-		row.last
-			a[href="#page/about"] About
+<html><head><title>App</title></head><body><script type="ui">
+
+%el Top-menu
+nav
+	hr
+	a[href="#"] Home
+	| | 
+	a[href="#home2"] Home2
 	hr
 
-%el footer
-	.footer
-		hr
-		i Bye
+%el Footer
+	hr
+	= End 
+	i is here
 
-%view home #body
-	menu
-	h1 Home
-	section Welcome
-	footer
+%each user,room
+	%view test-{key} #
+		;title "{key}"
+		h1 Hello {key}
 
-%view page/{pageName} #body
-	menu
-	h1 Welcome to {route.pageName} page!
-	section Hello World!
-	footer
+%view #pub #
+	h1 LiteJS is simple!
+	Top-menu
+	%slot
+	Footer
+
+%view #pub2 #
+	h1 LiteJS is simple!
+	Top-menu
+	.app
+		%slot
+	Footer
+
+%view home #pub
+	h2 Hello home
+
+%view home2 #pub2
+	h2 Hello home2
+
+%start
 </script>
-<script src="../ui/load.js"></script>
-<script src="min/up.js"></script>
-<script src="../ui/index.js"></script>
-<script>
-// Add `#body` view
-View("#body", document.body)
-
-// Read in templates from element with id=index
-El.tpl(index.innerHTML)
-
-// You must define at least one language
-El.i18n.def({
-	"en":"In English"
-})
-
-// Start a router to showing views
-history.start(View.show)
-</script>
-<noscript><h1>Error</h1>This application requires JavaScript</noscript>
+<script src="../load.js"></script>
+<script src="../index.js"></script>
 </body></html>
-
-
