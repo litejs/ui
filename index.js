@@ -358,8 +358,7 @@
 						)
 					} else {
 						if (tmp.route === "404") {
-							El.txt(tmp = El("h3"), "# Error 404")
-							View("404", tmp, "#")
+							parseTemplate("%view 404 #\nh2 Not found")
 						}
 						View("404").show({origin:params})
 					}
