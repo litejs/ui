@@ -58,21 +58,21 @@
 		stroke-width: 1;
 	}
 
-%el Pie
+%svg Pie
 	svg.Pie[viewBox="0 0 60 60"]
 
 
 
-%el Chart
+%svg Chart
 	svg.Chart[viewBox="0 0 600 300"][preserveAspectRatio="xMinYMid meet"]
 		;initChart
 
-%el Chart-line
+%svg Chart-line
 	g.Chart-line
 		;svgToLast
 		path ;svgLine: points, {radius: radius}
 
-%el Chart-axes
+%svg Chart-axes
 	g.labels.x-labels
 		text[x="100"][y="400"] 2008
 		text[x="246"][y="400"] 2009
