@@ -773,14 +773,15 @@
 
 			if (child.nodeType) {
 				tmp = el.insertBefore ? el : el[el.length - 1]
-				if ((i = getAttr(child, "slot"))) {
-					child.removeAttribute("slot")
-					before = findCom(tmp, "%slot-" + i) || tmp
+				if (
+					(i = getAttr(child, "slot")) && (setAttr(child, "slot", 0), 1) ||
+					(i = getAttr(tmp, "data-slot"))
+				) {
+					tmp = findCom(tmp, "%slot-" + i) || tmp
+				}
+				if (tmp.nodeType === 8) {
+					before = tmp
 					tmp = before.parentNode
-				} else if ((i = getAttr(tmp, "data-slot"))) {
-					before = findCom(tmp, "%slot-" + i) || tmp
-					tmp = before.parentNode
-					// TODO:2016-07-05:lauri:handle numeric befores
 				}
 				/*** debug ***/
 				if (tmp.namespaceURI && child.namespaceURI && tmp.namespaceURI !== child.namespaceURI && child.tagName !== "svg") {
