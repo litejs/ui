@@ -43,7 +43,7 @@
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
-	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([+>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
+	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*) ?([+>^;@|=\/]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
@@ -1111,7 +1111,7 @@
 				if (text && op != "/") {
 					if (op === ">" || op === "+") {
 						(op === "+" ? indent + text : indent + " " + text).replace(templateRe, work)
-					} else if (op === "|" || op === "\\") {
+					} else if (op === "|" || op === "=") {
 						append(parent, text) // + "\n")
 					} else {
 						if (op === "@") {
