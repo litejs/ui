@@ -8,7 +8,7 @@
 	window.LiteJS = LiteJS
 	window.View = View
 
-	var UNDEF, styleNode
+	var UNDEF, styleNode, tmp
 	, html = document.documentElement
 	, body = document.body
 	, defaults = {
@@ -135,6 +135,25 @@
 	, Event = window.Event || window
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
+
+	/*** svg ***/
+	, svgNs = "http://www.w3.org/2000/svg"
+	if (window.SVGElement) {
+		( "animate animateMotion animateTransform circle clipPath defs desc ellipse"
+		+ "feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix"
+		+ "feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood"
+		+ "feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode"
+		+ "feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile"
+		+ "feTurbulence filter foreignObject g image line linearGradient marker mask"
+		+ "metadata mpath path pattern polygon polyline radialGradient rect script set"
+		+ "stop svg switch symbol text textPath tspan use view"
+		).split(splitRe).forEach(populateSvgElement)
+		// a style title
+	}
+	function populateSvgElement(name) {
+		elCache[name] = document.createElementNS(svgNs, name)
+	}
+	/**/
 
 	Event.asEmitter = asEmitter
 	Event.stop = stopEvent
@@ -789,8 +808,8 @@
 					before < 0 ? el.childNodes.length - before - 2 : before
 				] : before) || null)
 				/*** debug ***/
-				if (el.namespaceURI && child.namespaceURI && el.namespaceURI !== child.namespaceURI && child.tagName !== "svg") {
-					console.error("NAMESPACE CHANGE!", el.namespaceURI, child.namespaceURI, child)
+				if (el.namespaceURI && child.namespaceURI && el.namespaceURI !== child.namespaceURI && el.tagName !== "foreignObject" && child.tagName !== "svg") {
+					console.error("NAMESPACE CHANGE!", el, child)
 				}
 				/**/
 			}
@@ -1169,7 +1188,7 @@
 				if (t.content) {
 					elCache = Object.create(t.c = elCache)
 				}
-				t.el = El("div")
+				t.el = El(name === "svg" ? name : "div")
 				t.el.plugin = t
 			}
 		}
@@ -1206,7 +1225,7 @@
 			params.split(splitRe).map(txt.replace.bind(txt, /{key}/g)).forEach(parseTemplate)
 		}
 	})
-	addPlugin("el", {
+	addPlugin("el", tmp = {
 		content: 1,
 		done: function() {
 			var t = this
@@ -1220,6 +1239,7 @@
 			return parent
 		}
 	})
+	addPlugin("svg", tmp)
 	addPlugin("map", {
 		_r: function() {
 			var self = this
