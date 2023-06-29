@@ -63,9 +63,6 @@
 		data: function(el, key, val) {
 			setAttr(el, "data-" + key, val)
 		},
-		html: function(el, html) {
-			el.innerHTML = html
-		},
 		ref: function(el, name) {
 			this[name] = el
 		},
