@@ -26,9 +26,8 @@
 
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
 	// http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
-	//
-	// The documentMode is an IE only property, supported in IE8 and up.
 	, ie678 = !+"\v1" // jshint ignore:line
+	// The documentMode is an IE only property, supported in IE8 and up.
 	, ie67 = ie678 && (document.documentMode | 0) < 8 // jshint ignore:line
 
 	, viewFn, lastView, lastStr, lastUrl, syncResume
@@ -42,7 +41,7 @@
 	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 
 	, BIND_ATTR = "data-bind"
-	, seq = 0
+	, elSeq = 0
 	, elCache = {}
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*)[ \t]*([+>^;@|\\\/]|!?=|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
@@ -134,7 +133,7 @@
 		if (!styleNode) {
 			// Safari and IE6-8 requires dynamically created
 			// <style> elements to be inserted into the <head>
-			append(document.getElementsByTagName("head")[0], styleNode = El("style"))
+			append($("head", html), styleNode = El("style"))
 		}
 		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
 		else append(styleNode, str)
@@ -714,22 +713,15 @@
 
 		current = el.getAttribute(key)
 
-		// Note: IE5-7 doesn't set styles and removes events when you try to set them.
-		//
-		// in IE6, a label with a for attribute linked to a select list
-		// will cause a re-selection of the first option instead of just giving focus.
-		// http://webbugtrack.blogspot.com/2007/09/bug-116-for-attribute-woes-in-ie6.html
-
-		// there are bug in IE<9 where changed 'name' param not accepted on form submit
-		// IE8 and below support document.createElement('<P>')
-		//
-		// http://www.matts411.com/post/setting_the_name_attribute_in_ie_dom/
-		// http://msdn.microsoft.com/en-us/library/ms536614(VS.85).aspx
 
 		/*** ie8 ***/
+		// Bug: IE5-7 doesn't set styles and removes events when you try to set them.
+		// IE6 label with a for attribute will re-select the first option of SELECT list instead of just giving focus.
+		// http://webbugtrack.blogspot.com/2007/09/bug-116-for-attribute-woes-in-ie6.html
 		// istanbul ignore next: IE fix
 		if (ie67 && (key === "id" || key === "name" || key === "checked")) {
-			el.mergeAttributes(document.createElement("<INPUT " + key + "='" + val + "'>"), false)
+			// IE8 and below have a bug where changed 'name' not accepted on form submit
+			el.mergeAttributes(El("INPUT[" + key + "='" + val + "']"), false)
 		} else
 		/**/
 		if (key === "class") {
@@ -964,7 +956,7 @@
 	function elScope(node, parent, fb) {
 		return elScope[node._scope] || fb || (
 			parent ?
-			(((fb = elScope[node._scope = ++seq] = Object.create(parent))._super = parent), fb) :
+			(((fb = elScope[node._scope = ++elSeq] = Object.create(parent))._super = parent), fb) :
 			closestScope(node)
 		) || scopeData
 	}
@@ -1006,8 +998,6 @@
 			scope._m = bindMatch
 			scope._t = bind
 			// i18n(bind, lang).format(scope)
-			// document.documentElement.lang
-			// document.getElementsByTagName('html')[0].getAttribute('lang')
 
 			fn = "data&&(" + bind.replace(renderRe, function(match, name, op, args) {
 				scope._m[i] = match
@@ -1046,7 +1036,7 @@
 	}
 
 	function blur() {
-		// IE8 can throw an exception for document.activeElement.
+		// IE8 can throw on accessing document.activeElement.
 		try {
 			var tag = document.activeElement.tagName
 			if (tag === "A" || tag === "BUTTON") el.blur()
@@ -1193,7 +1183,7 @@
 		}),
 		slot: extend(plugin, {
 			done: function() {
-				var name = this.name || ++seq
+				var name = this.name || ++elSeq
 				, root = append(this.parent, document.createComment("%slot-" + name))
 				for (; root.parentNode; root = root.parentNode);
 				;(root._s || (root._s = {}))[name] = root.childNodes.length - 1

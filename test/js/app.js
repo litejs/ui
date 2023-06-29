@@ -14,8 +14,6 @@ if (self !== top) {
 
 var app = LiteJS({
 	base: "view/",
-	home: "home",
-	root: document.body,
 	kb: {
 		h: "home",
 		u: "users"
