@@ -31,7 +31,7 @@
 	, ie67 = ie678 && (document.documentMode | 0) < 8 // jshint ignore:line
 
 	, viewFn, lastView, lastStr, lastUrl, syncResume
-	, capture = 1
+	, viewSeq = 1
 	, fnStr = ""
 	, reStr = ""
 	, views = View.views = {}
@@ -74,9 +74,7 @@
 		},
 		val: El.val = valFn,
 		"with": function(el, map) {
-			var scope = elScope(el, this)
-			Object.assign(scope, map)
-			if (scope !== this) {
+			if (this !== Object.assign(elScope(el, this), map)) {
 				render(el)
 				return true
 			}
@@ -316,10 +314,10 @@
 		view.parent = parent && View(parent)
 
 		if (route.charAt(0) !== "#") {
-			var params = "m[" + (view.seq = capture++) + "]?("
+			var params = "m[" + (view.seq = viewSeq++) + "]?("
 			, _re = route.replace(parseRe, function(_, key) {
 				return key ?
-					(params += "o['" + key + "']=m[" + (capture++) + "],") && "([^/]+?)" :
+					(params += "o['" + key + "']=m[" + (viewSeq++) + "],") && "([^/]+?)" :
 					_.replace(escapeRe, "\\$&")
 			})
 
@@ -329,7 +327,7 @@
 		}
 	}
 
-	View.prototype = {
+	View[P] = {
 		show: function(_params) {
 			var parent
 			, params = lastParams = _params || {} // jshint ignore:line
@@ -394,7 +392,7 @@
 	}
 
 	asEmitter(View)
-	asEmitter(View.prototype)
+	asEmitter(View[P])
 
 	function bubbleDown(params, close) {
 		var tmp
@@ -548,7 +546,7 @@
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var url
-		, base = html.getElementsByTagName("base")[0]
+		, base = $("base", html)
 		if (base) base = base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
 		if (base && !history.pushState) {
 			url = location.pathname.slice(base.length)
@@ -634,7 +632,6 @@
 		// NOTE: IE-s cloneNode consolidates the two text nodes together as one
 		// http://brooknovak.wordpress.com/2009/08/23/ies-clonenode-doesnt-actually-clone/
 		el = (name = elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true)
-		el._s = name._s
 
 		if (pres) {
 			setAttr(el, pre)
@@ -772,25 +769,24 @@
 			}
 
 			if (child.nodeType) {
-				tmp = el.insertBefore ? el : el[el.length - 1]
 				if (
 					(i = getAttr(child, "slot")) && (setAttr(child, "slot", 0), 1) ||
-					(i = getAttr(tmp, "data-slot"))
+					(i = getAttr(el, "data-slot"))
 				) {
-					tmp = findCom(tmp, "%slot-" + i) || tmp
+					el = findCom(el, "%slot-" + i) || el
 				}
-				if (tmp.nodeType === 8) {
-					before = tmp
-					tmp = before.parentNode
+				if (el.nodeType === 8) {
+					before = el
+					el = before.parentNode
 				}
+				el.insertBefore(child, (isNumber(before) ? el.childNodes[
+					before < 0 ? el.childNodes.length - before - 2 : before
+				] : before) || null)
 				/*** debug ***/
-				if (tmp.namespaceURI && child.namespaceURI && tmp.namespaceURI !== child.namespaceURI && child.tagName !== "svg") {
-					console.error("NAMESPACE CHANGE!", tmp.namespaceURI, child.namespaceURI, child)
+				if (el.namespaceURI && child.namespaceURI && el.namespaceURI !== child.namespaceURI && child.tagName !== "svg") {
+					console.error("NAMESPACE CHANGE!", el.namespaceURI, child.namespaceURI, child)
 				}
 				/**/
-				tmp.insertBefore(child, (isNumber(before) ? tmp.childNodes[
-					before < 0 ? tmp.childNodes.length - before - 2 : before
-				] : before) || null)
 			}
 		}
 		return el
@@ -1130,11 +1126,11 @@
 		str.replace(templateRe, work)
 		work("", "")
 		if (parent.childNodes[0]) {
-			/*** debug ***/
-			console.warn("Outside view defined elements are rendered immediately into body")
-			/**/
 			append(body, parent.childNodes)
 			render(body)
+			/*** debug ***/
+			console.log("Outside view defined elements are rendered immediately into body")
+			/**/
 		}
 		if (parent._i) {
 			LiteJS.start(LiteJS().show)
@@ -1188,7 +1184,8 @@
 		done: function() {
 			var name = this.name || ++elSeq
 			, root = append(this.parent, document.createComment("%slot-" + name))
-			for (; root.parentNode; root = root.parentNode);
+			// In IE6 root div is inside documentFragment
+			for (; root.parentNode && root.parentNode.nodeType === 1; root = root.parentNode);
 			;(root._s || (root._s = {}))[name] = root.childNodes.length - 1
 			if (!this.name) root._s._ = root._sk = name
 			root._cp = root.childNodes.length - 1
@@ -1478,7 +1475,8 @@
 
 	function findTemplates() {
 		return $$("script[type=ui]").map(function(el) {
-			return el.src || parseTemplate(el.textContent, el)
+			// IE6 script.innerText is empty
+			return el.src || parseTemplate(el[txtAttr] || el.innerHTML, el)
 		})
 	}
 	xhr.load(findTemplates())
