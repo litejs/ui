@@ -105,6 +105,27 @@
 			return deep
 		}
 	}
+	, plugins = {}
+	, pluginProto = {
+		_done: function() {
+			var t = this
+			, childNodes = t.el.childNodes
+			, i = t.el._cp
+			, el = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
+
+			if (i > -1) {
+				if (childNodes[i].nodeType == 1 && t.el._sk) {
+					setAttr(childNodes[i], "data-slot", t.el._sk)
+				}
+				el._s = t.el._s
+			}
+			if (t.c) elCache = t.c
+			t.el.plugin = t.el = t.parent = null
+			return el
+		},
+		done: Function("this._r(this.params||this.txt)")
+	}
+
 	// After iOS 13 iPad with default enabled "desktop" option
 	// is the only Macintosh with multi-touch
 	, iOS = /^(Mac|iP)/.test(navigator.platform)
@@ -1127,144 +1148,114 @@
 		) : val))
 	}
 
-	function plugin(parent, name) {
-		var t = this
-		, arr = name.split(splitRe)
-		t.name = arr[0]
-		t.attr = arr.slice(1)
-		t.parent = parent
-		if (t.content) {
-			elCache = Object.create(t.c = elCache)
-		}
-		t.el = El("div")
-		t.el.plugin = t
-	}
-
-	plugin[P] = {
-		_done: function() {
+	function addPlugin(name, opts) {
+		plugins[name] = plugin
+		function plugin(parent, params, attr1) {
 			var t = this
-			, childNodes = t.el.childNodes
-			, i = t.el._cp
-			, el = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
-
-			if (i > -1) {
-				if (childNodes[i].nodeType == 1 && t.el._sk) {
-					setAttr(childNodes[i], "data-slot", t.el._sk)
+			, arr = params.split(splitRe)
+			t.parent = parent
+			t.name = arr[0]
+			t.attr = arr.slice(1)
+			if (t._r) {
+				t.txt = ""
+				t.plugin = t.el = t
+				t.params = params
+				t.a = attr1
+			} else {
+				if (t.content) {
+					elCache = Object.create(t.c = elCache)
 				}
-				el._s = t.el._s
+				t.el = El("div")
+				t.el.plugin = t
 			}
-			if (t.c) elCache = t.c
-			t.el.plugin = t.el = t.parent = null
-			return el
 		}
+		Object.assign(plugin[P], pluginProto, opts)
 	}
 
-	function js(parent, params, attr1) {
-		var t = this
-		// Raw text mode
-		t.parent = parent
-		t.txt = ""
-		t.plugin = t.el = t
-		t.params = params
-		t.a = attr1
-	}
-
-	js[P] = {
-		done: Function("this._r(this.params||this.txt)"),
-		_r: eval
-	}
-
-	var plugins = El.plugins = {
-		start: extend(js, {
-			done: function() {
-				this.parent._i = 1
+	addPlugin("start", {
+		done: function() {
+			this.parent._i = 1
+		}
+	})
+	addPlugin("binding", {
+		done: function() {
+			Object.assign(bindings, Function("return({" + this.txt + "})")())
+		}
+	})
+	addPlugin("slot", {
+		done: function() {
+			var name = this.name || ++elSeq
+			, root = append(this.parent, document.createComment("%slot-" + name))
+			for (; root.parentNode; root = root.parentNode);
+			;(root._s || (root._s = {}))[name] = root.childNodes.length - 1
+			if (!this.name) root._s._ = root._sk = name
+			root._cp = root.childNodes.length - 1
+		}
+	})
+	addPlugin("css",  { _r: xhr.css })
+	addPlugin("def",  { _r: viewDef })
+	addPlugin("js",   { _r: eval })
+	addPlugin("each", {
+		_r: function(params) {
+			var txt = this.txt
+			params.split(splitRe).map(txt.replace.bind(txt, /{key}/g)).forEach(parseTemplate)
+		}
+	})
+	addPlugin("el", {
+		content: 1,
+		done: function() {
+			var t = this
+			, parent = t.parent
+			, el = t._done()
+			elCache[t.name] = el
+			//, arr = t.attr
+			//if (arr[0]) {
+			//	// TODO:2023-03-22:lauri:Add new scope
+			//}
+			return parent
+		}
+	})
+	addPlugin("map", {
+		_r: function() {
+			var self = this
+			, txt = (self.params + self.txt)
+			appendBind(
+				self.parent,
+				self.a ? txt.slice(1) : txt,
+				self.a
+			)
+		}
+	})
+	addPlugin("view", {
+		content: 1,
+		done: function() {
+			var fn
+			, t = this
+			, arr = t.attr
+			, bind = getAttr(t.el, BIND_ATTR)
+			, view = View(t.name, t._done(), arr[0], arr[1])
+			if (bind) {
+				fn = bind.replace(renderRe, function(match, name, op, args) {
+					return "(this['" + name + "']" + (
+						isFunction(view[name]) ?
+						"(" + (args || "") + ")" :
+						"=" + args
+					) + "),"
+				}) + "1"
+				Function(fn).call(view)
 			}
-		}),
-		binding: extend(js, {
-			done: function() {
-				Object.assign(bindings, Function("return({" + this.txt + "})")())
-			}
-		}),
-		slot: extend(plugin, {
-			done: function() {
-				var name = this.name || ++elSeq
-				, root = append(this.parent, document.createComment("%slot-" + name))
-				for (; root.parentNode; root = root.parentNode);
-				;(root._s || (root._s = {}))[name] = root.childNodes.length - 1
-				if (!this.name) root._s._ = root._sk = name
-				root._cp = root.childNodes.length - 1
-			}
-		}),
-		css: extend(js, {
-			_r: xhr.css
-		}),
-		def: extend(js, {
-			_r: viewDef
-		}),
-		each: extend(js, {
-			_r: function(params) {
-				var txt = this.txt
-				, fn = txt.replace.bind(txt, /{key}/g)
-				params.split(splitRe).map(fn).forEach(parseTemplate)
-			}
-		}),
-		el: extend(plugin, {
-			content: 1,
-			done: function() {
-				var t = this
-				, parent = t.parent
-				, el = t._done()
-				elCache[t.name] = el
-				//, arr = t.attr
-				//if (arr[0]) {
-				//	// TODO:2023-03-22:lauri:Add new scope
-				//}
-				return parent
-			}
-		}),
-		js: js,
-		map: extend(js, {
-			done: function() {
-				var self = this
-				, txt = (self.params + self.txt)
-				appendBind(
-					self.parent,
-					self.a ? txt.slice(1) : txt,
-					self.a
-				)
-			}
-		}),
-		view: extend(plugin, {
-			content: 1,
-			done: function() {
-				var fn
-				, t = this
-				, arr = t.attr
-				, bind = getAttr(t.el, BIND_ATTR)
-				, view = View(t.name, t._done(), arr[0], arr[1])
-				if (bind) {
-					fn = bind.replace(renderRe, function(match, name, op, args) {
-						return "(this['" + name + "']" + (
-							isFunction(view[name]) ?
-							"(" + (args || "") + ")" :
-							"=" + args
-						) + "),"
-					}) + "1"
-					Function(fn).call(view)
-				}
-			}
-		}),
-		"view-link": extend(plugin, {
-			done: function() {
-				var t = this
-				, arr = t.attr
-				View(t.name, null, arr[1])
-				.on("ping", function(opts) {
-					View.show(arr[0].format(opts))
-				})
-			}
-		})
-	}
+		}
+	})
+	addPlugin("view-link", {
+		done: function() {
+			var t = this
+			, arr = t.attr
+			View(t.name, null, arr[1])
+			.on("ping", function(opts) {
+				View.show(arr[0].format(opts))
+			})
+		}
+	})
 
 	/*** kb ***/
 	var kbMaps = []
@@ -1393,15 +1384,6 @@
 	}
 	function camelFn(_, a) {
 		return a.toUpperCase()
-	}
-	function extend(fn, opts) {
-		function wrapper() {
-			return fn.apply(this, arguments)
-		}
-		wrapper[P] = Object.create(fn[P])
-		Object.assign(wrapper[P], opts)
-		wrapper[P].constructor = wrapper
-		return wrapper
 	}
 	function findCom(node, val) {
 		for (var next, el = node.firstChild; el; ) {
