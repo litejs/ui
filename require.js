@@ -28,6 +28,6 @@
 	require.def = function(map, key) {
 		for (key in map) modules[key] = map[key]
 	}
-}(this)
+}(this) // jshint ignore:line
 
 

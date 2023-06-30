@@ -61,8 +61,8 @@ describe("load.js", function() {
 	function xhrReset() {
 		xhrRes = []
 		delete xhr._l
-		Object.keys(xhr._p).forEach(function(key) {
-			delete xhr._p[key]
+		Object.keys(xhr._c).forEach(function(key) {
+			delete xhr._c[key]
 		})
 	}
 

@@ -1,14 +1,14 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global xhr, getComputedStyle, navigator, requestAnimationFrame */
+/* global xhr, getComputedStyle, navigator */
 
 !function(window, document, history, location, Object) {
 	window.El = El
 	window.LiteJS = LiteJS
 	window.View = View
 
-	var UNDEF, styleNode, tmp
+	var UNDEF, styleNode
 	, html = document.documentElement
 	, body = document.body
 	, defaults = {
@@ -56,7 +56,7 @@
 		attr: El.attr = acceptMany(setAttr),
 		cls: El.cls = acceptMany(cls),
 		css: El.css = acceptMany(function(el, key, val) {
-			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
+			el.style[key.replace(camelRe, camelFn)] = "" + val
 		}),
 		data: acceptMany(function(el, key, val) {
 			setAttr(el, "data-" + key, val)
@@ -137,19 +137,11 @@
 	/*** svg ***/
 	, svgNs = "http://www.w3.org/2000/svg"
 	if (window.SVGElement) {
-		( "animate animateMotion animateTransform circle clipPath defs desc ellipse"
-		+ "feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix"
-		+ "feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood"
-		+ "feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode"
-		+ "feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile"
-		+ "feTurbulence filter foreignObject g image line linearGradient marker mask"
-		+ "metadata mpath path pattern polygon polyline radialGradient rect script set"
-		+ "stop svg switch symbol text textPath tspan use view"
-		).split(splitRe).forEach(populateSvgElement)
+		"animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect script set stop svg switch symbol text textPath tspan use view"
+		.split(splitRe).forEach(function(name) {
+			elCache[name] = document.createElementNS(svgNs, name)
+		})
 		// a style title
-	}
-	function populateSvgElement(name) {
-		elCache[name] = document.createElementNS(svgNs, name)
 	}
 	/**/
 
@@ -504,12 +496,12 @@
 
 	View.expand = expand
 	function expand(str, _last) {
-		var chr = str.charAt(0)
-		, slice = str.slice(1)
+		var first = str.charAt(0)
+		, rest = str.slice(1)
 		, last = _last || lastUrl
 		return (
-			chr === "+" ? last + slice :
-			chr === "%" ? ((chr = last.lastIndexOf(slice.charAt(0))), (chr > 0 ? last.slice(0, chr) : last)) + slice :
+			first === "+" ? last + rest :
+			first === "%" ? ((first = last.lastIndexOf(rest.charAt(0))), (first > 0 ? last.slice(0, first) : last)) + rest :
 			(lastStr = str)
 		)
 	}
@@ -597,7 +589,9 @@
 				// IE<9 encounters the Mixed Content warning when the URI javascript: is used.
 				// IE5/6 additionally encounters the Mixed Content warning when the URI about:blank is used.
 				// src="//:"
-				iframe = body.appendChild(document.createElement("<iframe tabindex=-1 style=display:none>")).contentWindow
+				iframe = El("iframe[tabindex=-1][style='display:none']")
+				append(body, iframe)
+				iframe = iframe.contentWindow
 			}
 			clearInterval(iframeTick)
 			iframeTick = setInterval(function(){
@@ -652,34 +646,42 @@
 	}
 
 	function ElWrap(nodes, clone) {
-		var wrap = []
-		, i = nodes.length
-		if (i) {
-			for (; i--; ) {
-				wrap[i] = clone < 2 ? nodes[i].cloneNode(clone) : nodes[i]
-			}
-		} else if (i == null) {
-			wrap[0] = nodes
+		for (var wrap = [], i = nodes.length; i--; ) {
+			wrap[i] = clone < 2 ? nodes[i].cloneNode(clone) : nodes[i]
 		}
 		return Object.assign(wrap, elArr)
 	}
 
 	El.empty = empty
 	El.kill = kill
+	El.on = bindings.on = bindingOn
+	El.off = acceptMany(rmEvent)
+	El.one = function(el, ev, fn) {
+		function remove() {
+			rmEvent(el, ev, fn)
+			rmEvent(el, ev, remove)
+		}
+		addEvent(el, ev, fn)
+		addEvent(el, ev, remove)
+		return el
+	}
+	El.emit = function(el) {
+		emit.apply(el, slice.call(arguments, 1))
+	}
 	El.render = render
 
 	Object.keys(El).forEach(function(key) {
 		elArr[key] = function() {
-			var i = 0
-			, self = this
-			, len = self.length
-			, arr = slice.call(arguments)
-			arr.unshift(1)
+			var arr = this
+			, i = 0
+			, len = arr.length
+			, arg = slice.call(arguments)
+			arg.unshift(1)
 			for (; i < len; ) {
-				arr[0] = self[i++]
-				El[key].apply(El, arr)
+				arg[0] = arr[i++]
+				El[key].apply(El, arg)
 			}
-			return self
+			return arr
 		}
 	})
 
@@ -703,20 +705,6 @@
 	El.style = function(el, key) {
 		return getComputedStyle(el).getPropertyValue(key)
 	}
-	El.on = bindings.on = bindingOn
-	El.off = acceptMany(rmEvent)
-	El.one = function(el, ev, fn) {
-		function remove() {
-			rmEvent(el, ev, fn)
-			rmEvent(el, ev, remove)
-		}
-		addEvent(el, ev, fn)
-		addEvent(el, ev, remove)
-		return el
-	}
-	El.emit = function(el) {
-		emit.apply(el, slice.call(arguments, 1))
-	}
 
 
 	function getAttr(el, key) {
@@ -726,15 +714,14 @@
 	function setAttr(el, key, val) {
 		var current = el.getAttribute(key)
 
-
 		/*** ie8 ***/
 		// Bug: IE5-7 doesn't set styles and removes events when you try to set them.
 		// IE6 label with a for attribute will re-select the first option of SELECT list instead of just giving focus.
 		// http://webbugtrack.blogspot.com/2007/09/bug-116-for-attribute-woes-in-ie6.html
 		// istanbul ignore next: IE fix
-		if (ie67 && (key === "id" || key === "name" || key === "checked")) {
+		if (ie67 && (key === "id" || key === "name" || key === "checked" || key === "style")) {
 			// IE8 and below have a bug where changed 'name' not accepted on form submit
-			el.mergeAttributes(El("INPUT[" + key + "='" + val + "']"), false)
+			el.mergeAttributes(document.createElement("<INPUT " + key + "='" + val + "'>"), false)
 		} else
 		/**/
 		if (key === "class") {
@@ -868,7 +855,7 @@
 		var current = el.className || ""
 
 		if (!isString(current)) {
-			current = el.getAttribute("class") || ""
+			current = getAttr(el, "class") || ""
 		}
 
 		return !!current && current.split(splitRe).indexOf(name) > -1
@@ -884,7 +871,7 @@
 			current = el.getAttribute("class") || ""
 		}
 
-		if (arguments.length < 3 || set) {
+		if (set === UNDEF || set) {
 			if (current) {
 				name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
 			}
@@ -1060,7 +1047,8 @@
 	function blur() {
 		// IE8 can throw on accessing document.activeElement.
 		try {
-			var tag = document.activeElement.tagName
+			var el = document.activeElement
+			, tag = el.tagName
 			if (tag === "A" || tag === "BUTTON") el.blur()
 		} catch(e) {}
 	}
@@ -1202,7 +1190,7 @@
 			params.split(splitRe).map(txt.replace.bind(txt, /{key}/g)).forEach(parseTemplate)
 		}
 	})
-	addPlugin("el", tmp = {
+	addPlugin("el", {
 		content: 1,
 		done: function() {
 			var t = this
@@ -1216,7 +1204,7 @@
 			return parent
 		}
 	})
-	addPlugin("svg", tmp)
+	plugins.svg = plugins.el
 	addPlugin("map", {
 		_r: function() {
 			var self = this
@@ -1271,7 +1259,7 @@
 		if (map) {
 			kbMaps.unshift(map)
 			if (killEl) {
-				on.call(killEl, "kill", rmKb.bind(map, map))
+				addEvent(killEl, "kill", rmKb.bind(map, map))
 			}
 		}
 	}
@@ -1357,9 +1345,7 @@
 	}
 
 	setBreakpointsRated()
-	addEvent(window, "resize", setBreakpointsRated)
-	addEvent(window, "orientationchange", setBreakpointsRated)
-	addEvent(window, "load", setBreakpointsRated)
+	bindingOn(window, "load orientationchange resize", setBreakpointsRated)
 	/**/
 
 	function $(sel, startNode) {
@@ -1377,14 +1363,11 @@
 	function camelFn(_, a) {
 		return a.toUpperCase()
 	}
-	function acceptMany(fn, getter) {
+	function acceptMany(fn) {
 		return function f(el, names, val, delay) {
 			if (el && names) {
 				if (delay >= 0) {
-					if (delay > 0) setTimeout(f, delay, el, names, val)
-					else requestAnimationFrame(function() {
-						f(el, names, val)
-					})
+					setTimeout(f, delay, el, names, val)
 					return
 				}
 				if (isObject(names)) {
@@ -1393,13 +1376,8 @@
 					}
 					return
 				}
-				if (getter && arguments.length < 3) return getter(el, names)
-				var arr = ("" + names).split(splitRe)
-				, len = arr.length
-				, i = 0
-				if (arguments.length < 3) for (; i < len; ) fn(el, arr[i++])
-				else if (isArray(val)) for (; i < len; ) fn(el, arr[i], val[i++])
-				else for (; i < len; ) fn(el, arr[i++], val)
+				var arr = ("" + names).split(splitRe), len = arr.length, i = 0
+				for (; i < len; ) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
 			}
 		}
 	}

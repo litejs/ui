@@ -1,4 +1,4 @@
-/* globals self */
+/* globals self, top, document */
 
 // Clickjacking defense
 //  - If JavaScript is disabled, the site will not display at all
