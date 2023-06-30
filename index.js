@@ -17,7 +17,7 @@
 		root: body
 	}
 	, hasOwn = defaults.hasOwnProperty
-	, histCb, histBase, histRoute, iframe, iframeTick, iframeUrl
+	, histBase, histCb, histLast
 	, splitRe = /[,\s]+/
 	, emptyArr = []
 	, isArray = Array.isArray
@@ -506,18 +506,14 @@
 		)
 	}
 
-	function getUrl(_loc) {
+	function getUrl() {
 		return (
 			/*** pushState ***/
 			histBase ? location.pathname.slice(histBase.length) :
 			/**/
 			// bug in Firefox where location.hash is decoded
 			// bug in Safari where location.pathname is decoded
-
-			// var hash = location.href.split('#')[1] || '';
-			// https://bugs.webkit.org/show_bug.cgi?id=30225
-			// https://github.com/documentcloud/backbone/pull/967
-			(_loc || location).href.split("#")[1] || ""
+			location.href.split("#")[1] || ""
 		).replace(/^[#\/\!]+|[\s\/]+$/g, "")
 	}
 
@@ -528,11 +524,6 @@
 		} else {
 		/**/
 			location[replace ? "replace" : "assign"]("#" + url)
-			// Opening and closing the iframe tricks IE7 and earlier
-			// to push a history entry on hash-tag change.
-			if (iframe && getUrl() !== getUrl(iframe.location) ) {
-				iframe.location[replace ? "replace" : iframe.document.open().close(), "assign"]("#" + url)
-			}
 		/*** pushState ***/
 		}
 		/**/
@@ -540,8 +531,8 @@
 	}
 
 	function checkUrl() {
-		if (histRoute != (histRoute = LiteJS.url = getUrl())) {
-			if (histCb) histCb(histRoute)
+		if (histLast != (histLast = LiteJS.url = getUrl())) {
+			if (histCb) histCb(histLast)
 			return true
 		}
 	}
@@ -578,33 +569,7 @@
 			window.onpopstate = checkUrl
 		} else
 		/**/
-			if ("onhashchange" in window && !ie67) {
-			// There is onhashchange in IE7 but its not get emitted
-			//
-			// Basic support:
-			// Chrome 5.0, Firefox 3.6, IE 8, Opera 10.6, Safari 5.0
-			window.onhashchange = checkUrl
-		} else {
-			if (ie67 && !iframe) {
-				// IE<9 encounters the Mixed Content warning when the URI javascript: is used.
-				// IE5/6 additionally encounters the Mixed Content warning when the URI about:blank is used.
-				// src="//:"
-				iframe = El("iframe[tabindex=-1][style='display:none']")
-				append(body, iframe)
-				iframe = iframe.contentWindow
-			}
-			clearInterval(iframeTick)
-			iframeTick = setInterval(function(){
-				var cur = getUrl()
-				if (iframe && iframeUrl === cur) cur = getUrl(iframe.location)
-				if (iframeUrl !== cur) {
-					iframeUrl = cur
-					if (iframe) setUrl(cur)
-					else checkUrl()
-				}
-			}, 60)
-		}
-
+		window.onhashchange = checkUrl
 		xhr.load(findTemplates(), checkUrl)
 	}
 
