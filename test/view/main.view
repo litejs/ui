@@ -42,7 +42,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 	.Menu.App-row.js-viewRender
 		%el nav-row
 		a.Menu-item.waves
-			;cls: "selected", (params._u || View.home).indexOf(this.href.split("#")[1]) == 0
+			;cls: "selected", (params._u || "").indexOf(this.href.split("#")[1]) == 0
 		nav-row[href="#home"]
 			svg-icon>path[d="M12,2L1,12h3v9h5V14h6v7h5V12h3z"]
 			svg-icon>path[d="M12,2L1,12h3v9h5V14h9V2h-3V21h5V12h3z"]
