@@ -23,7 +23,7 @@
 	// Object.fromEntries   - Chrome73, Edge79, Firefox63, Safari12.1, Opera60, Node.js12.0.0
 	// queueMicrotask       - Chrome71, Edge79, Firefox69, Safari12.1
 
-	var isArr, oKeys
+	var UNDEF, isArr, oKeys
 	, O = window
 	, patched = (window.xhr || window)._p = []
 	, jsonRe = /[\x00-\x1f\x22\x5c]/g
@@ -32,13 +32,14 @@
 	, esc = escape
 	, _parseInt = parseInt
 	, document = patch("document", {body:{}})
+	, location = patch("location", {href:""})
 	, navigator = patch("navigator")
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	// The documentMode is an IE only property, supported from IE8
 	, a = document.documentMode | 0, b, c
 	, ie678 = !+"\v1" && a < 9 // jshint ignore:line
 	, ie6789 = ie678 || a == 9
-	//, ie67 = ie678 && a < 8
+	, ie67 = ie678 && a < 8
 	, EV = "Event"
 	, Event = patch(
 		EV,
@@ -84,10 +85,23 @@
 		c: "touchcancel"
 	}
 
+	, IS_NODE = !document.location
+	, lastHash
+	, onhashchange = "onhashchange"
+
+	if (!IS_NODE && !(onhashchange in window) || ie67) {
+		patch(onhashchange, null)
+		setInterval(function() {
+			var cur = location.href.split("#")[1]
+			if (lastHash !== cur && isFn(window[onhashchange])) {
+				window[onhashchange]()
+			}
+		}, 60)
+	}
+
 	// Missing PointerEvents with Scribble enable on Safari 14
 	// https://mikepk.com/2020/10/iOS-safari-scribble-bug/
 	// https://bugs.webkit.org/show_bug.cgi?id=217430
-
 	if (!window.PointerEvent) {
 		// IE10
 		if (window[MS + EV]) {
@@ -249,6 +263,7 @@
 	// Patch parameters support for setTimeout callback
 	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFn)
 	patch("setInterval", a, ie6789, isFn)
+
 
 	// Ignore FF3 escape second non-standard argument
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
@@ -481,7 +496,8 @@
 		return !force && O[key] || (O[patched.push(key_), key] = (
 			isStr(src) ?
 			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this,A=arguments;" + src + "}")(hasOwn, O[key], P, patched.slice, force, arg1, arg2) :
-			src || {}
+			src === UNDEF ? {} :
+			src
 		))
 	}
 }(this, Date, Function, Infinity, "prototype") // jshint ignore:line
