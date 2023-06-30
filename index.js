@@ -1271,16 +1271,6 @@
 			}
 		}
 	})
-	addPlugin("view-link", {
-		done: function() {
-			var t = this
-			, arr = t.attr
-			View(t.name, null, arr[1])
-			.on("ping", function(opts) {
-				View.show(arr[0].format(opts))
-			})
-		}
-	})
 
 	/*** kb ***/
 	var kbMaps = []
