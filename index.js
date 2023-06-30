@@ -60,9 +60,9 @@
 		}, function(el, key) {
 			return getComputedStyle(el).getPropertyValue(key)
 		}),
-		data: function(el, key, val) {
+		data: acceptMany(function(el, key, val) {
 			setAttr(el, "data-" + key, val)
-		},
+		}),
 		ref: function(el, name) {
 			this[name] = el
 		},
