@@ -622,9 +622,6 @@
 	 */
 
 	function El(name) {
-		if (!isString(name)) {
-			return ElWrap(name)
-		}
 		var el, pres
 		, pre = {}
 		name = name.replace(selectorRe, function(_, op, key, _sub, fn, val, quotation) {
