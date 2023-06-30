@@ -192,20 +192,32 @@ anim-page
 	ul>li+li+li
 
 
-%view users #private
+%view users public
 anim-page
 	h2 Users
-	ul.users ;list: Data("users")
+	ul.users
 		li
 			a
-				;txt: item.name
-				;title: _("_welcome")
-				;href: "#users/" + item.id
+				;txt: "item.name"
+				;href: "#users/1"
+
+%view test public
+anim-page
+	h2 Test
+	ul
+		li>a[href="#testman"] Testman
+		li>a[href="#broken-link"] Test broken link
+		li>a[href="#test-form1"] Test form
+		li>a[href="#test-svg"] Test SVG
+		li>a[href="#test-grid"] Test grid
+		li>a[href="#test-material-ui"] Test Material-UI
+		li>a[href="#pointer"] PointerEvent
+		li>a[href="iframe.html#test1"] Iframe
+		li>a[href="//localhost:81/litejs/litejs/ui/iframe.html#test2"] Iframe 81
 
 %view users/{userId} #private
 anim-page
 	form-js
-		;schemaToForm: "../test/ui/schema/user.json", "edit", "form1"
 
 %view users/{userId}/{pageId} public
 anim-page
@@ -232,8 +244,6 @@ anim-page
 %view ok public
 	anim-page
 		h1 Ok!
-
-%view-link test-view-link ok
 
 %css
 	.tip {
@@ -265,36 +275,4 @@ anim-page
 		color: rgba(0,0,0,0.6);
 	}
 
-%view test public
-	anim-page
-		h2 Test
-		ul
-			li>a[href="#testman"] Testman
-			li>a[href="#broken-link"] Test broken link
-			li>a[href="#test-view-link"] Test View link
-			li>a[href="#test-form1"] Test form
-			li>a[href="#test-svg"] Test SVG
-			li>a[href="#test-grid"] Test grid
-			li>a[href="#test-material-ui"] Test Material-UI
-			li>a[href="#pointer"] PointerEvent
-			li>a[href="iframe.html#test1"] Iframe
-			li>a[href="//localhost:81/litejs/litejs/ui/iframe.html#test2"] Iframe 81
-		%rel user home vnd.app.home
-			.home {home.name} was here
-		%rel user home vnd.app.home.v2
-			.home {home.homeName}
-		.tip
-			%rel is not implemented
-		h2 Seven-segment display
-		.seg
-			Segment7[data-value=1]
-			Segment7[data-value=2]
-			Segment7[data-value=3]
-			Segment7[data-value=4]
-			Segment7[data-value=5]
-			Segment7[data-value=6]
-			Segment7[data-value=7]
-			Segment7[data-value=8]
-			Segment7[data-value=9]
-			Segment7[data-value=0]
 
