@@ -1,43 +1,39 @@
 
-/* litejs.com/MIT-LICENSE.txt */
+/*! litejs.com/MIT-LICENSE.txt */
 
-
+/* global location */
 
 // With initial congestion window set to 2 and 1452 bytes of data in a segment.
+//  - 1 round trip to get 2904 bytes, Initial Window (IW) = 2
+//  - 2 round trips to get 8712 bytes, Congestion Window (CW) = 4
+//  - 3 round trips to get 20328 bytes, CW = 8
+//  - 4 round trips to get 43560 bytes, CW = 16
 //
-// 1 round trip to get 2904 bytes, Initial Window (IW) = 2
-// 2 round trips to get 8712 bytes, Congestion Window (CW) = 4
-// 3 round trips to get 20328 bytes, CW = 8
-// 4 round trips to get 43560 bytes, CW = 16
-
-
-// Scripts that are dynamically created and added to the document are async by default
-// HTML5 declared that browsers shouldn’t download scripts with an unrecognised type
-
-
+// Dynamically created scripts are async by default.
+// HTML5 declared that scripts with an unrecognised type should not be downloaded.
+//
 // IE9 and below allows up to 32 stylesheets, this was increased to 4095 in IE10.
-
+//
 // Invalidate a URL in the browser's cache by sending a PUT method xmlhttprequest to it:
 // xhr("PUT", url).send(null) Works in all major browsers
 
-// XMLHttpRequest was unsupported in IE 5-6 and PATCH is not supported in IE7-8.
-// XDomainRequest is a CORS implementation in IE8/9 and was removed in IE10 in favor of using XMLHttpRequest with proper CORS
-// IE does not allow to add arbitrary properties to ActiveX objects.
-// IE does not allow to assign or read the readystatechange after the send().
-// Last version-independent ProgID with 3.0 is good enough (MSXML2 namespace is supported from IE6).
-// MSXML 6.0 has improved XSD, deprecated several legacy features
-// What's New in MSXML 6.0: https://msdn.microsoft.com/en-us/library/ms753751.aspx
 
 !function(window, Function) {
 	xhr._s = new Date()
-	var pending = xhr._p = {}
-	, rewrite = {
+	var rewrite = {
 		//!{loadRewrite}
 	}
 	// IE9, move setTimeout from window.prototype to window object, so you can patch it later
-	// `|| setTimeout` is for testing
-	, setTimeout_ = (window.setTimeout = window.setTimeout) || setTimeout
+	, setTimeout_ = (window.setTimeout = window.setTimeout) /*** debug ***/ || setTimeout
+	, loaded = xhr._c = {}
+	/*/
+	, loaded = {}
+	/**/
+
 	/*** activex ***/
+	// XMLHttpRequest in IE7-8 do not accept PATCH, use ActiveX.
+	// IE does not allow to add arbitrary properties to ActiveX objects.
+	// IE does not allow to assign or read the readystatechange after the send().
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
 	/**/
 	, execScript =
@@ -91,14 +87,10 @@
 	/**/
 
 	// next === true is for sync call
-	//
-	// Hypertext Transfer Protocol (HTTP) Status Code Registry
-	// http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
-	//
 
 	window.xhr = xhr
 	function xhr(method, url, next, attr1, attr2) {
-		var xhr = /*** reuse ***/ xhrs.pop() || /**/ new XMLHttpRequest()
+		var req = /*** reuse ***/ xhrs.pop() || /**/ new XMLHttpRequest()
 
 		// To be able to reuse the XHR object properly,
 		// use the open method first and set onreadystatechange later.
@@ -110,33 +102,27 @@
 		// is a loss of cross-browser support for readystates.
 		// http://www.quirksmode.org/blog/archives/2005/09/xmlhttp_notes_r_2.html
 
-
 		// function progress(ev) {
 		// 	if (ev.lengthComputable) {
 		// 		var percentComplete = (ev.loaded / ev.total) * 100
 		// 	}
 		// }
-		// xhr.upload.addEventListener("progress", onProgressHandler)
-		// xhr.addEventListener("progress", onProgressHandler)
-		// xhr.onprogress = progress
-
+		// req.upload.addEventListener("progress", onProgressHandler)
+		// req.addEventListener("progress", onProgressHandler)
+		// req.onprogress = progress
 
 		// Vodafone 360 doesn't pass session cookies, so they need to be passed manually
-		// if (sessionID) xhr.setRequestHeader("Cookie", sessionID);
-		// if (xhr.getResponseHeader("Set-Cookie")) sessionID = xhr.getResponseHeader("Set-Cookie");
+		// if (sessionID) req.setRequestHeader("Cookie", sessionID);
+		// if (req.getResponseHeader("Set-Cookie")) sessionID = req.getResponseHeader("Set-Cookie");
 
-		xhr.open(method, rewrite[url] || url, next !== true)
+		req.open(method, rewrite[url] || url, next !== true)
 
-		// With IE 8 XMLHttpRequest gains the timeout property.
-		// With the timeout property, Web developers can specify
-		// the length of time in milliseconds for the host to wait for a response
-		// before timing out the connection.
+		// With IE8 XMLHttpRequest gains the timeout property (length of time in milliseconds).
+		// req.timeout = 10000
+		// req.ontimeout = timeoutRaised
 
-		//xhr.timeout = 10000
-		//xhr.ontimeout = timeoutRaised
-
-		if (next !== true) xhr.onreadystatechange = function() {
-			if (xhr.readyState > 3) {
+		if (next !== true) req.onreadystatechange = function() {
+			if (req.readyState > 3) {
 				// From the XMLHttpRequest spec:
 				//
 				// > For 304 Not Modified responses
@@ -168,22 +154,22 @@
 				//          Miscellaneous -> Access data sources across domains -> Enable
 				//   - Use custom status code 1 for network error
 
-				method = xhr.status || (xhr.responseText ? 200 : 1)
+				method = req.status || (req.responseText ? 200 : 1)
 				if (next) next.call(
-					xhr,
+					req,
 					(method < 200 || method > 299 && method != 304 && method != 1223) && method,
-					xhr.responseText,
+					req.responseText,
 					url,
 					attr1,
 					attr2
 				)
-				xhr.onreadystatechange = next = nop
+				req.onreadystatechange = next = nop
 				/*** reuse ***/
-				xhrs.push(xhr)
+				xhrs.push(req)
 				/**/
 			}
 		}
-		return xhr
+		return req
 	}
 
 
@@ -197,13 +183,13 @@
 		, len = files && files.length
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) && pending[file] !== 2) {
-			if (pending[file]) {
+		for (; i < len; i++) if ((file = files[i]) && loaded[file] !== 2) {
+			if (loaded[file]) {
 				// Same file requested again before responce
-				;(pending[file].x || (pending[file].x = [])).push(exec, res, i)
+				;(loaded[file].x || (loaded[file].x = [])).push(exec, res, i)
 			} else {
 				// FireFox 3 throws on `xhr.send()` without arguments
-				xhr("GET", file, pending[file] = cb, i).send(null)
+				xhr("GET", file, loaded[file] = cb, i).send(null)
 			}
 			pos++
 		}
@@ -211,10 +197,10 @@
 		if (!pos && next) next()
 		pos = 0
 
-		function cb(err, str, file, i) {
-			;(xhr._l || (xhr._l = [])).push(file)
-			pending[file] = 2
-			res[i] = err ? (onerror(err, file), "") : str
+		function cb(err, str, fileName, filePos) {
+			;(xhr._l || (xhr._l = [])).push(fileName)
+			loaded[fileName] = 2
+			res[filePos] = err ? (onerror(err, fileName), "") : str
 			exec()
 		}
 		function exec() {

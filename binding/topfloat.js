@@ -1,5 +1,5 @@
 
-/* global El */
+/* global El, window */
 El.bindings.topFloat = function(el, offset) {
 	var h = el.offsetHeight + offset
 	, lastAbs = 0

@@ -13,7 +13,7 @@
 // "Event","pointer","sessionStorage","localStorage","requestAnimationFrame","cancelAnimationFrame","console","matchMedia","JSON","setTimeout","setInterval","g:parseInt","performance","p:now","timing","parseInt","parseFloat","isNaN","isFinite","isInteger","MAX_SAFE_INTEGER","isSafeInteger","d:now","toJSON","toISOString","bind","assign","create","entries","hasOwn","keys","values","toString","isArray","from","of","includes","indexOf","lastIndexOf","reduce","reduceRight","splice","every","forEach","map","filter","some","flat","flatMap","endsWith","startsWith","trim","sendBeacon","matches","querySelector","querySelectorAll"
 
 
-/* global El, xhr */
+/* global El, xhr, escape */
 /* c8 ignore start */
 !function(window, Date, Function, Infinity, P) {
 
@@ -23,7 +23,7 @@
 	// Object.fromEntries   - Chrome73, Edge79, Firefox63, Safari12.1, Opera60, Node.js12.0.0
 	// queueMicrotask       - Chrome71, Edge79, Firefox69, Safari12.1
 
-	var UNDEF, isArr, oKeys
+	var UNDEF, isArray, oKeys
 	, O = window
 	, patched = (window.xhr || window)._p = []
 	, jsonRe = /[\x00-\x1f\x22\x5c]/g
@@ -44,9 +44,9 @@
 	, Event = patch(
 		EV,
 		"c=F.createEventObject(event),b=c.buttons=c.button;c.button=b==1?0:b==4?1:b;c.preventDefault=X;c.stopPropagation=Y;c.target=c.srcElement;c.type=a;return c",
-		!isFn(O[EV]) && document,
-		Function("event.returnValue=!1"),
-		Function("event.cancelBubble=event.cancel=!0")
+		!isFunction(O[EV]) && document,
+		Function("this.returnValue=!1"),
+		Function("this.cancelBubble=this.cancel=!0")
 	)
 	, wheelDiff = 120
 	, fixEv = Event.fixEv = {
@@ -93,7 +93,7 @@
 		patch(onhashchange, null)
 		setInterval(function() {
 			var cur = location.href.split("#")[1]
-			if (lastHash !== cur && isFn(window[onhashchange])) {
+			if (lastHash !== cur && isFunction(window[onhashchange])) {
 				window[onhashchange]()
 			}
 		}, 60)
@@ -246,13 +246,13 @@
 		stringify: function stringify(o) {
 			// IE 8 serializes `undefined` as `"undefined"`
 			return (
-				isStr(o) ? "\"" + o.replace(jsonRe, jsonFn) + "\"" :
+				isString(o) ? "\"" + o.replace(jsonRe, jsonFn) + "\"" :
 				o !== o || o == null || o === Infinity || o === -Infinity ? "null" :
 				typeof o == "object" ? (
-					isFn(o.toJSON) ? stringify(o.toJSON()) :
-					isArr(o) ? "[" + o.map(stringify) + "]" :
-					"{" + oKeys(o).flatMap(function(a){
-						return o[a] === void 0 ? [] : stringify(a) + ":" + stringify(o[a])
+					isFunction(o.toJSON) ? stringify(o.toJSON()) :
+					isArray(o) ? "[" + o.map(stringify) + "]" :
+					"{" + oKeys(o).flatMap(function(key) {
+						return o[key] === void 0 ? [] : stringify(key) + ":" + stringify(o[key])
 					}) + "}"
 				) :
 				"" + o
@@ -261,8 +261,8 @@
 	})
 
 	// Patch parameters support for setTimeout callback
-	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFn)
-	patch("setInterval", a, ie6789, isFn)
+	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFunction)
+	patch("setInterval", a, ie6789, isFunction)
 
 
 	// Ignore FF3 escape second non-standard argument
@@ -297,8 +297,8 @@
 		"Hours(),':'", "Minutes(),':'", "Seconds(),'.'", "Milliseconds(),'Z',3)"
 	].join(")+X(t.getUTC"),
 		b,
-		function(a, b, c) {
-			return ("00000" + a).slice(-c || -2) + b
+		function(num, append, len) {
+			return ("00000" + num).slice(-len || -2) + append
 		}
 	), b)
 	/**/
@@ -329,11 +329,11 @@
 	// in IE8 Error("1") creates {description: "", message: "", name: "Error", number: 1}
 	patch(b, "a=t.message||t.number;return a?X+': '+a:X", Error(1) != "Error: 1", "Error")
 	O = Array
-	isArr = patch("isArray", "return X.call(a)==='[object Array]'", 0, a)
+	isArray = patch("isArray", "return X.call(a)==='[object Array]'", 0, a)
 
 	// TODO:2021-02-25:lauri:Accept iterable objects
 	//patch("from", "a=S.call(a);return b?a.map(b,c):a")
-	patch("from", "a=X(a)?a.split(''):b?a:S.call(a);return b?a.map(b,c):a", 0, isStr)
+	patch("from", "a=X(a)?a.split(''):b?a:S.call(a);return b?a.map(b,c):a", 0, isString)
 	patch("of", "return S.call(A)")
 
 	O = O[P]
@@ -351,7 +351,7 @@
 
 	// Safari12 bug, any modification to the original array before calling `reverse` makes bug disappear
 	// Fixed in Safari 12.0.1 and iOS 12.1 on October 30, 2018
-	// patch("reverse",     "if(X(t))t.length=t.length;return O.call(t)", "2,1" != [1, 2].reverse(), isArr)
+	// patch("reverse",     "if(X(t))t.length=t.length;return O.call(t)", "2,1" != [1, 2].reverse(), isArray)
 
 	// In ES3 the second deleteCount argument is required, IE<=8 requires deleteCount
 	// IE6-9 silently fails to write to the arguments object, make it to array first.
@@ -368,7 +368,7 @@
 	patch("filter",      b + "o.push(t[i])" + c)
 	patch("some",        b + "return!0;return!1")
 
-	patch("flat",        "return a<1?S.call(t):(b=t.concat.apply([],t))&&a>1&&b.some(X)?b.flat(a-1):b", 0, isArr)
+	patch("flat",        "return a<1?S.call(t):(b=t.concat.apply([],t))&&a>1&&b.some(X)?b.flat(a-1):b", 0, isArray)
 	patch("flatMap",     "return X.apply(t,A).flat()", 0, O.map)
 	//patch("entries", "a=this;b=-1;return{next:function(){c=a.length<=++b;return{done:c,value:c?void 0:a[b]}}}")
 
@@ -431,7 +431,7 @@
 			str.split(selectorSplitRe).map(function(sel) {
 				var relation, from
 				, rules = ["_&&_.nodeType==1"]
-				, parentSel = sel.replace(selectorLastRe, function(_, _rel, a, start) {
+				, parentSel = sel.replace(selectorLastRe, function(_, _rel, quote, start) {
 					from = start + _rel.length
 					relation = _rel.trim()
 					return ""
@@ -483,10 +483,10 @@
 		} catch(e){}
 	}
 
-	function isFn(value) {
+	function isFunction(value) {
 		return typeof value === "function"
 	}
-	function isStr(value) {
+	function isString(value) {
 		return typeof value === "string"
 	}
 	function nop() {}
@@ -494,7 +494,7 @@
 	function patch(key_, src, force, arg1, arg2) {
 		var key = key_.split(":").pop()
 		return !force && O[key] || (O[patched.push(key_), key] = (
-			isStr(src) ?
+			isString(src) ?
 			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this,A=arguments;" + src + "}")(hasOwn, O[key], P, patched.slice, force, arg1, arg2) :
 			src === UNDEF ? {} :
 			src

@@ -22,7 +22,7 @@
     "polyfill"
   ],
   "scripts": {
-    "test": "TZ='Europe/Tallinn' lj test test/index.js --brief --coverage && jshint --verbose *.js src/*.js binding/*.js polyfill/*.js"
+    "test": "TZ='Europe/Tallinn' lj test test/index.js --brief --coverage --sources=load.js,require.js && jshint --verbose *.js"
   },
   "devDependencies": {
     "@litejs/cli": "23.6.2",

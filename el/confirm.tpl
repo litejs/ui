@@ -4,7 +4,6 @@
 		z-index: 9;
 	}
 	.Confirm-bg {
-		backdrop-filter: blur(5px);
 		background-color: rgba(0, 0, 0, .6);
 	}
 	.Confirm-content {
@@ -21,6 +20,7 @@
 		width: 94%;
 	}
 	.Confirm--blur {
+		filter: blur(5px);
 		transform: scale(.85);
 		transform-origin: 50% 100vh;
 	}
