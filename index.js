@@ -1410,33 +1410,19 @@
 					})
 					return
 				}
-				var i
 				if (isObject(names)) {
-					for (i in names) {
-						if (hasOwn.call(names, i)) f(el, i, names[i], val)
+					for (delay in names) {
+						if (hasOwn.call(names, delay)) f(el, delay, names[delay], val)
 					}
 					return
 				}
-				var nameArr = ("" + names).split(splitRe)
-				, len = nameArr.length
-				i = 0
-
-				if (arguments.length < 3) {
-					if (getter) return getter(el, names)
-					for (; i < len; ) fn(el, nameArr[i++])
-				} else {
-					/*
-					if (isArray(val)) {
-						for (; i < len; ) fn(el, nameArr[i], val[i++])
-					} else {
-						for (; i < len; ) fn(el, nameArr[i++], val)
-					}
-					/*/
-					for (; i < len; ) {
-						fn(el, nameArr[i++], isArray(val) ? val[i - 1] : val)
-					}
-					//*/
-				}
+				if (getter && arguments.length < 3) return getter(el, names)
+				var arr = ("" + names).split(splitRe)
+				, len = arr.length
+				, i = 0
+				if (arguments.length < 3) for (; i < len; ) fn(el, arr[i++])
+				else if (isArray(val)) for (; i < len; ) fn(el, arr[i], val[i++])
+				else for (; i < len; ) fn(el, arr[i++], val)
 			}
 		}
 	}
