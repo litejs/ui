@@ -53,7 +53,7 @@
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
 	, bindings = {
-		attr: El.attr = acceptMany(setAttr, getAttr),
+		attr: El.attr = acceptMany(setAttr),
 		cls: El.cls = acceptMany(cls),
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
@@ -694,6 +694,7 @@
 	El.cache = elCache
 	El.closest = closest
 	El.data = scopeData
+	El.get = getAttr
 	El.hasClass = hasClass
 	El.matches = matches
 	El.rate = rate
