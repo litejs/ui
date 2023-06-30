@@ -57,8 +57,6 @@
 		cls: El.cls = acceptMany(cls),
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.replace(camelRe, camelFn)] = "" + val || ""
-		}, function(el, key) {
-			return getComputedStyle(el).getPropertyValue(key)
 		}),
 		data: acceptMany(function(el, key, val) {
 			setAttr(el, "data-" + key, val)
@@ -704,6 +702,9 @@
 	El.scrollLeft = scrollLeft
 	El.scrollTop = scrollTop
 	El.step = step
+	El.style = function(el, key) {
+		return getComputedStyle(el).getPropertyValue(key)
+	}
 	El.on = bindings.on = bindingOn
 	El.off = acceptMany(rmEvent)
 	El.one = function(el, ev, fn) {
