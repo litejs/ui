@@ -625,30 +625,30 @@
 		if (!isString(name)) {
 			return ElWrap(name)
 		}
-		var el, pres
-		, pre = {}
-		name = name.replace(selectorRe, function(_, op, key, _sub, fn, val, quotation) {
-			pres = 1
+		var par
+		, pars = {}
+		, el = name.replace(selectorRe, function(_, op, key, _sub, fn, val, quotation) {
+			par = 1
 			val = quotation ? val.slice(1, -1) : val || key
-			pre[op =
+			pars[op =
 				op === "." ?
 				(fn = "~", "class") :
 				op === "#" ?
 				"id" :
 				key
-			] = fn && pre[op] ?
-				fn === "^" ? val + pre[op] :
-				pre[op] + (fn === "~" ? " " : "") + val :
+			] = fn && pars[op] ?
+				fn === "^" ? val + pars[op] :
+				pars[op] + (fn === "~" ? " " : "") + val :
 				val
 			return ""
 		}) || "div"
 
 		// NOTE: IE-s cloneNode consolidates the two text nodes together as one
 		// http://brooknovak.wordpress.com/2009/08/23/ies-clonenode-doesnt-actually-clone/
-		el = (name = elCache[name] || (elCache[name] = document.createElement(name))).cloneNode(true)
+		el = (elCache[el] || (elCache[el] = document.createElement(el))).cloneNode(true)
 
-		if (pres) {
-			setAttr(el, pre)
+		if (par) {
+			for (par in pars) setAttr(el, par, pars[par])
 		}
 
 		return el
@@ -727,29 +727,7 @@
 	}
 
 	function setAttr(el, key, val) {
-		var current
-
-		if (isObject(key)) {
-			for (current in key) {
-				setAttr(el, current, key[current])
-			}
-			return
-		}
-
-		/* Accept namespaced arguments
-		var namespaces = {
-			xlink: "http://www.w3.org/1999/xlink",
-			svg: "http://www.w3.org/2000/svg"
-		}
-
-		current = key.split("|")
-		if (current[1]) {
-			el.setAttributeNS(namespaces[current[0]], current[1], val)
-			return
-		}
-		*/
-
-		current = el.getAttribute(key)
+		var current = el.getAttribute(key)
 
 
 		/*** ie8 ***/
@@ -788,7 +766,7 @@
 
 			if (child.nodeType) {
 				if (
-					(i = getAttr(child, "slot")) && (setAttr(child, "slot", 0), 1) ||
+					(i = getAttr(child, "slot")) && (setAttr(child, "slot", ""), 1) ||
 					(i = getAttr(el, "data-slot"))
 				) {
 					i = "%slot-" + i
