@@ -582,8 +582,7 @@
 			window.onpopstate = checkUrl
 		} else
 		/**/
-		window.onhashchange = checkUrl
-		load(findTemplates(), checkUrl)
+		readTemplates(window.onhashchange = checkUrl)
 	}
 
 
@@ -995,8 +994,7 @@
 		if (parent && newEl) return parent.replaceChild(oldEl, newEl)
 	}
 
-	function parseTemplate(str, el) {
-		kill(el)
+	function parseTemplate(str) {
 		var parent = El("div")
 		, stack = [-1]
 		, parentStack = []
@@ -1364,12 +1362,18 @@
 		}
 	}
 
-	function findTemplates() {
-		return $$("script[type=ui]").map(function(el) {
+	function readTemplates(next) {
+		var sources = []
+		load($$("script[type=ui]").map(function(el, i) {
 			// IE6 script.innerText is empty
-			return el.src || parseTemplate(el[txtAttr] || el.innerHTML, el)
-		})
+			sources[i] = el[txtAttr] || el.innerHTML
+			kill(el)
+			return el.src
+		}), function(res) {
+			for (var i = 0, len = sources.length; i < len; i++) parseTemplate(res[i] || sources[i])
+			if (next) next()
+		}, 1)
 	}
-	load(findTemplates())
+	readTemplates()
 }(this, document, history, location, Object) // jshint ignore:line
 
