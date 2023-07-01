@@ -1205,18 +1205,7 @@
 	/*** kb ***/
 	var kbMaps = []
 	, kbMod = El.kbMod = iOS ? "metaKey" : "ctrlKey"
-	, kbMap = El.kbMap = {
-		  8: "backspace", 9: "tab",
-		 13: "enter",    16: "shift", 17: "ctrl",  18: "alt",  19: "pause",
-		 20: "caps",     27: "esc",
-		 33: "pgup",     34: "pgdown",
-		 35: "end",      36: "home",
-		 37: "left",     38: "up",    39: "right", 40: "down",
-		 45: "ins",      46: "del",
-		 91: "cmd",
-		112: "f1",      113: "f2",   114: "f3",   115: "f4",  116: "f5",  117: "f6",
-		118: "f7",      119: "f8",   120: "f9",   121: "f10", 122: "f11", 123: "f12"
-	}
+	, kbCodes = El.kbCodes = ",,,,,,,,backspace,tab,,,,enter,,,shift,ctrl,alt,pause,caps,,,,,,,esc,,,,,,pgup,pgdown,end,home,left,up,right,down,,,,,ins,del,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cmd,,,,,,,,,,,,,,,,,,,,,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12".split(",")
 	El.addKb = addKb
 	El.rmKb = rmKb
 
@@ -1251,7 +1240,7 @@
 			var c = e.keyCode || e.which
 			, numpad = c > 95 && c < 106
 			, code = numpad ? c - 48 : c
-			, key = kbMap[code] || String.fromCharCode(code).toLowerCase() || code
+			, key = kbCodes[code] || String.fromCharCode(code).toLowerCase() || code
 
 			// Otherwise IE backspace navigates back
 			if (code == 8 && kbMaps[0].backspace) {
