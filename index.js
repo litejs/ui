@@ -52,6 +52,16 @@
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
+	, bindingsOn = acceptMany(addEvent, function(el, selector, data, handler) {
+		return isString(handler) ? function(e) {
+			var target = selector ? closest(e.target, selector) : el
+			if (target) emit.apply(View, [handler, e, target].concat(data))
+		} :
+		selector ? function(e) {
+			if (matches(e.target, selector)) handler(e)
+		} :
+		handler
+	})
 	, bindings = {
 		attr: El.attr = acceptMany(setAttr),
 		cls: El.cls = acceptMany(cls),
@@ -61,6 +71,7 @@
 		data: acceptMany(function(el, key, val) {
 			setAttr(el, "data-" + key, val)
 		}),
+		on: El.on = bindingsOn,
 		ref: function(el, name) {
 			this[name] = el
 		},
@@ -145,6 +156,7 @@
 	}
 	/**/
 
+	bindingsOn.once = 1
 	Event.asEmitter = asEmitter
 	Event.stop = stopEvent
 
@@ -619,9 +631,8 @@
 
 	El.empty = empty
 	El.kill = kill
-	El.on = bindings.on = bindingOn
 	El.off = acceptMany(rmEvent)
-	El.one = function(el, ev, fn) {
+	El.one = acceptMany(function(el, ev, fn) {
 		function remove() {
 			rmEvent(el, ev, fn)
 			rmEvent(el, ev, remove)
@@ -629,7 +640,7 @@
 		addEvent(el, ev, fn)
 		addEvent(el, ev, remove)
 		return el
-	}
+	})
 	El.emit = function(el) {
 		emit.apply(el, slice.call(arguments, 1))
 	}
@@ -852,46 +863,6 @@
 			}
 		}
 	}
-
-	function bindingOn(el, events, selector, data, handler, delay) {
-		var argi = arguments.length
-		if (argi == 3 || argi == 4 && isNumber(data)) {
-			delay = data
-			handler = selector
-			selector = data = null
-		} else if (argi == 4 || argi == 5 && isNumber(handler)) {
-			delay = handler
-			handler = data
-			if (isString(selector)) {
-				data = null
-			} else {
-				data = selector
-				selector = null
-			}
-		}
-		if (delay > 0) {
-			setTimeout(bindingOn, delay, el, events, selector, data, handler)
-			return
-		}
-		var fn = (
-			isString(handler) ? function(e) {
-				var target = selector ? closest(e.target, selector) : el
-				if (target) emit.apply(View, [handler, e, target].concat(data))
-			} :
-			selector ? function(e) {
-				if (matches(e.target, selector)) handler(e)
-			} :
-			handler
-		)
-		, nameArr = ("" + events).split(splitRe)
-		, i = 0
-		, len = nameArr.length
-
-		for (; i < len; ) {
-			addEvent(el, nameArr[i++], fn)
-		}
-	}
-	bindingOn.once = 1
 
 	function empty(el) {
 		for (var node; (node = el.firstChild); kill(node));
@@ -1299,7 +1270,7 @@
 	}
 
 	setBreakpointsRated()
-	bindingOn(window, "load orientationchange resize", setBreakpointsRated)
+	bindingsOn(window, "load orientationchange resize", setBreakpointsRated)
 	/**/
 
 	function $(sel, startNode) {
@@ -1317,9 +1288,24 @@
 	function camelFn(_, a) {
 		return a.toUpperCase()
 	}
-	function acceptMany(fn) {
-		return function f(el, names, val, delay) {
+	function acceptMany(fn, prepareVal) {
+		return function f(el, names, selector, data, val, delay) {
 			if (el && names) {
+				var argi = arguments.length
+				if (argi == 3 || argi == 4 && isNumber(data)) {
+					delay = data
+					val = selector
+					selector = data = null
+				} else if (argi == 4 || argi == 5 && isNumber(val)) {
+					delay = val
+					val = data
+					if (isString(selector)) {
+						data = null
+					} else {
+						data = selector
+						selector = null
+					}
+				}
 				if (delay >= 0) {
 					setTimeout(f, delay, el, names, val)
 					return
@@ -1330,6 +1316,7 @@
 					}
 					return
 				}
+				if (prepareVal) val = prepareVal(el, selector, data, val)
 				var arr = ("" + names).split(splitRe), len = arr.length, i = 0
 				for (; i < len; ) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
 			}
