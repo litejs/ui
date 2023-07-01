@@ -14,6 +14,7 @@ describe("load.js", function() {
 		"j.js": { text: "var j" },
 		"k.js": { text: "var k" },
 		"l.js": { text: "var l" },
+		"m.js": { text: "var m='raw'" },
 		"m.thenable": { text: "var m" }
 	}
 	, xhrRes = []
@@ -130,10 +131,20 @@ describe("load.js", function() {
 		})
 		mock.tick(500)
 	})
+	.should("handle raw response", function(assert, mock) {
+		mock.time()
+		xhrReset()
+		xhr.load(["m.js"], function(res) {
+			assert.equal(xhrRes, [])
+			assert.equal(res, ["var m='raw'"])
+			assert.end()
+		}, true)
+		mock.tick(500)
+	})
 	.should("handle promise-like response", function(assert, mock) {
 		mock.time()
 		xhrReset()
-		xhr.thenable = function(str) {
+		xhr.load.thenable = function(str) {
 			return { then: function(cb) {
 				setTimeout(function() {
 					xhrRes.push(str)

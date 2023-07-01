@@ -175,12 +175,12 @@
 
 	/*** load ***/
 	xhr.load = load
-	function load(files, next) {
-		if (typeof files == "string") files = [files]
+	function load(files, next, raw) {
+		files = [].concat(files)
 		var file
 		, i = 0
 		, pos = 0
-		, len = files && files.length
+		, len = files.length
 		, res = []
 
 		for (; i < len; i++) if ((file = files[i]) && loaded[file] !== 2) {
@@ -193,9 +193,7 @@
 			}
 			pos++
 		}
-
-		if (!pos && next) next()
-		pos = 0
+		exec(pos = 0)
 
 		function cb(err, str, fileName, filePos) {
 			;(xhr._l || (xhr._l = [])).push(fileName)
@@ -205,19 +203,23 @@
 		}
 		function exec() {
 			if (res[pos]) {
-				try {
-					var execResult = (xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
-					if (execResult && execResult.then) {
-						res[pos] = 0
-						return execResult.then(function() {
-							res[pos] = ""
-							exec()
-						})
+				if (raw) {
+					files[pos] = 0
+				} else {
+					try {
+						var execResult = (xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
+						if (execResult && execResult.then) {
+							res[pos] = 0
+							return execResult.then(function() {
+								res[pos] = ""
+								exec()
+							})
+						}
+					} catch(e) {
+						onerror(e, files[pos])
 					}
-				} catch(e) {
-					onerror(e, files[pos])
+					res[pos] = ""
 				}
-				res[pos] = ""
 			}
 			if (res[pos] === "" || !files[pos]) {
 				if (++pos < len) exec()
@@ -226,7 +228,7 @@
 				else if (pos === len) setTimeout_(exec, 1)
 				/**/
 				else {
-					if (next) next()
+					if (next) next(res)
 					if ((next = cb.x)) {
 						for (i = 0; next[i]; ) next[i++](next[i++][next[i++]] = "")
 					}
