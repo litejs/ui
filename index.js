@@ -153,7 +153,7 @@
 		fixEv.beforeunload = "pagehide"
 	}
 
-	xhr.view = xhr.tpl = El.tpl = parseTemplate
+	xhr.ui = parseTemplate
 	xhr.css = injectCss
 
 	function injectCss(str) {
