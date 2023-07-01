@@ -207,7 +207,7 @@
 					files[pos] = 0
 				} else {
 					try {
-						var execResult = (xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
+						var execResult = (load[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos])
 						if (execResult && execResult.then) {
 							res[pos] = 0
 							return execResult.then(function() {
