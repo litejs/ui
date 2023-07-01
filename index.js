@@ -22,6 +22,7 @@
 	, emptyArr = []
 	, isArray = Array.isArray
 	, slice = emptyArr.slice
+	, load = xhr.load
 	, P = "prototype"
 
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
@@ -165,8 +166,8 @@
 		fixEv.beforeunload = "pagehide"
 	}
 
-	xhr.ui = parseTemplate
-	xhr.css = injectCss
+	load.ui = parseTemplate
+	load.css = injectCss
 
 	function injectCss(str) {
 		if (!styleNode) {
@@ -368,7 +369,7 @@
 				}
 				if (!tmp.el) {
 					if (tmp.file) {
-						xhr.load(
+						load(
 							tmp.file
 							.replace(/^|,/g, "$&" + (View.base || ""))
 							.split(","),
@@ -582,7 +583,7 @@
 		} else
 		/**/
 		window.onhashchange = checkUrl
-		xhr.load(findTemplates(), checkUrl)
+		load(findTemplates(), checkUrl)
 	}
 
 
@@ -1369,6 +1370,6 @@
 			return el.src || parseTemplate(el[txtAttr] || el.innerHTML, el)
 		})
 	}
-	xhr.load(findTemplates())
+	load(findTemplates())
 }(this, document, history, location, Object) // jshint ignore:line
 
