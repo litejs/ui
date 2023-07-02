@@ -31,9 +31,11 @@
 	, hasOwn = JSONmap.hasOwnProperty
 	, esc = escape
 	, _parseInt = parseInt
-	, document = patch("document", {body:{}})
+	, document = patch("document", {body:{},documentElement:{}})
 	, location = patch("location", {href:""})
 	, navigator = patch("navigator")
+	, html = document.documentElement
+	, body = document.body
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	// The documentMode is an IE only property, supported from IE8
 	, a = document.documentMode | 0, b, c
@@ -391,7 +393,7 @@
 	// The HTML5 document.head DOM tree accessor
 	// patch("head", document.getElementsByTagName("head")[0])
 	// HTMLElement (IE9) -> Element (IE8)
-	O = document.body
+	O = body
 	var selectorCache = {}
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, selectorLastRe = /([\s>+~]*)(?:("|')(?:\\.|[^\\])*?\2|\((?:[^()]|\([^()]+\))+?\)|~=|[^'"()\s>+~])+$/
@@ -418,11 +420,25 @@
 	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
 	, closest = walk.bind(window, "parentNode", 1)
 
+	// The addEventListener is supported in Internet Explorer from version 9.
+	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
+	// - IE8 always prevents the default of the mousewheel event.
+	patch("addEventListener", "return(t.attachEvent('on'+a,b=X(t,a,b)),b)", 0, function(el, ev, fn) {
+		return function() {
+			var e = new Event(ev)
+			if (e.clientX !== UNDEF) {
+				e.pageX = e.clientX + (window.pageXOffset || html.scrollLeft || body.scrollLeft || 0)
+				e.pageY = e.clientY + (window.pageYOffset || html.scrollTop || body.scrollTop || 0)
+			}
+			fn.call(el, e)
+		}
+	})
+	patch("removeEventListener", "t.detachEvent('on'+a,b)")
+
 	// Note: querySelector in IE8 supports only CSS 2.1 selectors
-	patch((b="querySelector"), (a = "return X(t,a,") + "1)", ie678, find)
-	patch(b + "All", a + "0)", ie678, find)
-	//patch("addEventListener", function(ev, fn) { })
-	//patch("removeEventListener")
+	patch((a = "querySelector"), (b = "return X(t,a,Y)"), ie678, find, 1)
+	patch(a + "All", b, ie678, find, 0)
+
 
 	function selectorFn(str) {
 		if (str != null && typeof str !== "string") throw Error("Invalid selector")
