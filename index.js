@@ -136,12 +136,6 @@
 	, iOS = /^(Mac|iP)/.test(navigator.platform)
 	// || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 
-	// The addEventListener is supported in Internet Explorer from version 9.
-	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
-	// - IE8 always prevents the default of the mousewheel event.
-	, addEv = "addEventListener"
-	, remEv = "removeEventListener"
-	, prefix = window[addEv] ? "" : (addEv = "attachEvent", remEv = "detachEvent", "on")
 	, Event = window.Event || window
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
@@ -261,32 +255,29 @@
 		return this
 	}
 
-	function addEvent(el, ev, _fn) {
-		var fn = fixFn[ev] && fixFn[ev](el, _fn, ev) || _fn
-		, fix = prefix ? function() {
-			var e = new Event(ev)
-			if (e.clientX !== UNDEF) {
-				e.pageX = e.clientX + scrollLeft()
-				e.pageY = e.clientY + scrollTop()
-			}
-			fn.call(el, e)
-		} : fn
+	function addEvent(el, ev, fn) {
+		var fn2 = fixFn[ev] && fixFn[ev](el, fn, ev) || fn
+		, ev2 = fixEv[ev] || ev
 
-		if (fixEv[ev] !== "") {
-			el[addEv](prefix + (fixEv[ev] || ev), fix, false)
+		if (ev2 !== "" && "on" + ev2 in el) {
+			// polyfilled addEventListener returns patched function
+			fn2 = body.addEventListener.call(el, ev2, fn2, false) || fn2
 		}
 
-		on.call(el, ev, fix, el, _fn)
+		on.call(el, ev, fn2, el, fn)
 	}
 
 	function rmEvent(el, ev, fn) {
 		var evs = el._e && el._e[ev]
 		, id = evs && evs.indexOf(fn)
+		, ev2 = fixEv[ev] || ev
 		if (id > -1) {
 			if (fn !== evs[id + 1] && evs[id + 1]._rm) {
 				evs[id + 1]._rm()
 			}
-			el[remEv](prefix + (fixEv[ev] || ev), evs[id + 1])
+			if (ev2 !== "" && "on" + ev2 in el) {
+				body.removeEventListener.call(el, ev2, evs[id + 1])
+			}
 			evs.splice(id - 1, 3)
 		}
 	}
