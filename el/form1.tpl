@@ -243,7 +243,7 @@
 	.input.p3.m2b.cf.js-del
 		a.right.Form1-del.hand ×
 			;if: !data.noAdd
-			;data:: "tooltip", _("Delete")
+			;attr:: "data-tooltip", _("Delete")
 			@click: data.del
 		b
 			;if: title

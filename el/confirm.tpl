@@ -169,6 +169,6 @@
 						;txt:: _(action.title)
 						;class:: "w" + (12/actions.length)
 						;nop: this.focus()
-						;data: "action", action.action
+						;attr: "data-action", action.action
 						;class:: "is-" + action.action, action.action
 
