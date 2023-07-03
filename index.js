@@ -44,10 +44,10 @@
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
-	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\\4|.)*?\4|[-\w:.#[\]]=?)*) ?([+>^;@|=\/]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
-	, renderRe = /[;\s]*(\w+)(?:(::?| )((?:(["'\/])(?:\\\3|.)*?\3|[^;])*))?/g
+	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]]=?)*) ?([+>^;@|=\/]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
+	, renderRe = /[;\s]*([-\w]+)(?:(::?| )((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
-	, fnRe = /('|")(?:\\\1|.)*?\1|\/(?:\\?.)+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
+	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /\b[a-z_$][\w$]*/ig
 	, camelRe = /\-([a-z])/g
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
