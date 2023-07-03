@@ -95,26 +95,6 @@
 		return fn.apply(el, slice.call(arguments, 3))
 	}
 
-	bindings["if"] = bindingsIf
-	function bindingsIf(el, enabled) {
-		var parent = el.parentNode
-		, scope = this
-		if (enabled) {
-			if (!parent && el._ifComm) el._ifComm.parentNode.replaceChild(el, el._ifComm)
-		} else {
-			if (parent) {
-				if (!el._ifComm) {
-					El.on(el, "kill", El.kill.bind(el, el._ifComm = document.createComment("if")))
-					el._ifComm.render = function() {
-						El.render(el, scope)
-					}
-				}
-				parent.replaceChild(el._ifComm, el)
-			}
-			return true
-		}
-	}
-
 	bindings.is = function bindingIs(node, model, path, list, state, prefix) {
 		var match
 		, scope = this
