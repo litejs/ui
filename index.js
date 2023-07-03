@@ -69,6 +69,18 @@
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.replace(camelRe, camelFn)] = "" + val
 		}),
+		"if": function(el, enabled) {
+			if (enabled) {
+				elReplace(el._if, el)
+			} else {
+				if (!el._if) {
+					addEvent(el, "kill", kill.bind(el, el._if = document.createComment("if")))
+					el._if.render = render.bind(el, el, this)
+				}
+				elReplace(el, el._if)
+				return true
+			}
+		},
 		on: El.on = bindingsOn,
 		ref: function(el, name) {
 			this[name] = el
@@ -661,7 +673,7 @@
 	El.hasClass = hasClass
 	El.matches = matches
 	El.rate = rate
-	El.replace = replace
+	El.replace = elReplace
 	El.scope = elScope
 	El.scrollLeft = scrollLeft
 	El.scrollTop = scrollTop
@@ -977,9 +989,9 @@
 		} catch(e) {}
 	}
 
-	function replace(oldEl, newEl) {
+	function elReplace(oldEl, newEl) {
 		var parent = oldEl && oldEl.parentNode
-		if (parent && newEl) return parent.replaceChild(oldEl, newEl)
+		if (parent && newEl) return parent.replaceChild(newEl, oldEl)
 	}
 
 	function parseTemplate(str) {
