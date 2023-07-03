@@ -69,9 +69,6 @@
 		css: El.css = acceptMany(function(el, key, val) {
 			el.style[key.replace(camelRe, camelFn)] = "" + val
 		}),
-		data: acceptMany(function(el, key, val) {
-			setAttr(el, "data-" + key, val)
-		}),
 		on: El.on = bindingsOn,
 		ref: function(el, name) {
 			this[name] = el
