@@ -941,7 +941,7 @@
 					""
 				) + (
 					match ?
-					"b['" + name + "'].call(data,n" + (match.raw ? ",'" + args + "'" : args ? "," + args : "") :
+					"b['" + name + "'].call(data,n" + (args ? "," + args : "") :
 					"s(n,'" + name + "'," + args
 				) + ")||"
 			}) + "r)"
