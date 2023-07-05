@@ -1,39 +1,31 @@
-[LiteJS]: https://github.com/litejs/litejs
-[UI]: https://github.com/litejs/ui
-[CLI]: https://github.com/litejs/cli
-[Quick-Start]: https://github.com/litejs/litejs/wiki/Quick-Start
-
 [size]: https://packagephobia.now.sh/badge?p=@litejs/ui
 [size-src]: https://packagephobia.now.sh/result?p=@litejs/ui
 [wiki]: https://github.com/litejs/ui/wiki
+[5]: https://badgen.net/badge/icon/Buy%20Me%20A%20Tea/orange?icon=kofi&label
+[6]: https://www.buymeacoffee.com/lauriro
 
 
-[LiteJS][] full-stack framework is split into three main packages by designated install location:
-
- - **[litejs][LiteJS]** - Server and core libraries installed as `dependencies`
- - **[@litejs/ui][UI]** - UI engine installed as `devDependencies` and bundled into your app
- - **[@litejs/cli][CLI]** - Command line tool installed as global package (or as `devDependencies`)
-
-> Build your first [LiteJS][] app with in 5 minute [Quick Start Guide][Quick-Start].
-
-
-LiteJS UI &ndash; [![size][size]][size-src]
+LiteJS UI &ndash; [![size][]][size-src] [![Buy Me A Tea][5]][6]
 =========
 
-UI engine for [LiteJS][] full-stack framework.
+LiteJS UI is an old-school framework for making high-quality web UIs.
 
-> See [wiki][] for more.
+ - Dependency-free, weighs around 20KB (+8KB polyfills if needed).
+ - Written in ES5, compatible with all browsers (including IE5.5).
+ - No transpiling/compiling/bundling headache, simply write a working code.
+
+See [wiki][] for more information.
 
 
 ## External links
 
 [GitHub repo](https://github.com/litejs/ui) |
-[npm package](https://npmjs.org/package/@litejs/ui)
+[npm package](https://npmjs.org/package/@litejs/ui) |
+[Buy Me A Tea][6]
 
 
 ## Licence
 
-Copyright (c) 2013-2021 Lauri Rooden &lt;lauri@rooden.ee&gt;  
-[The MIT License](http://lauri.rooden.ee/mit-license.txt)
-
+Copyright (c) 2006-2023 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+[The MIT License](https://litejs.com/MIT-LICENSE.txt)
 
