@@ -1040,7 +1040,7 @@
 						append(parent, text) // + "\n")
 					} else {
 						if (op === "@") {
-							text = text.replace(/(\w+):?/, "on:'$1',")
+							text = text.replace(/([\w,]+):?/, "on:'$1',")
 						} else if (op != ";" && op != "^") {
 							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
 								op === "=" ? ":" + text.replace(/'/g, "\\'") :
