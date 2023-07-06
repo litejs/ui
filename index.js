@@ -20,6 +20,7 @@
 	, histBase, histCb, histLast
 	, splitRe = /[,\s]+/
 	, emptyArr = []
+	, assign = Object.assign
 	, isArray = Array.isArray
 	, slice = emptyArr.slice
 	, load = xhr.load
@@ -91,7 +92,7 @@
 		},
 		val: El.val = valFn,
 		"with": function(el, map) {
-			if (this !== Object.assign(elScope(el, this), map)) {
+			if (this !== assign(elScope(el, this), map)) {
 				render(el)
 				return true
 			}
@@ -303,7 +304,7 @@
 	}
 
 	function LiteJS(opts) {
-		opts = Object.assign({}, defaults, opts)
+		opts = assign({}, defaults, opts)
 		var key, name
 		, root = opts.root
 		for (key in opts) if (hasOwn.call(opts, key)) {
@@ -629,7 +630,7 @@
 		for (var wrap = [], i = nodes.length; i--; ) {
 			wrap[i] = clone < 2 ? nodes[i].cloneNode(clone) : nodes[i]
 		}
-		return Object.assign(wrap, elArr)
+		return assign(wrap, elArr)
 	}
 
 	El.empty = empty
@@ -1096,7 +1097,7 @@
 				t.el.plugin = t
 			}
 		}
-		Object.assign(plugin[P], pluginProto, opts)
+		assign(plugin[P], pluginProto, opts)
 	}
 
 	addPlugin("start", {
@@ -1106,7 +1107,7 @@
 	})
 	addPlugin("binding", {
 		done: function() {
-			Object.assign(bindings, Function("return({" + this.txt + "})")())
+			assign(bindings, Function("return({" + this.txt + "})")())
 		}
 	})
 	addPlugin("slot", {
@@ -1234,7 +1235,6 @@
 		}
 	})
 	/**/
-
 
 	/*** responsive ***/
 	var lastSize, lastOrient
