@@ -3,81 +3,48 @@
 	.content
 		h2 Test touch 1
 		.rel
-			#debu DEBU
-			#debu2 DEBU
-			;css: "background", "#ddd"
-			;css: "height", "400px"
+			;css: "background,height", ["#ddd","400px"]
 			.abs.w3.h3 BTN
 				;initTouch::
-				;css: "background", "#999"
-				;css: "height", "180px"
-				;css: "width", "180px"
+				;css "background", "#999"
+				;css "height,width", "180px"
 		h2 Events
 		div
 			;init: data.count1=0
 			;txt: "Click " + count1
 			;title:: "Click " + count1
-			;on: "click", Fn("el data->e->data.count1++,El.render(el)")(this, data)
+			@click "txt"
 		div
 			;init: data.count2=0
-			;init: El.one(this, "click", Fn("el data->e->data.count2++,El.render(el)")(this, data))
+			@click "txt"
 			;txt: "One click " + count2
 		div
 			;init: data.count2=0
 			;txt: "Hover"
-			;on: "mouseover", Fn("El el txt->_->El.txt(el, txt)")(El, this, "mouseover")
-			;on: "mouseout", Fn("El el txt->_->El.txt(el, txt)")(El, this, "mouseout")
+			@mouseover,mouseout "txt"
 		div
 			;init: data.count3=0
 			;txt: "Wheel " + count3
-			;on: "wheel", Fn("el data->e delta->data.count3=delta,El.render(el),Event.stop(e)")(this, data)
+			;on: "wheel", "txt"
 
 %js
 	El.bindings.initTouch = function(el) {
-		El.on(el, "move", function(e, pos) {
-			Event.stop(e)
-			//debu.textContent += e.type+" "+pos
-		})
-		var rotateRe = /rotate\(([-\d.]+)deg\)/
-		El.on(el, "rotate", function(e, diff) {
-			Event.stop(e)
+		var re = {
+			rotate: /rotate\(([-\d.]+)/
+		}
+		function transform(name, diff) {
 			var tr = el.style.transform
-			, cur = tr && tr.match(rotateRe)
-			, fn = "rotate(" + (cur ? +cur[1] + diff : diff) + "deg)"
-			el.style.transform = (
-				cur ?
-				tr.replace(rotateRe, fn) :
-				fn
-			)
+			, cur = tr && tr.match(re[name])
+			, val = name + "(" + (cur ? +cur[1] + diff : diff)
+			el.style.transform = cur ? tr.replace(re[name], val) : val + "deg)"
+		}
+		El.on(el, "rotate", function(e, diff) {
+			transform("rotate", diff)
 		})
-		var lastWheel = Date.now()
 		El.on(el, "pinch", function(e, diff) {
-			var isTouchPad = e.wheelDeltaY ? e.wheelDeltaY === -3 * e.deltaY : e.deltaMode === 0
-			var d = Date.now()
-			console.log("pinch", diff, e, e.deltaMode)
-			// console.log("wheel", diff, d-lastWheel, isTouchPad, e)
-			lastWheel = d
-			// IE5-8 mousewheel.type == "wheel"
-			// if (e.type && e.type.slice(-5) === "wheel") diff *= 10
-			El.css(el, "height", (el.offsetHeight + diff) + "px")
-			//debu2.innerHTML += e.type + "." + diff + " "
+			El.css(el, "height,width", (el.offsetHeight + diff) + "px")
 			Event.stop(e)
-		})
-		return
-		El.drag(el, el, null, {
-			leftMin: -100,
-			leftMax: 1000,
-			topMin: -100,
-			topMax: 1000
-		})
-		El.on(el, "mousedown touchstart pointerdown", function(e) {
-			console.log("T",e)
-			debu.textContent += e.type+" "
 		})
 	}
 	El.bindings.initTouch.once = 1
-	View.on("pi", function(e, el, diff) {
-		console.log("PI", arguments)
-		El.css(el, "height", (el.offsetHeight + diff) + "px")
-	})
 

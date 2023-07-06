@@ -53,6 +53,9 @@
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
 	, txtAttr = "textContent" in body ? "textContent" : "innerText"
+	, bindingsCss = acceptMany(function(el, key, val) {
+		el.style[key.replace(camelRe, camelFn)] = "" + val
+	})
 	, bindingsOn = acceptMany(addEvent, function(el, selector, data, handler) {
 		return isString(handler) ? function(e) {
 			var target = selector ? closest(e.target, selector) : el
@@ -66,9 +69,7 @@
 	, bindings = {
 		attr: El.attr = acceptMany(setAttr),
 		cls: El.cls = acceptMany(cls),
-		css: El.css = acceptMany(function(el, key, val) {
-			el.style[key.replace(camelRe, camelFn)] = "" + val
-		}),
+		css: El.css = bindingsCss,
 		"if": function(el, enabled) {
 			if (enabled) {
 				elReplace(el._if, el)
@@ -162,7 +163,7 @@
 
 	bindingsOn.once = 1
 	Event.asEmitter = asEmitter
-	Event.stop = stopEvent
+	Event.stop = eventStop
 
 	if (iOS) {
 		// iOS doesn't support beforeunload, use pagehide instead
@@ -270,6 +271,8 @@
 
 		if (ev2 !== "" && "on" + ev2 in el) {
 			// polyfilled addEventListener returns patched function
+			// Since Chrome 56 touchstart/move have the { passive: true } by default.
+			// preventDefault() won't work unless you set passive to false.
 			fn2 = body.addEventListener.call(el, ev2, fn2, false) || fn2
 		}
 
@@ -291,7 +294,7 @@
 		}
 	}
 
-	function stopEvent(e) {
+	function eventStop(e) {
 		if (e && e.preventDefault) {
 			e.stopPropagation()
 			e.preventDefault()
@@ -641,7 +644,8 @@
 		addEvent(el, ev, remove)
 		return el
 	})
-	El.emit = function(el) {
+	El.emit = elEmit
+	function elEmit(el) {
 		emit.apply(el, slice.call(arguments, 1))
 	}
 	El.render = render
@@ -1214,7 +1218,7 @@
 
 			// Otherwise IE backspace navigates back
 			if (code == 8 && kbMaps[0].backspace) {
-				stopEvent(e)
+				eventStop(e)
 			}
 			runKb(e, code, key)
 			if (e.shiftKey && code != 16) runKb(e, code, "shift+" + key)
@@ -1270,6 +1274,148 @@
 
 	setBreakpointsRated()
 	bindingsOn(window, "load orientationchange resize", setBreakpointsRated)
+	/**/
+
+	/*** touch ***/
+	var touchEl, touchDist, touchAngle, pinchThreshhold, touchMode
+	, TOUCH_FLAG = "-tf"
+	, MOVE = "pointermove"
+	, START = "start"
+	, END = "end"
+	, MS_WHICH = [0, 1, 4, 2]
+	, touches = []
+	, touchEv = {}
+
+	// tap
+	// swipe + left/right/up/down
+
+	"pan pinch rotate".split(" ").map(function(name) {
+		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
+		fixFn[name] = touchInit
+	})
+
+	function touchInit(el) {
+		if (!el[TOUCH_FLAG]) {
+			addEvent(el, "pointerdown", touchDown)
+			addEvent(el, "wheel", touchWheel)
+			bindingsOn(el, "pointerup pointercancel", touchUp)
+			bindingsCss(el, "touchAction msTouchAction", "none")
+			el[TOUCH_FLAG] = 1
+		}
+	}
+
+	function touchDown(e, e2) {
+		var len = e ? touches.push(e) : touches.length
+		touchEv.cancel = false
+
+		if (touchMode) {
+			elEmit(touchEl, touchMode + END, e2, touchEv, touchEl)
+			touchMode = UNDEF
+		}
+		if (len === 0) {
+			touchEl = null
+		}
+		if (len === 1) {
+			if (e) {
+				touchEl = e.currentTarget || e.target
+				if (e.button === 2 || matches(e.target, "INPUT,TEXTAREA,SELECT,.no-drag")) return
+			} else {
+				e = touches[0]
+			}
+			touchEv.X = e.clientX
+			touchEv.Y = e.clientY
+			touchPos("left", "offsetWidth")
+			touchPos("top", "offsetHeight")
+			moveOne(e)
+		}
+		if (len === 2) {
+			pinchThreshhold = touchEl.clientWidth / 10
+			touchDist = touchAngle = null
+			moveTwo(e)
+		}
+		El[len === 1 ? "on" : "off"](document, MOVE, moveOne)
+		El[len === 2 ? "on" : "off"](document, MOVE, moveTwo)
+		return eventStop(e)
+	}
+
+	function touchUp(e) {
+		for (var i = touches.length; i--; ) {
+			if (touches[i].pointerId == e.pointerId) {
+				touches.splice(i, 1)
+				break
+			}
+		}
+		touchDown(null, e)
+	}
+
+	function touchWheel(e) {
+		// IE10 enabled pinch-to-zoom gestures from multi-touch trackpad’s as mousewheel event with ctrlKey.
+		// Chrome M35 and Firefox 55 followed up.
+		if (!touches[0]) {
+			var ev = e.ctrlKey ? "pinch" : e.altKey ? "rotate" : UNDEF
+			if (ev && elEmit(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
+				return eventStop(e)
+			}
+		}
+	}
+
+	function moveOne(e) {
+		// In IE9 mousedown.buttons is OK but mousemove.buttons == 0
+		if (touches[0].buttons && touches[0].buttons !== (e.buttons || MS_WHICH[e.which || 0])) {
+			return touchUp(e)
+		}
+		touchEv.leftPos = e.clientX - touchEv.X + touchEv.left
+		touchEv.topPos  = e.clientY - touchEv.Y + touchEv.top
+		if (!touchMode) {
+			touchMode = "pan"
+			elEmit(touchEl, touchMode + START, e, touchEv, touchEl)
+		}
+		elEmit(touchEl, "pan", e, touchEv, touchEl)
+		if (!touchEv.cancel) {
+			if (touchEl.getBBox) {
+				El.attr(touchEl, {
+					x: touchEv.leftPos,
+					y: touchEv.topPos
+				}, 0)
+			} else {
+				bindingsCss(touchEl, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"], 0)
+			}
+		}
+	}
+
+	function moveTwo(e) {
+		touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
+		var diff
+		, x = touchEv.X - touches[1].clientX
+		, y = touchEv.Y - touches[1].clientY
+		, dist = Math.sqrt(x*x + y*y) | 0
+		, angle = Math.atan2(y, x)
+
+		if (touchDist !== null) {
+			diff = dist - touchDist
+			if (diff) elEmit(touchEl, "pinch", e, diff, angle)
+			// GestureEvent onGestureChange: function(e) {
+			//	e.target.style.transform =
+			//		'scale(' + e.scale  + startScale  + ') rotate(' + e.rotation + startRotation + 'deg)'
+			diff = angle - touchAngle
+			if (diff) elEmit(touchEl, "rotate", e, diff * (180/Math.PI))
+		}
+
+		touchDist = dist
+		touchAngle = angle
+	}
+
+	function touchPos(name, offset) {
+		var val = (
+			touchEl.getBBox ?
+			touchEl.getAttributeNS(null, name == "top" ? "y":"x") :
+			touchEl.style[name]
+		)
+		touchEv[name] = parseInt(val, 10) || 0
+		if (val && val.indexOf("%") > -1) {
+			touchEv[name] *= touchEl.parentNode[offset] / 100
+		}
+	}
 	/**/
 
 	function $(sel, startNode) {

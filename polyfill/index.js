@@ -51,13 +51,17 @@
 		Function("this.cancelBubble=this.cancel=!0")
 	)
 	, wheelDiff = 120
+	, wheelEv = (
+		"onwheel" in document      ? "wheel" :      // Modern browsers
+		"onmousewheel" in document ? "mousewheel" : // Webkit and IE
+		"DOMMouseScroll"                            // older Firefox
+	)
 	, fixEv = Event.fixEv = {
-		wheel: "onwheel" in document      ? "wheel" :      // Modern browsers
-			"onmousewheel" in document ? "mousewheel" : // Webkit and IE
-			"DOMMouseScroll"                            // older Firefox
+		wheel: wheelEv
 	}
 	, fixFn = Event.fixFn = {
-		wheel: function(el, fn) {
+		wheel: wheelEv !== "wheel" && function(el, fn) {
+			// DOMMouseScroll Firefox 1 MouseScrollEvent.detail - number of lines to scroll (-32768/+32768 = page up/down)
 			return function(e) {
 				var delta = (e.wheelDelta || -e.detail || -e.deltaY) / wheelDiff
 				if (delta) {
