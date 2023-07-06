@@ -18,7 +18,7 @@
 	function describeArc(x, y, radius, startAngle, endAngle) {
 		var start = polarToCartesian(x, y, radius, endAngle)
 		, end = polarToCartesian(x, y, radius, startAngle)
-		, arcSweep = endAngle - startAngle <= 180 ? "0" : "1"
+		, arcSweep = endAngle - startAngle <= 180 ? 0 : 1
 		, d = [
 			"M", start.x, start.y,
 			"A", radius, radius, 0, arcSweep, 0, end.x, end.y
