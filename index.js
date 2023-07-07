@@ -153,6 +153,12 @@
 
 	/*** svg ***/
 	, svgNs = "http://www.w3.org/2000/svg"
+	, xlinkNs = "http://www.w3.org/1999/xlink"
+	, bindingsXlink = bindings.xlink = function(el, href) {
+		// In SVG2, xlink namespace is not needed, plain href can be used (Chrome50 2016, Firefox51 2017).
+		el.setAttributeNS(xlinkNs, "xlink:href", href)
+	}
+	bindingsXlink.once = 1
 	if (window.SVGElement) {
 		"animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect script set stop svg switch symbol text textPath tspan use view"
 		.split(splitRe).forEach(function(name) {

@@ -4,8 +4,6 @@
 
 /* global El */
 !function(SVGElement, document, bindings) {
-	var xlinkNs = "http://www.w3.org/1999/xlink"
-
 
 	//http://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
 	function polarToCartesian(centerX, centerY, radius, angle/*InDegrees*/) {
@@ -36,11 +34,6 @@
 			3.6 * endAngle
 		))
 	}
-	bindings.xlink = function(el, href) {
-		// https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2
-		el.setAttributeNS(xlinkNs, "xlink:href", href)
-	}
-	bindings.xlink.once=1
 
 	function drawLine(node) {
 		var length = node.getTotalLength()
