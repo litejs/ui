@@ -7,7 +7,6 @@
 	var hasOwn = Object.prototype.hasOwnProperty
 	, slice = Array.prototype.slice
 
-	fixReadonlyCheckbox.once =
 	bindingEvery.once =
 	emitForm.once =
 	bindingFn.once =
@@ -79,15 +78,6 @@
 		function remove(item, i) {
 			El.kill(nodes.splice(i, 1)[0])
 		}
-	}
-
-	bindings.fixReadonlyCheckbox = fixReadonlyCheckbox
-	function fixReadonlyCheckbox(el) {
-		El.on(el, "click pointerdown", function(e) {
-			if ((this.firstChild || this).readOnly) {
-				return Event.stop(e)
-			}
-		})
 	}
 
 	bindings.fn = bindingFn

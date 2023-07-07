@@ -200,6 +200,8 @@ var app = LiteJS({
 	})
 
 
+	El.on(body, "click pointerdown", "input[readonly][type=checkbox]", Event.stop)
+
 	LiteJS.start(app.show)
 
 	El.on(body, "click", function(e) {

@@ -3,7 +3,7 @@
 	form[action="javascript:"][method=POST]
 
 %el checkbox
-	input[type=checkbox] ;fixReadonlyCheckbox
+	input[type=checkbox]
 
 %view test-form1 public
 	anim-page
