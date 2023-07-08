@@ -46,7 +46,7 @@
 	, elSeq = 0
 	, elCache = {}
 	, renderRe = /[;\s]*([-\w]+)(?:(::?| )((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
-	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
+	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([+>^;@|=\/]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /\b[a-z_$][\w$]*/ig
@@ -605,7 +605,7 @@
 	function El(name) {
 		var attr
 		, attrs = {}
-		, el = name.replace(selectorRe, function(_, op, key, _sub, fn, val, quotation) {
+		, el = name.replace(selectorRe, function(_, op, key, fn, val, quotation) {
 			attr = 1
 			val = quotation ? val.slice(1, -1) : val || key
 			attrs[op =
