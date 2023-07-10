@@ -31,14 +31,25 @@
 	, hasOwn = JSONmap.hasOwnProperty
 	, esc = escape
 	, _parseInt = parseInt
+	/*** debug ***/
 	, document = patch("document", {body:{},documentElement:{}})
 	, location = patch("location", {href:""})
 	, navigator = patch("navigator")
+	, IS_NODE = !document.location
+	/*/
+	, document = window.document
+	, location = window.location
+	, navigator = window.navigator
+	, IS_NODE = false
+	/**/
 	, html = document.documentElement
 	, body = document.body
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	// The documentMode is an IE only property, supported from IE8
-	, a = document.documentMode | 0, b, c
+	, a = document.documentMode | 0
+	, b = "setInterval"
+	, setInterval = (window[b] = window[b])
+	, c
 	, ie678 = !+"\v1" && a < 9 // jshint ignore:line
 	, ie6789 = ie678 || a == 9
 	, ie67 = ie678 && a < 8
@@ -73,7 +84,6 @@
 					//TODO: fix event
 					// e.deltaY =
 					// e.deltaX = - 1/40 * e.wheelDeltaX|0
-					// e.target = e.target || e.srcElement
 					fn.call(el, e, delta)
 				}
 			}
@@ -91,9 +101,22 @@
 		c: "touchcancel"
 	}
 
-	, IS_NODE = !document.location
 	, lastHash
 	, onhashchange = "onhashchange"
+
+
+	// Patch parameters support for setTimeout callback
+	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFunction)
+	// b = setInterval
+	patch(b, a, ie6789, isFunction)
+
+	// 20 fps is good enough
+	patch("request" + (a = "AnimationFrame"), "return setTimeout(a,50)")
+	// window.mozRequestAnimationFrame    || // Firefox 4-23
+	// window.webkitRequestAnimationFrame || // Chrome 10-24
+	// window.msRequestAnimationFrame     || // IE 10 PP2+
+	patch("cancel" + a, "clearTimeout(a)")
+
 
 	if (!IS_NODE && !(onhashchange in window) || ie67) {
 		patch(onhashchange, null)
@@ -226,20 +249,12 @@
 	createStorage("session")    // Chrome5, FF2, IE8, Safari4
 	createStorage("local")      // Chrome5, FF3.5, IE8, Safari4
 
-	// 20 fps is good enough
-	patch("requestAnimationFrame", "return setTimeout(a,50)")
-	// window.mozRequestAnimationFrame    || // Firefox 4-23
-	// window.webkitRequestAnimationFrame || // Chrome 10-24
-	// window.msRequestAnimationFrame     || // IE 10 PP2+
-	patch("cancelAnimationFrame", "clearTimeout(a)")
-
 	// IE8 has console, however, the console object does not exist if the console is not opened.
 	patch("console", {log: nop, error: nop})
 
 	/*** ie9 ***/
 	patch("matchMedia", "b=a||'all';return{media:b,matches:X?X.matchMedium(b):!1,addListener:Y}", 0, window.styleMedia || window.media, nop)
 	/**/
-
 
 	function jsonFn(str) {
 		return JSONmap[str] || esc(str).replace(/%u/g, "\\u").replace(/%/g, "\\x")
@@ -265,11 +280,6 @@
 			)
 		}
 	})
-
-	// Patch parameters support for setTimeout callback
-	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFunction)
-	patch("setInterval", a, ie6789, isFunction)
-
 
 	// Ignore FF3 escape second non-standard argument
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
@@ -445,7 +455,7 @@
 
 
 	function selectorFn(str) {
-		if (str != null && typeof str !== "string") throw Error("Invalid selector")
+		if (str != null && !isString(str)) throw Error("Invalid selector")
 		return selectorCache[str || ""] ||
 		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
 			str.split(selectorSplitRe).map(function(sel) {
