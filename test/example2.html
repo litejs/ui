@@ -5,19 +5,13 @@
 nav
 	hr
 	a[href="#"] Home
-	| | 
-	a[href="#home2"] Home2
+	= | 
+	a[href="#about"] About
 	hr
 
 %el Footer
 	hr
-	= End 
-	i is here
-
-%each user,room
-	%view test-{key} #
-		;title "{key}"
-		h1 Hello {key}
+	= The End 
 
 %view #pub #
 	h1 LiteJS is simple!
@@ -25,21 +19,11 @@ nav
 	%slot
 	Footer
 
-%view #pub2 #
-	h1 LiteJS is simple!
-	Top-menu
-	.app
-		%slot
-	Footer
-
 %view home #pub
 	h2 Hello home
 
-%view home2 #pub2
-	h2 Hello home2
+%view about #pub
+	h2 About
 
 %start
-</script>
-<script src="../load.js"></script>
-<script src="../index.js"></script>
-</body></html>
+</script><script src="https://litejs.com/litejs.min.js"></script></body></html>

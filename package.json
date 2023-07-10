@@ -1,6 +1,6 @@
 {
   "name": "@litejs/ui",
-  "version": "24.0.0-rc.2",
+  "version": "24.0.0-rc.3",
   "description": "UI engine for LiteJS full-stack framework",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",

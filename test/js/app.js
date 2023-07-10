@@ -19,6 +19,10 @@ var app = LiteJS({
 		u: "users"
 	},
 	on: {
+		txt: function() {
+			console.log("txt", arguments)
+
+		},
 		show: function(params, view) {
 			// Re-render all .js-viewHook elements on each View change
 			El.$$(".js-viewRender").render()
@@ -56,6 +60,8 @@ var app = LiteJS({
 		}
 	}
 })
+
+xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 
 
 !function(window, document, navigator) {
