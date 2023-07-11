@@ -90,13 +90,7 @@
 		txt: El.txt = function(el, txt) {
 			if (el[txtAttr] !== txt) el[txtAttr] = txt
 		},
-		val: El.val = valFn,
-		"with": function(el, map) {
-			if (this !== assign(elScope(el, this), map)) {
-				render(el)
-				return true
-			}
-		}
+		val: El.val = valFn
 	}
 	, bindMatch = []
 	, scopeData = {
