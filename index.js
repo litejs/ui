@@ -21,6 +21,7 @@
 	, splitRe = /[,\s]+/
 	, emptyArr = []
 	, assign = Object.assign
+	, create = Object.create
 	, isArray = Array.isArray
 	, slice = emptyArr.slice
 	, load = xhr.load
@@ -93,7 +94,7 @@
 		val: El.val = valFn
 	}
 	, bindMatch = []
-	, scopeData = {
+	, globalData = {
 		_: String,
 		_b: bindings,
 		El: El,
@@ -196,7 +197,7 @@
 
 	function on(type, fn, scope, _origin) {
 		var emitter = this === window ? emptyArr : this
-		, events = emitter._e || (emitter._e = Object.create(null))
+		, events = emitter._e || (emitter._e = create(null))
 		if (type && fn) {
 			if (isString(fn)) fn = emit.bind(emitter, fn)
 			emit.call(emitter, "newListener", type, fn, scope, _origin)
@@ -427,8 +428,8 @@
 		if (parent && !view.isOpen || view === close) {
 			closeView(close, view)
 			elScope(
-				view.isOpen = view.el.cloneNode(true),
-				elScope(tmp = parent.isOpen || parent.el)
+				(view.isOpen = view.el.cloneNode(true)),
+				(tmp = parent.isOpen || parent.el)
 			)
 			append(tmp, view.isOpen)
 			render(view.isOpen)
@@ -487,7 +488,7 @@
 		, view = get(url, params)
 		if (!view.isOpen || lastUrl !== url) {
 			params._u = lastUrl = url
-			view.show(scopeData.params = params)
+			view.show(globalData.params = params)
 		}
 	}
 
@@ -673,7 +674,7 @@
 	El.blur = blur
 	El.cache = elCache
 	El.closest = closest
-	El.data = scopeData
+	El.data = globalData
 	El.get = getAttr
 	El.hasClass = hasClass
 	El.matches = matches
@@ -895,7 +896,7 @@
 			}
 			empty(el)
 			if (el._scope !== UNDEF) {
-				delete elScope[el._scope]
+				el._scope = UNDEF
 			}
 			if (el.valObject !== UNDEF) {
 				el.valObject = UNDEF
@@ -903,24 +904,24 @@
 		}
 	}
 
-	function elScope(node, parent, fb) {
-		return elScope[node._scope] || fb || (
-			parent ?
-			(((fb = elScope[node._scope = ++elSeq] = Object.create(parent))._super = parent), fb) :
-			closestScope(node)
-		) || scopeData
+	function elScope(el, parent) {
+		return el._scope || (
+			parent ? ((parent = elScope(parent)), el._scope = assign(create(parent), { $up: parent })) :
+			closestScope(el)
+		)
 	}
 
 	function closestScope(node) {
 		for (; (node = node.parentNode); ) {
-			if (node._scope) return elScope[node._scope]
+			if (node._scope) return node._scope
 		}
+		return globalData
 	}
 
 	function render(node, _scope) {
 		if (!node) return
 		var bind, fn
-		, scope = elScope(node, 0, _scope)
+		, scope = node._scope || _scope || closestScope(node)
 
 		if (node.nodeType != 1) {
 			if (node.render) node.render(scope)
@@ -1091,7 +1092,7 @@
 				t.a = attr1
 			} else {
 				if (t.content) {
-					elCache = Object.create(t.c = elCache)
+					elCache = create(t.c = elCache)
 				}
 				t.el = El(name === "svg" ? name : "div")
 				t.el.plugin = t
