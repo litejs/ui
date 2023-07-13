@@ -1453,12 +1453,12 @@
 					}
 				}
 				if (delay >= 0) {
-					setTimeout(f, delay, el, names, val)
+					setTimeout(f, delay, el, names, selector, data, val)
 					return
 				}
 				if (isObject(names)) {
 					for (delay in names) {
-						if (hasOwn.call(names, delay)) f(el, delay, names[delay], val)
+						if (hasOwn.call(names, delay)) f(el, delay, selector, data, names[delay])
 					}
 					return
 				}
