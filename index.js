@@ -1463,8 +1463,10 @@
 					return
 				}
 				if (prepareVal) val = prepareVal(el, selector, data, val)
-				var arr = ("" + names).split(splitRe), len = arr.length, i = 0
-				for (; i < len; ) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
+				var arr = ("" + names).split(splitRe), len = arr.length, i
+				selector = !prepareVal && selector ? $$(selector, el) : [ el ]
+				for (delay = 0; (el = selector[delay++]); )
+				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
 			}
 		}
 	}
