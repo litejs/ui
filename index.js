@@ -175,16 +175,6 @@
 	load.ui = parseTemplate
 	load.css = injectCss
 
-	function injectCss(str) {
-		if (!styleNode) {
-			// Safari and IE6-8 requires dynamically created
-			// <style> elements to be inserted into the <head>
-			append($("head", html), styleNode = El("style"))
-		}
-		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
-		else append(styleNode, str)
-	}
-
 	function asEmitter(obj) {
 		obj.on = on
 		obj.off = off
@@ -322,6 +312,10 @@
 		return View
 	}
 
+	View.def = viewDef
+	View.expand = expand
+	View.get = viewGet
+
 	function View(route, el, parent) {
 		var view = views[route]
 		if (view) {
@@ -423,10 +417,10 @@
 		, view = params._v
 		, parent = view && view.parent
 		if (!view || params._p && /{/.test(view.route)) {
-			return closeView(close)
+			return viewClose(close)
 		}
 		if (parent && !view.isOpen || view === close) {
-			closeView(close, view)
+			viewClose(close, view)
 			elScope(
 				(view.isOpen = view.el.cloneNode(true)),
 				(tmp = parent.isOpen || parent.el)
@@ -447,58 +441,16 @@
 		}
 	}
 
-	function closeView(view, open) {
+	function viewClose(view, open) {
 		if (view && view.isOpen) {
 			viewEmit(view.parent, "closeChild", view, open)
-			closeView(view.child)
+			viewClose(view.child)
 			kill(view.isOpen)
 			view.isOpen = null
 			if (view.kb) rmKb(view.kb)
 			viewEmit(view, "close")
 		}
 	}
-
-	function viewEmit(view, event, a, b) {
-		view.emit(event, a, b)
-		View.emit(event, view, a, b)
-	}
-
-	View.get = get
-	function get(url, params) {
-		if (!viewFn) {
-			viewFn = Function(
-				"var r=/^\\/?(?:" + reStr + ")[\\/\\s]*$/;" +
-				"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
-			)()
-		}
-		return View(url ? viewFn(url, params || {}, "404") : View.home)
-	}
-
-	View.ping = function(name, fn) {
-		View(name).on("ping", fn)
-	}
-
-	View.show = function(url, _params) {
-		if (url === true) {
-			if (lastParams._p > 0) return
-			url = lastUrl
-			lastUrl = 0
-		}
-		var params = _params || {}
-		, view = get(url, params)
-		if (!view.isOpen || lastUrl !== url) {
-			globalData.url = lastUrl = url
-			view.show(globalData.params = params)
-		}
-	}
-
-	View.param = function(names, cb) {
-		;("" + names).split(splitRe).forEach(function(n) {
-			paramCb[n] = cb
-		})
-	}
-
-	View.def = viewDef
 	function viewDef(str) {
 		for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
 			match[1].split(",").map(def)
@@ -511,8 +463,42 @@
 			})
 		}
 	}
+	function viewEmit(view, event, a, b) {
+		view.emit(event, a, b)
+		View.emit(event, view, a, b)
+	}
+	function viewGet(url, params) {
+		if (!viewFn) {
+			viewFn = Function(
+				"var r=/^\\/?(?:" + reStr + ")[\\/\\s]*$/;" +
+				"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
+			)()
+		}
+		return View(url ? viewFn(url, params || {}, "404") : View.home)
+	}
 
-	View.expand = expand
+	View.param = function(names, cb) {
+		;("" + names).split(splitRe).forEach(function(n) {
+			paramCb[n] = cb
+		})
+	}
+	View.ping = function(name, fn) {
+		View(name).on("ping", fn)
+	}
+	View.show = function(url, _params) {
+		if (url === true) {
+			if (lastParams._p > 0) return
+			url = lastUrl
+			lastUrl = 0
+		}
+		var params = _params || {}
+		, view = viewGet(url, params)
+		if (!view.isOpen || lastUrl !== url) {
+			globalData.url = lastUrl = url
+			view.show(globalData.params = params)
+		}
+	}
+
 	function expand(str, _last) {
 		var first = str.charAt(0)
 		, rest = str.slice(1)
@@ -986,20 +972,6 @@
 		}
 	}
 
-	function blur() {
-		// IE8 can throw on accessing document.activeElement.
-		try {
-			var el = document.activeElement
-			, tag = el.tagName
-			if (tag === "A" || tag === "BUTTON") el.blur()
-		} catch(e) {}
-	}
-
-	function elReplace(oldEl, newEl) {
-		var parent = oldEl && oldEl.parentNode
-		if (parent && newEl) return parent.replaceChild(newEl, oldEl)
-	}
-
 	function parseTemplate(str) {
 		var parent = El("div")
 		, stack = [-1]
@@ -1431,9 +1403,6 @@
 	function closest(el, sel) {
 		return el && body.closest.call(el.closest ? el : el.parentNode, sel)
 	}
-	function camelFn(_, a) {
-		return a.toUpperCase()
-	}
 	function acceptMany(fn, prepareVal) {
 		return function f(el, names, selector, data, val, delay) {
 			if (el && names) {
@@ -1470,17 +1439,29 @@
 			}
 		}
 	}
-	function scrollLeft() {
-		return window.pageXOffset || html.scrollLeft || body.scrollLeft || 0
+	function blur() {
+		// IE8 can throw on accessing document.activeElement.
+		try {
+			var el = document.activeElement
+			, tag = el.tagName
+			if (tag === "A" || tag === "BUTTON") el.blur()
+		} catch(e) {}
 	}
-	function scrollTop() {
-		return window.pageYOffset || html.scrollTop || body.scrollTop || 0
+	function camelFn(_, a) {
+		return a.toUpperCase()
 	}
-	function step(num, factor, mid) {
-		var x = ("" + factor).split(".")
-		, steps = num / factor
-		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (mid == UNDEF ? 0.5 : mid === 1 && steps == (steps|0) ? 0 : +mid))) * factor
-		return "" + (1 in x ? n.toFixed(x[1].length) : n)
+	function elReplace(oldEl, newEl) {
+		var parent = oldEl && oldEl.parentNode
+		if (parent && newEl) return parent.replaceChild(newEl, oldEl)
+	}
+	function injectCss(str) {
+		if (!styleNode) {
+			// Safari and IE6-8 requires dynamically created
+			// <style> elements to be inserted into the <head>
+			append($("head", html), styleNode = El("style"))
+		}
+		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
+		else append(styleNode, str)
 	}
 	function isFunction(fn) {
 		return typeof fn === "function"
@@ -1509,6 +1490,18 @@
 				tick = setTimeout(fn, next - now)
 			}
 		}
+	}
+	function scrollLeft() {
+		return window.pageXOffset || html.scrollLeft || body.scrollLeft || 0
+	}
+	function scrollTop() {
+		return window.pageYOffset || html.scrollTop || body.scrollTop || 0
+	}
+	function step(num, factor, mid) {
+		var x = ("" + factor).split(".")
+		, steps = num / factor
+		, n = ~~(steps + ((steps < 0 ? -1 : 1) * (mid == UNDEF ? 0.5 : mid === 1 && steps == (steps|0) ? 0 : +mid))) * factor
+		return "" + (1 in x ? n.toFixed(x[1].length) : n)
 	}
 
 	function readTemplates(next) {
