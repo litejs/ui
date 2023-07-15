@@ -487,7 +487,7 @@
 		var params = _params || {}
 		, view = get(url, params)
 		if (!view.isOpen || lastUrl !== url) {
-			params._u = lastUrl = url
+			globalData.url = lastUrl = url
 			view.show(globalData.params = params)
 		}
 	}
@@ -549,7 +549,7 @@
 	}
 
 	function checkUrl() {
-		if (histLast != (histLast = LiteJS.url = getUrl())) {
+		if (histLast != (histLast = getUrl())) {
 			if (histCb) histCb(histLast)
 			return true
 		}
