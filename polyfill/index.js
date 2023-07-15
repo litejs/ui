@@ -279,7 +279,7 @@
 				"" + o
 			)
 		}
-	})
+	}, ie678)
 
 	// Ignore FF3 escape second non-standard argument
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
