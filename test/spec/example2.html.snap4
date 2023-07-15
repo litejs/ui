@@ -1,0 +1,8 @@
+<body>
+
+
+<script src="../load.js"></script>
+<script src="../polyfill/index.js"></script>
+<script src="../index.js"></script>
+<script src="https://litejs.cloud/data.js" referrerpolicy="origin"></script>
+<div><h1></h1><nav><hr><a href="#"></a> | <a href="#home2"></a> | <a href="#home3"></a><hr></nav><div><!--%slot-5--></div><hr> End <b></b><!--%slot-1--><i></i><h2></h2><p></p></div></body>

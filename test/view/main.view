@@ -21,6 +21,10 @@ form[action="javascript:"][method=POST]
 %el svg-icon
 svg[viewBox="0 0 24 24"][width=24px][height=24px][aria-hidden=true][focusable=false]
 
+/ square 18x18, rectangle 16x20, circle d20
+%el icon-line
+svg-icon[fill=none][stroke=currentColor][stroke-width=2]
+
 %el svg-flag
 svg[viewBox="0 0 4 3"][width=32px][height=24px]
 
@@ -47,7 +51,11 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 			svg-icon>path[d="M12,2L1,12h3v9h5V14h6v7h5V12h3z"]
 			svg-icon>path[d="M12,2L1,12h3v9h5V14h9V2h-3V21h5V12h3z"]
 			svg-icon>path[d="M4.5,18a1.5,1.5 0,1,0 3,0a1.5,1.5 0,1,0 -3,0m5.5 0a4,4 0,1,1 -4,-4L9.5,9.5a6,6 0,0,1 8.5,-6.5l-3 3a2,2 0,0,0 3,3l3 -3a6,6 0,0,1 -6.5,8.5z"]
-			svg-icon>path[d="M2,12a10,10 0,1,1 4,8a1,1 0,0,1 1.3,-1.6a8,8 0,1,0 -3.2,-6.4h-4l3,3l3,-3zM11,6h2v5.5h3v2h-5z"]
+			icon-line>path[d="M3,12A9,9 0 1 0 4.5 7M4.2,3v4h4M12,6v6l3,3"]
+			icon-line>path[d="M3,12A9,9 0 1 0 4 7.9M3.4,3v5h5M13.4,6.4l-2,6l3,3"]
+			icon-line>path[d="M3,12A9,9 0 1 0 4 7.9M3.4,3v5h5M12,6v6l3,3"]
+			icon-line>path[d="M8,4h-4v4M16,4h4v4M4,16v4h4M16,20h4v-4M4,12h16"]
+			icon-line>path[d="M4,4v6h6v-6zm3,2v2M14,4v6h6v-6zm3,2v2M4,14v6h6v-6zm3,2v2M16,13v4h-3h6"]
 		nav-row[href="#users"] Users ❌⚙
 		nav-row[href="#settings"] Settings
 		nav-row[href="#test"] Test

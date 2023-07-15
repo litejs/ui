@@ -1,5 +1,32 @@
 <!DOCTYPE html>
-<html><head><title>App</title></head><body><script type="ui">
+<html><head><title>App</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1">
+<link rel="stylesheet" href="../css/base.css">
+<style>
+:root {
+	--main-bg-color: brown;
+}
+
+html {
+	height: 100%;
+	/* Force a vertical scrollbar to prevent a jumpy page. */
+	overflow-y: scroll;
+	min-width: 300px;
+}
+
+.app {
+	margin: 0 auto 20vh;
+}
+.lg .app {
+	width: 990px;
+	zoom: 1;
+}
+
+body,html{height:100%}
+</style>
+</head><body>
+<script type="ui" src="../el/modal.ui"></script>
+<script type="ui">
 
 %el Top-menu
 nav
@@ -26,4 +53,8 @@ nav
 	h2 About
 
 %start
-</script><script src="https://litejs.com/litejs.min.js"></script></body></html>
+</script>
+<script src="../load.js"></script>
+<script src="../polyfill/index.js"></script>
+<script src="../index.js"></script>
+</body></html>

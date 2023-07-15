@@ -1,0 +1,5 @@
+<body>
+<script src="../load.js"></script>
+<script src="../polyfill/index.js"></script>
+<script src="../index.js"></script>
+<h1 data-bind="txt:_('LiteJS &lt;is> simple!',data)">LiteJS &lt;is> simple!</h1><p data-bind="txt:_('&lt;\!-- commented-out! -->',data)">&lt;!-- commented-out! --></p></body>

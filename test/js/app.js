@@ -221,7 +221,7 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 		}
 	})
 
-	if (window.console && console.warn) {
+	if (window.console && console.log) {
 		link.toString = function() {
 			return "https://en.wikipedia.org/wiki/Self-XSS"
 		}
