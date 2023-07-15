@@ -521,6 +521,7 @@
 		).replace(/^[#\/\!]+|[\s\/]+$/g, "")
 	}
 
+	View.go = setUrl
 	function setUrl(url, replace) {
 		/*** pushState ***/
 		if (histBase) {
@@ -541,7 +542,6 @@
 		}
 	}
 
-	LiteJS.go = setUrl
 	LiteJS.start = function(cb) {
 		histCb = cb
 		/*** pushState ***/
