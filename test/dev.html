@@ -2,29 +2,42 @@
 <html>
 	<head>
 		<!--
-		  1. https://blog.whatwg.org/the-road-to-html-5-character-encoding
-		  2. Options:
-		         resize enabled: width=device-width,initial-scale=1
-		         resize denied: width=device-width,initial-scale=1,maximum-scale=1
-		  3. Since Chrome 31.
-		     Chrome temporarily accepts the usage of "apple-mobile-web-app-capable"
-		     Meta tag apple-touch-fullscreen behave the same way as apple-mobile-web-app-capable.
-		     Only the last one is mentioned in Safari documentation, so I would stick with it.
-		     It looks to me as if apple-touch-fullscreen was used in early demos/previews,
-		     so it was left working later when the SDK got actually released,
-		     but the preferred version is the one documented.
-		  4. Since Chrome 39 you can use Web App Manifest.
-		     http://www.w3.org/TR/appmanifest/
-		     If there's a manifest with display specified,
-		     "mobile-web-app-capable" is ignored.
+		Declare charset in `Content-Type` header when possible, otherwise use <meta> in HTML.
+		https://blog.whatwg.org/the-road-to-html-5-character-encoding
 		<meta charset="utf-8">
 		-->
 
-		<meta name="viewport" content="initial-scale=1,maximum-scale=1">  <!-- 2 -->
-		<meta name="mobile-web-app-capable" content="yes">                <!-- 3 -->
-		<!-- <link rel="manifest" href="manifest.json">                        4 -->
+		<!--
+		Header `Referrer-Policy` is supported from Chrome 56, <meta> from Chrome 17.
+		<meta name="referrer" content="origin">
+		-->
 
 		<!--
+		The <base> HTML tag also affects the resolution of relative links in SVG.
+		<base href="/">
+		-->
+
+		<title>App</title>
+
+		<!--
+		Add meaningful meta description for search engines when you have one.
+		<meta name="description" content="">
+		-->
+
+		<!--
+		Disabling zoom can hinder accessibility for people with low vision.
+		Zoom enabled: width=device-width,initial-scale=1
+		Zoom disabld: width=device-width,initial-scale=1,maximum-scale=1
+		-->
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<!--
+		<link rel="manifest" href="manifest.json">
+		-->
+
+		<!--
+		Since Chrome 31 "apple-mobile-web-app-capable" is temporarily accepted.
+		Since Chrome 39 "mobile-web-app-capable" is ignored when a `display` is specified in manifest.
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link rel="apple-touch-startup-image" href="/startup.png">
@@ -32,13 +45,11 @@
 
 		<!--
 		OpenSearch autodiscovery: http://www.opensearch.org/Specifications/OpenSearch/1.1
-		<link rel="search" type="application/opensearchdescription+xml"
-		href="http://example.com/content-search.xml" title="Content search">
+		<link rel="search" type="application/opensearchdescription+xml" href="http://example.com/content-search.xml" title="Content search">
 		-->
 
 		<!--
-		Turn off telephone number detection in Safari on iOS,
-		you can still use the "tel" URI scheme.
+		Disable phone number detection on iOS, you can still use the "tel:" URI scheme.
 		<meta name="format-detection" content="telephone=no">
 		-->
 
@@ -48,35 +59,35 @@
 		-->
 
 		<!--
-		Chrome, Firefox OS and Opera
+		Site launched from home screen uses theme_color from manifest.
 		<meta name="theme-color" content="#4285f4">
 		-->
 
 		<!--
-		Referrer-Policy: same-origin
-		<meta name="referrer" content="same-origin">
+		https://ogp.me/
+		<meta property="og:title" content="">
+		<meta property="og:type" content="">
+		<meta property="og:url" content="">
+		<meta property="og:image" content="">
 		-->
 
 		<!--
 		Fallback application metadata for legacy browsers
-		-->
 		<meta name="application-name" content="App">
 		<meta name="msapplication-tooltip" content="App">
-
-		<title>App</title>
-		<!--
-		Base also applies to xlink:href-s in svg
-		<base href="/litejs/test/">
 		-->
 
+		<!--
+		Disable downloading favicon:
 		<link rel="icon" type="image/png" href="data:image/png;base64,">
-		<!--
-		Place icons in the root of your domain
-		and these references are not needed.
-
-		<link rel="shortcut icon" href="favicon.ico">
-		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+		Use SVG favicon:
+		<link rel="icon" href="/favicon.ico" sizes="any">
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+		Place icons in the root of your domain and these references are not needed.
+		<link rel="icon" href="favicon.ico">
+		<link rel="apple-touch-icon" href="icon.png">
 		-->
+
 		<link rel="stylesheet" href="app.css" drop="ie7 ie8">
 		<link rel="stylesheet" title="Default look" href="css/theme/blue.css">
 	</head>
@@ -103,9 +114,7 @@
 		<script src="../../litejs/i18n.js" min></script>
 		<script src="js/app.js" min></script>
 		<noscript>
-			<h1>Error</h1>
-			This application requires JavaScript,
-			please <a href="https://www.enable-javascript.com/">enable</a> it.
+			Please <a href="https://www.enable-javascript.com/">enable JavaScript</a> to use this app.
 			<!--
 			Redirect to no-JavaScript version of the site
 			or provide a link to give a chance to turn JavaScript on before redirect.
