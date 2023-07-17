@@ -485,7 +485,8 @@
 	View.ping = function(name, fn) {
 		View(name).on("ping", fn)
 	}
-	View.show = function(url, _params) {
+	View.show = viewShow
+	function viewShow(url, _params) {
 		if (url === true) {
 			if (lastParams._p > 0) return
 			url = lastUrl
@@ -543,7 +544,7 @@
 	}
 
 	LiteJS.start = function(cb) {
-		histCb = cb
+		histCb = cb || viewShow
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var url
@@ -1036,7 +1037,8 @@
 			/**/
 		}
 		if (parent._i) {
-			LiteJS.start(LiteJS().show)
+			LiteJS()
+			LiteJS.start()
 		}
 	}
 
