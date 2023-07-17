@@ -543,7 +543,7 @@
 		}
 	}
 
-	LiteJS.start = function(cb) {
+	View.start = function(cb) {
 		histCb = cb || viewShow
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
@@ -1038,7 +1038,7 @@
 		}
 		if (parent._i) {
 			LiteJS()
-			LiteJS.start()
+			View.start()
 		}
 	}
 
