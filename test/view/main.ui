@@ -131,7 +131,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		}
 
 %view #private #
-	;on: "ping", function() {
+	;on: "ping", function(View) {
 		var user
 		View.on("login", function(e, data) {
 			var err
@@ -154,7 +154,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 				El.data.user = user
 			}
 		}
-	}()
+	}(this)
 	.App.max-height
 		top
 			.p2

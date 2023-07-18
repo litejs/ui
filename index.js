@@ -6,13 +6,19 @@
 !function(window, document, history, location, Object) {
 	window.El = El
 	window.LiteJS = LiteJS
-	window.View = View
 
-	var UNDEF, styleNode
+	var UNDEF, parser, styleNode
 	, html = document.documentElement
 	, body = document.body
 	, defaults = {
 		base: "",
+		/*** responsive ***/
+		breakpoints: {
+			sm: 0,
+			md: 601,
+			lg: 1025
+		},
+		/**/
 		home: "home",
 		root: body
 	}
@@ -24,7 +30,6 @@
 	, create = Object.create
 	, isArray = Array.isArray
 	, slice = emptyArr.slice
-	, load = xhr.load
 	, P = "prototype"
 
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
@@ -33,15 +38,8 @@
 	// The documentMode is an IE only property, supported in IE8 and up.
 	, ie67 = ie678 && (document.documentMode | 0) < 8 // jshint ignore:line
 
-	, viewFn, lastView, lastStr, lastUrl, syncResume
-	, viewSeq = 1
-	, fnStr = ""
-	, reStr = ""
-	, views = View.views = {}
-	, paramCb = {}
-	, lastParams = paramCb
 	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
-	, parseRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
+	, routeRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
 
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
@@ -61,7 +59,7 @@
 	, bindingsOn = acceptMany(addEvent, function(el, selector, data, handler) {
 		return isString(handler) ? function(e) {
 			var target = selector ? closest(e.target, selector) : el
-			if (target) emit.apply(View, [handler, e, target].concat(data))
+			if (target) emit.apply(this.$ui, [handler, e, target].concat(data))
 		} :
 		selector ? function(e) {
 			if (matches(e.target, selector)) handler(e)
@@ -94,11 +92,9 @@
 		val: El.val = valFn
 	}
 	, bindMatch = []
-	, globalData = {
+	, globalScope = {
 		_: String,
-		_b: bindings,
-		El: El,
-		View: View
+		_b: bindings
 	}
 	, elArr = {
 		append: function(el) {
@@ -136,6 +132,8 @@
 		},
 		done: Function("this._r(this.params||this.txt)")
 	}
+	, load = xhr.load
+	, sources = []
 
 	// After iOS 13 iPad with default enabled "desktop" option
 	// is the only Macintosh with multi-touch
@@ -172,8 +170,9 @@
 		fixEv.beforeunload = "pagehide"
 	}
 
-	load.ui = parseTemplate
 	load.css = injectCss
+	load.ui = sources.push.bind(sources)
+	load._n = readTemplates
 
 	function asEmitter(obj) {
 		obj.on = on
@@ -296,218 +295,446 @@
 
 	function LiteJS(opts) {
 		opts = assign({}, defaults, opts)
-		var key, name
+		var opt, name
 		, root = opts.root
-		for (key in opts) if (hasOwn.call(opts, key)) {
-			if (isFunction(View[key])) {
-				for (name in opts[key]) if (hasOwn.call(opts[key], name)) {
-					View[key](name, opts[key][name])
+		, viewFn, lastView, lastStr, lastUrl, syncResume
+		, viewSeq = 1
+		, fnStr = ""
+		, reStr = ""
+		, views = View.views = {}
+		, paramCb = {}
+		, lastParams = paramCb
+
+		function View(route, el, parent) {
+			var view = views[route]
+			if (view) {
+				if (el) {
+					view.el = el
+					view.parent = parent && View(parent)
+				}
+				return view
+			}
+			view = this
+			if (!(view instanceof View)) return new View(route, el, parent)
+			views[view.route = route] = view
+			view.el = isString(el) ? find(body, el) : el
+			view.parent = parent && View(parent)
+
+			if (route.charAt(0) !== "#") {
+				var params = "m[" + (view.seq = viewSeq++) + "]?("
+				, _re = route.replace(routeRe, function(_, expr) {
+					return expr ?
+						(params += "o['" + expr + "']=m[" + (viewSeq++) + "],") && "([^/]+?)" :
+						_.replace(escapeRe, "\\$&")
+				})
+
+				fnStr += params + "'" + route + "'):"
+				reStr += (reStr ? "|(" : "(") + _re + ")"
+				viewFn = 0
+			}
+		}
+
+		assign(View, {
+			$: find.bind(View, root),
+			$$: findAll.bind(View, root),
+			def: viewDef,
+			expand: expand,
+			get: viewGet,
+			parse: (parser = viewParse),
+			show: viewShow,
+			param: function(names, cb) {
+				;("" + names).split(splitRe).forEach(function(n) {
+					paramCb[n] = cb
+				})
+			},
+			ping: function(view, fn) {
+				View(view).on("ping", fn)
+			}
+		})
+
+		asEmitter(View)
+		asEmitter(View[P] = {
+			show: function(_params) {
+				var parent
+				, params = lastParams = _params || {} // jshint ignore:line
+				, view = lastView = this // jshint ignore:line
+				, tmp = params._v || view
+				, close = view.isOpen && view
+
+				View.route = view.route
+				viewEmit(view, "init")
+
+				for (; tmp; tmp = parent) {
+					viewEmit(syncResume = params._v = tmp, "ping", params, View)
+					syncResume = null
+					if (lastParams !== params) return
+					if ((parent = tmp.parent)) {
+						if (parent.child && parent.child !== tmp) {
+							close = parent.child
+						}
+						parent.child = tmp
+					}
+					if (!tmp.el) {
+						if (tmp.file) {
+							load(
+								tmp.file
+								.replace(/^|,/g, "$&" + (View.base || ""))
+								.split(","),
+								view.wait(tmp.file = null)
+							)
+						} else {
+							if (tmp.route === "404") {
+								viewParse("%view 404 #\nh2 Not found")
+							}
+							View("404").show({origin:params})
+						}
+						return
+					}
+				}
+
+				if (view !== close) viewEmit(view, "change", close)
+
+				for (tmp in params) if (tmp.charAt(0) !== "_") {
+					if ((syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
+						syncResume.call(view, params[tmp], tmp, params)
+						syncResume = null
+					}
+				}
+
+				bubbleDown(params, close)
+			},
+			wait: function() {
+				var params = lastParams
+				params._p = 1 + (params._p | 0)
+				return function() {
+					if (--params._p || lastParams !== params || syncResume) return
+					if (params._d) {
+						bubbleDown(params)
+					} else if (params._v) {
+						lastView.show(params)
+					}
+				}
+			}
+		})
+
+		function bubbleDown(params, close) {
+			var tmp
+			, view = params._v
+			, parent = view && view.parent
+			if (!view || params._p && /{/.test(view.route)) {
+				return viewClose(close)
+			}
+			if (parent && !view.isOpen || view === close) {
+				viewClose(close, view)
+				elScope(
+					(view.isOpen = view.el.cloneNode(true)),
+					(tmp = parent.isOpen || parent.el)
+				)
+				append(tmp, view.isOpen)
+				render(view.isOpen)
+				viewEmit(parent, "openChild", view, close)
+				viewEmit(view, "open", params)
+				addKb(view.kb)
+				close = null
+			}
+			if ((params._d = params._v = view.child)) {
+				bubbleDown(params, close)
+			}
+			if ((lastView === view)) {
+				viewEmit(view, "show", params)
+				blur()
+			}
+		}
+
+		function viewClose(view, open) {
+			if (view && view.isOpen) {
+				viewEmit(view.parent, "closeChild", view, open)
+				viewClose(view.child)
+				kill(view.isOpen)
+				view.isOpen = null
+				if (view.kb) rmKb(view.kb)
+				viewEmit(view, "close")
+			}
+		}
+		function viewDef(str) {
+			for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
+				match[1].split(",").map(def)
+			}
+			function def(view) {
+				view = View(expand(view, lastStr))
+				view.file = (view.file ? view.file + "," : "") +
+				match[2].split(",").map(function(file) {
+					return views[file] ? views[file].file : expand(file, lastStr)
+				})
+			}
+		}
+		function viewEmit(view, event, a, b) {
+			view.emit(event, a, b)
+			View.emit(event, view, a, b)
+		}
+		function viewGet(url, params) {
+			if (!viewFn) {
+				viewFn = Function(
+					"var r=/^\\/?(?:" + reStr + ")[\\/\\s]*$/;" +
+					"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
+				)()
+			}
+			return View(url ? viewFn(url, params || {}, "404") : View.home)
+		}
+		function viewShow(url, _params) {
+			if (url === true) {
+				if (lastParams._p > 0) return
+				url = lastUrl
+				lastUrl = 0
+			}
+			var params = _params || {}
+			, view = viewGet(url, params)
+			if (!view.isOpen || lastUrl !== url) {
+				globalScope.url = lastUrl = url
+				view.show(globalScope.params = params)
+			}
+		}
+
+		function expand(str, _last) {
+			var first = str.charAt(0)
+			, rest = str.slice(1)
+			, last = _last || lastUrl
+			return (
+				first === "+" ? last + rest :
+				first === "%" ? ((first = last.lastIndexOf(rest.charAt(0))), (first > 0 ? last.slice(0, first) : last)) + rest :
+				(lastStr = str)
+			)
+		}
+
+		function viewParse(str) {
+			var parent = El("div")
+			, stack = [-1]
+			, parentStack = []
+
+			function work(all, indent, plugin, sel, q, op, text, mapEnd, mapStart, offset) {
+				if (offset && all === indent) return
+
+				for (q = indent.length; q <= stack[0]; ) {
+					if (parent.plugin) {
+						if (parent.plugin.content && !parent.plugin.el.childNodes[0]) break
+						parent.plugin.done()
+					}
+					parent = parentStack.pop()
+					stack.shift()
+				}
+
+				if (parent._r) {
+					parent.txt += all + "\n"
+				} else if (plugin || mapStart && (sel = "map")) {
+					if (plugins[sel]) {
+						parentStack.push(parent)
+						stack.unshift(q)
+						parent = (new plugins[sel](parent, op + text, mapEnd ? "" : ";")).el
+					} else {
+						append(parent, all)
+					}
+				} else if (mapEnd) {
+					appendBind(parent, text, "")
+				} else {
+					if (sel) {
+						parentStack.push(parent)
+						stack.unshift(q)
+						append(parent, parent = q = El(sel))
+					}
+					if (text && op != "/") {
+						if (op === ">" || op === "+") {
+							(op === "+" ? indent + text : indent + " " + text).replace(templateRe, work)
+						} else if (op === "|" || op === "=") {
+							append(parent, text) // + "\n")
+						} else {
+							if (op === "@") {
+								text = text.replace(/([\w,]+):?/, "on:'$1',")
+							} else if (op != ";" && op != "^") {
+								text = (parent.tagName === "INPUT" ? "val" : "txt") + (
+									op === "=" ? ":" + text.replace(/'/g, "\\'") :
+									":_('" + text.replace(/'/g, "\\'") + "',data)"
+								)
+							}
+							appendBind(parent, text, ";", op)
+						}
+					}
+				}
+			}
+			str.replace(templateRe, work)
+			work("", "")
+			if (parent.childNodes[0]) {
+				append(body, parent.childNodes)
+				render(body)
+				/*** debug ***/
+				console.log("Outside view defined elements are rendered immediately into body")
+				/**/
+			}
+			if (parent._i) {
+				histStart(viewShow)
+			}
+		}
+
+		function appendBind(el, val, sep, q) {
+			var current = getAttr(el, BIND_ATTR)
+			setAttr(el, BIND_ATTR, (current ? (
+				q === "^" ?
+				val + sep + current :
+				current + sep + val
+			) : val))
+		}
+
+		function addPlugin(plugin, proto) {
+			plugins[plugin] = Plugin
+			function Plugin(parent, params, attr1) {
+				var t = this
+				, arr = params.split(splitRe)
+				t.parent = parent
+				t.name = arr[0]
+				t.attr = arr.slice(1)
+				if (t._r) {
+					t.txt = ""
+					t.plugin = t.el = t
+					t.params = params
+					t.a = attr1
+				} else {
+					if (t.content) {
+						elCache = create(t.c = elCache)
+					}
+					t.el = El(plugin === "svg" ? plugin : "div")
+					t.el.plugin = t
+				}
+			}
+			assign(Plugin[P], pluginProto, proto)
+		}
+
+		addPlugin("start", {
+			done: function() {
+				this.parent._i = 1
+			}
+		})
+		addPlugin("binding", {
+			done: function() {
+				assign(bindings, Function("return({" + this.txt + "})")())
+			}
+		})
+		addPlugin("slot", {
+			done: function() {
+				var slotName = this.name || ++elSeq
+				, parent = append(this.parent, document.createComment("%slot-" + slotName))
+				// In IE6 root div is inside documentFragment
+				for (; parent.parentNode && parent.parentNode.nodeType === 1; parent = parent.parentNode);
+				;(parent._s || (parent._s = {}))[slotName] = parent.childNodes.length - 1
+				if (!this.name) parent._s._ = parent._sk = slotName
+				parent._cp = parent.childNodes.length - 1
+			}
+		})
+		addPlugin("css",  { _r: injectCss })
+		addPlugin("def",  { _r: viewDef })
+		addPlugin("js",   { _r: eval })
+		addPlugin("each", {
+			_r: function(params) {
+				var txt = this.txt
+				params.split(splitRe).map(txt.replace.bind(txt, /{key}/g)).forEach(viewParse)
+			}
+		})
+		addPlugin("el", {
+			content: 1,
+			done: function() {
+				var t = this
+				, parent = t.parent
+				, el = t._done()
+				elCache[t.name] = el
+				//, arr = t.attr
+				//if (arr[0]) {
+				//	// TODO:2023-03-22:lauri:Add new scope
+				//}
+				return parent
+			}
+		})
+		plugins.svg = plugins.el
+		addPlugin("map", {
+			_r: function() {
+				var self = this
+				, txt = (self.params + self.txt)
+				appendBind(
+					self.parent,
+					self.a ? txt.slice(1) : txt,
+					self.a
+				)
+			}
+		})
+		addPlugin("view", {
+			content: 1,
+			done: function() {
+				var fn
+				, t = this
+				, arr = t.attr
+				, bind = getAttr(t.el, BIND_ATTR)
+				, view = View(t.name, t._done(), arr[0], arr[1])
+				if (bind) {
+					fn = bind.replace(renderRe, function(match, fnName, op, args) {
+						return "(this['" + fnName + "']" + (
+							isFunction(view[fnName]) ?
+							"(" + (args || "") + ")" :
+							"=" + args
+						) + "),"
+					}) + "1"
+					Function(fn).call(view)
+				}
+			}
+		})
+
+		for (opt in opts) if (hasOwn.call(opts, opt)) {
+			if (isFunction(View[opt])) {
+				for (name in opts[opt]) if (hasOwn.call(opts[opt], name)) {
+					View[opt](name, opts[opt][name])
 				}
 			} else {
-				View[key] = opts[key]
+				View[opt] = opts[opt]
 			}
 		}
-		View("#", root)
-		return View
-	}
 
-	View.def = viewDef
-	View.expand = expand
-	View.get = viewGet
-
-	function View(route, el, parent) {
-		var view = views[route]
-		if (view) {
-			if (el) {
-				view.el = el
-				view.parent = parent && View(parent)
-			}
-			return view
-		}
-		view = this
-		if (!(view instanceof View)) return new View(route, el, parent)
-		views[view.route = route] = view
-		view.el = isString(el) ? $(el) : el
-		view.parent = parent && View(parent)
-
-		if (route.charAt(0) !== "#") {
-			var params = "m[" + (view.seq = viewSeq++) + "]?("
-			, _re = route.replace(parseRe, function(_, key) {
-				return key ?
-					(params += "o['" + key + "']=m[" + (viewSeq++) + "],") && "([^/]+?)" :
-					_.replace(escapeRe, "\\$&")
-			})
-
-			fnStr += params + "'" + route + "'):"
-			reStr += (reStr ? "|(" : "(") + _re + ")"
-			viewFn = 0
-		}
-	}
-
-	View[P] = {
-		show: function(_params) {
-			var parent
-			, params = lastParams = _params || {} // jshint ignore:line
-			, view = lastView = this // jshint ignore:line
-			, tmp = params._v || view
-			, close = view.isOpen && view
-
-			View.route = view.route
-			viewEmit(view, "init")
-
-			for (; tmp; tmp = parent) {
-				viewEmit(syncResume = params._v = tmp, "ping", params, View)
-				syncResume = null
-				if (lastParams !== params) return
-				if ((parent = tmp.parent)) {
-					if (parent.child && parent.child !== tmp) {
-						close = parent.child
-					}
-					parent.child = tmp
-				}
-				if (!tmp.el) {
-					if (tmp.file) {
-						load(
-							tmp.file
-							.replace(/^|,/g, "$&" + (View.base || ""))
-							.split(","),
-							view.wait(tmp.file = null)
-						)
-					} else {
-						if (tmp.route === "404") {
-							parseTemplate("%view 404 #\nh2 Not found")
-						}
-						View("404").show({origin:params})
-					}
-					return
-				}
-			}
-
-			if (view !== close) viewEmit(view, "change", close)
-
-			for (tmp in params) if (tmp.charAt(0) !== "_") {
-				if ((syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
-					syncResume.call(view, params[tmp], tmp, params)
-					syncResume = null
-				}
-			}
-
-			bubbleDown(params, close)
-		},
-		wait: function() {
-			var params = lastParams
-			params._p = 1 + (params._p | 0)
-			return function() {
-				if (--params._p || lastParams !== params || syncResume) return
-				if (params._d) {
-					bubbleDown(params)
-				} else if (params._v) {
-					lastView.show(params)
-				}
-			}
-		}
-	}
-
-	asEmitter(View)
-	asEmitter(View[P])
-
-	function bubbleDown(params, close) {
-		var tmp
-		, view = params._v
-		, parent = view && view.parent
-		if (!view || params._p && /{/.test(view.route)) {
-			return viewClose(close)
-		}
-		if (parent && !view.isOpen || view === close) {
-			viewClose(close, view)
-			elScope(
-				(view.isOpen = view.el.cloneNode(true)),
-				(tmp = parent.isOpen || parent.el)
-			)
-			append(tmp, view.isOpen)
-			render(view.isOpen)
-			viewEmit(parent, "openChild", view, close)
-			viewEmit(view, "open", params)
-			addKb(view.kb)
-			close = null
-		}
-		if ((params._d = params._v = view.child)) {
-			bubbleDown(params, close)
-		}
-		if ((lastView === view)) {
-			viewEmit(view, "show", params)
-			blur()
-		}
-	}
-
-	function viewClose(view, open) {
-		if (view && view.isOpen) {
-			viewEmit(view.parent, "closeChild", view, open)
-			viewClose(view.child)
-			kill(view.isOpen)
-			view.isOpen = null
-			if (view.kb) rmKb(view.kb)
-			viewEmit(view, "close")
-		}
-	}
-	function viewDef(str) {
-		for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
-			match[1].split(",").map(def)
-		}
-		function def(view) {
-			view = View(expand(view, lastStr))
-			view.file = (view.file ? view.file + "," : "") +
-			match[2].split(",").map(function(file) {
-				return views[file] ? views[file].file : expand(file, lastStr)
-			})
-		}
-	}
-	function viewEmit(view, event, a, b) {
-		view.emit(event, a, b)
-		View.emit(event, view, a, b)
-	}
-	function viewGet(url, params) {
-		if (!viewFn) {
-			viewFn = Function(
-				"var r=/^\\/?(?:" + reStr + ")[\\/\\s]*$/;" +
-				"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
-			)()
-		}
-		return View(url ? viewFn(url, params || {}, "404") : View.home)
-	}
-
-	View.param = function(names, cb) {
-		;("" + names).split(splitRe).forEach(function(n) {
-			paramCb[n] = cb
+		View.scope = View("#", root).el._scope = assign(create(globalScope), {
+			$ui: View
 		})
-	}
-	View.ping = function(name, fn) {
-		View(name).on("ping", fn)
-	}
-	View.show = viewShow
-	function viewShow(url, _params) {
-		if (url === true) {
-			if (lastParams._p > 0) return
-			url = lastUrl
-			lastUrl = 0
-		}
-		var params = _params || {}
-		, view = viewGet(url, params)
-		if (!view.isOpen || lastUrl !== url) {
-			globalData.url = lastUrl = url
-			view.show(globalData.params = params)
-		}
-	}
 
-	function expand(str, _last) {
-		var first = str.charAt(0)
-		, rest = str.slice(1)
-		, last = _last || lastUrl
-		return (
-			first === "+" ? last + rest :
-			first === "%" ? ((first = last.lastIndexOf(rest.charAt(0))), (first > 0 ? last.slice(0, first) : last)) + rest :
-			(lastStr = str)
-		)
+		/*** responsive ***/
+		var lastSize, lastOrient
+		, breakpoints = opts.breakpoints
+		, setBreakpointsRated = rate(setBreakpoints, 99)
+
+		if (breakpoints) {
+			setBreakpointsRated()
+			bindingsOn(window, "load orientationchange resize", setBreakpointsRated)
+		}
+
+		function setBreakpoints() {
+			// document.documentElement.clientWidth is 0 in IE5
+			var key, next
+			, width = html.offsetWidth
+
+			for (key in breakpoints) {
+				if (breakpoints[key] > width) break
+				next = key
+			}
+
+			if ( next != lastSize ) {
+				cls(html, lastSize, 0)
+				cls(html, lastSize = next)
+			}
+
+			next = width > html.offsetHeight ? "landscape" : "portrait"
+
+			if ( next != lastOrient) {
+				cls(html, lastOrient, 0)
+				cls(html, lastOrient = next)
+			}
+
+			View.emit("resize")
+		}
+		/**/
+
+		return View
 	}
 
 	function getUrl() {
@@ -520,8 +747,6 @@
 			location.href.split("#")[1] || ""
 		).replace(/^[#\/\!]+|[\s\/]+$/g, "")
 	}
-
-	View.go = setUrl
 	function setUrl(url, replace) {
 		/*** pushState ***/
 		if (histBase) {
@@ -534,7 +759,6 @@
 		/**/
 		return checkUrl()
 	}
-
 	function checkUrl() {
 		if (histLast != (histLast = getUrl())) {
 			if (histCb) histCb(histLast)
@@ -542,13 +766,14 @@
 		}
 	}
 
-	View.start = viewStart
-	function viewStart(cb) {
-		histCb = cb || viewShow
+	LiteJS.go = setUrl
+	LiteJS.start = histStart
+	function histStart(cb) {
+		histCb = cb
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var url
-		, base = $("base", html)
+		, base = find(html, "base")
 		if (base) base = base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
 		if (base && !history.pushState) {
 			url = location.pathname.slice(base.length)
@@ -655,14 +880,12 @@
 		}
 	})
 
-	El.$ = $
-	El.$$ = $$
 	El.append = append
 	El.bindings = bindings
 	El.blur = blur
 	El.cache = elCache
 	El.closest = closest
-	El.data = globalData
+	El.data = globalScope
 	El.get = getAttr
 	El.hasClass = hasClass
 	El.matches = matches
@@ -903,7 +1126,7 @@
 		for (; (node = node.parentNode); ) {
 			if (node._scope) return node._scope
 		}
-		return globalData
+		return globalScope
 	}
 
 	function render(node, _scope) {
@@ -974,191 +1197,10 @@
 		}
 	}
 
-	function parseTemplate(str) {
-		var parent = El("div")
-		, stack = [-1]
-		, parentStack = []
-
-		function work(all, indent, plugin, name, q, op, text, mapEnd, mapStart, offset) {
-			if (offset && all === indent) return
-
-			for (q = indent.length; q <= stack[0]; ) {
-				if (parent.plugin) {
-					if (parent.plugin.content && !parent.plugin.el.childNodes[0]) break
-					parent.plugin.done()
-				}
-				parent = parentStack.pop()
-				stack.shift()
-			}
-
-			if (parent._r) {
-				parent.txt += all + "\n"
-			} else if (plugin || mapStart && (name = "map")) {
-				if (plugins[name]) {
-					parentStack.push(parent)
-					stack.unshift(q)
-					parent = (new plugins[name](parent, op + text, mapEnd ? "" : ";")).el
-				} else {
-					append(parent, all)
-				}
-			} else if (mapEnd) {
-				appendBind(parent, text, "")
-			} else {
-				if (name) {
-					parentStack.push(parent)
-					stack.unshift(q)
-					append(parent, parent = q = El(name))
-				}
-				if (text && op != "/") {
-					if (op === ">" || op === "+") {
-						(op === "+" ? indent + text : indent + " " + text).replace(templateRe, work)
-					} else if (op === "|" || op === "=") {
-						append(parent, text) // + "\n")
-					} else {
-						if (op === "@") {
-							text = text.replace(/([\w,]+):?/, "on:'$1',")
-						} else if (op != ";" && op != "^") {
-							text = (parent.tagName === "INPUT" ? "val" : "txt") + (
-								op === "=" ? ":" + text.replace(/'/g, "\\'") :
-								":_('" + text.replace(/'/g, "\\'") + "',data)"
-							)
-						}
-						appendBind(parent, text, ";", op)
-					}
-				}
-			}
-		}
-		str.replace(templateRe, work)
-		work("", "")
-		if (parent.childNodes[0]) {
-			append(body, parent.childNodes)
-			render(body)
-			/*** debug ***/
-			console.log("Outside view defined elements are rendered immediately into body")
-			/**/
-		}
-		if (parent._i) {
-			LiteJS()
-			viewStart()
-		}
-	}
-
-	function appendBind(el, val, sep, q) {
-		var current = getAttr(el, BIND_ATTR)
-		setAttr(el, BIND_ATTR, (current ? (
-			q === "^" ?
-			val + sep + current :
-			current + sep + val
-		) : val))
-	}
-
-	function addPlugin(name, opts) {
-		plugins[name] = plugin
-		function plugin(parent, params, attr1) {
-			var t = this
-			, arr = params.split(splitRe)
-			t.parent = parent
-			t.name = arr[0]
-			t.attr = arr.slice(1)
-			if (t._r) {
-				t.txt = ""
-				t.plugin = t.el = t
-				t.params = params
-				t.a = attr1
-			} else {
-				if (t.content) {
-					elCache = create(t.c = elCache)
-				}
-				t.el = El(name === "svg" ? name : "div")
-				t.el.plugin = t
-			}
-		}
-		assign(plugin[P], pluginProto, opts)
-	}
-
-	addPlugin("start", {
-		done: function() {
-			this.parent._i = 1
-		}
-	})
-	addPlugin("binding", {
-		done: function() {
-			assign(bindings, Function("return({" + this.txt + "})")())
-		}
-	})
-	addPlugin("slot", {
-		done: function() {
-			var name = this.name || ++elSeq
-			, root = append(this.parent, document.createComment("%slot-" + name))
-			// In IE6 root div is inside documentFragment
-			for (; root.parentNode && root.parentNode.nodeType === 1; root = root.parentNode);
-			;(root._s || (root._s = {}))[name] = root.childNodes.length - 1
-			if (!this.name) root._s._ = root._sk = name
-			root._cp = root.childNodes.length - 1
-		}
-	})
-	addPlugin("css",  { _r: injectCss })
-	addPlugin("def",  { _r: viewDef })
-	addPlugin("js",   { _r: eval })
-	addPlugin("each", {
-		_r: function(params) {
-			var txt = this.txt
-			params.split(splitRe).map(txt.replace.bind(txt, /{key}/g)).forEach(parseTemplate)
-		}
-	})
-	addPlugin("el", {
-		content: 1,
-		done: function() {
-			var t = this
-			, parent = t.parent
-			, el = t._done()
-			elCache[t.name] = el
-			//, arr = t.attr
-			//if (arr[0]) {
-			//	// TODO:2023-03-22:lauri:Add new scope
-			//}
-			return parent
-		}
-	})
-	plugins.svg = plugins.el
-	addPlugin("map", {
-		_r: function() {
-			var self = this
-			, txt = (self.params + self.txt)
-			appendBind(
-				self.parent,
-				self.a ? txt.slice(1) : txt,
-				self.a
-			)
-		}
-	})
-	addPlugin("view", {
-		content: 1,
-		done: function() {
-			var fn
-			, t = this
-			, arr = t.attr
-			, bind = getAttr(t.el, BIND_ATTR)
-			, view = View(t.name, t._done(), arr[0], arr[1])
-			if (bind) {
-				fn = bind.replace(renderRe, function(match, name, op, args) {
-					return "(this['" + name + "']" + (
-						isFunction(view[name]) ?
-						"(" + (args || "") + ")" :
-						"=" + args
-					) + "),"
-				}) + "1"
-				Function(fn).call(view)
-			}
-		}
-	})
-
 	/*** kb ***/
 	var kbMaps = []
-	, kbMod = El.kbMod = iOS ? "metaKey" : "ctrlKey"
-	, kbCodes = El.kbCodes = ",,,,,,,,backspace,tab,,,,enter,,,shift,ctrl,alt,pause,caps,,,,,,,esc,,,,,,pgup,pgdown,end,home,left,up,right,down,,,,,ins,del,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cmd,,,,,,,,,,,,,,,,,,,,,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12".split(",")
-	El.addKb = addKb
-	El.rmKb = rmKb
+	, kbMod = LiteJS.kbMod = iOS ? "metaKey" : "ctrlKey"
+	, kbCodes = LiteJS.kbCodes = ",,,,,,,,backspace,tab,,,,enter,,,shift,ctrl,alt,pause,caps,,,,,,,esc,,,,,,pgup,pgdown,end,home,left,up,right,down,,,,,ins,del,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cmd,,,,,,,,,,,,,,,,,,,,,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12".split(",")
 
 	function addKb(map, killEl) {
 		if (map) {
@@ -1210,46 +1252,6 @@
 			}
 		}
 	})
-	/**/
-
-	/*** responsive ***/
-	var lastSize, lastOrient
-	, breakpoints = {
-		sm: 0,
-		md: 601,
-		lg: 1025
-	}
-	, setBreakpointsRated = rate(setBreakpoints, 100)
-
-	El.setBreakpoints = setBreakpoints
-	function setBreakpoints(_breakpoints) {
-		// document.documentElement.clientWidth is 0 in IE5
-		var key, next
-		, width = html.offsetWidth
-		, map = breakpoints = _breakpoints || breakpoints // jshint ignore:line
-
-		for (key in map) {
-			if (map[key] > width) break
-			next = key
-		}
-
-		if ( next != lastSize ) {
-			cls(html, lastSize, 0)
-			cls(html, lastSize = next)
-		}
-
-		next = width > html.offsetHeight ? "landscape" : "portrait"
-
-		if ( next != lastOrient) {
-			cls(html, lastOrient, 0)
-			cls(html, lastOrient = next)
-		}
-
-		View.emit("resize")
-	}
-
-	setBreakpointsRated()
-	bindingsOn(window, "load orientationchange resize", setBreakpointsRated)
 	/**/
 
 	/*** touch ***/
@@ -1394,11 +1396,11 @@
 	}
 	/**/
 
-	function $(sel, startNode) {
-		return body.querySelector.call(startNode || body, sel)
+	function find(root, sel, startNode) {
+		return body.querySelector.call(startNode || root, sel)
 	}
-	function $$(sel, startNode) {
-		return ElWrap(body.querySelectorAll.call(startNode || body, sel))
+	function findAll(root, sel, startNode) {
+		return ElWrap(body.querySelectorAll.call(startNode || root, sel))
 	}
 	function matches(el, sel) {
 		return el && body.matches.call(el, sel)
@@ -1436,7 +1438,7 @@
 				}
 				if (prepareVal) val = prepareVal(el, selector, data, val)
 				var arr = ("" + names).split(splitRe), len = arr.length, i
-				selector = !prepareVal && selector ? $$(selector, el) : [ el ]
+				selector = !prepareVal && selector ? findAll(el, selector) : [ el ]
 				for (delay = 0; (el = selector[delay++]); )
 				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
 			}
@@ -1461,7 +1463,7 @@
 		if (!styleNode) {
 			// Safari and IE6-8 requires dynamically created
 			// <style> elements to be inserted into the <head>
-			append($("head", html), styleNode = El("style"))
+			append(find(html, "head"), styleNode = El("style"))
 		}
 		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
 		else append(styleNode, str)
@@ -1508,14 +1510,18 @@
 	}
 
 	function readTemplates(next) {
-		var sources = []
-		load($$("script[type=ui]").map(function(el, i) {
+		xhr.load(findAll(body, "script[type=ui]").map(function(el) {
 			// IE6 script.innerText is empty
-			sources[i] = el[txtAttr] || el.innerHTML
+			sources.push(el[txtAttr] || el.innerHTML)
 			kill(el)
 			return el.src
 		}), function(res) {
-			for (var i = 0, len = sources.length; i < len; i++) parseTemplate(res[i] || sources[i])
+			res.push.apply(sources, res)
+			res = sources.splice(0).filter(Boolean)
+			if (res.length) {
+				if (!parser) LiteJS()
+				res.forEach(parser)
+			}
 			if (next) next()
 		}, 1)
 	}
