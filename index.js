@@ -307,7 +307,6 @@
 				View[key] = opts[key]
 			}
 		}
-		addKb(opts.kb)
 		View("#", root)
 		return View
 	}
@@ -429,7 +428,7 @@
 			render(view.isOpen)
 			viewEmit(parent, "openChild", view, close)
 			viewEmit(view, "open", params)
-			if (view.kb) addKb(view.kb)
+			addKb(view.kb)
 			close = null
 		}
 		if ((params._d = params._v = view.child)) {
@@ -543,7 +542,8 @@
 		}
 	}
 
-	View.start = function(cb) {
+	View.start = viewStart
+	function viewStart(cb) {
 		histCb = cb || viewShow
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
@@ -1038,7 +1038,7 @@
 		}
 		if (parent._i) {
 			LiteJS()
-			View.start()
+			viewStart()
 		}
 	}
 
@@ -1168,7 +1168,7 @@
 		}
 	}
 	function rmKb(map) {
-		map = kbMaps.indexOf(map || kbMaps[0])
+		map = kbMaps.indexOf(map)
 		if (map > -1) kbMaps.splice(map, 1)
 	}
 	function runKb(e, code, chr) {
