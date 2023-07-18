@@ -73,7 +73,7 @@ describe("Polyfill test", function() {
 		assert.equal(lib._patched || xhr._patched, [
 			"document","navigator","Event","pointer",
 			"escape","sessionStorage","localStorage","requestAnimationFrame","cancelAnimationFrame",
-			"JSON","performance","bind","assign","create","entries","keys","values",//"fromEntries",
+			"JSON","bind","assign","create","entries","keys","values",//"fromEntries",
 			"isArray","from","indexOf","lastIndexOf","reduce","reduceRight","every","forEach","map","filter","some",//"entries",
 			"trim","now","toJSON","toISOString","now","sendBeacon",
 			"matches","closest","querySelector","querySelectorAll"

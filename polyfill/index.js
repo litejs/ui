@@ -10,7 +10,7 @@
 //  - if ("key" in map) and hasOwnProperty
 
 // IE5.5-IE7 patched 56
-// "Event","pointer","sessionStorage","localStorage","requestAnimationFrame","cancelAnimationFrame","console","matchMedia","JSON","setTimeout","setInterval","g:parseInt","performance","p:now","timing","parseInt","parseFloat","isNaN","isFinite","isInteger","MAX_SAFE_INTEGER","isSafeInteger","d:now","toJSON","toISOString","bind","assign","create","entries","hasOwn","keys","values","toString","isArray","from","of","includes","indexOf","lastIndexOf","reduce","reduceRight","splice","every","forEach","map","filter","some","flat","flatMap","endsWith","startsWith","trim","sendBeacon","matches","querySelector","querySelectorAll"
+// "Event","pointer","sessionStorage","localStorage","requestAnimationFrame","cancelAnimationFrame","console","matchMedia","JSON","setTimeout","setInterval","g:parseInt","parseInt","parseFloat","isNaN","isFinite","isInteger","MAX_SAFE_INTEGER","isSafeInteger","d:now","toJSON","toISOString","bind","assign","create","entries","hasOwn","keys","values","toString","isArray","from","of","includes","indexOf","lastIndexOf","reduce","reduceRight","splice","every","forEach","map","filter","some","flat","flatMap","endsWith","startsWith","trim","sendBeacon","matches","querySelector","querySelectorAll"
 
 
 /* global El, xhr, escape */
@@ -288,11 +288,6 @@
 	// From Chrome23/Firefox21 parseInt parses leading-zero strings as decimal, not octal
 	b = patch("g:parseInt", "return X(a,(b>>>0)||(Y.test(''+a)?16:10))", _parseInt("08") !== 8, _parseInt, /^\s*[-+]?0[xX]/)
 
-
-	O = patch("performance")
-	patch("p:now", (a = "return+new Date") + "-X", 0, new Date())
-	patch("timing")
-
 	O = Number
 	patch("parseInt", b)
 	patch("parseFloat", parseFloat)
@@ -301,7 +296,7 @@
 	patch("isSafeInteger", "return a<=X", 0, patch("MAX_SAFE_INTEGER", 9007199254740991))
 
 	O = Date
-	patch("d:now", a)
+	patch("now", "return+new Date")
 
 	/*** toISOString ***/
 	O = O[P]
