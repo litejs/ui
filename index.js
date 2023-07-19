@@ -1308,8 +1308,8 @@
 			touchDist = touchAngle = null
 			moveTwo(e)
 		}
-		El[len === 1 ? "on" : "off"](document, MOVE, moveOne)
-		El[len === 2 ? "on" : "off"](document, MOVE, moveTwo)
+		;(len === 1 ? addEvent : rmEvent)(document, MOVE, moveOne)
+		;(len === 2 ? addEvent : rmEvent)(document, MOVE, moveTwo)
 		return eventStop(e)
 	}
 
