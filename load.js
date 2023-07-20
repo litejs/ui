@@ -23,7 +23,8 @@
 	var rewrite = {
 		//!{loadRewrite}
 	}
-	// IE9, move setTimeout from window.prototype to window object, so you can patch it later
+	// Move setTimeout from window.prototype to window object for future patching in IE9.
+	// Fallback to global.setTimeout and expose xhr._c for tests.
 	, setTimeout_ = (window.setTimeout = window.setTimeout) /*** debug ***/ || setTimeout
 	, loaded = xhr._c = {}
 	/*/
@@ -32,10 +33,10 @@
 
 	/*** activex ***/
 	// XMLHttpRequest in IE7-8 do not accept PATCH, use ActiveX.
-	// IE does not allow to add arbitrary properties to ActiveX objects.
-	// IE does not allow to assign or read the readystatechange after the send().
+	// IE disallows adding custom properties to ActiveX objects and read/write readystatechange after send().
 	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
 	/**/
+
 	, execScript =
 		// IE5-10, Chrome1-12
 		window.execScript ||
@@ -225,7 +226,7 @@
 				if (++pos < len) exec()
 				/*** inject ***/
 				// inject can be async
-				else if (pos === len) setTimeout_(exec, 1)
+				else if (pos === len && execScript !== eval) setTimeout_(exec, 1)
 				/**/
 				else {
 					if (next) next(res)
