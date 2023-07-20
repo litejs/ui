@@ -574,7 +574,8 @@
 			window.onpopstate = checkUrl
 		} else
 		/**/
-		readTemplates(window.onhashchange = checkUrl)
+			window.onhashchange = checkUrl
+		readTemplates(checkUrl)
 	}
 
 
