@@ -604,7 +604,8 @@
 		addPlugin("slot", {
 			done: function() {
 				var slotName = this.name || ++elSeq
-				, parent = append(this.parent, document.createComment("%slot-" + slotName))
+				, parent = this.parent
+				append(parent, document.createComment("%slot-" + slotName))
 				// In IE6 root div is inside documentFragment
 				for (; parent.parentNode && parent.parentNode.nodeType === 1; parent = parent.parentNode);
 				;(parent._s || (parent._s = {}))[slotName] = parent.childNodes.length - 1
@@ -929,7 +930,8 @@
 
 	function append(el, child, before) {
 		if (!el.nodeType) {
-			return el.append ? el.append(child, before) : el
+			if (el.append) el.append(child, before)
+			return
 		}
 		var next, tmp
 		, i = 0
@@ -970,7 +972,6 @@
 				/**/
 			}
 		}
-		return el
 	}
 
 	function valFn(el, val) {
@@ -1082,11 +1083,9 @@
 
 	function empty(el) {
 		for (var node; (node = el.firstChild); kill(node));
-		return el
 	}
 
 	function kill(el, tr, delay) {
-		var id
 		if (el) {
 			if (delay > 0) return setTimeout(kill, delay, el, tr)
 			if (tr) {
@@ -1096,20 +1095,21 @@
 			}
 			if (el._e) {
 				emit.call(el, "kill")
-				for (id in el._e) rmEvent(el, id)
+				for (delay in el._e) rmEvent(el, delay)
 			}
 			if (el.parentNode) {
 				el.parentNode.removeChild(el)
 			}
 			if (el.nodeType != 1) {
-				return el.kill && el.kill()
-			}
-			empty(el)
-			if (el._scope !== UNDEF) {
-				el._scope = UNDEF
-			}
-			if (el.valObject !== UNDEF) {
-				el.valObject = UNDEF
+				if (el.kill) el.kill()
+			} else {
+				empty(el)
+				if (el._scope !== UNDEF) {
+					el._scope = UNDEF
+				}
+				if (el.valObject !== UNDEF) {
+					el.valObject = UNDEF
+				}
 			}
 		}
 	}
