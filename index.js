@@ -67,29 +67,14 @@
 		handler
 	})
 	, bindings = {
-		attr: El.attr = acceptMany(setAttr),
-		cls: El.cls = acceptMany(cls),
-		css: El.css = bindingsCss,
-		"if": function(el, enabled) {
-			if (enabled) {
-				elReplace(el._if, el)
-			} else {
-				if (!el._if) {
-					addEvent(el, "kill", kill.bind(el, el._if = document.createComment("if")))
-					el._if.render = render.bind(el, el, this)
-				}
-				elReplace(el, el._if)
-				return true
-			}
-		},
-		on: El.on = bindingsOn,
-		ref: function(el, name) {
-			this[name] = el
-		},
-		txt: El.txt = function(el, txt) {
+		attr: acceptMany(setAttr),
+		cls: acceptMany(cls),
+		css: bindingsCss,
+		on: bindingsOn,
+		txt: function(el, txt) {
 			if (el[txtAttr] !== txt) el[txtAttr] = txt
 		},
-		val: El.val = valFn
+		val: valFn
 	}
 	, bindMatch = []
 	, globalScope = {
@@ -846,23 +831,21 @@
 		return assign(wrap, elArr)
 	}
 
-	El.empty = empty
-	El.kill = kill
-	El.off = acceptMany(rmEvent)
-	El.one = acceptMany(function(el, ev, fn) {
-		function remove() {
-			rmEvent(el, ev, fn)
-			rmEvent(el, ev, remove)
-		}
-		addEvent(el, ev, fn)
-		addEvent(el, ev, remove)
-		return el
+	assign(El, bindings, {
+		emit: elEmit,
+		empty: empty,
+		kill: kill,
+		off: acceptMany(rmEvent),
+		one: acceptMany(function(el, ev, fn) {
+			function remove() {
+				rmEvent(el, ev, fn)
+				rmEvent(el, ev, remove)
+			}
+			addEvent(el, ev, fn)
+			addEvent(el, ev, remove)
+		}),
+		render: render
 	})
-	El.emit = elEmit
-	function elEmit(el) {
-		emit.apply(el, slice.call(arguments, 1))
-	}
-	El.render = render
 
 	Object.keys(El).forEach(function(key) {
 		elArr[key] = function() {
@@ -879,25 +862,42 @@
 		}
 	})
 
-	El.append = append
-	El.bindings = bindings
-	El.blur = blur
-	El.cache = elCache
-	El.closest = closest
-	El.data = globalScope
-	El.get = getAttr
-	El.hasClass = hasClass
-	El.matches = matches
-	El.rate = rate
-	El.replace = elReplace
-	El.scope = elScope
-	El.scrollLeft = scrollLeft
-	El.scrollTop = scrollTop
-	El.step = step
-	El.style = function(el, key) {
-		return getComputedStyle(el).getPropertyValue(key)
-	}
-
+	assign(El, {
+		append: append,
+		bindings: assign(bindings, {
+			"if": function(el, enabled) {
+				if (enabled) {
+					elReplace(el._if, el)
+				} else {
+					if (!el._if) {
+						addEvent(el, "kill", kill.bind(el, el._if = document.createComment("if")))
+						el._if.render = render.bind(el, el, this)
+					}
+					elReplace(el, el._if)
+					return true
+				}
+			},
+			ref: function(el, name) {
+				this[name] = el
+			}
+		}),
+		blur: blur,
+		cache: elCache,
+		closest: closest,
+		data: globalScope,
+		get: getAttr,
+		hasClass: hasClass,
+		matches: matches,
+		rate: rate,
+		replace: elReplace,
+		scope: elScope,
+		scrollLeft: scrollLeft,
+		scrollTop: scrollTop,
+		step: step,
+		style: function(el, key) {
+			return getComputedStyle(el).getPropertyValue(key)
+		}
+	})
 
 	function getAttr(el, key) {
 		return el && el.getAttribute && el.getAttribute(key)
@@ -1454,6 +1454,9 @@
 	function camelFn(_, a) {
 		return a.toUpperCase()
 	}
+	function elEmit(el) {
+		emit.apply(el, slice.call(arguments, 1))
+	}
 	function elReplace(oldEl, newEl) {
 		var parent = oldEl && oldEl.parentNode
 		if (parent && newEl) return parent.replaceChild(newEl, oldEl)
@@ -1468,6 +1471,7 @@
 		else append(styleNode, str)
 	}
 	function isFunction(fn) {
+		// old WebKit returns "function" for HTML collections
 		return typeof fn === "function"
 	}
 	function isNumber(num) {
