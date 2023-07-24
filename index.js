@@ -277,6 +277,7 @@
 		return false
 	}
 
+	asEmitter(LiteJS)
 	function LiteJS(opts) {
 		opts = assign({}, defaults, opts)
 		var opt, name
@@ -455,6 +456,7 @@
 		function viewEmit(view, event, a, b) {
 			view.emit(event, a, b)
 			View.emit(event, view, a, b)
+			LiteJS.emit(event, view, a, b)
 		}
 		function viewGet(url, params) {
 			if (!viewFn) {
