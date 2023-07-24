@@ -759,6 +759,7 @@
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var url
 		, base = find(html, "base")
+		LiteJS.base = (base || location).href.replace(/[^\/]*(#.*)?$/, "")
 		if (base) base = base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
 		if (base && !history.pushState) {
 			url = location.pathname.slice(base.length)
