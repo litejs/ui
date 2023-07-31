@@ -908,7 +908,7 @@
 	}
 
 	function setAttr(el, key, val) {
-		var current = el.getAttribute(key)
+		var current = getAttr(el, key)
 
 		/*** ie8 ***/
 		// Bug: IE5-7 doesn't set styles and removes events when you try to set them.
@@ -929,6 +929,7 @@
 		} else if (current) {
 			el.removeAttribute(key)
 		}
+		return current
 	}
 
 	function append(el, child, before) {
@@ -946,10 +947,7 @@
 			}
 
 			if (child.nodeType) {
-				if (
-					(i = getAttr(child, "slot")) && (setAttr(child, "slot", ""), 1) ||
-					(i = getAttr(el, "data-slot"))
-				) {
+				if ((i = setAttr(child, "slot", "") || getAttr(el, "data-slot"))) {
 					i = "%slot-" + i
 					for (tmp = el.firstChild; tmp; tmp = next) {
 						if (tmp.nodeType === 8 && tmp.nodeValue === i) {
