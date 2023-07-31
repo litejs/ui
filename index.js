@@ -170,9 +170,8 @@
 		fixEv.beforeunload = "pagehide"
 	}
 
-	load.css = injectCss
-	load.ui = sources.push.bind(sources)
-	load._n = readTemplates
+	xhr.css = injectCss
+	xhr.ui = sources.push.bind(sources)
 
 	function asEmitter(obj) {
 		obj.on = on
@@ -376,7 +375,7 @@
 					}
 					if (!tmp.el) {
 						if (tmp.file) {
-							load(
+							xhr.load(
 								tmp.file
 								.replace(/^|,/g, "$&" + (View.base || ""))
 								.split(","),
