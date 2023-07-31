@@ -1152,11 +1152,11 @@
 	}
 
 	function hydrate(node, attr, scope) {
-		var bind, fn
+		var fn
 		, i = 0
-		if ((bind = getAttr(node, attr))) {
+		, bind = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
+		if (bind !== true) {
 			scope._m = bindMatch
-			scope._t = bind
 			// i18n(bind, lang).format(scope)
 
 			fn = "data&&(" + bind.replace(renderRe, function(match, name, op, args) {
@@ -1164,7 +1164,7 @@
 				match = bindings[name]
 				return (
 					(op === "::" || match && hasOwn.call(match, "once")) ?
-					"s(n,B,data._t=data._t.replace(data._m[" + (i++)+ "],''))||" :
+					"(n[B]=n[B].replace(data._m[" + (i++)+ "],''),0)||" :
 					""
 				) + (
 					match ?
