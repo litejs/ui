@@ -4,5 +4,4 @@
 <script src="../load.js"></script>
 <script src="../polyfill/index.js"></script>
 <script src="../index.js"></script>
-<script src="https://litejs.cloud/data.js" referrerpolicy="origin"></script>
-<div><h1></h1><nav><hr><a href="#"></a> | <a href="#home2"></a> | <a href="#home3"></a><hr></nav><!--%slot-3--><hr> End <b></b><!--%slot-1--><i></i><h2></h2><button></button><p></p></div></body>
+<h1></h1><nav><hr><a href="#"></a> | <a href="#users"></a> | <a href="#about"></a><hr></nav><h2></h2><!--%slot-1--><hr> The End </body>
