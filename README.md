@@ -1,11 +1,12 @@
-[size]: https://packagephobia.now.sh/badge?p=@litejs/ui
-[size-src]: https://packagephobia.now.sh/result?p=@litejs/ui
-[wiki]: https://github.com/litejs/ui/wiki
+
+[3]: https://badgen.net/packagephobia/install/@litejs/ui
+[4]: https://packagephobia.now.sh/result?p=@litejs/ui
 [5]: https://badgen.net/badge/icon/Buy%20Me%20A%20Tea/orange?icon=kofi&label
 [6]: https://www.buymeacoffee.com/lauriro
+[wiki]: https://github.com/litejs/ui/wiki
 
 
-LiteJS UI &ndash; [![size][]][size-src] [![Buy Me A Tea][5]][6]
+LiteJS UI &ndash; [![Size][3]][4] [![Buy Me A Tea][5]][6]
 =========
 
 LiteJS UI is an old-school framework for making high-quality web UIs.
@@ -17,15 +18,11 @@ LiteJS UI is an old-school framework for making high-quality web UIs.
 See [wiki][] for more information.
 
 
-## External links
-
-[GitHub repo](https://github.com/litejs/ui) |
-[npm package](https://npmjs.org/package/@litejs/ui) |
-[Buy Me A Tea][6]
-
-
 ## Licence
 
 Copyright (c) 2006-2023 Lauri Rooden &lt;lauri@rooden.ee&gt;  
-[The MIT License](https://litejs.com/MIT-LICENSE.txt)
+[MIT License](https://litejs.com/MIT-LICENSE.txt) |
+[GitHub repo](https://github.com/litejs/ui) |
+[npm package](https://npmjs.org/package/@litejs/ui) |
+[Buy Me A Tea][6]
 

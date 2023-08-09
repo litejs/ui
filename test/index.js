@@ -2,7 +2,7 @@
 
 require("./load.js")
 require("./require.js")
-require("./polyfill.js")
+require("./shim.js")
 require("./ui.js")
 
 
