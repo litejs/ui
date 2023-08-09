@@ -7,7 +7,7 @@
 	window.El = El
 	window.LiteJS = LiteJS
 
-	var UNDEF, parser, styleNode
+	var UNDEF, lastExp, parser, styleNode
 	, html = document.documentElement
 	, body = document.body
 	, defaults = {
@@ -74,7 +74,12 @@
 		txt: function(el, txt) {
 			if (el[txtAttr] !== txt) el[txtAttr] = txt
 		},
-		val: valFn
+		val: valFn,
+		view: function(el, url) {
+			if (url) {
+				setAttr(el, "href", (histBase || "#") + expand(url))
+			}
+		}
 	}
 	, bindMatch = []
 	, globalScope = {
@@ -117,7 +122,6 @@
 		},
 		done: Function("this._r(this.params||this.txt)")
 	}
-	, load = xhr.load
 	, sources = []
 
 	// After iOS 13 iPad with default enabled "desktop" option
@@ -281,7 +285,7 @@
 		opts = assign({}, defaults, opts)
 		var opt, name
 		, root = opts.root
-		, viewFn, lastView, lastStr, lastUrl, syncResume
+		, viewFn, lastView, lastUrl, syncResume
 		, viewSeq = 1
 		, fnStr = ""
 		, reStr = ""
@@ -322,7 +326,6 @@
 			$: find.bind(View, root),
 			$$: findAll.bind(View, root),
 			def: viewDef,
-			expand: expand,
 			get: viewGet,
 			parse: (parser = viewParse),
 			show: viewShow,
@@ -445,10 +448,10 @@
 				match[1].split(",").map(def)
 			}
 			function def(view) {
-				view = View(expand(view, lastStr))
+				view = View(expand(view))
 				view.file = (view.file ? view.file + "," : "") +
 				match[2].split(",").map(function(file) {
-					return views[file] ? views[file].file : expand(file, lastStr)
+					return views[file] ? views[file].file : expand(file)
 				})
 			}
 		}
@@ -474,20 +477,9 @@
 			var params = _params || {}
 			, view = viewGet(url, params)
 			if (!view.isOpen || lastUrl !== url) {
-				globalScope.url = lastUrl = url
+				globalScope.url = lastExp = lastUrl = url
 				view.show(globalScope.params = params)
 			}
-		}
-
-		function expand(str, _last) {
-			var first = str.charAt(0)
-			, rest = str.slice(1)
-			, last = _last || lastUrl
-			return (
-				first === "+" ? last + rest :
-				first === "%" ? ((first = last.lastIndexOf(rest.charAt(0))), (first > 0 ? last.slice(0, first) : last)) + rest :
-				(lastStr = str)
-			)
 		}
 
 		function viewParse(str) {
@@ -1459,6 +1451,15 @@
 	function elReplace(oldEl, newEl) {
 		var parent = oldEl && oldEl.parentNode
 		if (parent && newEl) return parent.replaceChild(newEl, oldEl)
+	}
+	function expand(str) {
+		var first = str.charAt(0)
+		, rest = str.slice(1)
+		return (
+			first === "+" ? lastExp + rest :
+			first === "%" ? ((first = lastExp.lastIndexOf(rest.charAt(0))), (first > 0 ? lastExp.slice(0, first) : lastExp)) + rest :
+			(lastExp = str)
+		)
 	}
 	function injectCss(str) {
 		if (!styleNode) {
