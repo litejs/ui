@@ -305,7 +305,7 @@
 			view = this
 			if (!(view instanceof View)) return new View(route, el, parent)
 			views[view.route = route] = view
-			view.el = isString(el) ? find(body, el) : el
+			view.el = isString(el) ? find(html, el) : el
 			view.parent = parent && View(parent)
 
 			if (route.charAt(0) !== "#") {
