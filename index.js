@@ -367,7 +367,7 @@
 								tmp.file
 								.replace(/^|,/g, "$&" + (View.base || ""))
 								.split(","),
-								view.wait(tmp.file = null)
+								readTemplates.bind(view, view.wait(tmp.file = null))
 							)
 						} else {
 							if (tmp.route === "404") {
