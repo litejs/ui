@@ -12,7 +12,7 @@
 	, body = document.body
 	, defaults = {
 		base: "",
-		/*** responsive ***/
+		/*** breakpoints ***/
 		breakpoints: {
 			sm: 0,
 			md: 601,
@@ -74,7 +74,7 @@
 		txt: function(el, txt) {
 			if (el[txtAttr] !== txt) el[txtAttr] = txt
 		},
-		val: valFn,
+		val: elVal,
 		view: function(el, url) {
 			if (url) {
 				setAttr(el, "href", (histBase || "#") + expand(url))
@@ -381,8 +381,8 @@
 
 				if (view !== close) viewEmit(view, "change", close)
 
-				for (tmp in params) if (tmp.charAt(0) !== "_") {
-					if ((syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
+				for (tmp in params) {
+					if (tmp.charAt(0) !== "_" && (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
 						syncResume.call(view, params[tmp], tmp, params)
 						syncResume = null
 					}
@@ -439,7 +439,7 @@
 				viewClose(view.child)
 				kill(view.isOpen)
 				view.isOpen = null
-				if (view.kb) rmKb(view.kb)
+				rmKb(view.kb)
 				viewEmit(view, "close")
 			}
 		}
@@ -675,7 +675,7 @@
 			$ui: View
 		})
 
-		/*** responsive ***/
+		/*** breakpoints ***/
 		var lastSize, lastOrient
 		, breakpoints = opts.breakpoints
 		, setBreakpointsRated = rate(setBreakpoints, 99)
@@ -965,7 +965,7 @@
 		}
 	}
 
-	function valFn(el, val) {
+	function elVal(el, val) {
 		if (!el) return ""
 		var input, step, key, value
 		, i = 0
@@ -983,7 +983,7 @@
 			// Read-only checkboxes can be changed by the user
 
 			for (opts = {}; (input = el.elements[i++]); ) if (!input.disabled && (key = input.name || input.id)) {
-				value = valFn(input, val != UNDEF ? val[key] : UNDEF)
+				value = elVal(input, val != UNDEF ? val[key] : UNDEF)
 				if (value !== UNDEF) {
 					step = opts
 					key.replace(/\[(.*?)\]/g, replacer)
@@ -1401,12 +1401,12 @@
 	function acceptMany(fn, prepareVal) {
 		return function f(el, names, selector, data, val, delay) {
 			if (el && names) {
-				var argi = arguments.length
-				if (argi == 3 || argi == 4 && isNumber(data)) {
+				var i = arguments.length
+				if (i == 3 || i == 4 && isNumber(data)) {
 					delay = data
 					val = selector
 					selector = data = null
-				} else if (argi == 4 || argi == 5 && isNumber(val)) {
+				} else if (i == 4 || i == 5 && isNumber(val)) {
 					delay = val
 					val = data
 					if (isString(selector)) {
@@ -1427,7 +1427,7 @@
 					return
 				}
 				if (prepareVal) val = prepareVal(el, selector, data, val)
-				var arr = ("" + names).split(splitRe), len = arr.length, i
+				var arr = ("" + names).split(splitRe), len = arr.length
 				selector = !prepareVal && selector ? findAll(el, selector) : [ el ]
 				for (delay = 0; (el = selector[delay++]); )
 				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
@@ -1461,14 +1461,14 @@
 			(lastExp = str)
 		)
 	}
-	function injectCss(str) {
+	function injectCss(cssText) {
 		if (!styleNode) {
 			// Safari and IE6-8 requires dynamically created
 			// <style> elements to be inserted into the <head>
 			append(find(html, "head"), styleNode = El("style"))
 		}
-		if (styleNode.styleSheet) styleNode.styleSheet.cssText += str
-		else append(styleNode, str)
+		if (styleNode.styleSheet) styleNode.styleSheet.cssText += cssText
+		else append(styleNode, cssText)
 	}
 	function isFunction(fn) {
 		// old WebKit returns "function" for HTML collections
@@ -1519,9 +1519,8 @@
 			kill(el)
 			return el.src
 		}), function(res) {
-			res.push.apply(sources, res)
-			res = sources.splice(0).filter(Boolean)
-			if (res.length) {
+			res = res.concat(sources).filter(Boolean)
+			if (res[0]) {
 				if (!parser) LiteJS()
 				res.forEach(parser)
 			}
