@@ -597,7 +597,7 @@
 			done: function() {
 				var slotName = this.name || ++elSeq
 				, parent = this.parent
-				append(parent, document.createComment("%slot-" + slotName))
+				append(parent, Comm("%slot-" + slotName))
 				// In IE6 root div is inside documentFragment
 				for (; parent.parentNode && parent.parentNode.nodeType === 1; parent = parent.parentNode);
 				;(parent._s || (parent._s = {}))[slotName] = parent.childNodes.length - 1
@@ -825,6 +825,12 @@
 		return assign(wrap, elArr)
 	}
 
+	function Comm(name, render) {
+		var comm = document.createComment(name)
+		if (render) comm.render = render
+		return comm
+	}
+
 	assign(El, bindings, {
 		emit: elEmit,
 		empty: empty,
@@ -864,8 +870,7 @@
 					elReplace(el._if, el)
 				} else {
 					if (!el._if) {
-						addEvent(el, "kill", kill.bind(el, el._if = document.createComment("if")))
-						el._if.render = render.bind(el, el, this)
+						addEvent(el, "kill", kill.bind(el, el._if = Comm("if", render.bind(el, el, this))))
 					}
 					elReplace(el, el._if)
 					return true
