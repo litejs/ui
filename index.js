@@ -71,9 +71,7 @@
 		cls: acceptMany(cls),
 		css: bindingsCss,
 		on: bindingsOn,
-		txt: function(el, txt) {
-			if (el[txtAttr] !== txt) el[txtAttr] = txt
-		},
+		txt: elTxt,
 		val: elVal,
 		view: function(el, url) {
 			if (url) {
@@ -970,6 +968,9 @@
 		}
 	}
 
+	function elTxt(el, txt) {
+		if (el[txtAttr] !== txt) el[txtAttr] = txt
+	}
 	function elVal(el, val) {
 		if (!el) return ""
 		var input, step, key, value
