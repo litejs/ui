@@ -131,30 +131,30 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		}
 
 %view #private #
-	;on: "ping", function(View) {
+	;on "ping", function(ui) {
 		var user
-		View.on("login", function(e, data) {
+		ui.on("login", function(e, data) {
 			var err
 			if (data.name != "a") {
 				err = "Login fail. Try name: a"
 				data = null
 			}
 			user = data
-			View.show(true, {error: err})
+			ui.show(true, {error: err})
 		})
-		View.on("logout", function() {
+		ui.on("logout", function() {
 			user = null
-			View.show(true)
+			LiteJS.go("")
 		})
-		View.on("xhr:401", "logout")
-		return function(params, app) {
-			if (!user && app.route != "login") {
-				app("login").show()
+		ui.on("xhr:401", "logout")
+		return function(params) {
+			if (!user && ui.route != "login") {
+				ui("login").show()
 			} else {
-				El.data.user = user
+				ui.scope.user = user
 			}
 		}
-	}(this)
+	}(this.$ui)
 	.App.max-height
 		top
 			.p2

@@ -106,9 +106,10 @@
 
 	bindings.emitForm = emitForm
 	function emitForm(el, ev, a1, a2, a3, a4) {
+		var $ui = this.$ui
 		El.on(el, "submit", function(e) {
 			var data = El.val(el)
-			View.emit(ev, e, data, a1, a2, a3, a4)
+			$ui.emit(ev, e, data, a1, a2, a3, a4)
 			return Event.stop(e)
 		})
 	}

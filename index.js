@@ -59,7 +59,7 @@
 	, bindingsOn = acceptMany(addEvent, function(el, selector, data, handler) {
 		return isString(handler) ? function(e) {
 			var target = selector ? closest(e.target, selector) : el
-			if (target) emit.apply(this.$ui, [handler, e, target].concat(data))
+			if (target) emit.apply(elScope(el).$ui, [handler, e, target].concat(data))
 		} :
 		selector ? function(e) {
 			if (matches(e.target, selector)) handler(e)
@@ -305,6 +305,7 @@
 			views[view.route = route] = view
 			view.el = isString(el) ? find(html, el) : el
 			view.parent = parent && View(parent)
+			view.$ui = View
 
 			if (route.charAt(0) !== "#") {
 				var params = "m[" + (view.seq = viewSeq++) + "]?("
@@ -343,7 +344,7 @@
 				var parent
 				, params = lastParams = _params || {} // jshint ignore:line
 				, view = lastView = this // jshint ignore:line
-				, tmp = params._v || view
+				, tmp = params._v || view // Continue bubbleUp from _v
 				, close = view.isOpen && view
 
 				View.route = view.route
@@ -381,7 +382,7 @@
 
 				for (tmp in params) {
 					if (tmp.charAt(0) !== "_" && (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
-						syncResume.call(view, params[tmp], tmp, params)
+						syncResume.call(view, params[tmp], tmp, params, View)
 						syncResume = null
 					}
 				}
@@ -390,7 +391,7 @@
 			},
 			wait: function() {
 				var params = lastParams
-				params._p = 1 + (params._p | 0)
+				params._p = 1 + (params._p | 0) // pending
 				return function() {
 					if (--params._p || lastParams !== params || syncResume) return
 					if (params._d) {
@@ -1433,8 +1434,8 @@
 					return
 				}
 				if (prepareVal) val = prepareVal(el, selector, data, val)
-				var arr = ("" + names).split(splitRe), len = arr.length
 				selector = !prepareVal && selector ? findAll(el, selector) : [ el ]
+				var arr = ("" + names).split(splitRe), len = arr.length, i
 				for (delay = 0; (el = selector[delay++]); )
 				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
 			}

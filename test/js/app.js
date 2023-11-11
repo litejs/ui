@@ -19,6 +19,9 @@ var app = LiteJS({
 		u: "users"
 	},
 	on: {
+		init: function() {
+			console.log("view init", arguments)
+		},
 		txt: function() {
 			console.log("txt", arguments)
 
@@ -39,15 +42,8 @@ var app = LiteJS({
 		}
 	},
 	param: {
-		"userId pageId": function(value, name, params) {
-			var list = Data(name.slice(0, -2) + "s")
-
-			list.get(value, function(err, item) {
-				if (err) return app("404").show()
-				console.log("set", name, item)
-				El.data.model = item
-			})
-			.then(this.wait())
+		"userId pageId": function(value, name, params, ui) {
+			console.log("PARAM", this, arguments)
 		}
 	},
 	ping: {
