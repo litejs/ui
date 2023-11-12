@@ -102,22 +102,6 @@
 	}
 	, plugins = {}
 	, pluginProto = {
-		_done: function() {
-			var t = this
-			, childNodes = t.el.childNodes
-			, i = t.el._cp
-			, el = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
-
-			if (i > -1) {
-				if (childNodes[i].nodeType == 1 && t.el._sk) {
-					setAttr(childNodes[i], "data-slot", t.el._sk)
-				}
-				el._s = t.el._s
-			}
-			if (t.c) elCache = t.c
-			t.el.plugin = t.el = t.parent = null
-			return el
-		},
 		done: Function("this._r(this.params||this.txt)")
 	}
 	, sources = []
@@ -581,6 +565,21 @@
 			}
 			assign(Plugin[P], pluginProto, proto)
 		}
+		function getPluginContent(t) {
+			var childNodes = t.el.childNodes
+			, i = t.el._cp
+			, el = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
+
+			if (i > -1) {
+				if (childNodes[i].nodeType == 1 && t.el._sk) {
+					setAttr(childNodes[i], "data-slot", t.el._sk)
+				}
+				el._s = t.el._s
+			}
+			if (t.c) elCache = t.c
+			t.el.plugin = t.el = t.parent = null
+			return el
+		}
 
 		addPlugin("start", {
 			done: function() {
@@ -618,7 +617,7 @@
 			done: function() {
 				var t = this
 				, parent = t.parent
-				, el = t._done()
+				, el = getPropertyValue(t)
 				elCache[t.name] = el
 				//, arr = t.attr
 				//if (arr[0]) {
@@ -646,7 +645,7 @@
 				, t = this
 				, arr = t.attr
 				, bind = getAttr(t.el, BIND_ATTR)
-				, view = View(t.name, t._done(), arr[0], arr[1])
+				, view = View(t.name, getPluginContent(t), arr[0], arr[1])
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, fnName, op, args) {
 						return "(this['" + fnName + "']" + (
