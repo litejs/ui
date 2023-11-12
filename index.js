@@ -3,7 +3,7 @@
 
 /* global xhr, getComputedStyle, navigator */
 
-!function(window, document, history, location, Object) {
+!function(window, document, history, location, Function, Object) {
 	window.El = El
 	window.LiteJS = LiteJS
 
@@ -102,7 +102,7 @@
 	}
 	, plugins = {}
 	, pluginProto = {
-		done: Function("this._r(this.params||this.txt)")
+		d: Function("this.r(this.o||this.t)")
 	}
 	, sources = []
 
@@ -474,21 +474,21 @@
 				if (offset && all === indent) return
 
 				for (q = indent.length; q <= stack[0]; ) {
-					if (parent.plugin) {
-						if (parent.plugin.content && !parent.plugin.el.childNodes[0]) break
-						parent.plugin.done()
+					if (parent.p) {
+						if (parent.p.c && !parent.p.e.childNodes[0]) break
+						parent.p.d()
 					}
 					parent = parentStack.pop()
 					stack.shift()
 				}
 
-				if (parent._r) {
-					parent.txt += all + "\n"
+				if (parent.r) {
+					parent.t += "\n" + all
 				} else if (plugin || mapStart && (sel = "map")) {
 					if (plugins[sel]) {
 						parentStack.push(parent)
 						stack.unshift(q)
-						parent = (new plugins[sel](parent, op + text, mapEnd ? "" : ";")).el
+						parent = (new plugins[sel](parent, op + text, mapEnd ? "" : ";")).e
 					} else {
 						append(parent, all)
 					}
@@ -528,7 +528,7 @@
 				console.log("Outside view defined elements are rendered immediately into body")
 				/**/
 			}
-			if (parent._i) {
+			if (parent.i) {
 				histStart(viewShow)
 			}
 		}
@@ -542,84 +542,82 @@
 			) : val))
 		}
 
-		function addPlugin(plugin, proto) {
-			plugins[plugin] = Plugin
-			function Plugin(parent, params, attr1) {
-				var t = this
-				, arr = params.split(splitRe)
-				t.parent = parent
-				t.name = arr[0]
-				t.attr = arr.slice(1)
-				if (t._r) {
-					t.txt = ""
-					t.plugin = t.el = t
-					t.params = params
-					t.a = attr1
+		function addPlugin(name, proto) {
+			plugins[name] = Plugin
+			function Plugin(parent, op, sep) {
+				var plugin = this
+				, arr = op.split(splitRe)
+				plugin.n = arr[0] // name
+				plugin.x = arr[1] // View parent
+				plugin.u = parent
+				if (plugin.r) {
+					plugin.t = ""
+					plugin.p = plugin.e = plugin
+					plugin.o = op
+					plugin.s = sep
 				} else {
-					if (t.content) {
-						elCache = create(t.c = elCache)
+					if (plugin.c) {
+						elCache = create(plugin.c = elCache)
 					}
-					t.el = El(plugin === "svg" ? plugin : "div")
-					t.el.plugin = t
+					plugin.e = El(name === "svg" ? name : "div")
+					plugin.e.p = plugin
 				}
 			}
 			assign(Plugin[P], pluginProto, proto)
 		}
-		function getPluginContent(t) {
-			var childNodes = t.el.childNodes
-			, i = t.el._cp
+		function getPluginContent(plugin) {
+			var childNodes = plugin.e.childNodes
+			, childPos = plugin.e._cp
 			, el = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
 
-			if (i > -1) {
-				if (childNodes[i].nodeType == 1 && t.el._sk) {
-					setAttr(childNodes[i], "data-slot", t.el._sk)
+			if (childPos > -1) {
+				if (childNodes[childPos].nodeType == 1 && plugin.e._sk) {
+					setAttr(childNodes[childPos], "data-slot", plugin.e._sk)
 				}
-				el._s = t.el._s
+				el._s = plugin.e._s
 			}
-			if (t.c) elCache = t.c
-			t.el.plugin = t.el = t.parent = null
+			if (plugin.c) elCache = plugin.c
+			plugin.e.p = plugin.e = plugin.u = null
 			return el
 		}
 
 		addPlugin("start", {
-			done: function() {
-				this.parent._i = 1
-			}
+			d: Function("this.u.i=1")
 		})
 		addPlugin("binding", {
-			done: function() {
-				assign(bindings, Function("return({" + this.txt + "})")())
+			d: function() {
+				assign(bindings, Function("return({" + this.t + "})")())
 			}
 		})
 		addPlugin("slot", {
-			done: function() {
-				var slotName = this.name || ++elSeq
-				, parent = this.parent
+			d: function() {
+				var slotName = this.n || ++elSeq
+				, parent = this.u
 				append(parent, Comm("%slot-" + slotName))
 				// In IE6 root div is inside documentFragment
 				for (; parent.parentNode && parent.parentNode.nodeType === 1; parent = parent.parentNode);
 				;(parent._s || (parent._s = {}))[slotName] = parent.childNodes.length - 1
-				if (!this.name) parent._s._ = parent._sk = slotName
+				if (!this.n) parent._s._ = parent._sk = slotName
 				parent._cp = parent.childNodes.length - 1
 			}
 		})
-		addPlugin("css",  { _r: injectCss })
-		addPlugin("def",  { _r: viewDef })
-		addPlugin("js",   { _r: eval })
+		addPlugin("css",  { r: injectCss })
+		addPlugin("def",  { r: viewDef })
+		addPlugin("js",   { r: Function })
 		addPlugin("each", {
-			_r: function(params) {
-				var txt = this.txt
+			r: function(params) {
+				var txt = this.t
 				params.split(splitRe).map(txt.replace.bind(txt, /{key}/g)).forEach(viewParse)
 			}
 		})
 		addPlugin("el", {
-			content: 1,
-			done: function() {
-				var t = this
-				, parent = t.parent
-				, el = getPropertyValue(t)
-				elCache[t.name] = el
-				//, arr = t.attr
+			c: 1,
+			d: function() {
+				var plugin = this
+				, parent = plugin.u
+				, el = getPluginContent(plugin)
+				elCache[plugin.n] = el
+				//, arr = plugin.x
 				//if (arr[0]) {
 				//	// TODO:2023-03-22:lauri:Add new scope
 				//}
@@ -628,24 +626,19 @@
 		})
 		plugins.svg = plugins.el
 		addPlugin("map", {
-			_r: function() {
-				var self = this
-				, txt = (self.params + self.txt)
-				appendBind(
-					self.parent,
-					self.a ? txt.slice(1) : txt,
-					self.a
-				)
+			r: function() {
+				var plugin = this
+				, txt = plugin.o + plugin.t
+				appendBind(plugin.u, plugin.s ? txt.slice(1) : txt, plugin.s)
 			}
 		})
 		addPlugin("view", {
-			content: 1,
-			done: function() {
+			c: 1,
+			d: function() {
 				var fn
-				, t = this
-				, arr = t.attr
-				, bind = getAttr(t.el, BIND_ATTR)
-				, view = View(t.name, getPluginContent(t), arr[0], arr[1])
+				, plugin = this
+				, bind = getAttr(plugin.e, BIND_ATTR)
+				, view = View(plugin.n, getPluginContent(plugin), plugin.x)
 				if (bind) {
 					fn = bind.replace(renderRe, function(match, fnName, op, args) {
 						return "(this['" + fnName + "']" + (
@@ -1534,5 +1527,5 @@
 		}, 1)
 	}
 	readTemplates()
-}(this, document, history, location, Object) // jshint ignore:line
+}(this, document, history, location, Function, Object) // jshint ignore:line
 
