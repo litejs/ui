@@ -5,7 +5,7 @@
 %el checkbox
 	input[type=checkbox]
 
-%view test-form1 public
+%view test-form public
 	anim-page
 		h2 Test form 1
 		form-js.grid.p1[data-expect='{"name":"smith","pet":"dog"}'] ;on:"submit", "logForm"

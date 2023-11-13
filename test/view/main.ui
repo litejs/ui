@@ -1,12 +1,12 @@
 
 %def #mat ../../el/material.tpl
 %def
-	settings %.view,%.css
-	test-form1,test-grid,pointer %.view
-	test-form1 %.view,../../binding/persist.js
+	settings %.ui,%.css
+	test-form,test-grid,pointer %.ui
+	test-form ../../binding/persist.js
 	test-svg #mat,../../el/Pie.tpl,test-svg.view
 	testman,+/lcov,+/lcov/{file} %.view
-	test-material-ui #mat,../../el/Slider.tpl,test-material-ui.view
+	test-material-ui #mat,../../el/Slider.tpl,test-material.ui
 	slot %.view
 
 %css
@@ -216,7 +216,7 @@ anim-page
 	ul
 		li>a[href="#testman"] Testman
 		li>a[href="#broken-link"] Test broken link
-		li>a[href="#test-form1"] Test form
+		li>a[href="#test-form"] Test form
 		li>a[href="#test-svg"] Test SVG
 		li>a[href="#test-grid"] Test grid
 		li>a[href="#test-material-ui"] Test Material-UI

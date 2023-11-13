@@ -194,7 +194,7 @@
 	}
 
 %js
-	!function(View) {
+	!function($ui) {
 		var menuTarget, menuEl, tipTarget, tipEl, tick, wait
 		, ripple = El(".waves-ripple")
 		El.near = near
@@ -244,7 +244,7 @@
 		}
 		El.on(document.body, "mouseover", onOver)
 		El.on(window, "focusin", onOver)
-		View.on("show", closeTooltip)
+		$ui.on("show", closeTooltip)
 		function onOver(e) {
 			var x, y, pos
 			, target = e.target
@@ -298,9 +298,9 @@
 				El.cls(menuTarget, "is-active", menuEl = menuTarget = null)
 			}
 		}
-		View.on("ping", closeMenu)
-		View.on("closeMenu", closeMenu)
-		View.on("showMenu", function(e, target, menu, x, y, margin) {
+		$ui.on("ping", closeMenu)
+		$ui.on("closeMenu", closeMenu)
+		$ui.on("showMenu", function(e, target, menu, x, y, margin) {
 			Event.stop(e)
 			var close = menuEl && menuTarget == target
 			closeMenu()
@@ -355,7 +355,7 @@
 				El.cls(ripple, "waves-ripple--play", 0)
 			}
 		}
-	}(View)
+	}($ui)
 
 
 %el Checkbox

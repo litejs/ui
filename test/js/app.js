@@ -167,11 +167,11 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 
 	app.on("logForm", function(e, el) {
 		var data = El.val(el)
-		, matches = El.attr(el, "data-expect") == JSON.stringify(data)
+		, matches = El.get(el, "data-expect") == JSON.stringify(data)
 		if (matches) {
 			console.log("logForm", matches, JSON.stringify(data))
 		} else {
-			console.error("logForm", JSON.stringify(data),"!==",El.attr(el, "data-expect"), data)
+			console.error("logForm", JSON.stringify(data),"!==",El.get(el, "data-expect"), data)
 		}
 	})
 

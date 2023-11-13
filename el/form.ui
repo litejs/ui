@@ -3,12 +3,12 @@
 		border: 0;
 		padding: 0;
 	}
-	.Form1-del.right {
+	.Form-del.right {
 		display: block;
 		margin: -10px -10px 0 0;
 		opacity: .2;
 	}
-	.Form1-del {
+	.Form-del {
 		font-size: 20px;
 		font-weight: 700;
 		border: 1px solid transparent;
@@ -18,7 +18,7 @@
 		text-align: center;
 		border-radius: 4px;
 	}
-	.Form1-del:hover {
+	.Form-del:hover {
 		opacity: 1;
 		border: 1px solid #aaa;
 		background-image: linear-gradient(to bottom, #ddd, #888);
@@ -152,101 +152,101 @@
 	}
 
 
-%el form1-row
-	label.row
-		.col.md-w4.input__label
+%el Form-row
+label.row
+	.col.md-w4.input__label
+		= _(title||name)
+	.col.md-w8
+		%child
+		.input__hint
+			= _(description)
+			;if: description
+
+%el Form-subheader
+.col
+	= _(title)
+
+%el Form-fieldset
+fieldset.grid.b2
+	legend
+		= _(schema.title || _link.title || "")
+
+%el Form
+Form-row
+	input.field
+
+%el Form-ro
+Form-row>span ;txt: value
+
+%el Form-hidden
+div>input.field[type=hidden]
+
+%el Form-boolean
+Form-row
+	input.field[type=checkbox] ;value: value
+
+%el Form-boolean-ro
+Form-row>span
+	= _(!!value)
+
+%el Form-password
+Form-row
+	input.field[type=password]
+
+%el Form-new-password
+Form-row
+	input.field[type=password][autocomplete=new-password]
+
+%el Form-text
+Form-row
+	textarea.field
+
+%el Form-text-ro
+Form-ro
+
+%el Form-enum
+Form-row
+	select.field ;each:val in data["enum"]
+		option
+			;val:: val
+			= _("" + val)
+
+%el Form-enum-ro
+Form-ro
+
+%el Form-list
+Form-row
+	select.field
+		;list: api(resourceCollection.format(data.params, data)), required ? 0 : [""], value
+		option
+			;val:: item.id
+			;txt:: _(item.name)
+
+%el Form-list-ro
+Form-row>span
+	= _(item.name)
+
+%el Form-array
+.col
+	.input.p13.cf
+		.left
 			= _(title||name)
-		.col.md-w8
-			%child
-			.input__hint
-				= _(description)
-				;if: description
-
-%el form1-subheader
-	.col
-		= _(title)
-
-%el form1-fieldset
-	fieldset.grid.b2
-		legend
-			= _(schema.title || _link.title || "")
-
-%el form1
-	form1-row
-		input.field
-
-%el form1-ro
-	form1-row>span ;txt: value
-
-%el form1-hidden
-	div>input.field[type=hidden]
-
-%el form1-boolean
-	form1-row
-		input.field[type=checkbox] ;value: value
-
-%el form1-boolean-ro
-	form1-row>span
-		= _(!!value)
-
-%el form1-password
-	form1-row
-		input.field[type=password]
-
-%el form1-new-password
-	form1-row
-		input.field[type=password][autocomplete=new-password]
-
-%el form1-text
-	form1-row
-		textarea.field
-
-%el form1-text-ro
-	form1-ro
-
-%el form1-enum
-	form1-row
-		select.field ;each:val in data["enum"]
-			option
-				;val:: val
-				= _("" + val)
-
-%el form1-enum-ro
-	form1-ro
-
-%el form1-list
-	form1-row
-		select.field
-			;list: api(resourceCollection.format(data.params, data)), required ? 0 : [""], value
-			option
-				;val:: item.id
-				;txt:: _(item.name)
-
-%el form1-list-ro
-	form1-row>span
-		= _(item.name)
-
-%el form1-array
-	.col
-		.input.p13.cf
-			.left
-				= _(title||name)
-			.input__hint
-				= _(description)
-			.js-items.cf
-			a.btn.right
-				;if: !data.noAdd
-				;txt: _(data.name + ".Add")
-				@click: data.add
-
-%el form1-array-item
-	.input.p3.m2b.cf.js-del
-		a.right.Form1-del.hand ×
+		.input__hint
+			= _(description)
+		.js-items.cf
+		a.btn.right
 			;if: !data.noAdd
-			;attr:: "data-tooltip", _("Delete")
-			@click: data.del
-		b
-			;if: title
-			;txt: title
-		.grid.b2.js-item
+			;txt: _(data.name + ".Add")
+			@click: data.add
+
+%el Form-array-item
+.input.p3.m2b.cf.js-del
+	a.right.Form-del.hand ×
+		;if: !data.noAdd
+		;attr:: "data-tooltip", _("Delete")
+		@click: data.del
+	b
+		;if: title
+		;txt: title
+	.grid.b2.js-item
 
