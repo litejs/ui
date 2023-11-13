@@ -584,11 +584,6 @@
 		addPlugin("start", {
 			d: Function("this.u.i=1")
 		})
-		addPlugin("binding", {
-			d: function() {
-				assign(bindings, Function("return({" + this.t + "})")())
-			}
-		})
 		addPlugin("slot", {
 			d: function() {
 				var slotName = this.n || ++elSeq
