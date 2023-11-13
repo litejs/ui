@@ -57,7 +57,7 @@
 		el.style[key.replace(camelRe, camelFn)] = "" + val
 	})
 	, bindingsOn = acceptMany(addEvent, function(el, selector, data, handler) {
-		return isString(handler) ? function(e) {
+		return isStr(handler) ? function(e) {
 			var target = selector ? closest(e.target, selector) : el
 			if (target) emit.apply(elScope(el).$ui, [handler, e, target].concat(data))
 		} :
@@ -158,7 +158,7 @@
 		var emitter = this === window ? emptyArr : this
 		, events = emitter._e || (emitter._e = create(null))
 		if (type && fn) {
-			if (isString(fn)) fn = emit.bind(emitter, fn)
+			if (isStr(fn)) fn = emit.bind(emitter, fn)
 			emit.call(emitter, "newListener", type, fn, scope, _origin)
 			;(events[type] || (events[type] = [])).unshift(scope, _origin, fn)
 		}
@@ -287,7 +287,7 @@
 			view = this
 			if (!(view instanceof View)) return new View(route, el, parent)
 			views[view.route = route] = view
-			view.el = isString(el) ? find(html, el) : el
+			view.el = isStr(el) ? find(html, el) : el
 			view.parent = parent && View(parent)
 			view.$ui = View
 
@@ -442,8 +442,8 @@
 			view.emit(event, a, b)
 			View.emit(event, view, a, b)
 		}
-		function viewEval(str) {
-			Function("$ui,$,$$", str)(View, View.$, View.$$)
+		function viewEval(str, scope) {
+			Function("$s,$ui,$data,$,$$", str)(scope, View, View.scope, View.$, View.$$)
 		}
 		function viewGet(url, params) {
 			if (!viewFn) {
@@ -633,25 +633,20 @@
 		addPlugin("view", {
 			c: 1,
 			d: function() {
-				var fn
-				, plugin = this
+				var plugin = this
 				, bind = getAttr(plugin.e, BIND_ATTR)
 				, view = View(plugin.n, getPluginContent(plugin), plugin.x)
 				if (bind) {
-					fn = bind.replace(renderRe, function(match, fnName, op, args) {
-						return "(this['" + fnName + "']" + (
-							isFunction(view[fnName]) ?
-							"(" + (args || "") + ")" :
-							"=" + args
-						) + "),"
+					bind = bind.replace(renderRe, function(_, name, op, args) {
+						return "($s." + name + (isFn(view[name]) ? "(" + (args || "") + ")" : "=" + args) + "),"
 					}) + "1"
-					Function(fn).call(view)
+					viewEval(bind, view)
 				}
 			}
 		})
 
 		for (opt in opts) if (hasOwn.call(opts, opt)) {
-			if (isFunction(View[opt])) {
+			if (isFn(View[opt])) {
 				for (name in opts[opt]) if (hasOwn.call(opts[opt], name)) {
 					View[opt](name, opts[opt][name])
 				}
@@ -924,7 +919,7 @@
 		var next, tmp
 		, i = 0
 		if (child) {
-			if (isString(child) || isNumber(child)) child = document.createTextNode(child)
+			if (isStr(child) || isNum(child)) child = document.createTextNode(child)
 			else if ( !child.nodeType && (i = child.length) ) {
 				for (tmp = document.createDocumentFragment(); i--; ) append(tmp, child[i], 0)
 				child = tmp
@@ -947,7 +942,7 @@
 					before = el
 					el = before.parentNode
 				}
-				el.insertBefore(child, (isNumber(before) ? el.childNodes[
+				el.insertBefore(child, (isNum(before) ? el.childNodes[
 					before < 0 ? el.childNodes.length - before - 2 : before
 				] : before) || null)
 				/*** debug ***/
@@ -1035,7 +1030,7 @@
 	function hasClass(el, name) {
 		var current = el.className || ""
 
-		if (!isString(current)) {
+		if (!isStr(current)) {
 			current = getAttr(el, "class") || ""
 		}
 
@@ -1046,7 +1041,7 @@
 		// setAttribute("class") is broken in IE7
 		// className is object on SVGElements
 		var current = el.className || ""
-		, useAttr = !isString(current)
+		, useAttr = !isStr(current)
 
 		if (useAttr) {
 			current = el.getAttribute("class") || ""
@@ -1213,8 +1208,8 @@
 			!(fn = !input || map.input ? map[code] || map[chr] || map.num && code > 47 && code < 58 && (chr|=0, map.num) || map.all : fn) &&
 			map.bubble
 		););
-		if (isString(fn)) setUrl(fn)
-		if (isFunction(fn)) fn(e, chr, el)
+		if (isStr(fn)) setUrl(fn)
+		if (isFn(fn)) fn(e, chr, el)
 	}
 
 	addEvent(document, "keydown", function(e) {
@@ -1401,14 +1396,14 @@
 		return function f(el, names, selector, data, val, delay) {
 			if (el && names) {
 				var i = arguments.length
-				if (i == 3 || i == 4 && isNumber(data)) {
+				if (i == 3 || i == 4 && isNum(data)) {
 					delay = data
 					val = selector
 					selector = data = null
-				} else if (i == 4 || i == 5 && isNumber(val)) {
+				} else if (i == 4 || i == 5 && isNum(val)) {
 					delay = val
 					val = data
-					if (isString(selector)) {
+					if (isStr(selector)) {
 						data = null
 					} else {
 						data = selector
@@ -1419,7 +1414,7 @@
 					setTimeout(f, delay, el, names, selector, data, val)
 					return
 				}
-				if (isObject(names)) {
+				if (isObj(names)) {
 					for (delay in names) {
 						if (hasOwn.call(names, delay)) f(el, delay, selector, data, names[delay])
 					}
@@ -1469,17 +1464,17 @@
 		if (styleNode.styleSheet) styleNode.styleSheet.cssText += cssText
 		else append(styleNode, cssText)
 	}
-	function isFunction(fn) {
+	function isFn(fn) {
 		// old WebKit returns "function" for HTML collections
 		return typeof fn === "function"
 	}
-	function isNumber(num) {
+	function isNum(num) {
 		return typeof num === "number"
 	}
-	function isObject(obj) {
+	function isObj(obj) {
 		return !!obj && obj.constructor === Object
 	}
-	function isString(str) {
+	function isStr(str) {
 		return typeof str === "string"
 	}
 	// Maximum call rate for Function

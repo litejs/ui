@@ -108,7 +108,8 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 	}
 
 %view public #
-	;tr: ".page,.header"
+;tr: ".page,.header"
+.app
 	.App.max-height
 		top
 		Menu
@@ -131,30 +132,30 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		}
 
 %view #private #
-	;on "ping", function(ui) {
-		var user
-		ui.on("login", function(e, data) {
-			var err
-			if (data.name != "a") {
-				err = "Login fail. Try name: a"
-				data = null
-			}
-			user = data
-			ui.show(true, {error: err})
-		})
-		ui.on("logout", function() {
-			user = null
-			LiteJS.go("")
-		})
-		ui.on("xhr:401", "logout")
-		return function(params) {
-			if (!user && ui.route != "login") {
-				ui("login").show()
-			} else {
-				ui.scope.user = user
-			}
+;on "ping", function() {
+	var user
+	$ui.on("login", function(e, data) {
+		var err
+		if (data.name != "a") {
+			err = "Login fail. Try name: a"
+			data = null
 		}
-	}(this.$ui)
+		user = $data.user = data
+		$ui.show(true, {error: err})
+	})
+	$ui.on("logout", function() {
+		user = $data.user = null
+		LiteJS.go("")
+	})
+	$ui.on("xhr:401", "logout")
+	return function(params) {
+		$data.user = user
+		if (!user && $ui.route != "login") {
+			$ui("login").show()
+		}
+	}
+}()
+.app
 	.App.max-height
 		top
 			.p2
