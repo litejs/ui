@@ -47,7 +47,7 @@
 	, renderRe = /[;\s]*([-\w]+)(?:(::?| )((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([+>^;@|=\/]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
-	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\b(?:n|data|b|s|B|r|false|in|new|null|this|true|typeof|void|function|var|if|else|return)\b|\.\w+|\w+:/g
+	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[marsS]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /\b[a-z_$][\w$]*/ig
 	, camelRe = /\-([a-z])/g
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
@@ -514,7 +514,7 @@
 							} else if (op != ";" && op != "^") {
 								text = (parent.tagName === "INPUT" ? "val" : "txt") + (
 									op === "=" ? ":" + text.replace(/'/g, "\\'") :
-									":_('" + text.replace(/'/g, "\\'") + "',data)"
+									":_('" + text.replace(/'/g, "\\'") + "',$s)"
 								)
 							}
 							appendBind(parent, text, ";", op)
@@ -1140,33 +1140,29 @@
 		, i = 0
 		, bind = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
 		if (bind !== true) {
-			scope._m = bindMatch
 			// i18n(bind, lang).format(scope)
 
-			fn = "data&&(" + bind.replace(renderRe, function(match, name, op, args) {
-				scope._m[i] = match
+			fn = "$s&&(" + bind.replace(renderRe, function(match, name, op, args) {
+				bindMatch[i] = match
 				match = bindings[name]
 				return (
 					(op === "::" || match && hasOwn.call(match, "once")) ?
-					"(n[B]=n[B].replace(data._m[" + (i++)+ "],''),0)||" :
+					"($el[$a]=$el[$a].replace($m[" + (i++)+ "],''),0)||" :
 					""
 				) + (
 					match ?
-					"b['" + name + "'].call(data,n" + (args ? "," + args : "") :
-					"s(n,'" + name + "'," + args
+					"$s._b['" + name + "'].call($s,$el" + (args ? "," + args : "") :
+					"$S($el,'" + name + "'," + args
 				) + ")||"
-			}) + "r)"
+			}) + "$r)"
 
 			try {
 				var vars = fn.replace(fnRe, "").match(wordRe) || []
-				for (i = vars.length; i--; ) if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
-				if (Function(
-					"n,data,b,s,B,r",
-					(vars[0] ? "var " + vars.join("='',") + "='';" : "") +
-					"with(data||{})return " + fn
-				).call(node, node, scope, bindings, setAttr, attr)) {
-					return true
+				for (i = vars.length; i--; ) {
+					if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
+					else vars[i] += "=$s." + vars[i]
 				}
+				return Function("$el,$s,$S,$a,$m,$r", (vars[0] ? "var " + vars + ";" : "") + "return " + fn)(node, scope, setAttr, attr, bindMatch)
 			} catch (e) {
 				/*** debug ***/
 				console.error(e)
