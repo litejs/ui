@@ -105,19 +105,15 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 	} catch(e) {}
 
 	function setLang(lang) {
-		html.lang = lang = i18n.use(lang)
-		xhr.load("lang/" + lang + ".js", function() {
-			String.alphabet = i18n("__alphabet")
-			String.ordinal = i18n("__ordinal")
-			String.plural = i18n("__plural")
-			body.dir = i18n("dir")
-
-			El.render(body)
-		})
+		if (html.lang != lang) {
+			i18n.current = lang
+			html.lang = lang
+			El.render(app.root)
+		}
 	}
 	app.setLang = setLang
 	app.on("setLang", function(e, el, lang) {
-		console.log(arguments)
+		console.log("setLang", arguments)
 		setLang(lang)
 	})
 	setLang(i18n.detect())

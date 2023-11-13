@@ -33,8 +33,10 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 	.top.t-1.App-row
 		.right
 			%slot
-		.right.lang ;each: lng in _.list
-			a.hand - {lng.toUpperCase()} -
+		.right.lang
+			a.hand
+				;for "lng", _.list
+				;txt " - " + lng.toUpperCase() + " - "
 				@click: [lng], "setLang"
 				;cls: "selected", lng == _.current
 				;cls: "lang-" + lng
@@ -119,7 +121,6 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 	Footer
 	.scroll-up
 		;init: function(el) {
-			console.log("i", arguments)
 			var state = false
 			El.on(el, 'click', function() {
 				window.scrollTo(0, 0)

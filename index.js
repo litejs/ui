@@ -81,6 +81,7 @@
 	}
 	, bindMatch = []
 	, globalScope = {
+		El: El,
 		_: String,
 		_b: bindings
 	}
@@ -129,7 +130,6 @@
 	}
 	/**/
 
-	bindingsOn.once = 1
 	Event.asEmitter = asEmitter
 	Event.stop = eventStop
 
@@ -847,6 +847,35 @@
 	assign(El, {
 		append: append,
 		bindings: assign(bindings, {
+			"for": function(el, name, list) {
+				var comm = Comm("for " + name, up)
+				, pos = 0
+				, nodes = []
+				comm._scope = this
+				elReplace(el, comm)
+				up()
+				return { a: add, r: remove, u: up }
+
+				function add(item) {
+					var clone = nodes[pos++] = el.cloneNode(true)
+					, subScope = assign(elScope(clone, comm), {
+						$i: pos,
+						$len: list.length
+					})
+					clone[BIND_ATTR] = el[BIND_ATTR]
+					subScope[name] = item
+					append(comm.parentNode, clone, comm)
+					render(clone, subScope)
+				}
+				function remove(i) {
+					kill(nodes.splice(i, 1)[0])
+				}
+				function up() {
+					for (; pos; ) remove(--pos)
+					list.forEach(add)
+					return true
+				}
+			},
 			"if": function(el, enabled) {
 				if (enabled) {
 					elReplace(el._if, el)
@@ -879,6 +908,7 @@
 			return getComputedStyle(el).getPropertyValue(key)
 		}
 	})
+	bindingsOn.once = bindings["for"].once = 1
 
 	function getAttr(el, key) {
 		return el && el.getAttribute && el.getAttribute(key)
