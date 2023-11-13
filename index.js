@@ -442,6 +442,9 @@
 			view.emit(event, a, b)
 			View.emit(event, view, a, b)
 		}
+		function viewEval(str) {
+			Function("$ui,$,$$", str)(View, View.$, View.$$)
+		}
 		function viewGet(url, params) {
 			if (!viewFn) {
 				viewFn = Function(
@@ -598,7 +601,7 @@
 		})
 		addPlugin("css",  { r: injectCss })
 		addPlugin("def",  { r: viewDef })
-		addPlugin("js",   { r: Function })
+		addPlugin("js",   { r: viewEval })
 		addPlugin("each", {
 			r: function(params) {
 				var txt = this.t
@@ -1186,6 +1189,8 @@
 	, kbMod = LiteJS.kbMod = iOS ? "metaKey" : "ctrlKey"
 	, kbCodes = LiteJS.kbCodes = ",,,,,,,,backspace,tab,,,,enter,,,shift,ctrl,alt,pause,caps,,,,,,,esc,,,,,,pgup,pgdown,end,home,left,up,right,down,,,,,ins,del,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cmd,,,,,,,,,,,,,,,,,,,,,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12".split(",")
 
+	El.addKb = addKb
+	El.rmKb = rmKb
 	function addKb(map, killEl) {
 		if (map) {
 			kbMaps.unshift(map)
