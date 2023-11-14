@@ -44,11 +44,12 @@
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
-	, renderRe = /[;\s]*([-\w]+)(?:(::?| )((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
+	, renderRe = /[;\s]*([-\w]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([+>^;@|=\/]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
-	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[marsS]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
-	, wordRe = /\b[a-z_$][\w$]*/ig
+	, fnCache = {}
+	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[as]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
+	, wordRe = /[a-z_$][\w$]*/ig
 	, camelRe = /\-([a-z])/g
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
@@ -79,7 +80,6 @@
 			}
 		}
 	}
-	, bindMatch = []
 	, globalScope = {
 		El: El,
 		_: String,
@@ -114,17 +114,14 @@
 	, fixFn = Event.fixFn || (Event.fixFn = {})
 
 	/*** svg ***/
-	, svgNs = "http://www.w3.org/2000/svg"
-	, xlinkNs = "http://www.w3.org/1999/xlink"
-	, bindingsXlink = bindings.xlink = function(el, href) {
+	bindings.xlink = function(el, href) {
 		// In SVG2, xlink namespace is not needed, plain href can be used (Chrome50 2016, Firefox51 2017).
-		el.setAttributeNS(xlinkNs, "xlink:href", href)
+		el.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", href)
 	}
-	bindingsXlink.once = 1
 	if (window.SVGElement) {
 		"animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect script set stop svg switch symbol text textPath tspan use view"
 		.split(splitRe).forEach(function(name) {
-			elCache[name] = document.createElementNS(svgNs, name)
+			elCache[name] = document.createElementNS("http://www.w3.org/2000/svg", name)
 		})
 		// a style title
 	}
@@ -262,7 +259,7 @@
 
 	function LiteJS(opts) {
 		opts = assign({}, defaults, opts)
-		var opt, name
+		var opt, key
 		, root = opts.root
 		, viewFn, lastView, lastUrl, syncResume
 		, viewSeq = 1
@@ -476,7 +473,7 @@
 				for (q = indent.length; q <= stack[0]; ) {
 					if (parent.p) {
 						if (parent.p.c && !parent.p.e.childNodes[0]) break
-						parent.p.d()
+						parent.p.d(parent.p)
 					}
 					parent = parentStack.pop()
 					stack.shift()
@@ -507,7 +504,7 @@
 							append(parent, text) // + "\n")
 						} else {
 							if (op === "@") {
-								text = text.replace(/([\w,]+):?/, "on:'$1',")
+								text = text.replace(/([\w,]+):?/, "on!'$1',")
 							} else if (op != ";" && op != "^") {
 								text = (parent.tagName === "INPUT" ? "val" : "txt") + (
 									op === "=" ? ":" + text.replace(/'/g, "\\'") :
@@ -555,6 +552,7 @@
 					plugin.p = plugin.e = plugin
 					plugin.o = op
 					plugin.s = sep
+					Plugin[P].d = Function("p", "p.r(p.o||p.t)")
 				} else {
 					if (plugin.c) {
 						elCache = create(plugin.c = elCache)
@@ -563,7 +561,6 @@
 					plugin.e.p = plugin
 				}
 			}
-			Plugin[P].d = Function("this.r(this.o||this.t)")
 			assign(Plugin[P], proto)
 		}
 		function getPluginContent(plugin) {
@@ -583,17 +580,17 @@
 		}
 
 		addPlugin("start", {
-			d: Function("this.u.i=1")
+			d: Function("p", "p.u.i=1")
 		})
 		addPlugin("slot", {
-			d: function() {
-				var slotName = this.n || ++elSeq
-				, parent = this.u
+			d: function(plugin) {
+				var slotName = plugin.n || ++elSeq
+				, parent = plugin.u
 				append(parent, Comm("%slot-" + slotName))
 				// In IE6 root div is inside documentFragment
 				for (; parent.parentNode && parent.parentNode.nodeType === 1; parent = parent.parentNode);
 				;(parent._s || (parent._s = {}))[slotName] = parent.childNodes.length - 1
-				if (!this.n) parent._s._ = parent._sk = slotName
+				if (!plugin.n) parent._s._ = parent._sk = slotName
 				parent._cp = parent.childNodes.length - 1
 			}
 		})
@@ -608,9 +605,8 @@
 		})
 		addPlugin("el", {
 			c: 1,
-			d: function() {
-				var plugin = this
-				, parent = plugin.u
+			d: function(plugin) {
+				var parent = plugin.u
 				, el = getPluginContent(plugin)
 				elCache[plugin.n] = el
 				//, arr = plugin.x
@@ -630,9 +626,8 @@
 		})
 		addPlugin("view", {
 			c: 1,
-			d: function() {
-				var plugin = this
-				, bind = getAttr(plugin.e, BIND_ATTR)
+			d: function(plugin) {
+				var bind = getAttr(plugin.e, BIND_ATTR)
 				, view = View(plugin.n, getPluginContent(plugin), plugin.x)
 				if (bind) {
 					bind = bind.replace(renderRe, function(_, name, op, args) {
@@ -645,8 +640,8 @@
 
 		for (opt in opts) if (hasOwn.call(opts, opt)) {
 			if (isFn(View[opt])) {
-				for (name in opts[opt]) if (hasOwn.call(opts[opt], name)) {
-					View[opt](name, opts[opt][name])
+				for (key in opts[opt]) if (hasOwn.call(opts[opt], key)) {
+					View[opt](key, opts[opt][key])
 				}
 			} else {
 				View[opt] = opts[opt]
@@ -669,12 +664,12 @@
 
 		function setBreakpoints() {
 			// document.documentElement.clientWidth is 0 in IE5
-			var key, next
+			var point, next
 			, width = html.offsetWidth
 
-			for (key in breakpoints) {
-				if (breakpoints[key] > width) break
-				next = key
+			for (point in breakpoints) {
+				if (breakpoints[point] > width) break
+				next = point
 			}
 
 			if ( next != lastSize ) {
@@ -873,7 +868,6 @@
 				function up() {
 					for (; pos; ) remove(--pos)
 					list.forEach(add)
-					return true
 				}
 			},
 			"if": function(el, enabled) {
@@ -908,7 +902,6 @@
 			return getComputedStyle(el).getPropertyValue(key)
 		}
 	})
-	bindingsOn.once = bindings["for"].once = 1
 
 	function getAttr(el, key) {
 		return el && el.getAttribute && el.getAttribute(key)
@@ -1165,42 +1158,40 @@
 
 	function hydrate(node, attr, scope) {
 		var fn
-		, i = 0
 		, bind = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
-		if (bind !== true) {
-			// i18n(bind, lang).format(scope)
-
-			fn = "$s&&(" + bind.replace(renderRe, function(match, name, op, args) {
-				bindMatch[i] = match
-				match = bindings[name]
-				return (
-					(op === "::" || match && hasOwn.call(match, "once")) ?
-					"($el[$a]=$el[$a].replace($m[" + (i++)+ "],''),0)||" :
-					""
-				) + (
-					match ?
-					"$s._b['" + name + "'].call($s,$el" + (args ? "," + args : "") :
-					"$S($el,'" + name + "'," + args
-				) + ")||"
-			}) + "$r)"
-
-			try {
-				var vars = fn.replace(fnRe, "").match(wordRe) || []
-				for (i = vars.length; i--; ) {
-					if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
-					else vars[i] += "=$s." + vars[i]
-				}
-				return Function("$el,$s,$S,$a,$m,$r", (vars[0] ? "var " + vars + ";" : "") + "return " + fn)(node, scope, setAttr, attr, bindMatch)
-			} catch (e) {
-				/*** debug ***/
-				console.error(e)
-				console.error("BINDING: " + bind, node)
-				/**/
-				if (window.onerror) {
-					window.onerror(e.message, e.fileName, e.lineNumber)
-				}
+		if (bind !== true) try {
+			fn = fnCache[bind] || (fnCache[bind] = makeFn(bind))
+			scope.$o = fn.o
+			return fn(node, scope, attr)
+		} catch (e) {
+			/*** debug ***/
+			console.error(e)
+			console.error("BINDING: " + bind, node)
+			/**/
+			if (window.onerror) {
+				window.onerror(e.message, e.fileName, e.lineNumber)
 			}
 		}
+	}
+	function makeFn(fn) {
+		var i = 0
+		, bindOnce = []
+		fn = "$s&&(" + fn.replace(renderRe, function(match, name, op, args) {
+			bindOnce[i] = match
+			return (
+				(op === "!" || name === "for") ?
+				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
+				""
+			) + "_b['" + (bindings[name] ? name + "'].call($s,$el" : "attr']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
+		}) + "$r)"
+		var vars = fn.replace(fnRe, "").match(wordRe) || []
+		for (i = vars.length; i--; ) {
+			if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
+			else vars[i] += "=$s." + vars[i]
+		}
+		fn = Function("$el,$s,$a,$r", "var " + vars + ";return " + fn)
+		fn.o = bindOnce
+		return fn
 	}
 
 	/*** kb ***/
@@ -1446,7 +1437,7 @@
 				}
 				if (prepareVal) val = prepareVal(el, selector, data, val)
 				selector = !prepareVal && selector ? findAll(el, selector) : [ el ]
-				var arr = ("" + names).split(splitRe), len = arr.length, i
+				var arr = ("" + names).split(splitRe), len = arr.length
 				for (delay = 0; (el = selector[delay++]); )
 				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
 			}

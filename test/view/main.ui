@@ -48,7 +48,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 	.Menu.App-row.js-viewRender
 		%el nav-row
 		a.Menu-item.waves
-			;cls: "selected", (params._u || "").indexOf($el.href.split("#")[1]) == 0
+			;cls: "selected", url.indexOf($el.href.split("#")[1]) == 0
 		nav-row[href="#home"]
 			svg-icon>path[d="M12,2L1,12h3v9h5V14h6v7h5V12h3z"]
 			svg-icon>path[d="M12,2L1,12h3v9h5V14h9V2h-3V21h5V12h3z"]
@@ -197,6 +197,8 @@ anim-page
 		;if: Math.random() > .5
 		;txt: "If"
 	.time ="Init '\" " + started
+	.time
+		;txt! "Load " + new Date()
 	.time
 		;txt: "Load " + new Date()
 	ul>li+li+li
