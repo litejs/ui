@@ -101,9 +101,6 @@
 		}
 	}
 	, plugins = {}
-	, pluginProto = {
-		d: Function("this.r(this.o||this.t)")
-	}
 	, sources = []
 
 	// After iOS 13 iPad with default enabled "desktop" option
@@ -566,7 +563,8 @@
 					plugin.e.p = plugin
 				}
 			}
-			assign(Plugin[P], pluginProto, proto)
+			Plugin[P].d = Function("this.r(this.o||this.t)")
+			assign(Plugin[P], proto)
 		}
 		function getPluginContent(plugin) {
 			var childNodes = plugin.e.childNodes
