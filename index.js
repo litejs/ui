@@ -506,10 +506,7 @@
 							if (op === "@") {
 								text = text.replace(/([\w,]+):?/, "on!'$1',")
 							} else if (op != ";" && op != "^") {
-								text = (parent.tagName === "INPUT" ? "val" : "txt") + (
-									op === "=" ? ":" + text.replace(/'/g, "\\'") :
-									":_('" + text.replace(/'/g, "\\'") + "',$s)"
-								)
+								text = "txt _('" + text.replace(/'/g, "\\'") + "',$s)"
 							}
 							appendBind(parent, text, ";", op)
 						}
