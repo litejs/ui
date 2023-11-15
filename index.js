@@ -143,8 +143,6 @@
 		obj.off = off
 		obj.one = one
 		obj.emit = emit
-		obj.listen = listen
-		obj.unlisten = unlisten
 		// emitNext, emitLate
 	}
 
@@ -197,27 +195,6 @@
 			}
 		}
 		return _e / 3
-	}
-
-	function listen(emitter, ev, fn, scope, _origin) {
-		if (emitter) {
-			on.call(emitter, ev, fn, scope)
-			;(this._l || (this._l = [])).push([emitter, ev, fn, scope, _origin])
-		}
-		return this
-	}
-
-	function unlisten(key) {
-		var a, i
-		, listening = this._l
-		if (listening) for (i = listening.length; i--; ) {
-			a = listening[i]
-			if (key === "*" || a.indexOf(key) > -1) {
-				listening.splice(i, 1)
-				off.call(a[0], a[1], a[2], a[3])
-			}
-		}
-		return this
 	}
 
 	function addEvent(el, ev, fn) {
