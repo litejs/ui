@@ -4,7 +4,7 @@
 	settings %.ui,%.css
 	test-form,test-grid,pointer %.ui
 	test-form ../../binding/persist.js
-	test-svg #mat,../../el/Pie.tpl,test-svg.view
+	test-svg #mat,../../el/Pie.tpl,test-svg.ui
 	testman,+/lcov,+/lcov/{file} %.view
 	test-material-ui #mat,../../el/Slider.tpl,test-material.ui
 	slot %.view
@@ -111,6 +111,10 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 
 %view public #
 ;tr: ".page,.header"
+;kb: {
+	h: "home",
+	u: "users"
+}
 .app
 	.App.max-height
 		top

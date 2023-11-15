@@ -14,10 +14,6 @@ if (self !== top) {
 
 var app = LiteJS({
 	base: "view/",
-	kb: {
-		h: "home",
-		u: "users"
-	},
 	on: {
 		init: function() {
 			console.log("view init", arguments)
@@ -182,16 +178,17 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 	//var lower = "Back", upper = "Forward"
 	var lower = "Left", upper = "Right"
 
+
 	app("public")
 	.on("openChild", function(open, close) {
-		if (close) El.cls(open.isOpen, close.seq < open.seq ? "from" + upper : "from" + lower)
+		if (close) El.cls(open.o, close.s < open.s ? "from" + upper : "from" + lower)
 	})
 
 	app("public")
 	.on("closeChild", function(close, open) {
-		var isOpen = close.isOpen
-		close.isOpen = null
-		El.cls(isOpen, open && open.seq < close.seq ? "to" + upper : "to" + lower)
+		var isOpen = close.o
+		close.o = null
+		El.cls(isOpen, open && open.s < close.s ? "to" + upper : "to" + lower)
 		setTimeout(function() {
 			El.kill(isOpen)
 		}, 600)
@@ -218,7 +215,7 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 			return "https://en.wikipedia.org/wiki/Self-XSS"
 		}
 		console.log(
-			"%cStop!\n%cThis developer tool lets you hack and give others access only to your own account.\nSee %s for more information.",
+			"%cStop!\n%cThis developer tool lets you hack and only give others access to your own account.\nSee %s for more information.",
 			"font:bold 50px monospace;color:red;text-shadow:3px 3px #000,-1px -1px #fff",
 			"font:20px sans-serif",
 			link

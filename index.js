@@ -250,20 +250,19 @@
 			var view = views[route]
 			if (view) {
 				if (el) {
-					view.el = el
-					view.parent = parent && View(parent)
+					view.e = el
+					view.p = parent && View(parent)
 				}
 				return view
 			}
 			view = this
 			if (!(view instanceof View)) return new View(route, el, parent)
-			views[view.route = route] = view
-			view.el = isStr(el) ? find(html, el) : el
-			view.parent = parent && View(parent)
-			view.$ui = View
+			views[view.r = route] = view
+			view.e = isStr(el) ? find(html, el) : el
+			view.p = parent && View(parent)
 
 			if (route.charAt(0) !== "#") {
-				var params = "m[" + (view.seq = viewSeq++) + "]?("
+				var params = "m[" + (view.s = viewSeq++) + "]?("
 				, _re = route.replace(routeRe, function(_, expr) {
 					return expr ?
 						(params += "o['" + expr + "']=m[" + (viewSeq++) + "],") && "([^/]+?)" :
@@ -276,23 +275,6 @@
 			}
 		}
 
-		assign(View, {
-			$: find.bind(View, root),
-			$$: findAll.bind(View, root),
-			def: viewDef,
-			get: viewGet,
-			parse: (parser = viewParse),
-			show: viewShow,
-			param: function(names, cb) {
-				;("" + names).split(splitRe).forEach(function(n) {
-					paramCb[n] = cb
-				})
-			},
-			ping: function(view, fn) {
-				View(view).on("ping", fn)
-			}
-		})
-
 		asEmitter(View)
 		asEmitter(View[P] = {
 			show: function(_params) {
@@ -300,31 +282,29 @@
 				, params = lastParams = _params || {} // jshint ignore:line
 				, view = lastView = this // jshint ignore:line
 				, tmp = params._v || view // Continue bubbleUp from _v
-				, close = view.isOpen && view
+				, close = view.o && view
 
-				View.route = view.route
-				viewEmit(view, "init")
+				View.route = view.r
+				viewEmit(view, "nav")
 
 				for (; tmp; tmp = parent) {
 					viewEmit(syncResume = params._v = tmp, "ping", params, View)
 					syncResume = null
 					if (lastParams !== params) return
-					if ((parent = tmp.parent)) {
-						if (parent.child && parent.child !== tmp) {
-							close = parent.child
+					if ((parent = tmp.p)) {
+						if (parent.c && parent.c !== tmp) {
+							close = parent.c
 						}
-						parent.child = tmp
+						parent.c = tmp
 					}
-					if (!tmp.el) {
-						if (tmp.file) {
+					if (!tmp.e) {
+						if (tmp.f) {
 							xhr.load(
-								tmp.file
-								.replace(/^|,/g, "$&" + (View.base || ""))
-								.split(","),
-								readTemplates.bind(view, view.wait(tmp.file = null))
+								tmp.f.replace(/^|,/g, "$&" + (View.base || "")).split(","),
+								readTemplates.bind(view, view.wait(tmp.f = null))
 							)
 						} else {
-							if (tmp.route === "404") {
+							if (tmp.r === "404") {
 								viewParse("%view 404 #\nh2 Not found")
 							}
 							View("404").show({origin:params})
@@ -358,27 +338,65 @@
 			}
 		})
 
+		assign(View, {
+			$: find.bind(View, root),
+			$$: findAll.bind(View, root),
+			data: View("#", root).e._scope = assign(create(globalScope), {
+				$ui: View
+			}),
+			def: viewDef,
+			get: viewGet,
+			param: function(names, cb) {
+				;("" + names).split(splitRe).forEach(function(n) {
+					paramCb[n] = cb
+				})
+			},
+			parse: (parser = viewParse),
+			ping: function(view, fn) {
+				View(view).on("ping", fn)
+			},
+			show: viewShow
+		})
+
+		for (opt in opts) if (hasOwn.call(opts, opt)) {
+			if (isFn(View[opt])) {
+				for (key in opts[opt]) if (hasOwn.call(opts[opt], key)) {
+					View[opt](key, opts[opt][key])
+				}
+			} else {
+				View[opt] = opts[opt]
+			}
+		}
+
+		function appendBind(el, val, sep, q) {
+			var current = getAttr(el, BIND_ATTR)
+			setAttr(el, BIND_ATTR, (current ? (
+				q === "^" ?
+				val + sep + current :
+				current + sep + val
+			) : val))
+		}
 		function bubbleDown(params, close) {
 			var tmp
 			, view = params._v
-			, parent = view && view.parent
-			if (!view || params._p && /{/.test(view.route)) {
+			, parent = view && view.p
+			if (!view || params._p && /{/.test(view.r)) {
 				return viewClose(close)
 			}
-			if (parent && !view.isOpen || view === close) {
+			if (parent && !view.o || view === close) {
 				viewClose(close, view)
 				elScope(
-					(view.isOpen = view.el.cloneNode(true)),
-					(tmp = parent.isOpen || parent.el)
+					(view.o = view.e.cloneNode(true)),
+					(tmp = parent.o || parent.e)
 				)
-				append(tmp, view.isOpen)
-				render(view.isOpen)
+				append(tmp, view.o)
+				render(view.o)
 				viewEmit(parent, "openChild", view, close)
 				viewEmit(view, "open", params)
 				addKb(view.kb)
 				close = null
 			}
-			if ((params._d = params._v = view.child)) {
+			if ((params._d = params._v = view.c)) {
 				bubbleDown(params, close)
 			}
 			if ((lastView === view)) {
@@ -388,11 +406,11 @@
 		}
 
 		function viewClose(view, open) {
-			if (view && view.isOpen) {
-				viewEmit(view.parent, "closeChild", view, open)
-				viewClose(view.child)
-				kill(view.isOpen)
-				view.isOpen = null
+			if (view && view.o) {
+				viewEmit(view.p, "closeChild", view, open)
+				viewClose(view.c)
+				elKill(view.o)
+				view.o = null
 				rmKb(view.kb)
 				viewEmit(view, "close")
 			}
@@ -403,9 +421,8 @@
 			}
 			function def(view) {
 				view = View(expand(view))
-				view.file = (view.file ? view.file + "," : "") +
-				match[2].split(",").map(function(file) {
-					return views[file] ? views[file].file : expand(file)
+				view.f = (view.f ? view.f + "," : "") + match[2].split(",").map(function(file) {
+					return views[file] ? views[file].f : expand(file)
 				})
 			}
 		}
@@ -414,7 +431,7 @@
 			View.emit(event, view, a, b)
 		}
 		function viewEval(str, scope) {
-			Function("$s,$ui,$data,$,$$", str)(scope, View, View.scope, View.$, View.$$)
+			Function("$s,$ui,$data,$,$$", str)(scope, View, View.data, View.$, View.$$)
 		}
 		function viewGet(url, params) {
 			if (!viewFn) {
@@ -425,20 +442,6 @@
 			}
 			return View(url ? viewFn(url, params || {}, "404") : View.home)
 		}
-		function viewShow(url, _params) {
-			if (url === true) {
-				if (lastParams._p > 0) return
-				url = lastUrl
-				lastUrl = 0
-			}
-			var params = _params || {}
-			, view = viewGet(url, params)
-			if (!view.isOpen || lastUrl !== url) {
-				globalScope.url = lastExp = lastUrl = url
-				view.show(globalScope.params = params)
-			}
-		}
-
 		function viewParse(str) {
 			var parent = El("div")
 			, stack = [-1]
@@ -476,7 +479,7 @@
 					}
 					if (text && op != "/") {
 						if (op === ">" || op === "+") {
-							(op === "+" ? indent + text : indent + " " + text).replace(templateRe, work)
+							(indent + (op === "+" ? text : " " + text)).replace(templateRe, work)
 						} else if (op === "|" || op === "=") {
 							append(parent, text) // + "\n")
 						} else {
@@ -503,14 +506,18 @@
 				histStart(viewShow)
 			}
 		}
-
-		function appendBind(el, val, sep, q) {
-			var current = getAttr(el, BIND_ATTR)
-			setAttr(el, BIND_ATTR, (current ? (
-				q === "^" ?
-				val + sep + current :
-				current + sep + val
-			) : val))
+		function viewShow(url, _params) {
+			if (url === true) {
+				if (lastParams._p > 0) return
+				url = lastUrl
+				lastUrl = 0
+			}
+			var params = _params || {}
+			, view = viewGet(url, params)
+			if (!view.o || lastUrl !== url) {
+				globalScope.url = lastExp = lastUrl = url
+				view.show(globalScope.params = params)
+			}
 		}
 
 		function addPlugin(name, proto) {
@@ -537,7 +544,7 @@
 			}
 			assign(Plugin[P], proto)
 		}
-		function getPluginContent(plugin) {
+		function usePluginContent(plugin) {
 			var childNodes = plugin.e.childNodes
 			, childPos = plugin.e._cp
 			, el = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
@@ -562,7 +569,7 @@
 				, parent = plugin.u
 				append(parent, Comm("%slot-" + slotName))
 				// In IE6 root div is inside documentFragment
-				for (; parent.parentNode && parent.parentNode.nodeType === 1; parent = parent.parentNode);
+				for (; (parent.parentNode || plugin).nodeType === 1; parent = parent.parentNode);
 				;(parent._s || (parent._s = {}))[slotName] = parent.childNodes.length - 1
 				if (!plugin.n) parent._s._ = parent._sk = slotName
 				parent._cp = parent.childNodes.length - 1
@@ -581,12 +588,8 @@
 			c: 1,
 			d: function(plugin) {
 				var parent = plugin.u
-				, el = getPluginContent(plugin)
+				, el = usePluginContent(plugin)
 				elCache[plugin.n] = el
-				//, arr = plugin.x
-				//if (arr[0]) {
-				//	// TODO:2023-03-22:lauri:Add new scope
-				//}
 				return parent
 			}
 		})
@@ -602,7 +605,7 @@
 			c: 1,
 			d: function(plugin) {
 				var bind = getAttr(plugin.e, BIND_ATTR)
-				, view = View(plugin.n, getPluginContent(plugin), plugin.x)
+				, view = View(plugin.n, usePluginContent(plugin), plugin.x)
 				if (bind) {
 					bind = bind.replace(renderRe, function(_, name, op, args) {
 						return "($s." + name + (isFn(view[name]) ? "(" + (args || "") + ")" : "=" + args) + "),"
@@ -610,20 +613,6 @@
 					viewEval(bind, view)
 				}
 			}
-		})
-
-		for (opt in opts) if (hasOwn.call(opts, opt)) {
-			if (isFn(View[opt])) {
-				for (key in opts[opt]) if (hasOwn.call(opts[opt], key)) {
-					View[opt](key, opts[opt][key])
-				}
-			} else {
-				View[opt] = opts[opt]
-			}
-		}
-
-		View.scope = View("#", root).el._scope = assign(create(globalScope), {
-			$ui: View
 		})
 
 		/*** breakpoints ***/
@@ -651,7 +640,7 @@
 				cls(html, lastSize = next)
 			}
 
-			next = width > html.offsetHeight ? "landscape" : "portrait"
+			next = width > html.offsetHeight ? "land" : "port"
 
 			if ( next != lastOrient) {
 				cls(html, lastOrient, 0)
@@ -733,12 +722,11 @@
 	}
 
 
-	/**
-	 * Turns CSS selector like syntax to DOM Node
-	 * El("input#12.nice[type=checkbox]:checked:disabled[data-lang=en].class")
-	 * <input id="12" class="nice class" type="checkbox" checked="checked" disabled="disabled" data-lang="en">
-	 */
-
+	function Comm(name, render) {
+		var comm = document.createComment(name)
+		if (render) comm.render = render
+		return comm
+	}
 	function El(name) {
 		var attr
 		, attrs = {}
@@ -768,7 +756,6 @@
 
 		return el
 	}
-
 	function ElWrap(nodes, clone) {
 		for (var wrap = [], i = nodes.length; i--; ) {
 			wrap[i] = clone < 2 ? nodes[i].cloneNode(clone) : nodes[i]
@@ -776,16 +763,10 @@
 		return assign(wrap, elArr)
 	}
 
-	function Comm(name, render) {
-		var comm = document.createComment(name)
-		if (render) comm.render = render
-		return comm
-	}
-
 	assign(El, bindings, {
 		emit: elEmit,
-		empty: empty,
-		kill: kill,
+		empty: elEmpty,
+		kill: elKill,
 		off: acceptMany(rmEvent),
 		one: acceptMany(function(el, ev, fn) {
 			function remove() {
@@ -837,7 +818,7 @@
 					render(clone, subScope)
 				}
 				function remove(i) {
-					kill(nodes.splice(i, 1)[0])
+					elKill(nodes.splice(i, 1)[0])
 				}
 				function up() {
 					for (; pos; ) remove(--pos)
@@ -849,7 +830,7 @@
 					elReplace(el._if, el)
 				} else {
 					if (!el._if) {
-						addEvent(el, "kill", kill.bind(el, el._if = Comm("if", render.bind(el, el, this))))
+						addEvent(el, "kill", elKill.bind(el, el._if = Comm("if", render.bind(el, el, this))))
 					}
 					elReplace(el, el._if)
 					return true
@@ -949,6 +930,87 @@
 		}
 	}
 
+	function hasClass(el, name) {
+		var current = el.className || ""
+
+		if (!isStr(current)) {
+			current = getAttr(el, "class") || ""
+		}
+
+		return !!current && current.split(splitRe).indexOf(name) > -1
+	}
+
+	function cls(el, name, set) {
+		// setAttribute("class") is broken in IE7
+		// className is object on SVGElements
+		var current = el.className || ""
+		, useAttr = !isStr(current)
+
+		if (useAttr) {
+			current = el.getAttribute("class") || ""
+		}
+
+		if (set === UNDEF || set) {
+			if (current) {
+				name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
+			}
+		} else {
+			name = current ? (" " + current + " ").replace(" " + name + " ", " ").trim() : current
+		}
+
+		if (current != name) {
+			if (useAttr) {
+				el.setAttribute("class", name)
+			} else {
+				el.className = name
+			}
+		}
+	}
+
+	function elEmit(el) {
+		emit.apply(el, slice.call(arguments, 1))
+	}
+	function elEmpty(el) {
+		for (var node; (node = el.firstChild); elKill(node));
+	}
+	function elKill(el, tr, delay) {
+		if (el) {
+			if (delay > 0) return setTimeout(elKill, delay, el, tr)
+			if (tr) {
+				cls(el, tr, tr = "transitionend")
+				// transitionend fires for each property transitioned
+				if ("on" + tr in el) return addEvent(el, tr, elKill.bind(el, el, el = null))
+			}
+			if (el._e) {
+				emit.call(el, "kill")
+				for (delay in el._e) rmEvent(el, delay)
+			}
+			if (el.parentNode) {
+				el.parentNode.removeChild(el)
+			}
+			if (el.nodeType != 1) {
+				if (el.kill) el.kill()
+			} else {
+				elEmpty(el)
+				if (el._scope !== UNDEF) {
+					el._scope = UNDEF
+				}
+				if (el.valObject !== UNDEF) {
+					el.valObject = UNDEF
+				}
+			}
+		}
+	}
+	function elReplace(el, newEl) {
+		var parent = el && el.parentNode
+		if (parent && newEl) return parent.replaceChild(newEl, el)
+	}
+	function elScope(el, parent) {
+		return el._scope || (
+			parent ? ((parent = elScope(parent)), el._scope = assign(create(parent), { $up: parent })) :
+			closestScope(el)
+		)
+	}
 	function elTxt(el, txt) {
 		if (el[txtAttr] !== txt) el[txtAttr] = txt
 	}
@@ -977,7 +1039,6 @@
 					step[key || step.length] = value
 				}
 			}
-
 			return opts
 		}
 
@@ -1020,83 +1081,6 @@
 			step = step[key] || (step[key] = step[key] === null || _key && +_key != _key ? {} : [])
 			key = _key
 		}
-	}
-
-	function hasClass(el, name) {
-		var current = el.className || ""
-
-		if (!isStr(current)) {
-			current = getAttr(el, "class") || ""
-		}
-
-		return !!current && current.split(splitRe).indexOf(name) > -1
-	}
-
-	function cls(el, name, set) {
-		// setAttribute("class") is broken in IE7
-		// className is object on SVGElements
-		var current = el.className || ""
-		, useAttr = !isStr(current)
-
-		if (useAttr) {
-			current = el.getAttribute("class") || ""
-		}
-
-		if (set === UNDEF || set) {
-			if (current) {
-				name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
-			}
-		} else {
-			name = current ? (" " + current + " ").replace(" " + name + " ", " ").trim() : current
-		}
-
-		if (current != name) {
-			if (useAttr) {
-				el.setAttribute("class", name)
-			} else {
-				el.className = name
-			}
-		}
-	}
-
-	function empty(el) {
-		for (var node; (node = el.firstChild); kill(node));
-	}
-
-	function kill(el, tr, delay) {
-		if (el) {
-			if (delay > 0) return setTimeout(kill, delay, el, tr)
-			if (tr) {
-				cls(el, tr, tr = "transitionend")
-				// transitionend fires for each property transitioned
-				if ("on" + tr in el) return addEvent(el, tr, kill.bind(el, el, el = null))
-			}
-			if (el._e) {
-				emit.call(el, "kill")
-				for (delay in el._e) rmEvent(el, delay)
-			}
-			if (el.parentNode) {
-				el.parentNode.removeChild(el)
-			}
-			if (el.nodeType != 1) {
-				if (el.kill) el.kill()
-			} else {
-				empty(el)
-				if (el._scope !== UNDEF) {
-					el._scope = UNDEF
-				}
-				if (el.valObject !== UNDEF) {
-					el.valObject = UNDEF
-				}
-			}
-		}
-	}
-
-	function elScope(el, parent) {
-		return el._scope || (
-			parent ? ((parent = elScope(parent)), el._scope = assign(create(parent), { $up: parent })) :
-			closestScope(el)
-		)
 	}
 
 	function closestScope(node) {
@@ -1428,13 +1412,6 @@
 	function camelFn(_, a) {
 		return a.toUpperCase()
 	}
-	function elEmit(el) {
-		emit.apply(el, slice.call(arguments, 1))
-	}
-	function elReplace(oldEl, newEl) {
-		var parent = oldEl && oldEl.parentNode
-		if (parent && newEl) return parent.replaceChild(newEl, oldEl)
-	}
 	function expand(str) {
 		var first = str.charAt(0)
 		, rest = str.slice(1)
@@ -1499,7 +1476,7 @@
 		xhr.load(findAll(body, "script[type=ui]").map(function(el) {
 			// IE6 script.innerText is empty
 			sources.push(el[txtAttr] || el.innerHTML)
-			kill(el)
+			elKill(el)
 			return el.src
 		}), function(res) {
 			res = res.concat(sources).filter(Boolean)
