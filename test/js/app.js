@@ -15,8 +15,8 @@ if (self !== top) {
 var app = LiteJS({
 	base: "view/",
 	on: {
-		init: function() {
-			console.log("view init", arguments)
+		nav: function() {
+			console.log("Navigating to", app.route)
 		},
 		txt: function() {
 			console.log("txt", arguments)
@@ -168,12 +168,6 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 	})
 
 
-
-	app("#body")
-	.on("ping", function() {
-		El.data.user = user
-		app.$$(".Menu,.lang").render()
-	})
 
 	//var lower = "Back", upper = "Forward"
 	var lower = "Left", upper = "Right"

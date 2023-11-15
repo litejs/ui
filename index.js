@@ -284,10 +284,7 @@
 				, tmp = params._v || view // Continue bubbleUp from _v
 				, close = view.o && view
 
-				View.route = view.r
-				viewEmit(view, "nav")
-
-				for (; tmp; tmp = parent) {
+				for (View.route = view.r; tmp; tmp = parent) {
 					viewEmit(syncResume = params._v = tmp, "ping", params, View)
 					syncResume = null
 					if (lastParams !== params) return
@@ -313,15 +310,13 @@
 					}
 				}
 
-				if (view !== close) viewEmit(view, "change", close)
-
 				for (tmp in params) {
 					if (tmp.charAt(0) !== "_" && (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
 						syncResume.call(view, params[tmp], tmp, params, View)
 						syncResume = null
 					}
 				}
-
+				viewEmit(view, "nav")
 				bubbleDown(params, close)
 			},
 			wait: function() {

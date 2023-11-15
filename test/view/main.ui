@@ -158,6 +158,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		if (!user && $ui.route != "login") {
 			$ui("login").show()
 		}
+		$$(".Menu,.lang").render()
 	}
 }()
 .app
