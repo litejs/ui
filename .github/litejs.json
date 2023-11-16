@@ -1,0 +1,3 @@
+{
+  "build": "lj b --out=test/index.html test/dev.html"
+}

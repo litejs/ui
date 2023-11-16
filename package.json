@@ -22,26 +22,11 @@
     "polyfill"
   ],
   "scripts": {
-    "test": "TZ='Europe/Tallinn' lj test test/index.js --brief --coverage --no-status --sources=load.js,require.js,index.js && jshint --verbose *.js"
+    "lint": "jshint --config=.github/jshint.json *.js",
+    "test": "TZ='Europe/Tallinn' lj test test/index.js --brief --coverage --no-status --sources=load.js,require.js,index.js && npm run lint"
   },
   "devDependencies": {
     "@litejs/cli": "23.8.0",
     "jshint": "2.13.6"
-  },
-  "litejs": {
-    "build": "lj b --out=test/index.html test/dev.html"
-  },
-  "jshintConfig": {
-    "esversion": 5,
-    "asi": true,
-    "evil": true,
-    "laxcomma": true,
-    "maxdepth": 6,
-    "node": true,
-    "nonbsp": true,
-    "undef": true,
-    "unused": true,
-    "shadow": "outer",
-    "quotmark": "double"
   }
 }

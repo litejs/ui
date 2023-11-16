@@ -491,10 +491,10 @@
 			str.replace(templateRe, work)
 			work("", "")
 			if (parent.childNodes[0]) {
-				append(body, parent.childNodes)
-				render(body)
+				append(root, parent.childNodes)
+				render(root)
 				/*** debug ***/
-				console.log("Outside view defined elements are rendered immediately into body")
+				console.log("Outside view defined elements are rendered immediately into UI")
 				/**/
 			}
 			if (parent.i) {
@@ -1133,9 +1133,8 @@
 		var i = 0
 		, bindOnce = []
 		fn = "$s&&(" + fn.replace(renderRe, function(match, name, op, args) {
-			bindOnce[i] = match
 			return (
-				(op === "!") ?
+				(op === "!" && (bindOnce[i] = match)) ?
 				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
 				""
 			) + "_b['" + (bindings[name] ? name + "'].call($s,$el" : "attr']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
@@ -1478,8 +1477,8 @@
 			return el.src
 		}), function(res) {
 			res = res.concat(sources).filter(Boolean)
-			if (res[0]) {
-				if (!parser) LiteJS()
+			if (res[sources.length = 0]) {
+				if (!parser) LiteJS.ui = LiteJS()
 				res.forEach(parser)
 			}
 			if (next) next()
