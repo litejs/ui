@@ -771,7 +771,8 @@
 			addEvent(el, ev, fn)
 			addEvent(el, ev, remove)
 		}),
-		render: render
+		render: render,
+		rm: elRm
 	})
 
 	Object.keys(El).forEach(function(key) {
@@ -980,9 +981,7 @@
 				emit.call(el, "kill")
 				for (delay in el._e) rmEvent(el, delay)
 			}
-			if (el.parentNode) {
-				el.parentNode.removeChild(el)
-			}
+			elRm(el)
 			if (el.nodeType != 1) {
 				if (el.kill) el.kill()
 			} else {
@@ -999,6 +998,10 @@
 	function elReplace(el, newEl) {
 		var parent = el && el.parentNode
 		if (parent && newEl) return parent.replaceChild(newEl, el)
+	}
+	function elRm(el) {
+		var parent = el && el.parentNode
+		if (parent) parent.removeChild(el)
 	}
 	function elScope(el, parent) {
 		return el._scope || (
