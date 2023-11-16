@@ -46,7 +46,7 @@
 	, elCache = {}
 	, renderRe = /[;\s]*([-\w]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
-	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([+>^;@|=\/]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
+	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>+=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, fnCache = {}
 	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[as]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /[a-z_$][\w$]*/ig
@@ -475,12 +475,12 @@
 					if (text && op != "/") {
 						if (op === ">" || op === "+") {
 							(indent + (op === "+" ? text : " " + text)).replace(templateRe, work)
-						} else if (op === "|" || op === "=") {
+						} else if (op === "=") {
 							append(parent, text) // + "\n")
 						} else {
 							if (op === "@") {
 								text = text.replace(/([\w,]+):?/, "on!'$1',")
-							} else if (op != ";" && op != "^") {
+							} else if (op === "") {
 								text = "txt _('" + text.replace(/'/g, "\\'") + "',$s)"
 							}
 							appendBind(parent, text, ";", op)
@@ -1135,7 +1135,7 @@
 		fn = "$s&&(" + fn.replace(renderRe, function(match, name, op, args) {
 			bindOnce[i] = match
 			return (
-				(op === "!" || name === "for") ?
+				(op === "!") ?
 				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
 				""
 			) + "_b['" + (bindings[name] ? name + "'].call($s,$el" : "attr']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
