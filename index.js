@@ -522,7 +522,6 @@
 					plugin.p = plugin.e = plugin
 					plugin.o = op
 					plugin.s = sep
-					Plugin[P].d = Function("p", "p.r(p.o||p.t)")
 				} else {
 					if (plugin.c) {
 						elCache = create(plugin.c = elCache)
@@ -531,6 +530,7 @@
 					plugin.e.p = plugin
 				}
 			}
+			if (proto.r) proto.d = Function("p", "p.r(p.o||p.t)")
 			assign(Plugin[P], proto)
 		}
 		function usePluginContent(plugin) {

@@ -58,10 +58,10 @@
 	*/
 
 	El.on(window, "focus", onFocus)
-	El.on(window, "unload", function() {
-		xhr.unload = true
-		if (events.length) navigator.sendBeacon("/events", JSON.stringify(events))
-	})
+	//El.on(window, "unload", function() {
+	//	xhr.unload = true
+	//	if (events.length) navigator.sendBeacon("/events", JSON.stringify(events))
+	//})
 
 	function addMethod(method, name) {
 		xhr[name || method.toLowerCase()] = xhr[method] = xhrReq.bind(null, method)
