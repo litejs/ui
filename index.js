@@ -819,10 +819,7 @@
 				if (enabled) {
 					elReplace(el._if, el)
 				} else {
-					if (!el._if) {
-						addEvent(el, "kill", elKill.bind(el, el._if = Comm("if", render.bind(el, el, this))))
-					}
-					elReplace(el, el._if)
+					elReplace(el, el._if || (el._if = Comm("if", render.bind(el, el, this))))
 					return true
 				}
 			},
