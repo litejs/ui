@@ -336,9 +336,7 @@
 		assign(View, {
 			$: find.bind(View, root),
 			$$: findAll.bind(View, root),
-			data: View("#", root).e._scope = assign(create(globalScope), {
-				$ui: View
-			}),
+			data: elScope(View("#", root).e, globalScope),
 			def: viewDef,
 			get: viewGet,
 			param: function(names, cb) {
@@ -352,6 +350,7 @@
 			},
 			show: viewShow
 		})
+		View.data.$ui = View
 
 		for (opt in opts) if (hasOwn.call(opts, opt)) {
 			if (isFn(View[opt])) {
