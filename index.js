@@ -371,19 +371,14 @@
 			) : val))
 		}
 		function bubbleDown(params, close) {
-			var tmp
-			, view = params._v
+			var view = params._v
 			, parent = view && view.p
 			if (!view || params._p && /{/.test(view.r)) {
 				return viewClose(close)
 			}
 			if (parent && !view.o || view === close) {
 				viewClose(close, view)
-				elScope(
-					(view.o = view.e.cloneNode(true)),
-					(tmp = parent.o || parent.e)
-				)
-				append(tmp, view.o)
+				append(parent.o || parent.e, view.o = view.e.cloneNode(true))
 				render(view.o)
 				viewEmit(parent, "openChild", view, close)
 				viewEmit(view, "open", params)
