@@ -406,7 +406,7 @@
 		}
 		function viewDef(str) {
 			for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
-				match[1].split(",").map(def)
+				match[1].split(splitRe).map(def)
 			}
 			function def(view) {
 				view = View(expand(view))
@@ -1142,7 +1142,7 @@
 	/*** kb ***/
 	var kbMaps = []
 	, kbMod = LiteJS.kbMod = iOS ? "metaKey" : "ctrlKey"
-	, kbCodes = LiteJS.kbCodes = ",,,,,,,,backspace,tab,,,,enter,,,shift,ctrl,alt,pause,caps,,,,,,,esc,,,,,,pgup,pgdown,end,home,left,up,right,down,,,,,ins,del,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cmd,,,,,,,,,,,,,,,,,,,,,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12".split(",")
+	, kbCodes = LiteJS.kbCodes = ",,,,,,,,backspace,tab,,,,enter,,,shift,ctrl,alt,pause,caps,,,,,,,esc,,,,,,pgup,pgdown,end,home,left,up,right,down,,,,,ins,del,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cmd,,,,,,,,,,,,,,,,,,,,,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12".split(splitRe)
 
 	El.addKb = addKb
 	El.rmKb = rmKb
