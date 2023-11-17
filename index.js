@@ -791,7 +791,7 @@
 				var comm = Comm("for " + name, up)
 				, pos = 0
 				, nodes = []
-				comm._scope = this
+				comm.$s = this
 				elReplace(el, comm)
 				up()
 				return { a: add, r: remove, u: up }
@@ -980,8 +980,8 @@
 				if (el.kill) el.kill()
 			} else {
 				elEmpty(el)
-				if (el._scope !== UNDEF) {
-					el._scope = UNDEF
+				if (el.$s !== UNDEF) {
+					el.$s = UNDEF
 				}
 				if (el.valObject !== UNDEF) {
 					el.valObject = UNDEF
@@ -998,8 +998,8 @@
 		if (parent) parent.removeChild(el)
 	}
 	function elScope(el, parent) {
-		return el._scope || (
-			parent ? ((parent = elScope(parent)), el._scope = assign(create(parent), { $up: parent })) :
+		return el.$s || (
+			parent ? ((parent = elScope(parent)), el.$s = assign(create(parent), { $up: parent })) :
 			closestScope(el)
 		)
 	}
@@ -1077,15 +1077,15 @@
 
 	function closestScope(node) {
 		for (; (node = node.parentNode); ) {
-			if (node._scope) return node._scope
+			if (node.$s) return node.$s
 		}
 		return globalScope
 	}
 
-	function render(node, _scope) {
+	function render(node, $s) {
 		if (!node) return
-		var bind, fn
-		, scope = node._scope || _scope || closestScope(node)
+		var bind
+		, scope = node.$s || $s || closestScope(node)
 
 		if (node.nodeType != 1) {
 			if (node.render) node.render(scope)
@@ -1099,8 +1099,7 @@
 		/**/
 
 		if (hydrate(node, BIND_ATTR, scope)) return
-		for (bind = node.firstChild; bind; bind = fn) {
-			fn = bind.nextSibling
+		for (bind = node.firstChild; bind; bind = bind.nextSibling) {
 			render(bind, scope)
 		}
 		hydrate(node, "data-out", scope)
