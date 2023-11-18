@@ -1,0 +1,8 @@
+
+
+@media not (prefers-reduced-motion) {
+	.smooth-scroll {
+		scroll-behavior: smooth;
+	}
+}
+

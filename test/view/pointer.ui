@@ -1,33 +1,34 @@
 
 %view pointer public
-	.content
-		h2 Test touch 1
-		.rel
-			;css: "background,height", ["#ddd","400px"]
-			.abs.w3.h3 BTN
-				;initTouch::
-				;css "background", "#999"
-				;css "height,width", "180px"
-		h2 Events
-		div
-			;init: data.count1=0
-			;txt: "Click " + count1
-			;title:: "Click " + count1
-			@click "txt"
-		div
-			;init: data.count2=0
-			@click "txt"
-			;txt: "One click " + count2
-		div
-			;init: data.count2=0
-			;txt: "Hover"
-			@mouseover,mouseout "txt"
-		div
-			;init: data.count3=0
-			;txt: "Wheel " + count3
-			;on: "wheel", "txt"
+anim-page
+	h2 Test touch 1
+	.rel
+		;css "background,height", ["#ddd","400px"]
+		.abs.w3.h3 BTN
+			;initTouch!
+			;css "background", "#999"
+			;css "height,width", "180px"
+	h2 Events
+	div
+		;init: data.count1=0
+		;txt: "Click " + count1
+		;title! "Click " + count1
+		@click "txt"
+	div
+		;init: data.count2=0
+		@click "txt"
+		;txt: "One click " + count2
+	div
+		;init: data.count2=0
+		;txt: "Hover"
+		@mouseover,mouseout "txt"
+	div
+		;init: data.count3=0
+		;txt: "Wheel " + count3
+		;on: "wheel", "txt"
 
 %js
+	El.bindings.init = function() {}
 	El.bindings.initTouch = function(el) {
 		var re = {
 			rotate: /rotate\(([-\d.]+)/

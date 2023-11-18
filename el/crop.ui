@@ -1,0 +1,49 @@
+
+%css
+	.Crop {
+		position: relative;
+		width: 400px;
+		height: 300px;
+		overflow: hidden;
+	}
+	.Crop-img {
+		position: absolute;
+		pointer-events: none;
+	}
+	.Crop:after {
+		position: absolute;
+		content: "";
+		width: 150px;
+		height: 150px;
+		top: 75px;
+		left: 125px;
+		border: 2px solid #fff;
+		border-radius: 50%;
+		box-shadow: 0 0 2000px 2000px rgba(0, 0, 0, 0.5);
+		pointer-events: none;
+	}
+
+
+%el Crop
+	.Crop
+		@pan function(e){}
+		@pinch function(zoom){
+			var imgWidth = $el.offsetWidth
+			scale(0,0)
+			El.on($el, "wheel", scale)
+			return scale
+			function scale(e, delta) {
+				console.log("pinch", arguments)
+				zoom += delta / 5
+				if (zoom < .5) zoom = .5
+				else if (zoom > 50) zoom = 50
+				El.css($el.firstChild, "width", (imgWidth * zoom) + "px")
+			}
+		}(1)
+		img.Crop-img[src="img/pixabay.com-mountain-8330401_640.jpg"]
+
+%view test/crop public
+anim-page
+	h2 Crop image
+	Crop
+

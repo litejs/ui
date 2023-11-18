@@ -1275,7 +1275,7 @@
 		// Chrome M35 and Firefox 55 followed up.
 		if (!touches[0]) {
 			var ev = e.ctrlKey ? "pinch" : e.altKey ? "rotate" : UNDEF
-			if (ev && elEmit(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
+			if (ev && emit.call(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
 				return eventStop(e)
 			}
 		}

@@ -140,12 +140,29 @@
 	;each: num in [1,2,3,4,5,6,7,8,9,"CLEAR",0]
 	.col.w4>.btn {num}
 
+%js
+	$ui.on("showDialog", function(e, el, dialog) {
+		console.log("showDialog", El.scope(el), arguments)
+		El.kill(dialog)
+	})
+
+%el Dialog
+.Dialog.grid.p2.anim Dialog
+	.col.ts3 ;txt!_(title, map)
+	.col.js-body ;md!_(body, map)
+	.col
+		.group ;each: action in actions
+			.btn.js-btn
+				;txt!_(action.title)
+				;class!"w" + (12/actions.length)
+				;nop: this.focus()
+				;attr: "data-action", action.action
+				;class!"is-" + action.action, action.action
+
 %el Modal
 	.Modal.max.fix.anim
 		.Modal-bg.max.abs
 		.Modal-content.Modal--blur.grid.p2.anim
-			.col.ts3 ;txt:: _(title, map)
-			.col.js-body ;md:: _(body, map)
 			.row
 				;if: input
 				.col>input.field.js-input
@@ -166,12 +183,4 @@
 						option
 							;val:: item.id
 							;txt:: _(item.name)
-			.col
-				.group ;each: action in actions
-					.btn.js-btn
-						;txt:: _(action.title)
-						;class:: "w" + (12/actions.length)
-						;nop: this.focus()
-						;attr: "data-action", action.action
-						;class:: "is-" + action.action, action.action
 
