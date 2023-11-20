@@ -958,7 +958,7 @@
 		emit.apply(el, slice.call(arguments, 1))
 	}
 	function elEmpty(el) {
-		for (var node; (node = el.firstChild); elKill(node));
+		ElWrap(el.childNodes).kill()
 	}
 	function elKill(el, tr, delay) {
 		if (el) {
