@@ -28,7 +28,7 @@
 	, emptyArr = []
 	, assign = Object.assign
 	, create = Object.create
-	, isArray = Array.isArray
+	, isArr = Array.isArray
 	, slice = emptyArr.slice
 	, P = "prototype"
 
@@ -119,8 +119,7 @@
 		el.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", href)
 	}
 	if (window.SVGElement) {
-		"animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect script set stop svg switch symbol text textPath tspan use view"
-		.split(splitRe).forEach(function(name) {
+		each("animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect script set stop svg switch symbol text textPath tspan use view", function(name) {
 			elCache[name] = document.createElementNS("http://www.w3.org/2000/svg", name)
 		})
 		// a style title
@@ -236,8 +235,7 @@
 
 	function LiteJS(opts) {
 		opts = assign({}, defaults, opts)
-		var opt, key
-		, root = opts.root
+		var root = opts.root
 		, viewFn, lastView, lastUrl, syncResume
 		, viewSeq = 1
 		, fnStr = ""
@@ -340,7 +338,7 @@
 			def: viewDef,
 			get: viewGet,
 			param: function(names, cb) {
-				;("" + names).split(splitRe).forEach(function(n) {
+				each(names, function(n) {
 					paramCb[n] = cb
 				})
 			},
@@ -352,15 +350,15 @@
 		})
 		View.data.$ui = View
 
-		for (opt in opts) if (hasOwn.call(opts, opt)) {
+		each(opts, function(val, opt) {
 			if (isFn(View[opt])) {
-				for (key in opts[opt]) if (hasOwn.call(opts[opt], key)) {
-					View[opt](key, opts[opt][key])
-				}
+				each(val, function(obj, key) {
+					View[opt](key, obj)
+				})
 			} else {
-				View[opt] = opts[opt]
+				View[opt] = val
 			}
-		}
+		})
 
 		function appendBind(el, val, sep, q) {
 			var current = getAttr(el, BIND_ATTR)
@@ -406,12 +404,12 @@
 		}
 		function viewDef(str) {
 			for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
-				match[1].split(splitRe).map(def)
+				each(match[1], def)
 			}
 			function def(view) {
 				view = View(expand(view))
-				view.f = (view.f ? view.f + "," : "") + match[2].split(",").map(function(file) {
-					return views[file] ? views[file].f : expand(file)
+				each(match[2], function(file) {
+					view.f = (view.f ? view.f + "," : "") + (views[file] ? views[file].f : expand(file))
 				})
 			}
 		}
@@ -570,7 +568,9 @@
 		addPlugin("each", {
 			r: function(params) {
 				var txt = this.t
-				params.split(splitRe).map(txt.replace.bind(txt, /{key}/g)).forEach(viewParse)
+				each(params, function(param) {
+					viewParse(txt.replace(/{key}/g, param))
+				})
 			}
 		})
 		addPlugin("el", {
@@ -769,7 +769,7 @@
 		rm: elRm
 	})
 
-	Object.keys(El).forEach(function(key) {
+	each(El, function(fn, key) {
 		elArr[key] = function() {
 			var arr = this
 			, i = 0
@@ -778,7 +778,7 @@
 			arg.unshift(1)
 			for (; i < len; ) {
 				arg[0] = arr[i++]
-				El[key].apply(El, arg)
+				fn.apply(El, arg)
 			}
 			return arr
 		}
@@ -812,7 +812,7 @@
 				}
 				function up() {
 					for (; pos; ) remove(--pos)
-					list.forEach(add)
+					each(list, add)
 				}
 			},
 			"if": function(el, enabled) {
@@ -1033,7 +1033,7 @@
 
 		if (val !== UNDEF) {
 			if (opts) {
-				value = (isArray(val) ? val : [ val ]).map(String)
+				value = (isArr(val) ? val : [ val ]).map(String)
 				for (; (input = opts[i++]); ) {
 					input.selected = value.indexOf(input.value) > -1
 				}
@@ -1384,7 +1384,7 @@
 				selector = !prepareVal && selector ? findAll(el, selector) : [ el ]
 				var arr = ("" + names).split(splitRe), len = arr.length
 				for (delay = 0; (el = selector[delay++]); )
-				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArray(val) ? val[i - 1] : val)
+				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArr(val) ? val[i - 1] : val)
 			}
 		}
 	}
@@ -1398,6 +1398,11 @@
 	}
 	function camelFn(_, a) {
 		return a.toUpperCase()
+	}
+	function each(arr, fn, scope, key) {
+		if (isStr(arr)) arr = arr.split(splitRe)
+		if (isArr(arr)) arr.forEach(fn, scope)
+		else if (arr) for (key in arr) if (hasOwn.call(arr, key)) fn.call(scope, arr[key], key, arr)
 	}
 	function expand(str) {
 		var first = str.charAt(0)
@@ -1469,7 +1474,7 @@
 			res = res.concat(sources).filter(Boolean)
 			if (res[sources.length = 0]) {
 				if (!parser) LiteJS.ui = LiteJS()
-				res.forEach(parser)
+				each(res, parser)
 			}
 			if (next) next()
 		}, 1)
