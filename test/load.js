@@ -144,16 +144,17 @@ describe("load.js", function() {
 	.should("handle promise-like response", function(assert, mock) {
 		mock.time()
 		xhrReset()
-		xhr.load.thenable = function(str) {
+		var thenable = xhr.thenable = mock.fn(function(str) {
 			return { then: function(cb) {
 				setTimeout(function() {
-					xhrRes.push(str)
+					xhrRes.push("var M")
 					cb()
 				}, 1)
 			}}
-		}
+		})
 		xhr.load(["m.thenable"], function() {
-			assert.equal(xhrRes, ["var m"])
+			assert.equal(thenable.called, 1)
+			assert.equal(xhrRes, ["var M"])
 			assert.end()
 		})
 		mock.tick(500)

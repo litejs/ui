@@ -10,19 +10,6 @@
 	var UNDEF, lastExp, parser, styleNode
 	, html = document.documentElement
 	, body = document.body
-	, defaults = {
-		base: "",
-		/*** breakpoints ***/
-		breakpoints: {
-			sm: 0,
-			md: 601,
-			lg: 1025
-		},
-		/**/
-		home: "home",
-		root: body
-	}
-	, hasOwn = defaults.hasOwnProperty
 	, histBase, histCb, histLast
 	, splitRe = /[,\s]+/
 	, emptyArr = []
@@ -30,7 +17,6 @@
 	, create = Object.create
 	, isArr = Array.isArray
 	, slice = emptyArr.slice
-	, P = "prototype"
 
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
 	// http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
@@ -103,6 +89,7 @@
 	}
 	, plugins = {}
 	, sources = []
+	, hasOwn = plugins.hasOwnProperty
 
 	// After iOS 13 iPad with default enabled "desktop" option
 	// is the only Macintosh with multi-touch
@@ -234,7 +221,18 @@
 	}
 
 	function LiteJS(opts) {
-		opts = assign({}, defaults, opts)
+		opts = assign({
+			base: "",
+			/*** breakpoints ***/
+			breakpoints: {
+				sm: 0,
+				md: 601,
+				lg: 1025
+			},
+			/**/
+			home: "home",
+			root: body
+		}, opts)
 		var root = opts.root
 		, viewFn, lastView, lastUrl, syncResume
 		, viewSeq = 1
@@ -274,7 +272,7 @@
 		}
 
 		asEmitter(View)
-		asEmitter(View[P] = {
+		asEmitter(View.prototype = {
 			show: function(_params) {
 				var parent
 				, params = lastParams = _params || {} // jshint ignore:line
@@ -529,7 +527,7 @@
 				}
 			}
 			if (proto.r) proto.d = Function("p", "p.r(p.o||p.t)")
-			assign(Plugin[P], proto)
+			assign(Plugin.prototype, proto)
 		}
 		function usePluginContent(plugin) {
 			var childNodes = plugin.e.childNodes
@@ -856,7 +854,7 @@
 		// Bug: IE5-7 doesn't set styles and removes events when you try to set them.
 		// IE6 label with a for attribute will re-select the first option of SELECT list instead of just giving focus.
 		// http://webbugtrack.blogspot.com/2007/09/bug-116-for-attribute-woes-in-ie6.html
-		// istanbul ignore next: IE fix
+		/* c8 ignore next 3 */
 		if (ie67 && (key === "id" || key === "name" || key === "checked" || key === "style")) {
 			// IE8 and below have a bug where changed 'name' not accepted on form submit
 			el.mergeAttributes(document.createElement("<INPUT " + key + "='" + val + "'>"), false)
