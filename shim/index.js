@@ -262,7 +262,7 @@
 
 	patch("JSON", {
 		parse: function(t) {
-			return Function("return(" + t.replace(/\u2028|\u2029/g, jsonFn) + ")")()
+			return Function("return(" + t + ")")()
 		},
 		stringify: function stringify(o) {
 			// IE 8 serializes `undefined` as `"undefined"`

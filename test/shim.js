@@ -241,6 +241,8 @@ describe("Shim test", function() {
 		assert.equal(    JSON.parse(str1), obj2)
 		assert.equal(lib.JSON.stringify(obj1), str1)
 		assert.equal(    JSON.stringify(obj1), str1)
+		assert.equal(lib.JSON.parse('"a\u2029b\\u2029c"'), "a\u2029b\u2029c")
+		assert.equal(    JSON.parse('"a\u2029b\\u2029c"'), "a\u2029b\u2029c")
 		assert.end()
 	})
 })
