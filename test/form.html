@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html><head><title>Form</title>
+	<link rel="stylesheet" href="../css/base.css">
+	<link rel="stylesheet" href="../css/grid.css">
+	<link rel="stylesheet" href="../css/spacing-4.css">
+	<link rel="stylesheet" href="../css/form.css">
+</head><body><script type="ui">
+%css
+	body {
+		margin: 0 auto;
+		max-width: 800px;
+	}
+
+%el checkbox
+input[type=checkbox]
+
+form.grid.b2
+	h1 Form test
+	label.row
+		.col.w6 Text
+		.col.w6>input ;val "Hello"
+	label.row
+		.col.w6 Number
+		.col.w6>input[type=number] ;val 123
+	label.row
+		.col.w6 Date
+		.col.w6>input[type=date] ;val 123
+	label.row
+		.col.w6 Readonly
+		.col.w6>input:readonly ;val "Readonly"
+	label.row
+		.col.w6 Disabled
+		.col.w6>input:disabled ;val "Disabled"
+	label.row
+		.col.w6 Select
+		.col.w6
+			select[name="pet"]
+				option[value=cat] Cat
+				option[value=dog]:selected Dog
+				option Bird
+				option:disabled Snake
+				option
+	label.row
+		.col.w6 Select multiple
+		.col.w6
+			select[name="pets"]:multiple
+				option[value=dog]:selected Dog
+				option[value=cat] Cat
+				option Bird
+				option:disabled Snake
+				option
+	.row
+		.col.w6 Radio
+		.col.w6
+			label.m1
+				input[name="user[pet]"][type="radio"][value="dog"]:checked
+				span.m02 Dog
+			label.m1
+				input[name="user[pet]"][type="radio"][value="cat"]
+				span.m02 Cat
+			label.m1
+				input[name="user[pet]"][type="radio"][value="bird"]:readonly
+				span.m02 Bird
+			label.m1
+				input[name="user[pet]"][type="radio"]:disabled
+				span.m02 Unknown
+	.row
+		.col.w6 Checkbox
+		.col.w6
+			label.m1
+				input[name="user[pets][b]"][type="checkbox"][value="dog"]:checked
+				span.m02 Dog
+			label.m1
+				input[name="user[pets][a]"][type="checkbox"][value="cat"]:checked
+				span.m02 Cat
+			label.m1
+				input[type=checkbox][name="user[pets][c]"][value="bird"]:readonly
+				span.m02 Bird
+			label.m1
+				input[name="user[pets][d]"][type="checkbox"]:disabled
+				span.m02 Unknown
+			label.m1
+				input[name="user[pets][e]"][type="checkbox"]:disabled:checked
+				span.m02 Unknown
+	label.row
+		.col.w6 Textarea
+		.col.w6
+			textarea ;val "Dog"
+	.row.right
+		.col.group.left
+			button.btn Single button in group
+		.col.group.left
+			button.btn:disabled Button disabled
+			button.btn Button 2
+		.col.group.left
+			a[href="#"].btn A link
+			button.btn:disabled Disabled
+			button.btn Button 3
+hr
+.p2
+	a[href="dev.html"] Link
+	
+</script>
+<script src="../load.js"></script>
+<script src="../shim/index.js"></script>
+<script src="../index.js"></script>
+</body></html>
+

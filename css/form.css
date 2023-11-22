@@ -1,0 +1,200 @@
+
+
+::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}
+
+fieldset {
+	position: relative;
+}
+label {
+	cursor: pointer;
+	line-height: 32px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+input, select, textarea {
+	width: 100%;
+}
+
+.btn, button,
+input,
+select,
+textarea {
+	font: inherit;
+	line-height: 30px;
+	display: block;
+	border-radius: 5px;
+	border: 1px solid;
+	height: 32px;
+	padding: 0 8px;
+	margin: 0;
+}
+select {
+	padding: 0 4px;
+}
+select[multiple] {
+	height: auto;
+	padding: 4px 0;
+}
+option {
+	padding: 2px 8px;
+}
+textarea {
+	height: 64px;
+	padding: 8px;
+	line-height: 1.2;
+}
+.btn,
+button,
+input[type=button],
+input[type=submit] {
+	-webkit-appearance: none;   /* remove ios styling */
+	-moz-appearance: none;
+	appearance: none;
+	position: relative;
+	padding: 0px 14px;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+}
+input[type=radio],
+input[type=checkbox] {
+	border-radius: 10px;
+	width: auto;
+	height: auto;
+	display: inline;
+	margin-top: -2px;
+}
+input[type=time] {
+	padding: 0 0 0 8px;
+}
+.btn:disabled,
+input:disabled,
+option:disabled,
+textarea:disabled,
+select:disabled {
+	opacity: .6;
+        font-style: italic;
+	box-shadow: none;
+	cursor: not-allowed;
+}
+input[readonly] {
+	opacity: .6;
+        font-style: italic;
+}
+
+input.Toggle {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	position: relative;
+	padding: 0;
+	outline: 0;
+	width: 36px;
+	height: 14px;
+	margin: 4px 0;
+	border-radius: 7px;
+}
+input.Toggle:after {
+	position: relative;
+	width: 20px;
+	height: 20px;
+	border-radius: 10px;
+}
+input.Toggle:after {
+	content: "";
+	display: block;
+	background-color: #666;
+	left: -3px;
+	top: -4px;
+	transition: all .25s cubic-bezier(0, 0, .2, 1) 0s;
+	box-shadow:
+	2px 2px 8px rgba(255, 255, 255, .3) inset,
+	0 1px 5px rgba(0, 0, 0, 1);
+}
+input.Toggle:focus:after {
+	box-shadow:
+	2px 2px 8px rgba(255, 255, 255, .3) inset,
+	0 1px 5px rgba(0, 0, 0, 1),
+	0 0 0 12px rgb(255, 255, 255, .2);
+}
+input.Toggle:checked:after {
+	background-color: #00a651;
+	left: 17px;
+}
+input.Toggle:active:after {
+	width: 30px;
+}
+input.Toggle:checked:active:after {
+	left: 7px;
+}
+
+
+
+
+
+
+
+.group:after {
+	content: "";
+}
+.group > .btn {
+	float: left;
+	border-radius: 0;
+	margin-left: -1px;
+}
+.group > .btn:first-child {
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+.group > .btn:last-child {
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+
+/* theme */
+
+:focus {
+	outline: 0;
+        box-shadow: 0 0 6px -1px inset, 0 0 6px 1px;
+}
+
+.btn:active,
+button:active,
+select:active,
+textarea:active,
+input:active {
+        box-shadow: 0 0 8px 1px inset, 0 0 8px 2px;
+}
+input, textarea, select {
+	background: #eee;
+}
+.btn,
+button,
+option:checked,
+input[type=button],
+input[type=submit] {
+	background: #aaa;
+}
+
+input.Toggle:after {
+        background-color: #666;
+        box-shadow:
+                2px 2px 8px rgba(255, 255, 255, .3) inset,
+                0 1px 5px rgba(0, 0, 0, 1);
+}
+input.Toggle:focus:after {
+        box-shadow:
+                2px 2px 8px rgba(255, 255, 255, .3) inset,
+                0 1px 5px rgba(0, 0, 0, 1),
+                0 0 0 12px rgb(0, 0, 0, .2);
+}
+input.Toggle:checked:after {
+        background-color: #00a651;
+}
+/**/
+
+
