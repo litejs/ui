@@ -120,7 +120,7 @@ textarea {
 button,
 [draggable=true],
 .btn,
-.noselect {
+.no-select {
 	-webkit-user-select: none;
 	 -khtml-user-select: none;
 	   -moz-user-select: none;
@@ -190,7 +190,7 @@ button,
 }
 
 .btn,
-.nowrap,
+.no-wrap,
 .ellipsis {
 	text-overflow: ellipsis;
 	white-space: nowrap;
