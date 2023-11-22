@@ -67,6 +67,18 @@ input[type=checkbox] {
 	display: inline;
 	margin-top: -2px;
 }
+input[type=file] {
+	cursor: pointer;
+	padding: 0;
+}
+::file-selector-button {
+	font: inherit;
+	border: 0;
+	border-right: 1px solid;
+	padding: 0 8px;
+	margin: 0 8px 0 0;
+	background: transparent;
+}
 input[type=time] {
 	padding: 0 0 0 8px;
 }
@@ -155,7 +167,7 @@ input.Toggle:checked:active:after {
 }
 
 
-/* theme */
+/*** theme ***/
 
 :focus {
 	outline: 0;
@@ -178,6 +190,11 @@ option:checked,
 input[type=button],
 input[type=submit] {
 	background: #aaa;
+}
+::file-selector-button {
+        box-shadow: 0 0 26px -5px inset;
+}
+:focus::file-selector-button {
 }
 
 input.Toggle:after {
