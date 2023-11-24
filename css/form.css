@@ -149,13 +149,13 @@ input.Toggle:checked:active:after {
 
 
 
-.group:after {
-	content: "";
+.group {
+	padding: 0 1px;
 }
 .group > .btn {
-	float: left;
+	display: inline-block;
 	border-radius: 0;
-	margin-left: -1px;
+	margin: 0 -1px;
 }
 .group > .btn:first-child {
 	border-top-left-radius: 5px;
@@ -172,6 +172,9 @@ input.Toggle:checked:active:after {
 :focus {
 	outline: 0;
         box-shadow: 0 0 6px -1px inset, 0 0 6px 1px;
+}
+:focus:not(:focus-visible) {
+        box-shadow: 0;
 }
 
 .btn:active,

@@ -1,0 +1,21 @@
+
+/*
+<hr label="or continue with">
+*/
+
+hr {
+	border: none;
+	border-top: currentColor solid 1px;
+	overflow: visible;
+	text-align: center;
+	height: 1px;
+	margin: 1em 0;
+}
+hr[label]:after {
+	background-color: inherit;
+	content: attr(label);
+	padding: 0 .5em;
+	position: relative;
+	top: -12px;
+}
+

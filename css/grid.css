@@ -26,6 +26,7 @@ Expects box-sizing: border-box;
 	clear: none;
 }
 
+.col,
 .w12, .md .md-w12, .lg .md-w12, .lg .lg-w12 { width: 100%; }
 .w11, .md .md-w11, .lg .md-w11, .lg .lg-w11 { width: 91.6667%; }
 .w10, .md .md-w10, .lg .md-w10, .lg .lg-w10 { width: 83.3333%; }
