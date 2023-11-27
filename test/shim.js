@@ -106,8 +106,8 @@ describe("Shim test", function() {
 		assert.ok(Object.hasOwn(tmp, "a"))
 		assert.ok(!Object.hasOwn(Object.create(tmp), "a"))
 		tmp = Object.create(null)
-		assert.equal(tmp.constructor, null)
-		assert.equal(tmp.toString, null)
+		assert.equal(tmp.constructor, undef)
+		assert.equal(tmp.toString, undef)
 		assert.equal(Object.entries(tmp), [])
 		assert.equal(Object.entries(obj), [["a", 1], ["b", 2]])
 		assert.equal(Object.keys(tmp), [])
@@ -153,6 +153,14 @@ describe("Shim test", function() {
 			tmp.concat(2, "b").map(function(i) { return tmp.lastIndexOf(i) }),
 			[0, 5, 2, 3, -1, 5, -1, -1]
 		)
+
+		var reducer = mock.fn(function(sum, i) { return sum + i })
+
+		assert.equal([1, 2, 3].reduce(reducer), 6)
+		assert.equal(reducer.calls[0].scope, global)
+		assert.equal([1, 2, 3].reduce(function(sum, i) { return sum + i }, 1), 7)
+		assert.equal([1, 2, 4].reduceRight(function(diff, i) { return diff - i }), 1)
+
 		assert.equal(
 			tmp.concat(2, "b").map(function(i) { return tmp.includes(i) }),
 			[true, true, true, true, true, true, false, false]

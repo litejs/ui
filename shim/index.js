@@ -356,7 +356,7 @@
 	patch("lastIndexOf", a + "i=(b|0)||l;i>--l&&(i=l)||i<0&&(i+=l);++i;while(--i>-1)" + c)
 
 	b = a + "if(A.length<2)b=t"
-	c = "b=a.call(null,b,t[i],i,t);return b"
+	c = "b=a(b,t[i],i,t);return b"
 	patch("reduce",      b + "[++i];while(++i<l)" + c)
 	patch("reduceRight", b + "[--l];i=l;while(i--)" + c)
 

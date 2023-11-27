@@ -14,9 +14,9 @@ describe("ui", function() {
 		mock.swap(global, {
 			document: document,
 			history: {},
-			location: { href: "" },
-			navigator: {}
+			location: { href: "" }
 		})
+		if (!global.navigator) mock.swap(global, "navigator", {})
 		var lib = require("../index.js")
 		El = lib.El
 		LiteJS = lib.LiteJS
