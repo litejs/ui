@@ -17,7 +17,6 @@
 
 *, *:before, *:after {
 	color: inherit;
-	background-color: inherit;
 	text-decoration: inherit;
 	-webkit-box-sizing: inherit;          /* 3 */
 	   -moz-box-sizing: inherit;
@@ -52,20 +51,12 @@ img,
 	outline: 0;
 }
 
-/**
- *  1. Alternate cursor for IE
- *  2. Fixes extra padding issue in IE6/7
- *  3. Firefox default is: b, strong { font-weight: bolder; }
- *     and it does not render well with some fonts (Helvetica Neue on macs for example).
- */
-
 a,
 button,
 label,
 .btn,
 .hand {
 	cursor: pointer;
-	*cursor: hand;       /* 1 */
 	pointer-events: auto;
 }
 
@@ -74,14 +65,16 @@ label,
 }
 
 button {
-	width: auto;         /* 2 */
-	overflow: visible;   /* 2 */
+	/* Fix extra padding issue in IE6/7 */
+	width: auto;
+	overflow: visible;
 }
 
 b,
 strong,
 th {
-	font-weight: bold;   /* 3 */
+	/* Firefox default {font-weight:bolder} does not render well with some fonts (Helvetica Neue on macs). */
+	font-weight: bold;
 }
 
 audio,
@@ -93,7 +86,7 @@ input,
 select,
 svg,
 video {
-	vertical-align: middle;
+	vertical-align: top;
 }
 
 /**

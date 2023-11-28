@@ -27,7 +27,6 @@ textarea {
 	display: block;
 	border-radius: 5px;
 	border: 1px solid;
-	height: 32px;
 	padding: 0 8px;
 	margin: 0;
 }
@@ -65,7 +64,7 @@ input[type=checkbox] {
 	width: auto;
 	height: auto;
 	display: inline;
-	margin-top: -2px;
+	margin-top: 6px;
 }
 input[type=file] {
 	cursor: pointer;
