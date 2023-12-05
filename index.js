@@ -1079,7 +1079,7 @@
 
 	function render(node, $s) {
 		if (!node) return
-		var bind
+		var bind, next
 		, scope = node.$s || $s || closestScope(node)
 
 		if (node.nodeType != 1) {
@@ -1094,7 +1094,8 @@
 		/**/
 
 		if (hydrate(node, BIND_ATTR, scope)) return
-		for (bind = node.firstChild; bind; bind = bind.nextSibling) {
+		for (bind = node.firstChild; bind; bind = next) {
+			next = bind.nextSibling
 			render(bind, scope)
 		}
 		hydrate(node, "data-out", scope)

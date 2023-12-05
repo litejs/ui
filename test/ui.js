@@ -44,14 +44,13 @@ describe("ui", function() {
 	})
 
 	it ("should parse examples: {i}", [
-		[ "example1.html", '<h1></h1>' ],
-		[ "example2.html", '<h1></h1>' ],
-	], function(fileName, html, assert, mock) {
-		//mock.swap(console, "log", mock.fn())
+		[ "example1.html", '<h1></h1>', 1 ],
+		[ "example2.html", '<h1></h1>', 0 ],
+	], function(fileName, html, logCount, assert, mock) {
+		mock.swap(console, "log", mock.fn())
 		var newDoc = parser.parseFromString(fs.readFileSync(path.resolve("./test", fileName), "utf8"))
-		, app = LiteJS()
-		document.body.innerHTML = newDoc.body.innerHTML
-		document.querySelectorAll("script[type=ui]").forEach(function(el) {
+		, app = LiteJS({ root: newDoc.body })
+		newDoc.querySelectorAll("script[type=ui]").forEach(function(el) {
 			var source = el.innerHTML
 			//console.log(newDoc.body.childNodes[0].childNodes, source)
 			El.kill(el)
@@ -60,8 +59,9 @@ describe("ui", function() {
 		Object.keys(app.views).forEach(function(view) {
 			if (view.charAt(0) === "#") return
 			app.show(view)
-			assert.matchSnapshot("./test/spec/" + fileName, document.body.outerHTML)
+			assert.matchSnapshot("./test/spec/" + fileName, newDoc.body.outerHTML)
 		})
+		assert.equal(console.log.called, logCount)
 		assert.end()
 	})
 })
