@@ -30,7 +30,7 @@
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
-	, renderRe = /[;\s]*([-\w]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
+	, renderRe = /[;\s]*([-\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>+=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, fnCache = {}
@@ -823,6 +823,15 @@
 			},
 			ref: function(el, name) {
 				this[name] = el
+			},
+			$s: function(el) {
+				var scope = elScope(el, el)
+				each(slice.call(arguments, 1), function(args) {
+					each(args, function(arg, i) {
+						if (isStr(i)) scope[i] = arg
+						else scope[arg] = setAttr(el, arg, "")
+					})
+				})
 			}
 		}),
 		blur: blur,
