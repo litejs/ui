@@ -51,7 +51,7 @@ img,
 	outline: 0;
 }
 
-a,
+a[href],
 button,
 label,
 .btn,

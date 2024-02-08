@@ -530,19 +530,20 @@
 			assign(Plugin.prototype, proto)
 		}
 		function usePluginContent(plugin) {
-			var childNodes = plugin.e.childNodes
-			, childPos = plugin.e._cp
-			, el = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
+			var el = plugin.e
+			, childNodes = el.childNodes
+			, child = childNodes[1] ? ElWrap(childNodes) : childNodes[0]
+			, contentPos = el._cp
 
-			if (childPos > -1) {
-				if (childNodes[childPos].nodeType == 1 && plugin.e._sk) {
-					setAttr(childNodes[childPos], "data-slot", plugin.e._sk)
+			if (contentPos > -1) {
+				if (childNodes[contentPos].nodeType == 1 && el._sk) {
+					setAttr(childNodes[contentPos], "data-slot", el._sk)
 				}
-				el._s = plugin.e._s
+				child._s = el._s
 			}
 			if (plugin.c) elCache = plugin.c
-			plugin.e.p = plugin.e = plugin.u = null
-			return el
+			el.p = plugin.e = plugin.u = null
+			return child
 		}
 
 		addPlugin("start", {
