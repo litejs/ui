@@ -6,10 +6,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
-    - run: npm install
-    - run: npm test
+    - run: npm install && npm i -g c8 jshint uglify-js
+    - run: c8 -r lcov -r text npm test
     - run: npm run lint
-    - uses: coverallsapp/github-action@master
+    - uses: coverallsapp/github-action@v2
       name: Upload to coveralls.io
       with:
         github-token: ${{ github.token }}
@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - { node: 16, os: ubuntu-latest,  arch: x86 }
+          - { node: 18, os: ubuntu-latest,  arch: x64 }
     runs-on: ${{ matrix.os }}
     name: Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
     steps:
@@ -27,7 +27,7 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
         architecture: ${{ matrix.arch }}
-    - run: npm install
+    - run: npm install && npm i -g uglify-js
     - run: npm test
   Analyze:
     runs-on: ubuntu-latest
