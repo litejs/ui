@@ -61,9 +61,7 @@
 		txt: elTxt,
 		val: elVal,
 		view: function(el, url) {
-			if (url) {
-				setAttr(el, "href", (histBase || "#") + expand(url))
-			}
+			setAttr(el, "href", (histBase || "#") + expand(url||""))
 		}
 	}
 	, globalScope = {
