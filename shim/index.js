@@ -57,7 +57,7 @@
 	, Event = patch(
 		EV,
 		"c=F.createEventObject(event),b=c.buttons=c.button;c.button=b==1?0:b==4?1:b;c.preventDefault=X;c.stopPropagation=Y;c.target=c.srcElement;c.type=a;return c",
-		!isFunction(O[EV]) && document,
+		!isFn(O[EV]) && document,
 		Function("this.returnValue=!1"),
 		Function("this.cancelBubble=this.cancel=!0")
 	)
@@ -106,9 +106,9 @@
 
 
 	// Patch parameters support for setTimeout callback
-	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFunction)
-	// b = setInterval
-	patch(b, a, ie6789, isFunction)
+	patch("setTimeout", (a = "return O(X(a)&&A.length>2?a.apply.bind(a,null,S.call(A,2)):a,b)"), ie6789, isFn)
+	// b = "setInterval"
+	patch(b, a, ie6789, isFn)
 
 	// 20 fps is good enough
 	patch("request" + (a = "AnimationFrame"), "return setTimeout(a,50)")
@@ -122,7 +122,7 @@
 		patch(onhashchange, null)
 		setInterval(function() {
 			var cur = location.href.split("#")[1]
-			if (lastHash !== cur && isFunction(window[onhashchange])) {
+			if (lastHash !== cur && isFn(window[onhashchange])) {
 				window[onhashchange]()
 			}
 		}, 60)
@@ -267,10 +267,10 @@
 		stringify: function stringify(o) {
 			// IE 8 serializes `undefined` as `"undefined"`
 			return (
-				isString(o) ? "\"" + o.replace(jsonRe, jsonFn) + "\"" :
+				isStr(o) ? "\"" + o.replace(jsonRe, jsonFn) + "\"" :
 				o !== o || o == null || o === Infinity || o === -Infinity ? "null" :
 				typeof o == "object" ? (
-					isFunction(o.toJSON) ? stringify(o.toJSON()) :
+					isFn(o.toJSON) ? stringify(o.toJSON()) :
 					isArray(o) ? "[" + o.map(stringify) + "]" :
 					"{" + oKeys(o).flatMap(function(key) {
 						return o[key] === void 0 ? [] : stringify(key) + ":" + stringify(o[key])
@@ -344,7 +344,7 @@
 
 	// TODO:2021-02-25:lauri:Accept iterable objects
 	//patch("from", "a=S.call(a);return b?a.map(b,c):a")
-	patch("from", "a=X(a)?a.split(''):b?a:S.call(a);return b?a.map(b,c):a", 0, isString)
+	patch("from", "a=X(a)?a.split(''):b?a:S.call(a);return b?a.map(b,c):a", 0, isStr)
 	patch("of", "return S.call(A)")
 
 	O = O[P]
@@ -450,7 +450,7 @@
 
 
 	function selectorFn(str) {
-		if (str != null && !isString(str)) throw Error("Invalid selector")
+		if (str != null && !isStr(str)) throw Error("Invalid selector")
 		return selectorCache[str || ""] ||
 		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
 			str.split(selectorSplitRe).map(function(sel) {
@@ -508,10 +508,10 @@
 		} catch(e){}
 	}
 
-	function isFunction(value) {
+	function isFn(value) {
 		return typeof value === "function"
 	}
-	function isString(value) {
+	function isStr(value) {
 		return typeof value === "string"
 	}
 	function nop() {}
@@ -519,7 +519,7 @@
 	function patch(key_, src, force, arg1, arg2) {
 		var key = key_.split(":").pop()
 		return !force && O[key] || (O[patched.push(key_), key] = (
-			isString(src) ?
+			isStr(src) ?
 			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this,A=arguments;" + src + "}")(hasOwn, O[key], P, patched.slice, force, arg1, arg2) :
 			src === UNDEF ? {} :
 			src
