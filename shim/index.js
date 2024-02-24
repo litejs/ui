@@ -32,10 +32,10 @@
 	, esc = escape
 	, _parseInt = parseInt
 	/*** debug ***/
+	, IS_NODE = !window.document
 	, document = patch("document", {body:{},documentElement:{}})
 	, location = patch("location", {href:""})
 	, navigator = patch("navigator")
-	, IS_NODE = !document.location
 	/*/
 	, document = window.document
 	, location = window.location
