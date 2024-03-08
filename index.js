@@ -39,7 +39,7 @@
 	, camelRe = /\-([a-z])/g
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
-	, txtAttr = "textContent" in body ? "textContent" : "innerText"
+	, txtAttr = "textContent" in html ? "textContent" : "innerText"
 	, bindingsCss = acceptMany(function(el, key, val) {
 		el.style[key.replace(camelRe, camelFn)] = "" + val
 	})
@@ -189,7 +189,7 @@
 			// polyfilled addEventListener returns patched function
 			// Since Chrome 56 touchstart/move have the { passive: true } by default.
 			// preventDefault() won't work unless you set passive to false.
-			fn2 = body.addEventListener.call(el, ev2, fn2, false) || fn2
+			fn2 = html.addEventListener.call(el, ev2, fn2, false) || fn2
 		}
 
 		on.call(el, ev, fn2, el, fn)
@@ -204,7 +204,7 @@
 				evs[id + 1]._rm()
 			}
 			if (ev2 !== "" && "on" + ev2 in el) {
-				body.removeEventListener.call(el, ev2, evs[id + 1])
+				html.removeEventListener.call(el, ev2, evs[id + 1])
 			}
 			evs.splice(id - 1, 3)
 		}
@@ -1348,16 +1348,16 @@
 	/**/
 
 	function find(root, sel, startNode) {
-		return body.querySelector.call(startNode || root, sel)
+		return html.querySelector.call(startNode || root, sel)
 	}
 	function findAll(root, sel, startNode) {
-		return ElWrap(body.querySelectorAll.call(startNode || root, sel))
+		return ElWrap(html.querySelectorAll.call(startNode || root, sel))
 	}
 	function matches(el, sel) {
-		return el && body.matches.call(el, sel)
+		return el && html.matches.call(el, sel)
 	}
 	function closest(el, sel) {
-		return el && body.closest.call(el.closest ? el : el.parentNode, sel)
+		return el && html.closest.call(el.closest ? el : el.parentNode, sel)
 	}
 	function acceptMany(fn, prepareVal) {
 		return function f(el, names, selector, data, val, delay) {
@@ -1472,7 +1472,7 @@
 	}
 
 	function readTemplates(next) {
-		xhr.load(findAll(body, "script[type=ui]").map(function(el) {
+		xhr.load(findAll(html, "script[type=ui]").map(function(el) {
 			// IE6 script.innerText is empty
 			sources.push(el[txtAttr] || el.innerHTML)
 			elKill(el)

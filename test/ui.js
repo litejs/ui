@@ -4,10 +4,10 @@ describe("ui", function() {
 	var El, LiteJS, View
 	, fs = require("fs")
 	, path = require("path")
-	, cli = require("@litejs/cli")
+	, dom = require("@litejs/dom")
 	, xhr = global.xhr = require("../load.js").xhr
-	, document = cli.dom.document
-	, parser = new cli.dom.DOMParser()
+	, document = dom.document
+	, parser = new dom.DOMParser()
 	require("@litejs/cli/snapshot.js")
 
 	it ("should import index.js", function(assert, mock) {

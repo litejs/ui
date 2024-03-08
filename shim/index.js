@@ -402,7 +402,7 @@
 	// The HTML5 document.head DOM tree accessor
 	// patch("head", document.getElementsByTagName("head")[0])
 	// HTMLElement (IE9) -> Element (IE8)
-	O = body
+	O = html
 	var selectorCache = {}
 	, selectorRe = /([.#:[])([-\w]+)(?:\(((?:[^()]|\([^)]+\))+?)\)|([~^$*|]?)=(("|')(?:\\.|[^\\])*?\6|[-\w]+))?]?/g
 	, selectorLastRe = /([\s>+~]*)(?:("|')(?:\\.|[^\\])*?\2|\((?:[^()]|\([^()]+\))+?\)|~=|[^'"()\s>+~])+$/
@@ -426,8 +426,8 @@
 		"++": "m(_.previousSibling,v)",
 		"": "c(_.parentNode,v)"
 	}
+	, closest = patch("closest", walk.bind(window, "parentNode", 1))
 	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
-	, closest = walk.bind(window, "parentNode", 1)
 
 	// The addEventListener is supported in Internet Explorer from version 9.
 	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
