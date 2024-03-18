@@ -604,14 +604,7 @@
 		/*** breakpoints ***/
 		var lastSize, lastOrient
 		, breakpoints = opts.breakpoints
-		, setBreakpointsRated = rate(setBreakpoints, 99)
-
-		if (breakpoints) {
-			setBreakpointsRated()
-			bindingsOn(window, "load orientationchange resize", setBreakpointsRated)
-		}
-
-		function setBreakpoints() {
+		, setBreakpointsRated = rate(function() {
 			// document.documentElement.clientWidth is 0 in IE5
 			var point, next
 			, width = html.offsetWidth
@@ -634,6 +627,11 @@
 			}
 
 			View.emit("resize")
+		}, 99)
+
+		if (breakpoints) {
+			setBreakpointsRated()
+			bindingsOn(window, "orientationchange resize", setBreakpointsRated)
 		}
 		/**/
 
