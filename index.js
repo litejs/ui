@@ -3,7 +3,7 @@
 
 /* global xhr, getComputedStyle, navigator */
 
-!function(window, document, history, location, Function, Object) {
+!function(window, document, history, localStorage, location, navigator, Function, Object) {
 	window.El = El
 	window.LiteJS = LiteJS
 
@@ -635,6 +635,29 @@
 		if (breakpoints) {
 			setBreakpointsRated()
 			bindingsOn(window, "orientationchange resize", setBreakpointsRated)
+		}
+		/**/
+
+		/*** i18n ***/
+		var iData = {}
+		, iFormat = create(null)
+		, iGlobals = assignDeep(create(null), opts.locales)
+		each(iGlobals, function(translations, key) {
+			translations = iData[key] = assignDeep(create(iGlobals), opts[key])
+			iFormat[key] = function(key, data) {
+				return format(get(key, translations, key || ""), data)
+			}
+		})
+		assignDeep(iGlobals, opts.globals)
+		iSet([localStorage.lang, navigator.language, navigator.userLanguage].concat(navigator.languages, opts.lang).find(iResolve))
+		data.locales = Object.keys(iFormat)
+		View.lang = iSet
+		function iResolve(lang) {
+			return lang && (iFormat[lang = ("" + lang).toLowerCase()] || iFormat[lang = lang.split("-")[0]]) && lang
+		}
+		function iSet(lang, translations) {
+			assignDeep(iData[lang = html.lang = data.lang = localStorage.lang = iResolve(lang) || data.lang || opts.lang], translations)
+			return data._ = iFormat[lang] || format
 		}
 		/**/
 
@@ -1396,6 +1419,12 @@
 			}
 		}
 	}
+	function assignDeep(target, map) {
+		if (map) for (var k in map) {
+			target[k] = isObj(map[k]) && isObj(target[k]) ? assignDeep(target[k], map[k]) : map[k]
+		}
+		return target
+	}
 	function blur() {
 		// IE8 can throw on accessing document.activeElement.
 		try {
@@ -1501,5 +1530,5 @@
 		}, 1)
 	}
 	readTemplates()
-}(this, document, history, location, Function, Object) // jshint ignore:line
+}(this, document, history, localStorage, location, navigator, Function, Object) // jshint ignore:line
 

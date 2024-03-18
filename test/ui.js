@@ -14,6 +14,7 @@ describe("ui", function() {
 		mock.swap(global, {
 			document: document,
 			history: {},
+			localStorage: {},
 			location: { href: "" }
 		})
 		if (!global.navigator) mock.swap(global, "navigator", {})

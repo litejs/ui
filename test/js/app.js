@@ -14,6 +14,20 @@ if (self !== top) {
 
 var app = LiteJS({
 	base: "view/",
+	lang: "en",
+	locales: {
+		"ar": "Arabic",
+		"et": "Eesti keeles",
+		"fi": "Suomeksi",
+		"ru": "На русском",
+		"sv": "På Svenska",
+		//, "lt": "Lietuviškai"
+		//, "lv": "Latviski"
+		//, "pl": "Polski"
+		//, "de": "Deutsch"
+		//, "fr": "Français"
+		"en": "In English"
+	},
 	on: {
 		nav: function() {
 			console.log("Navigating to", app.route)
@@ -57,72 +71,41 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 
 
 !function(window, document, navigator) {
-	i18n.def({
-		"ar": "Arabic",
-		"et": "Eesti keeles",
-		"fi": "Suomeksi",
-		"ru": "На русском",
-		"sv": "På Svenska",
-		//, "lt": "Lietuviškai"
-		//, "lv": "Latviski"
-		//, "pl": "Polski"
-		//, "de": "Deutsch"
-		//, "fr": "Français"
-		"en": "In English"
-	})
 
 	var timezone
 	, html = document.documentElement
 	, body = document.body
 	, link = /./
-	, standalone = "standalone" in navigator ?
-		navigator.standalone :
-		window.matchMedia && matchMedia("(display-mode:standalone)").matches
-		// matchMedia("(prefers-color-scheme:light)").matches
-		// window.matchMedia('(max-width: 600px)')        // Chrome 9
-		// .addListener(function(e){ if (e.matches) {} }) // Chrome 9
-		// .addEventListener()                            // Chrome 45
-		// .onchange = function() { ... }                 // Chrome 45
-		// MediaQueryList.prototype.addEventListener !== MediaQueryList.prototype.addListener
 
 
 	// Detect base from HTML <base> element
-	, base = (html.getElementsByTagName("base")[0] || i18n).href
+	, base = (html.getElementsByTagName("base")[0] || html).href
 
 
 	history.scrollRestoration = "manual"
-	if (standalone) {
-		El.cls(html, "is-app")
-	}
+
+	El.cls(html, "is-app", "standalone" in navigator ? navigator.standalone : matchMedia("(display-mode:standalone)").matches)
+	// matchMedia("(prefers-color-scheme:light)").matches
 
 
 	try {
 		timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 	} catch(e) {}
 
-	function setLang(lang) {
-		if (html.lang != lang) {
-			i18n.current = lang
-			html.lang = lang
-			El.render(app.root)
-		}
-	}
-	app.setLang = setLang
 	app.on("setLang", function(e, el, lang) {
 		console.log("setLang", arguments)
 		setLang(lang)
 	})
-	setLang(i18n.detect())
+	//setLang(i18n.detect())
 
 
 
 
 	document.title = "Litejs Example"
 
-	window._ = i18n
+	//window._ = i18n
 
 	El.data.window = window
-	El.data._ = i18n
 	El.data.console = console
 	El.data.window = window
 	//El.data.alert = alert.bind(window)
