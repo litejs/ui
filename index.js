@@ -30,6 +30,7 @@
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
+	, formatRe = /{((?:("|')(?:\\\2|[\s\S])*?\2|[^"'{}])+?)}/g
 	, renderRe = /[;\s]*([-\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\3|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>+=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
@@ -66,7 +67,8 @@
 	}
 	, globalScope = {
 		El: El,
-		_: String,
+		_: format,
+		_f: format,
 		_b: bindings
 	}
 	, elArr = {
@@ -1418,6 +1420,19 @@
 			first === "%" ? ((first = lastExp.lastIndexOf(rest.charAt(0))), (first > 0 ? lastExp.slice(0, first) : lastExp)) + rest :
 			(lastExp = str)
 		)
+	}
+	function format(str, data) {
+		return str.replace(formatRe, function(all, path) {
+			return get(data, path, "")
+		})
+	}
+	function get(path, obj, fallback) {
+		return isStr(path) ? (
+			obj[path] !== UNDEF ? obj[path] :
+			(path = path.split("."))[1] && isObj(obj = obj[path[0]]) && obj[path[1]] !== UNDEF ? obj[path[1]] : fallback
+		) :
+		isArr(path) ? get(path[0], obj) || get(path[1], obj) || get(path[2], obj, fallback) :
+		fallback
 	}
 	function injectCss(cssText) {
 		if (!styleNode) {
