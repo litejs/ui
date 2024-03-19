@@ -231,14 +231,6 @@
 			home: "home",
 			root: body
 		}, opts)
-		var root = opts.root
-		, viewFn, lastView, lastUrl, syncResume
-		, viewSeq = 1
-		, fnStr = ""
-		, reStr = ""
-		, views = View.views = {}
-		, paramCb = {}
-		, lastParams = paramCb
 
 		function View(route, el, parent) {
 			var view = views[route]
@@ -327,10 +319,20 @@
 			}
 		})
 
-		assign(View, {
+		var root = opts.root
+		, viewFn, lastView, lastUrl, syncResume
+		, viewSeq = 1
+		, fnStr = ""
+		, reStr = ""
+		, views = View.views = {}
+		, paramCb = {}
+		, lastParams = paramCb
+		, data = elScope(View("#", root).e, root)
+
+		data.$ui = assign(View, {
 			$: find.bind(View, root),
 			$$: findAll.bind(View, root),
-			data: elScope(View("#", root).e, globalScope),
+			data: data,
 			def: viewDef,
 			get: viewGet,
 			param: function(names, cb) {
@@ -344,7 +346,6 @@
 			},
 			show: viewShow
 		})
-		View.data.$ui = View
 
 		each(opts, function(val, opt) {
 			if (isFn(View[opt])) {
@@ -414,7 +415,7 @@
 			View.emit(event, view, a, b)
 		}
 		function viewEval(str, scope) {
-			Function("$s,$ui,$data,$,$$", str)(scope, View, View.data, View.$, View.$$)
+			Function("$s,$ui,$data,$,$$", str)(scope, View, data, View.$, View.$$)
 		}
 		function viewGet(url, params) {
 			if (!viewFn) {
