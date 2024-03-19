@@ -196,7 +196,6 @@
 		exec(pos = 0)
 
 		function cb(err, str, fileName, filePos) {
-			;(xhr._l || (xhr._l = [])).push(fileName)
 			loaded[fileName] = 2
 			res[filePos] = err ? (onerror(err, fileName), "") : str
 			exec()
