@@ -768,7 +768,7 @@
 	}
 	function ElWrap(nodes, clone) {
 		for (var wrap = [], i = nodes.length; i--; ) {
-			wrap[i] = clone < 2 ? nodes[i].cloneNode(clone) : nodes[i]
+			wrap[i] = clone ? nodes[i].cloneNode(clone) : nodes[i]
 		}
 		return assign(wrap, elArr)
 	}
