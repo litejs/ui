@@ -104,8 +104,10 @@ describe("load.js", function() {
 		xhrReset()
 		xhr.load("a.js")
 		xhr.load("a.js", function() {
-			assert.equal(xhrRes, ["var a"])
-			assert.end()
+			xhr.load("a.js", function() {
+				assert.equal(xhrRes, ["var a"])
+				assert.end()
+			})
 		})
 	})
 	.should("load array with null's", function(assert) {

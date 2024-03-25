@@ -178,20 +178,19 @@
 	function load(files, next, raw) {
 		files = [].concat(files)
 		var file
-		, i = 0
 		, pos = 0
 		, len = files.length
 		, res = []
 
-		for (; i < len; i++) if ((file = files[i]) && loaded[file] !== 2) {
-			if (loaded[file]) {
+		for (; pos < len; pos++) if ((file = files[pos])) {
+			if (loaded[file] === 2) files[pos] = 0
+			else if (loaded[file]) {
 				// Same file requested again before responce
-				;(loaded[file].x || (loaded[file].x = [])).push(exec, res, i)
+				;(loaded[file].x || (loaded[file].x = [])).push(exec, res, pos)
 			} else {
 				// FireFox 3 throws on `xhr.send()` without arguments
-				xhr("GET", file, loaded[file] = cb, i).send(null)
+				xhr("GET", file, loaded[file] = cb, pos).send(null)
 			}
-			pos++
 		}
 		exec(pos = 0)
 
@@ -229,7 +228,7 @@
 				else {
 					if (next) next(res)
 					if ((next = cb.x)) {
-						for (i = 0; next[i]; ) next[i++](next[i++][next[i++]] = "")
+						for (pos = 0; next[pos]; ) next[pos++](next[pos++][next[pos++]] = "")
 					}
 				}
 			}
