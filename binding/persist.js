@@ -19,6 +19,5 @@
 			window[stor].setItem(key, El.val(el))
 		})
 	}
-	bindingPersist.once = bindingPersist
-}(El.bindings, window) // jshint ignore:line
+}(El.$b, window) // jshint ignore:line
 

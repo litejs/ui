@@ -67,7 +67,7 @@ var app = LiteJS({
 	}
 })
 
-xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
+xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 
 !function(window, document, navigator) {
@@ -118,13 +118,10 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 
 
 
-	El.bindings.init = function(el, fn) {
-		if (typeof fn == "function") {
-			fn(el)
-		}
+
+	El.$b.focus = function(el) {
+		el.focus()
 	}
-	El.bindings.init.once = 1
-	El.bindings.run = function() {}
 
 	var user
 
@@ -188,6 +185,7 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 			}
 		}
 	})
+
 
 	if (window.console && console.log) {
 		link.toString = function() {

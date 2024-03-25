@@ -28,8 +28,8 @@ anim-page
 		;on: "wheel", "txt"
 
 %js
-	El.bindings.init = function() {}
-	El.bindings.initTouch = function(el) {
+	El.$b.init = function() {}
+	El.$b.initTouch = function(el) {
 		var re = {
 			rotate: /rotate\(([-\d.]+)/
 		}
@@ -47,5 +47,4 @@ anim-page
 			Event.stop(e)
 		})
 	}
-	El.bindings.initTouch.once = 1
 

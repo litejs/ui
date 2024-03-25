@@ -152,9 +152,6 @@
 		return node
 	}
 
-	bindings.focus = function(el) {
-		el.focus()
-	}
 
 }(El.bindings) // jshint ignore:line
 

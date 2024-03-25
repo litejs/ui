@@ -144,7 +144,7 @@
 %js
 	var on = El.on
 	, off = El.off
-	El.bindings.SliderInit = function(el) {
+	El.$b.SliderInit = function(el) {
 		var knobLen, offset, px, drag, min, max, step, minPx, maxPx, value
 		, vert = El.hasClass(el, "is-vertical")
 		, track = el.firstChild
@@ -232,16 +232,15 @@
 			}
 		}
 	}
-	El.bindings.SliderInit.once = 1
 
 %el Slider
-	button.Slider.reset ;SliderInit
+	button.Slider.reset ;SliderInit!
 		.Slider-track
 			.Slider-fill.abs.anim
 				.Slider-knob.anim[tabindex=0]
 
 /%el Slider2
-/	button.Slider.reset ;SliderInit
+/	button.Slider.reset ;SliderInit!
 /		.Slider-track
 /			.Slider-fill.abs.anim
 /				.Slider-knob.anim[tabindex=0]
@@ -249,7 +248,7 @@
 /				.Slider-knob.anim[tabindex=0]
 /
 /%el Slider3
-/	button.Slider.reset ;SliderInit
+/	button.Slider.reset ;SliderInit!
 /		.Slider-track
 /			.Slider-fill.abs.anim
 /				.Slider-knob.anim[tabindex=0]
