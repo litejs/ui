@@ -1329,9 +1329,9 @@
 				El.attr(touchEl, {
 					x: touchEv.leftPos,
 					y: touchEv.topPos
-				}, 0)
+				}, 1)
 			} else {
-				bindingsCss(touchEl, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"], 0)
+				bindingsCss(touchEl, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"], 1)
 			}
 		}
 	}
@@ -1401,8 +1401,8 @@
 						selector = null
 					}
 				}
-				if (delay >= 0) {
-					setTimeout(f, delay, el, names, selector, data, val)
+				if (delay > 0) {
+					setTimeout(f, delay, el, names, selector, data, val, 0)
 					return
 				}
 				if (isObj(names)) {
