@@ -36,11 +36,11 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 			%slot
 		.right.lang
 			a.hand
-				;for!"lng",_.list
-				;txt " - " + lng.toUpperCase() + " - "
-				@click: [lng], "setLang"
-				;cls: "selected", lng == _.current
-				;cls: "lang-" + lng
+				;each!"l",locales
+				;txt " - " + l.toUpperCase() + " - "
+				@click [l],"setLang"
+				;cls: "selected", l==lang
+				;cls: "lang-" + l
 		a[href="#home"].home-link Header
 		span.sizeHint Responsive
 
@@ -196,6 +196,7 @@ anim-page
 anim-page
 	h2 Home
 	div Hi
+	div Yes
 	div ;txt: _("_welcome")
 	div ;txt: _(welcomeText)
 	div ;txt: _(nonExistingWelcomeText)
@@ -214,10 +215,10 @@ anim-page
 anim-page
 	h2 Users
 	ul.users
-		li
+		li ;each!user in people
 			a
-				;txt: "item.name"
-				;href: "#users/1"
+				;txt user
+				;view!"users/"+$i
 
 %view test public
 anim-page

@@ -72,6 +72,8 @@ xhr.load.view = xhr.load.tpl = xhr.load.el = xhr.load.ui
 
 !function(window, document, navigator) {
 
+	app.data.people = [ "Yehuda Katz", "Alan Johnson", "Charles Jolley" ]
+
 	var timezone
 	, html = document.documentElement
 	, body = document.body

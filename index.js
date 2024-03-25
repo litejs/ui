@@ -808,8 +808,8 @@
 	assign(El, {
 		append: append,
 		bindings: assign(bindings, {
-			"for": function(el, name, list) {
-				var comm = Comm("for " + name, up)
+			each: function(el, name, list, count) {
+				var comm = Comm("each " + name, up)
 				, pos = 0
 				, nodes = []
 				comm.$s = this
@@ -818,9 +818,9 @@
 				return { a: add, r: remove, u: up }
 
 				function add(item) {
-					var clone = nodes[pos++] = el.cloneNode(true)
+					var clone = nodes[pos] = el.cloneNode(true)
 					, subScope = assign(elScope(clone, comm), {
-						$i: pos,
+						$i: pos++,
 						$len: list.length
 					})
 					clone[BIND_ATTR] = el[BIND_ATTR]
@@ -1158,7 +1158,7 @@
 				(op === "!" && (bindOnce[i] = match)) ?
 				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
 				""
-			) + "_b['" + (bindings[name] ? name + "'].call($s,$el" : "attr']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
+			) + "_b['" + (bindings[name] ? name + "'].call($s,$el" : "attr']($el,'" + name + "'") + (args ? "," + args.replace(/^\s*(\w+) in /,'"$1",') : "") + ")||"
 		}) + "$r)"
 		var vars = fn.replace(fnRe, "").match(wordRe) || []
 		for (i = vars.length; i--; ) {
