@@ -112,7 +112,7 @@
 		}
 		function resolve(e, key) {
 			if (el) {
-				var action = key || El.attr(this, "data-action")
+				var action = key || El.get(this, "data-action")
 				, result = {
 					code: code,
 					input: El.val($(".js-input", el)),
@@ -156,7 +156,7 @@
 				;txt!_(action.title)
 				;class!"w" + (12/actions.length)
 				;nop: this.focus()
-				;attr: "data-action", action.action
+				;set: "data-action", action.action
 				;class!"is-" + action.action, action.action
 
 %el Modal

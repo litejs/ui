@@ -22,6 +22,12 @@ html {
  *    :focus { outline: 5px solid red; }
  */
 
+:focus {
+	/* Visible in the full-colour mode */
+	box-shadow: 0 0 4px 8px #f00, 0 0 40px 12px #000;
+	/* Visible in high-contrast mode */
+	outline: 5px solid transparent;
+}
 
 ::-moz-selection {             /* 1 */
 	text-shadow: none;     /* 2 */
@@ -140,7 +146,7 @@ img {
 }
 
 .Menu-item:hover, .Menu-item.selected {
-	background-image: linear-gradient(#fff, rgba(255,255,255,0));
+	background-image: linear-gradient(#fff, #f2f7fb);
 	border-bottom-color: #f2f7fb;
 	color: #000;
 }

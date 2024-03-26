@@ -248,7 +248,7 @@
 		function onOver(e) {
 			var x, y, pos
 			, target = e.target
-			, text = El.attr(target, "data-tooltip")
+			, text = El.get(target, "data-tooltip")
 			, relTarg = e.relatedTarget || e.fromElement
 			// without relTarg is event on click
 			if (!relTarg && e.type !== "focusin" || target === tipTarget) return
@@ -260,19 +260,19 @@
 			closeTooltip()
 			if (!text) return
 			tipEl = openVisible("pre.tooltip", tipTarget = target)
-			pos = El.attr(target, "data-tooltip-pos") || "top"
+			pos = El.get(target, "data-tooltip-pos") || "top"
 			El.txt(tipEl, text)
 			if (pos === "left" || pos === "right") {
 				x = pos
 			} else {
 				y = pos
 			}
-			El.attr(tipEl, "data-pos", pos)
+			El.set(tipEl, "data-pos", pos)
 			near(tipEl, target, x, y, 6)
 		}
 		function openVisible(tag, target) {
 			var el = typeof tag == "string" ? El(tag) : tag
-			, scope = El.scope(el, El.scope(target))
+			, scope = El.scope(el, target)
 			scope.openTarget = target
 			El.render(el)
 			El.append(document.body, el)
@@ -313,7 +313,7 @@
 				})
 			} else {
 				El.cls(menuTarget = target, "is-active")
-				near(menuEl, target, x, y, 4)
+				near(menuEl, target, x, y, margin)
 			}
 			if (menuEl.style.transform !== void 0) {
 				El.cls(menuEl, "no-events")

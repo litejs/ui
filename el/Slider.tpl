@@ -14,12 +14,12 @@
 		width: 4px;
 		height: 100%;
 	}
-	.is-vertical > .Slider-track > .Slider-fill {
+	.is-vertical > * > .Slider-fill {
 		top: auto;
 		bottom: 0;
 		width: 4px;
 	}
-	.is-vertical > .Slider-track > .Slider-fill > .Slider-knob {
+	.is-vertical > * > * > .Slider-knob {
 		margin: -10px -8px 0 0;
 	}
 	.Slider-track {
@@ -31,10 +31,10 @@
 		height: 4px;
 		border-radius: 2px;
 		overflow: visible;
-		background: #666;
+		background: #999;
 	}
 	.Slider-fill {
-		background: rgba(255,255,255,.57);
+		background: rgba(0,0,0,.5);
 	}
 	.Slider-knob,
 	.Toggle-knob {
@@ -43,6 +43,7 @@
 		height: 20px;
 		border-radius: 50%;
 		box-shadow:
+			0 0 0 0 rgb(0, 0, 0, .2),
 			0 1px 4px rgba(0, 0, 0, .2);
 	}
 	.Slider-knob {
@@ -52,9 +53,10 @@
 		background: #f5f5f5;
 		background-color: rgb(245, 245, 245);
 	}
-	.Slider-knob:hover,
-	.Slider-knob:focus,
-	:hover>.Toggle-knob {
+	:hover > * > * > .Slider-knob,
+	:focus > * > * > .Slider-knob,
+	:focus > .Toggle-knob,
+	:hover > .Toggle-knob {
 		box-shadow:
 			0 0 0 8px rgb(0, 0, 0, .2),
 			0 1px 4px rgba(0, 0, 0, .3);
@@ -64,6 +66,7 @@
 			0 0 0 12px rgb(0, 0, 0, .2),
 			0 1px 5px 5px rgba(0, 0, 0, .3);
 	}
+	/* value bubble */
 	.Slider-knob.is-active:before,
 	.Slider-knob.is-active:after {
 		position: absolute;
@@ -145,7 +148,7 @@
 	var on = El.on
 	, off = El.off
 	El.$b.SliderInit = function(el) {
-		var knobLen, offset, px, drag, min, max, step, minPx, maxPx, value
+		var attr, range, knobLen, offset, px, drag, min, max, step, minPx, maxPx, value
 		, vert = El.hasClass(el, "is-vertical")
 		, track = el.firstChild
 		, fill = track.firstChild
@@ -156,8 +159,8 @@
 		el.val = set
 		setTimeout(function() { set(value||0) }, 10)
 		function load() {
-			var attr = vert ? "offsetHeight" : "offsetWidth"
-			, range = (El.attr(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
+			attr = vert ? "offsetHeight" : "offsetWidth"
+			range = (El.get(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
 			min = +(range[0] || 0)
 			max = +(range[1] || 100)
 			step = +(range[2] || 1)
@@ -227,8 +230,8 @@
 			if (value !== val) {
 				el.value = value = val
 				if (drag && e) emit(e)
-				var format = El.attr(el, "format")
-				El.attr(knob, "data-val", format ? _(format, {val:val}) : val)
+				var format = El.get(el, "format")
+				El.set(knob, "data-val", format ? _(format, {val:val}) : val)
 			}
 		}
 	}

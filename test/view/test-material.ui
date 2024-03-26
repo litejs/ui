@@ -1,5 +1,18 @@
 
 
+%el Fab-menu1
+ul.mat-Menu.shadow-1
+	li.mat-Menu-item.waves Some Action
+	li.mat-Menu-item.waves.is-divider Another Action
+	li.mat-Menu-item.waves:disabled Disabled Action
+	li.mat-Menu-item.waves Yet Another Action
+%el Fab-menu2
+ul.mat-Menu.shadow-1
+	li.mat-Menu-item.waves Some Action
+	li.mat-Menu-item.waves.is-divider Another Action
+	li.mat-Menu-item.waves:disabled Disabled Action
+	li.mat-Menu-item.waves Yet Another Action
+
 %view test-material-ui public
 	anim-page
 		h2 Material UI
@@ -10,26 +23,14 @@
 				Button.raised Primary
 				Button:disabled Disabled
 				Button.raised.is-warning Warn
-			%el Fab-menu1
-				ul.mat-Menu.shadow-1
-					li.mat-Menu-item.waves Some Action
-					li.mat-Menu-item.waves.is-divider Another Action
-					li.mat-Menu-item.waves:disabled Disabled Action
-					li.mat-Menu-item.waves Yet Another Action
-			%el Fab-menu2
-				ul.mat-Menu.shadow-1
-					li.mat-Menu-item.waves Some Action
-					li.mat-Menu-item.waves.is-divider Another Action
-					li.mat-Menu-item.waves:disabled Disabled Action
-					li.mat-Menu-item.waves Yet Another Action
 			.col-3 Fab buttons
 			.col-9
 				Fab>\+
 					;data: "tooltip", "Hello1"
-					@click: ["Fab-menu1", "right-end", "bottom", 0, 1], "showMenu"
+					@click ["Fab-menu1","right-end","bottom",4], "showMenu"
 				Fab.Fab--red[data-tooltip-pos=left]>\—
 					;data: "tooltip", "World\n2"
-					;on: "click", ["Fab-menu2", "left-start", "bottom", 0, 1], "showMenu"
+					;on: "click", ["Fab-menu2", "left-start", "bottom", 1], "showMenu"
 				Fab[data-tooltip-pos=right]>\+
 					;data: "tooltip", "Hello2"
 				Fab>\+

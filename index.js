@@ -55,14 +55,14 @@
 		handler
 	})
 	, bindings = {
-		attr: acceptMany(setAttr),
 		cls: acceptMany(cls),
 		css: bindingsCss,
 		on: bindingsOn,
+		set: acceptMany(setAttr),
 		txt: elTxt,
 		val: elVal,
 		view: function(el, url) {
-			setAttr(el, "href", (histBase || "#") + expand(url||""))
+			setAttr(el, "href", (histBase || "#") + expand(url || ""))
 		}
 	}
 	, globalScope = {
@@ -1160,7 +1160,7 @@
 				(op === "!" && (bindOnce[i] = match)) ?
 				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
 				""
-			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "attr']($el,'" + name + "'") + (args ? "," + args.replace(/^\s*(\w+) in /,'"$1",') : "") + ")||"
+			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "set']($el,'" + name + "'") + (args ? "," + args.replace(/^\s*(\w+) in /,'"$1",') : "") + ")||"
 		}) + "$r)"
 		var vars = fn.replace(fnRe, "").match(wordRe) || []
 		for (i = vars.length; i--; ) {
@@ -1328,7 +1328,7 @@
 		elEmit(touchEl, "pan", e, touchEv, touchEl)
 		if (!touchEv.cancel) {
 			if (touchEl.getBBox) {
-				El.attr(touchEl, {
+				El.set(touchEl, {
 					x: touchEv.leftPos,
 					y: touchEv.topPos
 				}, 1)
