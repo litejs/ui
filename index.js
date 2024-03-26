@@ -935,9 +935,11 @@
 					before = el
 					el = before.parentNode
 				}
-				el.insertBefore(child, (isNum(before) ? el.childNodes[
-					before < 0 ? el.childNodes.length - before - 2 : before
-				] : before) || null)
+				el.insertBefore(child, (
+					isNum(before) ? el.childNodes[before < 0 ? el.childNodes.length - before - 2 : before] :
+					isArr(before) ? before[0] :
+					before
+				) || null)
 				/*** debug ***/
 				if (el.namespaceURI && child.namespaceURI && el.namespaceURI !== child.namespaceURI && el.tagName !== "foreignObject" && child.tagName !== "svg") {
 					console.error("NAMESPACE CHANGE!", el, child)
