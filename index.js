@@ -1244,7 +1244,7 @@
 	// tap
 	// swipe + left/right/up/down
 
-	"pan pinch rotate".split(" ").map(function(name) {
+	each("pan pinch rotate", function(name) {
 		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
 		fixFn[name] = touchInit
 	})
@@ -1261,7 +1261,6 @@
 
 	function touchDown(e, e2) {
 		var len = e ? touches.push(e) : touches.length
-		touchEv.cancel = false
 
 		if (touchMode) {
 			elEmit(touchEl, touchMode + END, e2, touchEv, touchEl)
@@ -1325,17 +1324,7 @@
 			touchMode = "pan"
 			elEmit(touchEl, touchMode + START, e, touchEv, touchEl)
 		}
-		elEmit(touchEl, "pan", e, touchEv, touchEl)
-		if (!touchEv.cancel) {
-			if (touchEl.getBBox) {
-				El.set(touchEl, {
-					x: touchEv.leftPos,
-					y: touchEv.topPos
-				}, 1)
-			} else {
-				bindingsCss(touchEl, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"], 1)
-			}
-		}
+		elEmit(touchEl, touchMode, e, touchEv, touchEl)
 	}
 
 	function moveTwo(e) {
