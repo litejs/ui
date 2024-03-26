@@ -1232,7 +1232,7 @@
 	/**/
 
 	/*** touch ***/
-	var touchEl, touchDist, touchAngle, pinchThreshhold, touchMode
+	var touchEl, touchDist, touchAngle, touchMode
 	, TOUCH_FLAG = "-tf"
 	, MOVE = "pointermove"
 	, START = "start"
@@ -1283,7 +1283,6 @@
 			moveOne(e)
 		}
 		if (len === 2) {
-			pinchThreshhold = touchEl.clientWidth / 10
 			touchDist = touchAngle = null
 			moveTwo(e)
 		}
@@ -1318,10 +1317,17 @@
 		if (touches[0].buttons && touches[0].buttons !== (e.buttons || MS_WHICH[e.which || 0])) {
 			return touchUp(e)
 		}
-		touchEv.leftPos = e.clientX - touchEv.X + touchEv.left
-		touchEv.topPos  = e.clientY - touchEv.Y + touchEv.top
+		touchEv.x = e.clientX - touchEv.X
+		touchEv.y = e.clientY - touchEv.Y
+		touchEv.leftPos = touchEv.x + touchEv.left
+		touchEv.topPos  = touchEv.y + touchEv.top
 		if (!touchMode) {
-			touchMode = "pan"
+			var evs = touchEl._e
+			touchMode = (
+				evs.pan && (touchEv.x > 10 || touchEv.x < -10 || touchEv.y > 10 || touchEv.y < -10) ? "pan" :
+				UNDEF
+			)
+			if (!touchMode) return
 			elEmit(touchEl, touchMode + START, e, touchEv, touchEl)
 		}
 		elEmit(touchEl, touchMode, e, touchEv, touchEl)

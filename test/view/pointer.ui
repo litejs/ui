@@ -10,20 +10,20 @@ anim-page
 			;css "height,width", "180px"
 	h2 Events
 	div
-		;init: data.count1=0
+		;init: $s.count1=0
 		;txt: "Click " + count1
 		;title! "Click " + count1
 		@click "txt"
 	div
-		;init: data.count2=0
+		;init: $s.count2=0
 		@click "txt"
 		;txt: "One click " + count2
 	div
-		;init: data.count2=0
+		;init: $s.count2=0
 		;txt: "Hover"
 		@mouseover,mouseout "txt"
 	div
-		;init: data.count3=0
+		;init: $s.count3=0
 		;txt: "Wheel " + count3
 		;on: "wheel", "txt"
 
@@ -39,8 +39,14 @@ anim-page
 			, val = name + "(" + (cur ? +cur[1] + diff : diff)
 			el.style.transform = cur ? tr.replace(re[name], val) : val + "deg)"
 		}
+		El.on(el, "tap", function(e, diff) {
+			console.log("tap", arguments)
+		})
 		El.on(el, "rotate", function(e, diff) {
 			transform("rotate", diff)
+		})
+		El.on(el, "pan", function(e, touchEv, touchEl) {
+			El.css(touchEl, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"], 1)
 		})
 		El.on(el, "pinch", function(e, diff) {
 			El.css(el, "height,width", (el.offsetHeight + diff) + "px")
