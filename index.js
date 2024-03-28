@@ -836,6 +836,17 @@
 					each(list, add)
 				}
 			},
+			el: function(el, tag, fallback) {
+				var child = El(elCache[tag] ? tag : fallback)
+				, tmp = getAttr(el, BIND_ATTR)
+				, tmp2 = getAttr(child, BIND_ATTR)
+				if (tmp) setAttr(child, BIND_ATTR, tmp2 ? tmp + ";" + tmp2 : tmp)
+				if ((tmp = el.className)) cls(child, tmp)
+				child.$s = el.$s
+				elReplace(el, child)
+				render(child, this)
+				return child
+			},
 			"if": function(el, enabled) {
 				if (enabled) {
 					elReplace(el._if, el)
