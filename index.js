@@ -1029,9 +1029,9 @@
 			}
 		}
 	}
-	function elReplace(el, newEl) {
-		var parent = el && el.parentNode
-		if (parent && newEl) return parent.replaceChild(newEl, el)
+	function elReplace(oldChild, newChild) {
+		var parent = oldChild && oldChild.parentNode
+		if (parent && newChild) parent.replaceChild(newChild, oldChild)
 	}
 	function elRm(el) {
 		var parent = el && el.parentNode
