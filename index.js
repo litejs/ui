@@ -1233,35 +1233,29 @@
 
 	/*** touch ***/
 	var touchEl, touchDist, touchAngle, touchMode
-	, TOUCH_FLAG = "-tf"
-	, MOVE = "pointermove"
 	, START = "start"
 	, END = "end"
 	, MS_WHICH = [0, 1, 4, 2]
 	, touches = []
 	, touchEv = {}
 
-	// tap
-	// swipe + left/right/up/down
-
+	// tap, swipe + left/right/up/down
 	each("pan pinch rotate", function(name) {
 		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
 		fixFn[name] = touchInit
 	})
-
 	function touchInit(el) {
-		if (!el[TOUCH_FLAG]) {
+		if (!el._ti) {
 			addEvent(el, "pointerdown", touchDown)
 			addEvent(el, "wheel", touchWheel)
 			bindingsOn(el, "pointerup pointercancel", touchUp)
 			bindingsCss(el, "touchAction msTouchAction", "none")
-			el[TOUCH_FLAG] = 1
+			el._ti = 1
 		}
 	}
-
 	function touchDown(e, e2) {
 		var len = e ? touches.push(e) : touches.length
-
+		, MOVE = "pointermove"
 		if (touchMode) {
 			elEmit(touchEl, touchMode + END, e2, touchEv, touchEl)
 			touchMode = UNDEF
@@ -1289,8 +1283,18 @@
 		;(len === 1 ? addEvent : rmEvent)(document, MOVE, moveOne)
 		;(len === 2 ? addEvent : rmEvent)(document, MOVE, moveTwo)
 		return eventStop(e)
+		function touchPos(name, offset) {
+			var val = (
+				touchEl.getBBox ?
+				touchEl.getAttributeNS(null, name == "top" ? "y":"x") :
+				touchEl.style[name]
+			)
+			touchEv[name] = parseInt(val, 10) || 0
+			if (val && val.indexOf("%") > -1) {
+				touchEv[name] *= touchEl.parentNode[offset] / 100
+			}
+		}
 	}
-
 	function touchUp(e) {
 		for (var i = touches.length; i--; ) {
 			if (touches[i].pointerId == e.pointerId) {
@@ -1300,7 +1304,6 @@
 		}
 		touchDown(null, e)
 	}
-
 	function touchWheel(e) {
 		// IE10 enabled pinch-to-zoom gestures from multi-touch trackpad’s as mousewheel event with ctrlKey.
 		// Chrome M35 and Firefox 55 followed up.
@@ -1311,7 +1314,6 @@
 			}
 		}
 	}
-
 	function moveOne(e) {
 		// In IE9 mousedown.buttons is OK but mousemove.buttons == 0
 		if (touches[0].buttons && touches[0].buttons !== (e.buttons || MS_WHICH[e.which || 0])) {
@@ -1332,7 +1334,6 @@
 		}
 		elEmit(touchEl, touchMode, e, touchEv, touchEl)
 	}
-
 	function moveTwo(e) {
 		touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
 		var diff
@@ -1350,21 +1351,8 @@
 			diff = angle - touchAngle
 			if (diff) elEmit(touchEl, "rotate", e, diff * (180/Math.PI))
 		}
-
 		touchDist = dist
 		touchAngle = angle
-	}
-
-	function touchPos(name, offset) {
-		var val = (
-			touchEl.getBBox ?
-			touchEl.getAttributeNS(null, name == "top" ? "y":"x") :
-			touchEl.style[name]
-		)
-		touchEv[name] = parseInt(val, 10) || 0
-		if (val && val.indexOf("%") > -1) {
-			touchEv[name] *= touchEl.parentNode[offset] / 100
-		}
 	}
 	/**/
 
