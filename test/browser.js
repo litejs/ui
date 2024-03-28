@@ -24,9 +24,9 @@
 			count = 0 | (options.timeout / 50)
 		}
 
-		this.ok(function() {
+		testCase.ok(function() {
 			return !!result
-		}, options || "Function returns something")
+		}, "Function returns something")
 		test()
 
 		return testCase

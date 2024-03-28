@@ -231,7 +231,7 @@ describe("Shim test", function() {
 		assert.equal(new Date(-864e12).toISOString(), "-025410-12-06T00:00:00.000Z")
 		assert.equal(new Date(-864e13).toISOString(), "-271821-04-20T00:00:00.000Z")
 		assert.throws(function() {
-			new Date(NaN).toISOString()
+			return new Date(NaN).toISOString()
 		})
 
 

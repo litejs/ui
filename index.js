@@ -461,7 +461,7 @@
 					if (sel) {
 						parentStack.push(parent)
 						stack.unshift(q)
-						append(parent, parent = q = El(sel))
+						append(parent, parent = El(sel))
 					}
 					if (text && op != "/") {
 						if (op === ">" || op === "+") {
@@ -642,10 +642,10 @@
 		var iData = {}
 		, iFormat = create(null)
 		, iGlobals = assignDeep(create(null), opts.locales)
-		each(iGlobals, function(translations, key) {
-			translations = iData[key] = assignDeep(create(iGlobals), opts[key])
-			iFormat[key] = function(key, data) {
-				return format(get(key, translations, key || ""), data)
+		each(iGlobals, function(translations, iKey) {
+			translations = iData[iKey] = assignDeep(create(iGlobals), opts[iKey])
+			iFormat[iKey] = function(str, data) {
+				return format(get(str, translations, str || ""), data)
 			}
 		})
 		assignDeep(iGlobals, opts.globals)
@@ -657,7 +657,7 @@
 		}
 		function iSet(lang, translations) {
 			assignDeep(iData[lang = html.lang = $d.lang = localStorage.lang = iResolve(lang) || $d.lang || opts.lang], translations)
-			return $d._ = iFormat[lang] || format
+			return ($d._ = iFormat[lang] || format)
 		}
 		/**/
 
@@ -808,7 +808,7 @@
 	assign(El, {
 		append: append,
 		$b: assign(bindings, {
-			each: function(el, name, list, count) {
+			each: function(el, name, list) {
 				var comm = Comm("each " + name, up)
 				, pos = 0
 				, nodes = []
@@ -1177,7 +1177,7 @@
 				(op === "!" && (bindOnce[i] = match)) ?
 				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
 				""
-			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "set']($el,'" + name + "'") + (args ? "," + args.replace(/^\s*(\w+) in /,'"$1",') : "") + ")||"
+			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "set']($el,'" + name + "'") + (args ? "," + args.replace(/^\s*(\w+) in /,"'$1',") : "") + ")||"
 		}) + "$r)"
 		var vars = fn.replace(fnRe, "").match(wordRe) || []
 		for (i = vars.length; i--; ) {
@@ -1408,8 +1408,8 @@
 					return
 				}
 				if (isObj(names)) {
-					for (delay in names) {
-						if (hasOwn.call(names, delay)) f(el, delay, selector, data, names[delay])
+					for (delay in names) if (hasOwn.call(names, delay)) {
+						f(el, delay, selector, data, names[delay])
 					}
 					return
 				}
@@ -1422,7 +1422,7 @@
 		}
 	}
 	function assignDeep(target, map) {
-		if (map) for (var k in map) {
+		if (map) for (var k in map) if (hasOwn.call(map, k)) {
 			target[k] = isObj(map[k]) && isObj(target[k]) ? assignDeep(target[k], map[k]) : map[k]
 		}
 		return target

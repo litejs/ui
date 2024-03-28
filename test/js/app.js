@@ -89,9 +89,6 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 	, body = document.body
 	, link = /./
 
-	// Detect base from HTML <base> element
-	, base = (html.getElementsByTagName("base")[0] || html).href
-
 
 	history.scrollRestoration = "manual"
 
@@ -150,7 +147,7 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 
 
-	document.title = "Litejs Example"
+	document.title = "LiteJS Example"
 
 	//window._ = i18n
 
@@ -173,8 +170,6 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 	El.$b.init = function(el, fn) {
 		fn.call(this, el)
 	}
-
-	var user
 
 	app.on("timerTest", function(e, el) {
 		setTimeout(function() {
@@ -232,7 +227,7 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 		var el = e.target
 		, link = !(e.altKey || e.shiftKey) && el.tagName == "A" && el.href.split("#")
 
-		if (link && link[0] == (base || location.href.split("#")[0])) {
+		if (link && link[0] == LiteJS.base) {
 			if (e[El.kbMod] ? window.open(el.href, "_blank") : !LiteJS.go(link[1])) {
 				return Event.stop(e)
 			}
