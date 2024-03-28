@@ -1484,17 +1484,21 @@
 	}
 	// Maximum call rate for Function
 	// leading edge, trailing edge
-	function rate(fn, ms) {
+	function rate(fn, ms, onStart, onEnd) {
 		var tick
 		, next = 0
+		onStart = isFn(onStart) ? onStart : (onStart === UNDEF || onStart) && fn
+		onEnd = isFn(onEnd) ? onEnd : (onEnd === UNDEF || onEnd) && fn
 		return function() {
 			var now = Date.now()
 			clearTimeout(tick)
 			if (now >= next) {
+				if (next < 1) {
+					if (onStart) onStart()
+				} else fn()
 				next = now + ms
-				fn()
-			} else {
-				tick = setTimeout(fn, next - now)
+			} else if (onEnd) {
+				tick = setTimeout(onEnd, next - now)
 			}
 		}
 	}
