@@ -206,7 +206,7 @@ Form-ro
 
 %el Form-enum
 Form-row
-	select.field ;each:val in data["enum"]
+	select.field ;each:val in $d["enum"]
 		option
 			;val:: val
 			= _("" + val)
@@ -217,7 +217,7 @@ Form-ro
 %el Form-list
 Form-row
 	select.field
-		;list: api(resourceCollection.format(data.params, data)), required ? 0 : [""], value
+		;list: api(resourceCollection.format(params, $d)), required ? 0 : [""], value
 		option
 			;val:: item.id
 			;txt:: _(item.name)
@@ -235,16 +235,16 @@ Form-row>span
 			= _(description)
 		.js-items.cf
 		a.btn.right
-			;if: !data.noAdd
-			;txt: _(data.name + ".Add")
-			@click: data.add
+			;if: !$d.noAdd
+			;txt: _($d.name + ".Add")
+			@click: $d.add
 
 %el Form-array-item
 .input.p3.m2b.cf.js-del
 	a.right.Form-del.hand ×
-		;if !data.noAdd
+		;if !$d.noAdd
 		;set "data-tooltip", _("Delete")
-		@click data.del
+		@click $d.del
 	b
 		;if: title
 		;txt: title

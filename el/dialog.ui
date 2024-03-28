@@ -68,7 +68,7 @@
 		var sound, vibrate
 		, code = ""
 		, el = El("Modal")
-		, scope = Object.assign(El.scope(el, El.data), opts)
+		, scope = Object.assign(El.scope(el, el), opts)
 		, kbMap = {}
 		, body = document.body
 		, blurEl = $(scope.blur) || $ui.root.lastChild
@@ -167,7 +167,7 @@
 				;if: input
 				.col>input.field.js-input
 			.row
-				;if: data.inputMd!=null
+				;if: $d.inputMd!=null
 				.col
 					textarea.field.js-inputMd
 						@keyup [this.parentNode.nextSibling.nextSibling], "renderMd"

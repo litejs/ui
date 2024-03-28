@@ -35,6 +35,7 @@ html {
 	touch-action: manipulation;           /* 4 */
 	-webkit-backface-visibility: hidden;  /* 5 */
 	        backface-visibility: hidden;
+	text-rendering: optimizeLegibility;
 }
 
 html,

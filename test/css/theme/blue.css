@@ -10,8 +10,8 @@ html {
 	/* 'transform' and 'will-change' will break position: fixed
 	 * Element 'transform' property establishes a new local coordinate system,
 	 * so 'position: fixed' will become relative to that element - not the viewport
-	 */
 	will-change: transform;
+	 */
 }
 
 /**

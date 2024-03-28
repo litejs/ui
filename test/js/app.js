@@ -28,6 +28,16 @@ var app = LiteJS({
 		//, "fr": "Français"
 		"en": "In English"
 	},
+	translations: {
+		Yes: {
+			en: "Yes",
+			et: "Jah"
+		},
+		No: {
+			en: "No",
+			et: "Ei"
+		}
+	},
 	on: {
 		nav: function() {
 			console.log("Navigating to", app.route)
@@ -41,7 +51,7 @@ var app = LiteJS({
 			app.$$(".js-viewRender").render()
 			scroll(0, 1)
 		},
-		"xhr:406": function(body, method, url, data, onResponse, send) {
+		xhr406: function(body, method, url, data, onResponse, send) {
 			this.emit("confirm", body.title || "Not Acceptable", body, function(action) {
 				if (action) {
 					var req = xhr(method, url, onResponse)
@@ -57,10 +67,10 @@ var app = LiteJS({
 		}
 	},
 	ping: {
-		"users": function() {
+		"user": function() {
 			this.wait()()
 		},
-		"users/{userId}": function() {
+		"user/{useId}": function() {
 			setTimeout(this.wait(), 2000)
 			setTimeout(this.wait(), 1000)
 		}
@@ -72,13 +82,12 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 !function(window, document, navigator) {
 
-	app.data.people = [ "Yehuda Katz", "Alan Johnson", "Charles Jolley" ]
+	app.$d.people = [ "Yehuda Katz", "Alan Johnson", "Charles Jolley" ]
 
 	var timezone
 	, html = document.documentElement
 	, body = document.body
 	, link = /./
-
 
 	// Detect base from HTML <base> element
 	, base = (html.getElementsByTagName("base")[0] || html).href
@@ -94,11 +103,49 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 		timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 	} catch(e) {}
 
-	app.on("setLang", function(e, el, lang) {
-		console.log("setLang", arguments)
-		setLang(lang)
-	})
-	//setLang(i18n.detect())
+	xhr.load("translations.json", function(res) {
+		var allJson = JSON.parse(res[0])
+		app.on("setLang", setLang)
+		setLang(0, 0, app.$d.lang)
+		LiteJS.start(app.show)
+		function setLang(e, el, lang) {
+			app.lang(lang)
+			app.lang(lang, extractLang(app))
+			app.lang(lang, extractLang(allJson))
+			El.render(app.root)
+		}
+	}, 1)
+
+	function extractLang(translations) {
+		var missing = []
+		, lang = app.$d.lang
+		, out = extract(translations, "")
+		if (missing[0]) {
+			console.warn("WARNING: %s translations missing: %s", lang, missing.join(", "))
+		}
+		console.log("extractLang", lang, out)
+		return out
+
+		function extract(map, path) {
+			var key
+			, out = {}
+			, translations = map.translations
+			if (!translations) return map[lang]
+			for (key in translations) {
+				out[key] = extract(translations[key], path + key + ".")
+				if (
+					out[key] === key ||
+					out[key] === void 0 && missing.push(path + key) ||
+					isObject(out[key]) && Object.keys(out[key]).length < 1
+				) delete out[key]
+			}
+			return out
+		}
+		function isObject(obj) {
+			return obj && obj.constructor === Object
+		}
+	}
+
 
 
 
@@ -107,20 +154,24 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 	//window._ = i18n
 
-	El.data.window = window
-	El.data.console = console
-	El.data.window = window
-	//El.data.alert = alert.bind(window)
-	El.data.Date = Date
-	El.data.Math = Math
-	El.data.started = new Date()
-	El.data.welcomeText = "_welcome"
+	El.$d.window = window
+	El.$d.console = console
+	El.$d.window = window
+	El.$d.parseInt = parseInt
+	//El.$d.alert = alert.bind(window)
+	El.$d.Date = Date
+	El.$d.Math = Math
+	El.$d.started = new Date()
+	El.$d.welcomeText = "_welcome"
 
 
 
 
 	El.$b.focus = function(el) {
 		el.focus()
+	}
+	El.$b.init = function(el, fn) {
+		fn.call(this, el)
 	}
 
 	var user
@@ -157,11 +208,16 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 	app("public")
 	.on("openChild", function(open, close) {
+		console.log("openChild", open.tr)
+	})
+
+	app("public")
+	.on("openChil", function(open, close) {
 		if (close) El.cls(open.o, close.s < open.s ? "from" + upper : "from" + lower)
 	})
 
 	app("public")
-	.on("closeChild", function(close, open) {
+	.on("closeChil", function(close, open) {
 		var isOpen = close.o
 		close.o = null
 		El.cls(isOpen, open && open.s < close.s ? "to" + upper : "to" + lower)
@@ -172,9 +228,6 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 
 	El.on(body, "click pointerdown", "input[readonly][type=checkbox]", Event.stop)
-
-	LiteJS.start(app.show)
-
 	El.on(body, "click", function(e) {
 		var el = e.target
 		, link = !(e.altKey || e.shiftKey) && el.tagName == "A" && el.href.split("#")

@@ -58,7 +58,6 @@
 left-pitch-right
 forward-roll-back
 up-yaw-down
-*/
 
 .fromLeft    { animation: .5s ease both fromLeft;    }
 .fromRight   { animation: .5s ease both fromRight;   }
@@ -87,4 +86,5 @@ up-yaw-down
 @keyframes fromForward { from { transform: scale(2); opacity: 0; } }
 @keyframes toForward   { to   { transform: scale(2); opacity: 0; } }
 
+*/
 

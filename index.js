@@ -329,12 +329,12 @@
 		, views = View.views = {}
 		, paramCb = {}
 		, lastParams = paramCb
-		, data = elScope(View("#", root).e, root)
+		, $d = elScope(View("#", root).e, root)
 
-		data.$ui = assign(View, {
+		$d.$ui = assign(View, {
 			$: find.bind(View, root),
 			$$: findAll.bind(View, root),
-			data: data,
+			$d: $d,
 			def: viewDef,
 			get: viewGet,
 			param: function(names, cb) {
@@ -417,7 +417,7 @@
 			View.emit(event, view, a, b)
 		}
 		function viewEval(str, scope) {
-			Function("$s,$ui,$data,$,$$", str)(scope, View, data, View.$, View.$$)
+			Function("$s,$ui,$d,$,$$", str)(scope, View, $d, View.$, View.$$)
 		}
 		function viewGet(url, params) {
 			if (!viewFn) {
@@ -650,14 +650,14 @@
 		})
 		assignDeep(iGlobals, opts.globals)
 		iSet([localStorage.lang, navigator.language, navigator.userLanguage].concat(navigator.languages, opts.lang).find(iResolve))
-		data.locales = Object.keys(iFormat)
+		$d.locales = Object.keys(iFormat)
 		View.lang = iSet
 		function iResolve(lang) {
 			return lang && (iFormat[lang = ("" + lang).toLowerCase()] || iFormat[lang = lang.split("-")[0]]) && lang
 		}
 		function iSet(lang, translations) {
-			assignDeep(iData[lang = html.lang = data.lang = localStorage.lang = iResolve(lang) || data.lang || opts.lang], translations)
-			return data._ = iFormat[lang] || format
+			assignDeep(iData[lang = html.lang = $d.lang = localStorage.lang = iResolve(lang) || $d.lang || opts.lang], translations)
+			return $d._ = iFormat[lang] || format
 		}
 		/**/
 
@@ -871,7 +871,7 @@
 		blur: blur,
 		cache: elCache,
 		closest: closest,
-		data: globalScope,
+		$d: globalScope,
 		get: getAttr,
 		hasClass: hasClass,
 		matches: matches,
