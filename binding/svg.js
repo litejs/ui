@@ -85,7 +85,7 @@
 	bindings.svgToLast = function(el) {
 		El.on(el, "mouseover", function() {
 			if (!svgToLastActive || el != el.parentNode.lastChild) {
-				El.cls(svgToLastActive, "line-active", 0)
+				El.cls(svgToLastActive, "is-active", 0)
 				El.append(el.parentNode, el)
 				El.cls(el, "is-active", svgToLastActive = el)
 			}
@@ -93,5 +93,5 @@
 	}
 	bindings.svgToLast.once =
 	bindings.initChart.once = 1
-}(this.SVGElement, document, El.bindings) // jshint ignore:line
+}(this.SVGElement, document, El.$b) // jshint ignore:line
 

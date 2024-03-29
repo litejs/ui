@@ -1,6 +1,6 @@
 
 /* global El, window */
-El.bindings.topFloat = function(el, offset) {
+El.$b.topFloat = function(el, offset) {
 	var h = el.offsetHeight + offset
 	, lastAbs = 0
 	, lastTop = 0
@@ -32,6 +32,5 @@ El.bindings.topFloat = function(el, offset) {
 	})
 }
 
-El.bindings.topFloat.once = 1
 
 
