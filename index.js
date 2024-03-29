@@ -855,6 +855,12 @@
 					return true
 				}
 			},
+			is: function(el, val, opts, prefix) {
+				if (!prefix) prefix = "is-"
+				var match = format(val, opts)
+				cls(el, el[prefix + opts], 0)
+				cls(el, el[prefix + opts] = match && prefix + match)
+			},
 			ref: function(el, name) {
 				this[name] = el
 			},
