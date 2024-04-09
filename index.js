@@ -1019,7 +1019,7 @@
 			}
 			if (el._e) {
 				emit.call(el, "kill")
-				for (delay in el._e) rmEvent(el, delay)
+				el._e = UNDEF
 			}
 			elRm(el)
 			el.$s = UNDEF
