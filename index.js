@@ -1022,13 +1022,11 @@
 				for (delay in el._e) rmEvent(el, delay)
 			}
 			elRm(el)
+			el.$s = UNDEF
 			if (el.nodeType != 1) {
 				if (el.kill) el.kill()
 			} else {
 				elEmpty(el)
-				if (el.$s !== UNDEF) {
-					el.$s = UNDEF
-				}
 				if (el.valObject !== UNDEF) {
 					el.valObject = UNDEF
 				}
