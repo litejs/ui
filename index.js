@@ -819,12 +819,11 @@
 
 				function add(item) {
 					var clone = nodes[pos] = el.cloneNode(true)
-					, subScope = assign(elScope(clone, comm), {
-						$i: pos++,
-						$len: list.length
-					})
-					clone[BIND_ATTR] = el[BIND_ATTR]
+					, subScope = elScope(clone, comm)
+					subScope.$i = pos++
+					subScope.$len = list.length
 					subScope[name] = item
+					clone[BIND_ATTR] = el[BIND_ATTR]
 					append(comm.parentNode, clone, comm)
 					render(clone, subScope)
 				}
