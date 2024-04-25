@@ -645,7 +645,7 @@
 		each(iGlobals, function(translations, iKey) {
 			translations = iData[iKey] = assignDeep(create(iGlobals), opts[iKey])
 			iFormat[iKey] = function(str, data) {
-				return format(get(str, translations, str || ""), data)
+				return format(get(translations, str, str || ""), data)
 			}
 		})
 		assignDeep(iGlobals, opts.globals)
@@ -1454,12 +1454,12 @@
 			return get(data, path, "")
 		})
 	}
-	function get(path, obj, fallback) {
+	function get(obj, path, fallback) {
 		return isStr(path) ? (
 			obj[path] !== UNDEF ? obj[path] :
 			(path = path.split("."))[1] && isObj(obj = obj[path[0]]) && obj[path[1]] !== UNDEF ? obj[path[1]] : fallback
 		) :
-		isArr(path) ? get(path[0], obj) || get(path[1], obj) || get(path[2], obj, fallback) :
+		isArr(path) ? get(obj, path[0]) || get(obj, path[1]) || get(obj, path[2], fallback) :
 		fallback
 	}
 	function injectCss(cssText) {
