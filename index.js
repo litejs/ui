@@ -24,9 +24,6 @@
 	// The documentMode is an IE only property, supported in IE8 and up.
 	, ie67 = ie678 && (document.documentMode | 0) < 8 // jshint ignore:line
 
-	, escapeRe = /[.*+?^=!:${}()|\[\]\/\\]/g
-	, routeRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
-
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
@@ -251,15 +248,13 @@
 			view.p = parent && View(parent)
 
 			if (route.charAt(0) !== "#") {
-				var params = "m[" + (view.s = viewSeq++) + "]?("
-				, _re = route.replace(routeRe, function(_, expr) {
+				fnStr += "m[" + (view.s = routeSeq++) + "]?("
+				reStr += "|(" + route.replace(routeRe, function(_, expr) {
 					return expr ?
-						(params += "o['" + expr + "']=m[" + (viewSeq++) + "],") && "([^/]+?)" :
-						_.replace(escapeRe, "\\$&")
-				})
-
-				fnStr += params + "'" + route + "'):"
-				reStr += (reStr ? "|(" : "(") + _re + ")"
+						(fnStr += "p['" + expr + "']=m[" + (routeSeq++) + "],") && "([^/]+?)" :
+						_.replace(reEsc, "\\$&")
+				}) + ")"
+				fnStr += "'" + route + "'):"
 				viewFn = 0
 			}
 		}
@@ -324,9 +319,12 @@
 
 		var root = opts.root
 		, viewFn, lastView, lastUrl, syncResume
-		, viewSeq = 1
 		, fnStr = ""
 		, reStr = ""
+		, reEsc = /[.*+?^${}()|[\]/\\]/g
+		, routeRe = /\{([\w%.]+?)\}|.[^{\\]*?/g
+		, routeSeq = 1
+
 		, views = View.views = {}
 		, paramCb = {}
 		, lastParams = paramCb
@@ -424,7 +422,7 @@
 			if (!viewFn) {
 				viewFn = Function(
 					"var r=/^\\/?(?:" + reStr + ")[\\/\\s]*$/;" +
-					"return function(i,o,d){var m=r.exec(i);return m!==null?(" + fnStr + "d):d}"
+					"return function(u,p,d){var m=r.exec(u);return m!==null?(" + fnStr + "d):d}"
 				)()
 			}
 			return View(url ? viewFn(url, params || {}, "404") : View.home)
