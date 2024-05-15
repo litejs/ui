@@ -20,7 +20,7 @@ See [wiki][] for more information.
 
 ## Licence
 
-Copyright (c) 2006-2023 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+Copyright (c) 2006-2024 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [MIT License](https://litejs.com/MIT-LICENSE.txt) |
 [GitHub repo](https://github.com/litejs/ui) |
 [npm package](https://npmjs.org/package/@litejs/ui) |
