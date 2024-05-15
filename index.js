@@ -88,7 +88,7 @@
 		}
 	}
 	, plugins = {}
-	, sources = []
+	, sources = [ (findAll(html, "script").pop() || plugins).innerHTML ]
 	, hasOwn = plugins.hasOwnProperty
 
 	// After iOS 13 iPad with default enabled "desktop" option
@@ -120,6 +120,7 @@
 		// iOS doesn't support beforeunload, use pagehide instead
 		fixEv.beforeunload = "pagehide"
 	}
+
 
 	xhr.css = injectCss
 	xhr.ui = sources.push.bind(sources)
@@ -1520,7 +1521,7 @@
 	function readTemplates(next) {
 		xhr.load(findAll(html, "script[type=ui]").map(function(el) {
 			// IE6 script.innerText is empty
-			sources.push(el[txtAttr] || el.innerHTML)
+			sources.push(el.innerHTML)
 			elKill(el)
 			return el.src
 		}), function(res) {
