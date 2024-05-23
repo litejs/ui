@@ -67,7 +67,7 @@
 		}
 		var sound, vibrate
 		, code = ""
-		, el = El("Modal")
+		, el = El("Dialog")
 		, scope = Object.assign(El.scope(el, el), opts)
 		, kbMap = {}
 		, body = document.body
@@ -81,9 +81,10 @@
 			if (a.key) kbMap[a.key] = resolve.bind(el, el, a.action)
 		}
 		El.cls(blurEl, "Modal--blur")
-		El.cls(el.lastChild, "Modal--blur", false, 1)
-		El.append(body, el)
-		El.render(el, scope)
+		var mm = El("Modal")
+		El.append(mm, el)
+		El.append(body, mm)
+		El.render(mm)
 		if (scope.code) {
 			$$(".js-numpad", el).on("click", numpad)
 			kbMap.backspace = kbMap.del = kbMap.num = numpad
@@ -119,7 +120,7 @@
 					inputMd: El.val($(".js-inputMd", el)),
 					select: El.val($(".js-select", el))
 				}
-				El.kill(el, "transparent")
+				El.kill(mm, "transparent")
 				El.cls(blurEl, "Modal--blur", el = false)
 				if (action && next) {
 					if (typeof next === "function") next(action, result)
@@ -147,7 +148,7 @@
 	})
 
 %el Dialog
-.Dialog.grid.p2.anim Dialog
+.Dialog.grid.p2.anim
 	.col.ts3 ;txt!_(title, map)
 	.col.js-body ;md!_(body, map)
 	.col
@@ -160,27 +161,9 @@
 				;class!"is-" + action.action, action.action
 
 %el Modal
-	.Modal.max.fix.anim
-		.Modal-bg.max.abs
-		.Modal-content.Modal--blur.grid.p2.anim
-			.row
-				;if: input
-				.col>input.field.js-input
-			.row
-				;if: $d.inputMd!=null
-				.col
-					textarea.field.js-inputMd
-						@keyup [this.parentNode.nextSibling.nextSibling], "renderMd"
-						;val: inputMd
-				.col.ts3 Preview
-				.p4
-					;md: inputMd
-			.row
-				;if: select
-				.col
-					select.field.js-select
-						;list: select, [""]
-						option
-							;val:: item.id
-							;txt:: _(item.name)
+.Modal.max.fix.anim
+	.Modal-bg.max.abs
+	.Modal-content.Modal--blur.grid.p2.anim
+		;cls!"Modal--blur",!1,1
+		%slot
 
