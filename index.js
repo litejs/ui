@@ -85,7 +85,7 @@
 		}
 	}
 	, plugins = {}
-	, sources = [ (findAll(html, "script").pop() || plugins).innerHTML ]
+	, sources = []
 	, hasOwn = plugins.hasOwnProperty
 
 	// After iOS 13 iPad with default enabled "desktop" option
@@ -1523,14 +1523,14 @@
 			elKill(el)
 			return el.src
 		}), function(res) {
-			res = res.concat(sources).filter(Boolean)
+			res = res.concat(sources, (next || res).innerHTML).filter(Boolean)
 			if (res[sources.length = 0]) {
 				if (!parser) LiteJS.ui = LiteJS()
 				each(res, parser)
 			}
-			if (next) next()
+			if (isFn(next)) next()
 		}, 1)
 	}
-	readTemplates()
+	readTemplates(findAll(html, "script").pop())
 }(this, document, history, localStorage, location, navigator, Function, Object) // jshint ignore:line
 
