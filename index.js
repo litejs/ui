@@ -616,14 +616,14 @@
 				next = point
 			}
 
-			if ( next != lastSize ) {
+			if (next != lastSize) {
 				cls(html, lastSize, 0)
 				cls(html, lastSize = next)
 			}
 
 			next = width > html.offsetHeight ? "land" : "port"
 
-			if ( next != lastOrient) {
+			if (next != lastOrient) {
 				cls(html, lastOrient, 0)
 				cls(html, lastOrient = next)
 			}
@@ -928,7 +928,7 @@
 		, i = 0
 		if (child) {
 			if (isStr(child) || isNum(child)) child = document.createTextNode(child)
-			else if ( !child.nodeType && (i = child.length) ) {
+			else if (!child.nodeType && (i = child.length)) {
 				for (tmp = document.createDocumentFragment(); i--; ) append(tmp, child[i], 0)
 				child = tmp
 			}
@@ -1078,8 +1078,7 @@
 
 		if (val !== UNDEF) {
 			if (opts) {
-				value = (isArr(val) ? val : [ val ]).map(String)
-				for (; (input = opts[i++]); ) {
+				for (value = (isArr(val) ? val : [ val ]).map(String); (input = opts[i++]); ) {
 					input.selected = value.indexOf(input.value) > -1
 				}
 			} else if (el.val) {
