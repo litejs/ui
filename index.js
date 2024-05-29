@@ -1,7 +1,7 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global xhr, getComputedStyle, navigator */
+/* global xhr, navigator */
 
 !function(window, document, history, localStorage, location, navigator, Function, Object) {
 	window.El = El
@@ -884,10 +884,7 @@
 		scope: elScope,
 		scrollLeft: scrollLeft,
 		scrollTop: scrollTop,
-		step: step,
-		style: function(el, key) {
-			return getComputedStyle(el).getPropertyValue(key)
-		}
+		step: step
 	})
 
 	function getAttr(el, key) {
