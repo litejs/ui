@@ -4,4 +4,4 @@
 <script src="../load.js"></script>
 <script src="../shim/index.js"></script>
 <script src="../index.js"></script>
-<h1>LiteJS is simple!</h1><nav><hr><a href="#">Home</a> | <a href="#about">About</a><hr></nav><h2>Hello home</h2><!--%slot-1--><hr> The End </body>
+<h1>LiteJS is simple!</h1><nav><hr><a href="#">Home</a> | <a href="#about">About</a><hr></nav><h2>Hello home</h2><!--slot1--><hr> The End </body>

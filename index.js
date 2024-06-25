@@ -553,7 +553,7 @@
 			d: function(plugin) {
 				var slotName = plugin.n || ++elSeq
 				, parent = plugin.u
-				append(parent, Comm("%slot-" + slotName))
+				append(parent, Comm("slot" + slotName))
 				// In IE6 root div is inside documentFragment
 				for (; (parent.parentNode || plugin).nodeType === 1; parent = parent.parentNode);
 				;(parent._s || (parent._s = {}))[slotName] = parent.childNodes.length - 1
@@ -932,7 +932,7 @@
 
 			if (child.nodeType) {
 				if ((i = setAttr(child, "slot", "") || getAttr(el, "data-slot"))) {
-					i = "%slot-" + i
+					i = "slot" + i
 					for (tmp = el.firstChild; tmp; tmp = next) {
 						if (tmp.nodeType === 8 && tmp.nodeValue === i) {
 							el = tmp
