@@ -849,7 +849,7 @@
 				if (enabled) {
 					elReplace(el._if, el)
 				} else {
-					elReplace(el, el._if || (el._if = Comm("if", render.bind(el, el, this))))
+					elReplace(el, el._if || (el._if = Comm("if", render.bind(el, el))))
 					return true
 				}
 			},
