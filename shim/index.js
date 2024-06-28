@@ -199,33 +199,33 @@
 		try {
 			// FF4-beta with dom.storage.enabled=false throws for accessing windows.localStorage
 			// iOS5 private browsing throws for localStorage.setItem()
-			return window[name += "Storage"].setItem(name, name)
+			window[name += "Storage"].setItem(name, name)
+			return window[name].removeItem(name)
 		} catch(e){}
-		/***
-		} else if (el.addBehavior) {
-			// The saveHistory behavior persists only for the current session.
-			// The saveHistory behavior uses one UserData store for the entire document.
-			// Thus, if two elements write the same attribute, the first is overwritten by the second.
-			// The UserData store is saved in an in-memory stream and is not saved to disk.
-			// Therefore, it is not available after the user closes Windows Internet Explorer.
-			//
-			// The userData behavior persists data across sessions, using one UserData store for each object.
-			// The UserData store is persisted in the cache using the save and load methods.
-			// Once the UserData store has been saved, it can be reloaded even if the document has been closed and reopened.
-			//
-			// An ID is required for the userData and saveSnapshot behaviors,
-			// and is recommended for the saveHistory and saveFavorite behaviors.
-			//
-			// https://msdn.microsoft.com/en-us/library/ms531348(v=vs.85).aspx
-			// el.style.behavior = surviveReboot ? "url('#default#userData')" : "url('#default#saveHistory')"
-			el.addBehavior("#default#" + (surviveReboot ? "userData" : "saveHistory"))
-			if (surviveReboot) el.load("persist")
-			value = el.getAttribute(key)
-			save = function() {
-				el.setAttribute(key, El.val(el))
-				if (surviveReboot) el.save("persist")
-			}
-		/**/
+
+		// # IE5 128KB per document
+		//
+		// The `saveHistory` behavior persists data only for the current session,
+		// using one in-memory UserData store for the entire document.
+		// If two elements write the same attribute, the first is overwritten.
+		//
+		// The `userData` behavior persists data across sessions,
+		// using one UserData store for each object, saved in the cache.
+		// Saved UserData can be reloaded even if the document has been closed and reopened.
+		//
+		// An ID is required for userData and saveSnapshot behaviors
+		// and recommended for saveHistory and saveFavorite behaviors.
+		//
+		// https://msdn.microsoft.com/en-us/library/ms531348(v=vs.85).aspx
+		// if (el.addBehavior) {
+		// el.style.behavior = surviveReboot ? "url('#default#userData')" : "url('#default#saveHistory')"
+		// el.addBehavior("#default#" + (surviveReboot ? "userData" : "saveHistory"))
+		// if (surviveReboot) el.load("persist")
+		// value = el.getAttribute(key)
+		// save = function() {
+		// 	el.setAttribute(key, El.val(el))
+		// 	if (surviveReboot) el.save("persist")
+		// }
 		var data = {
 			setItem: function(id, val) {
 				return (data[id] = "" + val)
