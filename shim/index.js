@@ -38,8 +38,6 @@
 	, navigator = patch("navigator")
 	/*/
 	, document = window.document
-	, location = window.location
-	, navigator = window.navigator
 	, IS_NODE = false
 	/**/
 	, html = document.documentElement
@@ -121,8 +119,7 @@
 	if (!IS_NODE && !(onhashchange in window) || ie67) {
 		patch(onhashchange, null)
 		setInterval(function() {
-			var cur = location.href.split("#")[1]
-			if (lastHash !== cur && isFn(window[onhashchange])) {
+			if (lastHash !== (lastHash = location.href.split("#")[1]) && isFn(window[onhashchange])) {
 				window[onhashchange]()
 			}
 		}, 60)
