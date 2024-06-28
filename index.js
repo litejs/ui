@@ -3,6 +3,10 @@
 
 /* global xhr, navigator */
 
+/*** debug ***/
+console.log("LiteJS is in debug mode, but it's fine for production")
+/**/
+
 !function(window, document, history, localStorage, location, navigator, Function, Object) {
 	window.El = El
 	window.LiteJS = LiteJS
