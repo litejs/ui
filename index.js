@@ -1012,7 +1012,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		if (el) {
 			if (delay > 0) return setTimeout(elKill, delay, el, tr)
 			if (tr) {
-				cls(el, tr, tr = "transitionend")
+				if (isStr(tr)) cls(el, tr)
+				if (isObj(tr)) bindingsCss(el, tr)
+				tr = "transitionend"
 				// transitionend fires for each property transitioned
 				if ("on" + tr in el) return addEvent(el, tr, elKill.bind(el, el, el = null))
 			}
