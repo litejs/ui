@@ -420,7 +420,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			View.emit(event, view, a, b)
 		}
 		function viewEval(str, scope) {
-			Function("$s,$ui,$d,$,$$", str)(scope, View, $d, View.$, View.$$)
+			try {
+				Function("$s,$ui,$d,$,$$", str)(scope, View, $d, View.$, View.$$)
+			} catch(e) {
+				logErr(e, "viewEval: " + str)
+			}
 		}
 		function viewGet(url, params) {
 			if (!viewFn) {
@@ -1158,13 +1162,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			scope.$o = fn.o
 			return fn(node, scope, attr)
 		} catch (e) {
-			/*** debug ***/
-			console.error(e)
-			console.error("BINDING: " + bind, node)
-			/**/
-			if (window.onerror) {
-				window.onerror(e.message, e.fileName, e.lineNumber)
-			}
+			logErr(e, attr + ": " + bind, node)
 		}
 	}
 	function makeFn(fn) {
@@ -1462,6 +1460,15 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		) :
 		isArr(path) ? get(obj, path[0]) || get(obj, path[1]) || get(obj, path[2], fallback) :
 		fallback
+	}
+	function logErr(e, source, node) {
+		/*** debug ***/
+		console.error(e)
+		console.error(source, node)
+		/**/
+		if (window.onerror) {
+			window.onerror(e.message, e.fileName, e.lineNumber)
+		}
 	}
 	function injectCss(cssText) {
 		if (!styleNode) {
