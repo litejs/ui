@@ -990,6 +990,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 
 		if (set === UNDEF || set) {
+			if (set && set !== el && set.nodeType === 1) cls(set, name, 0)
 			if (current) {
 				name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
 			}
