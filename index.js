@@ -1410,7 +1410,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					return
 				}
 				if (prepareVal) val = prepareVal(el, selector, data, val)
-				selector = !prepareVal && selector ? findAll(el, selector) : [ el ]
+				selector = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
 				var arr = ("" + names).split(splitRe), len = arr.length
 				for (delay = 0; (el = selector[delay++]); )
 				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArr(val) ? val[i - 1] : val)
