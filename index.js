@@ -544,7 +544,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			, contentPos = el._cp
 
 			if (contentPos > -1) {
-				if (childNodes[contentPos].nodeType == 1 && el._sk) {
+				if (childNodes[contentPos].nodeType < 2 && el._sk) {
 					setAttr(childNodes[contentPos], "data-slot", el._sk)
 				}
 				child._s = el._s
@@ -563,7 +563,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				, parent = plugin.u
 				append(parent, Comm("slot" + slotName))
 				// In IE6 root div is inside documentFragment
-				for (; (parent.parentNode || plugin).nodeType === 1; parent = parent.parentNode);
+				for (; (parent.parentNode || plugin).nodeType < 2; parent = parent.parentNode);
 				;(parent._s || (parent._s = {}))[slotName] = parent.childNodes.length - 1
 				if (!plugin.n) parent._s._ = parent._sk = slotName
 				parent._cp = parent.childNodes.length - 1
@@ -990,7 +990,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 
 		if (set === UNDEF || set) {
-			if (set && set !== el && set.nodeType === 1) cls(set, name, 0)
+			if (set && set !== el && set.nodeType < 2) cls(set, name, 0)
 			if (current) {
 				name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
 			}
@@ -1029,13 +1029,13 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 			elRm(el)
 			el.$s = UNDEF
-			if (el.nodeType != 1) {
-				if (el.kill) el.kill()
-			} else {
+			if (el.nodeType < 2) {
 				elEmpty(el)
 				if (el.valObject !== UNDEF) {
 					el.valObject = UNDEF
 				}
+			} else {
+				if (el.kill) el.kill()
 			}
 		}
 	}
@@ -1209,7 +1209,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		var fn, map
 		, i = 0
 		, el = e.target || e.srcElement
-		, input = /INPUT|TEXTAREA|SELECT/i.test((el.nodeType == 3 ? el.parentNode : el).tagName)
+		, input = /INPUT|TEXTAREA|SELECT/i.test((el.nodeType < 2 ? el : el.parentNode).tagName)
 
 		for (; (map = kbMaps[i++]) && (
 			!(fn = !input || map.input ? map[code] || map[chr] || map.num && code > 47 && code < 58 && (chr|=0, map.num) || map.all : fn) &&
