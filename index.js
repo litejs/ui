@@ -1380,7 +1380,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return el && html.matches.call(el, sel)
 	}
 	function closest(el, sel) {
-		return el && html.closest.call(el.closest ? el : el.parentNode, sel)
+		return el && html.closest.call(el.nodeType < 2 ? el : el.parentNode, sel)
 	}
 	function acceptMany(fn, prepareVal) {
 		return function f(el, names, selector, data, val, delay) {
