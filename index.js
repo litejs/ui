@@ -43,7 +43,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
 	, txtAttr = "textContent" in html ? "textContent" : "innerText"
 	, bindingsCss = acceptMany(function(el, key, val) {
-		el.style[key.replace(camelRe, camelFn)] = "" + val
+		el.style[key.replace(camelRe, camelFn)] = val
 	})
 	, bindingsOn = acceptMany(addEvent, function(el, selector, data, handler) {
 		return isStr(handler) ? function(e) {
