@@ -1268,111 +1268,111 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			bindingsCss(el, "touchAction msTouchAction", "none")
 			el._ti = 1
 		}
-	}
-	function touchDown(e, e2) {
-		clearTimeout(touchTick)
-		var len = e ? touches.push(e) : touches.length
-		, MOVE = "pointermove"
-		if (touchMode || len < 1) {
-			elEmit(touchEl, touchMode ? touchMode + END : "tap", e2, touchEv, touchEl)
-			touchMode = UNDEF
-		}
-		if (len < 0) {
-			touchEl = null
-		}
-		if (len === 1) {
-			if (e) {
-				touchEl = e.currentTarget || e.target
-				if (e.button === 2 || matches(e.target, "INPUT,TEXTAREA,SELECT,.no-drag")) return
-				touchTick = setTimeout(moveOne, 1500, e, 1)
-			} else {
-				e = touches[0]
-			}
-			touchEv.X = e.clientX
-			touchEv.Y = e.clientY
-			touchPos("left", "offsetWidth")
-			touchPos("top", "offsetHeight")
-			moveOne(e)
-		}
-		if (len === 2) {
-			touchDist = touchAngle = null
-			moveTwo(e)
-		}
-		;(len === 1 ? addEvent : rmEvent)(document, MOVE, moveOne)
-		;(len === 2 ? addEvent : rmEvent)(document, MOVE, moveTwo)
-		return eventStop(e)
-		function touchPos(name, offset) {
-			var val = (
-				touchEl.getBBox ?
-				touchEl.getAttributeNS(null, name == "top" ? "y":"x") :
-				touchEl.style[name]
-			)
-			touchEv[name] = parseInt(val, 10) || 0
-			if (val && val.indexOf("%") > -1) {
-				touchEv[name] *= touchEl.parentNode[offset] / 100
-			}
-		}
-	}
-	function touchUp(e) {
-		for (var i = touches.length; i--; ) {
-			if (touches[i].pointerId == e.pointerId) {
-				touches.splice(i, 1)
-				break
-			}
-		}
-		touchDown(null, e)
-	}
-	function touchWheel(e) {
-		// IE10 enabled pinch-to-zoom gestures from multi-touch trackpad’s as mousewheel event with ctrlKey.
-		// Chrome M35 and Firefox 55 followed up.
-		if (!touches[0]) {
-			var ev = e.ctrlKey ? "pinch" : e.altKey ? "rotate" : UNDEF
-			if (ev && emit.call(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
-				return eventStop(e)
-			}
-		}
-	}
-	function moveOne(e, fromTimer) {
-		// In IE9 mousedown.buttons is OK but mousemove.buttons == 0
-		if (touches[0].buttons && touches[0].buttons !== (e.buttons || MS_WHICH[e.which || 0])) {
-			return touchUp(e)
-		}
-		touchEv.x = e.clientX - touchEv.X
-		touchEv.y = e.clientY - touchEv.Y
-		touchEv.leftPos = touchEv.x + touchEv.left
-		touchEv.topPos  = touchEv.y + touchEv.top
-		if (!touchMode) {
-			var evs = touchEl._e
-			touchMode = (
-				evs.pan && (touchEv.x > 10 || touchEv.x < -10 || touchEv.y > 10 || touchEv.y < -10) ? "pan" :
-				evs.hold && fromTimer ? "hold" :
-				UNDEF
-			)
-			if (!touchMode) return
+		function touchDown(e, e2) {
 			clearTimeout(touchTick)
-			elEmit(touchEl, touchMode + START, e, touchEv, touchEl)
+			var len = e ? touches.push(e) : touches.length
+			, MOVE = "pointermove"
+			if (touchMode || len < 1) {
+				elEmit(touchEl, touchMode ? touchMode + END : "tap", e2, touchEv, touchEl)
+				touchMode = UNDEF
+			}
+			if (len < 0) {
+				touchEl = null
+			}
+			if (len === 1) {
+				if (e) {
+					touchEl = e.currentTarget || e.target
+					if (e.button === 2 || matches(e.target, "INPUT,TEXTAREA,SELECT,.no-drag")) return
+					touchTick = setTimeout(moveOne, 1500, e, 1)
+				} else {
+					e = touches[0]
+				}
+				touchEv.X = e.clientX
+				touchEv.Y = e.clientY
+				touchPos("left", "offsetWidth")
+				touchPos("top", "offsetHeight")
+				moveOne(e)
+			}
+			if (len === 2) {
+				touchDist = touchAngle = null
+				moveTwo(e)
+			}
+			;(len === 1 ? addEvent : rmEvent)(document, MOVE, moveOne)
+			;(len === 2 ? addEvent : rmEvent)(document, MOVE, moveTwo)
+			return eventStop(e)
+			function touchPos(name, offset) {
+				var val = (
+					touchEl.getBBox ?
+					touchEl.getAttributeNS(null, name == "top" ? "y":"x") :
+					touchEl.style[name]
+				)
+				touchEv[name] = parseInt(val, 10) || 0
+				if (val && val.indexOf("%") > -1) {
+					touchEv[name] *= touchEl.parentNode[offset] / 100
+				}
+			}
 		}
-		if (touchMode !== "hold" || fromTimer) elEmit(touchEl, touchMode, e, touchEv, touchEl)
-	}
-	function moveTwo(e) {
-		touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
-		var diff
-		, x = touchEv.X - touches[1].clientX
-		, y = touchEv.Y - touches[1].clientY
-		, dist = Math.sqrt(x*x + y*y) | 0
-		, angle = Math.atan2(y, x)
+		function touchUp(e) {
+			for (var i = touches.length; i--; ) {
+				if (touches[i].pointerId == e.pointerId) {
+					touches.splice(i, 1)
+					break
+				}
+			}
+			touchDown(null, e)
+		}
+		function touchWheel(e) {
+			// IE10 enabled pinch-to-zoom gestures from multi-touch trackpad’s as mousewheel event with ctrlKey.
+			// Chrome M35 and Firefox 55 followed up.
+			if (!touches[0]) {
+				var ev = e.ctrlKey ? "pinch" : e.altKey ? "rotate" : UNDEF
+				if (ev && emit.call(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
+					return eventStop(e)
+				}
+			}
+		}
+		function moveOne(e, fromTimer) {
+			// In IE9 mousedown.buttons is OK but mousemove.buttons == 0
+			if (touches[0].buttons && touches[0].buttons !== (e.buttons || MS_WHICH[e.which || 0])) {
+				return touchUp(e)
+			}
+			touchEv.x = e.clientX - touchEv.X
+			touchEv.y = e.clientY - touchEv.Y
+			touchEv.leftPos = touchEv.x + touchEv.left
+			touchEv.topPos  = touchEv.y + touchEv.top
+			if (!touchMode) {
+				var evs = touchEl._e
+				touchMode = (
+					evs.pan && (touchEv.x > 10 || touchEv.x < -10 || touchEv.y > 10 || touchEv.y < -10) ? "pan" :
+					evs.hold && fromTimer ? "hold" :
+					UNDEF
+				)
+				if (!touchMode) return
+				clearTimeout(touchTick)
+				elEmit(touchEl, touchMode + START, e, touchEv, touchEl)
+			}
+			if (touchMode !== "hold" || fromTimer) elEmit(touchEl, touchMode, e, touchEv, touchEl)
+		}
+		function moveTwo(e) {
+			touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
+			var diff
+			, x = touchEv.X - touches[1].clientX
+			, y = touchEv.Y - touches[1].clientY
+			, dist = Math.sqrt(x*x + y*y) | 0
+			, angle = Math.atan2(y, x)
 
-		if (touchDist !== null) {
-			diff = dist - touchDist
-			if (diff) elEmit(touchEl, "pinch", e, diff, angle)
-			// GestureEvent onGestureChange: function(e) {
-			//	e.target.style.transform =
-			//		'scale(' + e.scale  + startScale  + ') rotate(' + e.rotation + startRotation + 'deg)'
-			diff = angle - touchAngle
-			if (diff) elEmit(touchEl, "rotate", e, diff * (180/Math.PI))
+			if (touchDist !== null) {
+				diff = dist - touchDist
+				if (diff) elEmit(touchEl, "pinch", e, diff, angle)
+				// GestureEvent onGestureChange: function(e) {
+				//	e.target.style.transform =
+				//		'scale(' + e.scale  + startScale  + ') rotate(' + e.rotation + startRotation + 'deg)'
+				diff = angle - touchAngle
+				if (diff) elEmit(touchEl, "rotate", e, diff * (180/Math.PI))
+			}
+			touchDist = dist
+			touchAngle = angle
 		}
-		touchDist = dist
-		touchAngle = angle
 	}
 	/**/
 
