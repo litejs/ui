@@ -1251,7 +1251,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	var touchEl, touchDist, touchAngle, touchMode, touchTick
 	, START = "start"
 	, END = "end"
-	, MS_WHICH = [0, 1, 4, 2]
 	, touches = []
 	, touchEv = {}
 
@@ -1333,7 +1332,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 		function moveOne(e, fromTimer) {
 			// In IE9 mousedown.buttons is OK but mousemove.buttons == 0
-			if (touches[0].buttons && touches[0].buttons !== (e.buttons || MS_WHICH[e.which || 0])) {
+			if (touches[0].buttons && touches[0].buttons !== (e.buttons || [0, 1, 4, 2][e.which || 0])) {
 				return touchUp(e)
 			}
 			touchEv.x = e.clientX - touchEv.X
