@@ -887,6 +887,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		get: getAttr,
 		hasClass: hasClass,
 		matches: matches,
+		next: walk.bind(El, "nextSibling"),
+		prev: walk.bind(El, "previousSibling"),
 		rate: rate,
 		replace: elReplace,
 		scope: elScope,
@@ -1381,6 +1383,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	function closest(el, sel) {
 		return el && html.closest.call(el.nodeType < 2 ? el : el.parentNode, sel)
+	}
+	function walk(attr, el, sel) {
+		for (; el && !matches(el = el[attr], sel); );
+		return el
 	}
 	function acceptMany(fn, prepareVal) {
 		return function f(el, name, val, selector, delay, data) {
