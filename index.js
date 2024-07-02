@@ -1256,7 +1256,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, touchEv = {}
 
 	// tap, swipe + left/right/up/down
-	each("pan pinch rotate", function(name) {
+	each("pan pinch rotate tap", function(name) {
 		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
 		fixFn[name] = touchInit
 	})
@@ -1272,11 +1272,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function touchDown(e, e2) {
 		var len = e ? touches.push(e) : touches.length
 		, MOVE = "pointermove"
-		if (touchMode) {
-			elEmit(touchEl, touchMode + END, e2, touchEv, touchEl)
+		if (touchMode || len < 1) {
+			elEmit(touchEl, touchMode ? touchMode + END : "tap", e2, touchEv, touchEl)
 			touchMode = UNDEF
 		}
-		if (len === 0) {
+		if (len < 0) {
 			touchEl = null
 		}
 		if (len === 1) {
