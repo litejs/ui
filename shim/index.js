@@ -249,6 +249,8 @@
 	// IE8 has console, however, the console object does not exist if the console is not opened.
 	patch("console", {log: nop, error: nop})
 
+	patch("getComputedStyle", "return a.currentStyle")
+
 	/*** ie9 ***/
 	patch("matchMedia", "b=a||'all';return{media:b,matches:X?X.matchMedium(b):!1,addListener:Y}", 0, window.styleMedia || window.media, nop)
 	/**/
