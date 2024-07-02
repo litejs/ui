@@ -1248,7 +1248,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	/**/
 
 	/*** touch ***/
-	var touchEl, touchDist, touchAngle, touchMode
+	var touchEl, touchDist, touchAngle, touchMode, touchTick
 	, START = "start"
 	, END = "end"
 	, MS_WHICH = [0, 1, 4, 2]
@@ -1270,6 +1270,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 	}
 	function touchDown(e, e2) {
+		clearTimeout(touchTick)
 		var len = e ? touches.push(e) : touches.length
 		, MOVE = "pointermove"
 		if (touchMode || len < 1) {
@@ -1283,6 +1284,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			if (e) {
 				touchEl = e.currentTarget || e.target
 				if (e.button === 2 || matches(e.target, "INPUT,TEXTAREA,SELECT,.no-drag")) return
+				touchTick = setTimeout(moveOne, 1500, e, 1)
 			} else {
 				e = touches[0]
 			}
@@ -1330,7 +1332,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		}
 	}
-	function moveOne(e) {
+	function moveOne(e, fromTimer) {
 		// In IE9 mousedown.buttons is OK but mousemove.buttons == 0
 		if (touches[0].buttons && touches[0].buttons !== (e.buttons || MS_WHICH[e.which || 0])) {
 			return touchUp(e)
@@ -1343,12 +1345,14 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			var evs = touchEl._e
 			touchMode = (
 				evs.pan && (touchEv.x > 10 || touchEv.x < -10 || touchEv.y > 10 || touchEv.y < -10) ? "pan" :
+				evs.hold && fromTimer ? "hold" :
 				UNDEF
 			)
 			if (!touchMode) return
+			clearTimeout(touchTick)
 			elEmit(touchEl, touchMode + START, e, touchEv, touchEl)
 		}
-		elEmit(touchEl, touchMode, e, touchEv, touchEl)
+		if (touchMode !== "hold" || fromTimer) elEmit(touchEl, touchMode, e, touchEv, touchEl)
 	}
 	function moveTwo(e) {
 		touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
