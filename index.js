@@ -1281,16 +1281,14 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			if (len === 1) {
 				if (e) {
 					touchEl = e.currentTarget || e.target
-					if (e.button === 2 || matches(e.target, "INPUT,TEXTAREA,SELECT,.no-drag")) return
+					touchEv.X = e.clientX
+					touchEv.Y = e.clientY
+					touchPos("left", "offsetWidth")
+					touchPos("top", "offsetHeight")
+					if (e.button === 2 || matches(touchEl, "INPUT,TEXTAREA,SELECT,.no-drag")) return
 					touchTick = setTimeout(moveOne, 1500, e, 1)
-				} else {
-					e = touches[0]
 				}
-				touchEv.X = e.clientX
-				touchEv.Y = e.clientY
-				touchPos("left", "offsetWidth")
-				touchPos("top", "offsetHeight")
-				moveOne(e)
+				moveOne(e || touches[0])
 			}
 			if (len === 2) {
 				touchDist = touchAngle = null
