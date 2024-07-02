@@ -45,15 +45,15 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, bindingsCss = acceptMany(function(el, key, val) {
 		el.style[key.replace(camelRe, camelFn)] = val
 	})
-	, bindingsOn = acceptMany(addEvent, function(el, selector, data, handler) {
-		return isStr(handler) ? function(e) {
+	, bindingsOn = acceptMany(addEvent, function(el, val, selector, data) {
+		return isStr(val) ? function(e) {
 			var target = selector ? closest(e.target, selector) : el
-			if (target) emit.apply(elScope(el).$ui, [handler, e, target].concat(data))
+			if (target) emit.apply(elScope(el).$ui, [val, e, target].concat(data))
 		} :
 		selector ? function(e) {
-			if (matches(e.target, selector)) handler(e)
+			if (matches(e.target, selector)) val(e)
 		} :
-		handler
+		val
 	})
 	, bindings = {
 		cls: acceptMany(cls),
@@ -1383,36 +1383,27 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return el && html.closest.call(el.nodeType < 2 ? el : el.parentNode, sel)
 	}
 	function acceptMany(fn, prepareVal) {
-		return function f(el, names, selector, data, val, delay) {
-			if (el && names) {
+		return function f(el, name, val, selector, delay, data) {
+			if (el && name) {
 				var i = arguments.length
-				if (i == 3 || i == 4 && isNum(data)) {
-					delay = data
-					val = selector
-					selector = data = null
-				} else if (i == 4 || i == 5 && isNum(val)) {
-					delay = val
-					val = data
-					if (isStr(selector)) {
-						data = null
-					} else {
-						data = selector
-						selector = null
-					}
+				if (i > 3 && i < 6 && isNum(selector)) {
+					data = delay
+					delay = selector
+					selector = null
 				}
 				if (delay > 0) {
-					setTimeout(f, delay, el, names, selector, data, val, 0)
+					setTimeout(f, delay, el, name, val, selector, 0, data)
 					return
 				}
-				if (isObj(names)) {
-					for (delay in names) if (hasOwn.call(names, delay)) {
-						f(el, delay, selector, data, names[delay])
+				if (isObj(name)) {
+					for (delay in name) if (hasOwn.call(name, delay)) {
+						f(el, delay, name[delay], selector, 0, data)
 					}
 					return
 				}
-				if (prepareVal) val = prepareVal(el, selector, data, val)
+				if (prepareVal) val = prepareVal(el, val, selector, data)
 				selector = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
-				var arr = ("" + names).split(splitRe), len = arr.length
+				var arr = ("" + name).split(splitRe), len = arr.length
 				for (delay = 0; (el = selector[delay++]); )
 				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArr(val) ? val[i - 1] : val)
 			}
