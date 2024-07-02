@@ -1340,15 +1340,17 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			if (!touchMode) {
 				var evs = touchEl._e
 				touchMode = (
-					evs.pan && (touchEv.x > 10 || touchEv.x < -10 || touchEv.y > 10 || touchEv.y < -10) ? "pan" :
-					evs.hold && fromTimer ? "hold" :
-					UNDEF
+					haveEv("pan", touchEv.x > 10 || touchEv.x < -10 || touchEv.y > 10 || touchEv.y < -10) ||
+					haveEv("hold", fromTimer)
 				)
 				if (!touchMode) return
 				clearTimeout(touchTick)
 				elEmit(touchEl, touchMode + START, e, touchEv, touchEl)
 			}
-			if (touchMode !== "hold" || fromTimer) elEmit(touchEl, touchMode, e, touchEv, touchEl)
+			elEmit(touchEl, touchMode, e, touchEv, touchEl)
+			function haveEv(name, set) {
+				return set && (evs[name] || evs[name + START] || evs[name + END]) && name
+			}
 		}
 		function moveTwo(e) {
 			touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
