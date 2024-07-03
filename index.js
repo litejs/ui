@@ -832,7 +832,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					subScope[name] = item
 					clone[BIND_ATTR] = el[BIND_ATTR]
 					append(comm.parentNode, clone, comm)
-					render(clone, subScope)
+					render(clone)
 				}
 				function remove(i) {
 					elKill(nodes.splice(i, 1)[0])
@@ -850,7 +850,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if ((tmp = el.className)) cls(child, tmp)
 				child.$s = el.$s
 				elReplace(el, child)
-				render(child, this)
+				render(child)
 				return child
 			},
 			"if": function(el, enabled) {
