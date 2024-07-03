@@ -24,8 +24,9 @@
 		//!{loadRewrite}
 	}
 	// Move setTimeout from window.prototype to window object for future patching in IE9.
-	// Fallback to global.setTimeout and expose xhr._c for tests.
-	, setTimeout_ = (window.setTimeout = window.setTimeout) /*** debug ***/ || setTimeout
+	, setTimeout_ = window.setTimeout = setTimeout
+	/*** debug ***/
+	// Expose xhr._c for tests.
 	, loaded = xhr._c = {}
 	/*/
 	, loaded = {}

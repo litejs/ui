@@ -265,7 +265,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				params._c = view.o ? view : params._c
 				for (View.route = view.r; tmp; tmp = parent) {
 					viewEmit(syncResume = params._v = tmp, "ping", params, View)
-					syncResume = null
+					syncResume = UNDEF
 					if (lastParams !== params) return
 					if ((parent = tmp.p)) {
 						if (parent.c && parent.c !== tmp) {
@@ -274,24 +274,22 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						parent.c = tmp
 					}
 					if (tmp.f) {
-						xhr.load(
+						return xhr.load(
 							replace(tmp.f, /^|,/g, "$&" + (View.base || "")).split(","),
 							readTemplates.bind(view, view.wait(tmp.f = ""))
 						)
-						return
 					} else if (!tmp.e) {
 						if (tmp.r === "404") {
 							viewParse("%view 404 #\nh2 Not found")
 						}
-						View("404").show({origin:params})
-						return
+						return View("404").show({origin:params})
 					}
 				}
 
 				for (tmp in params) {
 					if (tmp.charAt(0) !== "_" && (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
 						syncResume(params[tmp], tmp, view, params)
-						syncResume = null
+						syncResume = UNDEF
 					}
 				}
 				viewEmit(view, "nav")
@@ -374,7 +372,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				viewEmit(parent, "openChild", view, close)
 				viewEmit(view, "open", params)
 				addKb(view.kb)
-				params._c = null
+				params._c = UNDEF
 			}
 			if ((params._d = params._v = view.c)) {
 				bubbleDown(params)
@@ -390,7 +388,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				viewEmit(view.p, "closeChild", view, open)
 				viewClose(view.c)
 				elKill(view.o)
-				view.o = null
+				view.o = UNDEF
 				rmKb(view.kb)
 				viewEmit(view, "close")
 			}
@@ -541,7 +539,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				child._s = el._s
 			}
 			if (plugin.c) elCache = plugin.c
-			el.p = plugin.e = plugin.u = null
+			el.p = plugin.e = plugin.u = UNDEF
 			return child
 		}
 
@@ -971,18 +969,19 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		// className is object on SVGElements
 		var current = el.className || ""
 		, useAttr = !isStr(current)
+		, SP = " "
 
 		if (useAttr) {
-			current = el.getAttribute("class") || ""
+			current = getAttr(el, "class") || ""
 		}
 
 		if (set === UNDEF || set) {
 			if (set && set !== el && set.nodeType < 2) cls(set, name, 0)
 			if (current) {
-				name = current.split(splitRe).indexOf(name) > -1 ? current : current + " " + name
+				name = current.split(SP).indexOf(name) > -1 ? current : current + SP + name
 			}
 		} else {
-			name = current ? replace(" " + current + " ", " " + name + " ", " ").trim() : current
+			name = current ? replace(SP + current + SP, SP + name + SP, SP).trim() : current
 		}
 
 		if (current != name) {
@@ -1008,7 +1007,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (isObj(tr)) bindingsCss(el, tr)
 				tr = "transitionend"
 				// transitionend fires for each property transitioned
-				if ("on" + tr in el) return addEvent(el, tr, elKill.bind(el, el, el = null))
+				if ("on" + tr in el) return addEvent(el, tr, elKill.bind(el, el, el = UNDEF))
 			}
 			if (el._e) {
 				emit.call(el, "kill")
@@ -1185,7 +1184,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function runKb(e, code, chr) {
 		var fn, map
 		, i = 0
-		, el = e.target || e.srcElement
+		, el = e.target
 		, input = /INPUT|TEXTAREA|SELECT/i.test((el.nodeType < 2 ? el : el.parentNode).tagName)
 
 		for (; (map = kbMaps[i++]) && (
@@ -1251,7 +1250,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				touchMode = UNDEF
 			}
 			if (len < 0) {
-				touchEl = null
+				touchEl = UNDEF
 			}
 			if (len === 1) {
 				if (e) {
@@ -1266,7 +1265,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				moveOne(e || touches[0])
 			}
 			if (len === 2) {
-				touchDist = touchAngle = null
+				touchDist = touchAngle = UNDEF
 				moveTwo(e)
 			}
 			;(len === 1 ? addEvent : rmEvent)(document, MOVE, moveOne)
@@ -1290,7 +1289,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					break
 				}
 			}
-			touchDown(null, e)
+			touchDown(UNDEF, e)
 		}
 		function touchWheel(e) {
 			// IE10 enabled pinch-to-zoom gestures from multi-touch trackpad’s as mousewheel event with ctrlKey.
@@ -1334,7 +1333,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			, dist = Math.sqrt(x*x + y*y) | 0
 			, angle = Math.atan2(y, x)
 
-			if (touchDist !== null) {
+			if (touchDist !== UNDEF) {
 				diff = dist - touchDist
 				if (diff) elEmit(touchEl, "pinch", e, diff, angle)
 				// GestureEvent onGestureChange: function(e) {
@@ -1372,7 +1371,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (i > 3 && i < 6 && isNum(selector)) {
 					data = delay
 					delay = selector
-					selector = null
+					selector = UNDEF
 				}
 				if (delay > 0) {
 					setTimeout(f, delay, el, name, val, selector, 0, data)
@@ -1387,8 +1386,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (prepareVal) val = prepareVal(el, val, selector, data)
 				selector = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
 				var arr = ("" + name).split(splitRe), len = arr.length
-				for (delay = 0; (el = selector[delay++]); )
-				for (i = 0; i < len; ) if (arr[i]) fn(el, arr[i++], isArr(val) ? val[i - 1] : val)
+				for (delay = 0; (el = selector[delay++]); ) {
+					for (i = 0; i < len; ) {
+						if (arr[i]) fn(el, arr[i++], isArr(val) ? val[i - 1] : val)
+					}
+				}
 			}
 		}
 	}
@@ -1410,9 +1412,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return a.toUpperCase()
 	}
 	function each(arr, fn, scope, key) {
-		if (isStr(arr)) arr = arr.split(splitRe)
-		if (isArr(arr)) arr.forEach(fn, scope)
-		else if (arr) for (key in arr) if (hasOwn.call(arr, key)) fn.call(scope, arr[key], key, arr)
+		if (arr) {
+			if (isStr(arr)) arr = arr.split(splitRe)
+			if (isArr(arr)) arr.forEach(fn, scope)
+			else for (key in arr) if (hasOwn.call(arr, key)) fn.call(scope, arr[key], key, arr)
+		}
 	}
 	function expand(str) {
 		var first = str.charAt(0)
@@ -1472,8 +1476,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function rate(fn, ms, onStart, onEnd) {
 		var tick
 		, next = 0
-		onStart = isFn(onStart) ? onStart : (onStart === UNDEF || onStart) && fn
-		onEnd = isFn(onEnd) ? onEnd : (onEnd === UNDEF || onEnd) && fn
+		onStart = isFn(onStart) ? onStart : (onStart === tick || onStart) && fn
+		onEnd = isFn(onEnd) ? onEnd : (onEnd === tick || onEnd) && fn
 		return function() {
 			var now = Date.now()
 			clearTimeout(tick)

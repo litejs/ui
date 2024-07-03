@@ -10,7 +10,7 @@
 
 	function transform(el, name, diff, def) {
 		var tr = el.style.transform.split(name + "(")
-		tr[1] = (tr[1] || def + ")").replace(/^-?[\d.]+/, parseFloat(tr[1]||def) + diff)
+		tr[1] = (tr[1] || def + ")").replace(/^-?[\d.]+/, +(parseFloat(tr[1]||def) + diff).toFixed(3))
 		el.style.transform = tr.join(name + "(")
 	}
 
@@ -35,7 +35,8 @@
 				transform(el, "rotate", diff, "0deg")
 			},
 			pinch: function(e, diff) {
-				css(el, "height,width", (el.offsetHeight + diff) + "px")
+				transform(el, "scale", diff/15, "1")
+				//css(el, "height,width", (el.offsetHeight + diff) + "px")
 				Event.stop(e)
 			}
 		})

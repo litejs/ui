@@ -5,10 +5,10 @@
 	test-form,test-grid,pointer %.ui
 	test-form ../../binding/persist.js
 	test-svg #mat,../../el/Pie.tpl,test-svg.ui
-	testman,+/lcov,+/lcov/{file} %.view
+	testman,+/lcov,+/lcov/{file} %.ui
 	test-material-ui #mat,../../el/Slider.tpl,test-material.ui
 	test/crop ../../el/crop.ui
-	slot %.view
+	slot %.ui
 
 %css
 	.content{ will-change: transform, opacity; }

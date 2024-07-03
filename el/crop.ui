@@ -26,14 +26,15 @@
 
 %el Crop
 	.Crop
-		@pan function(e){}
+		@pan function(e, touchEv, touchEl) {
+			El.css(touchEl, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"],"img")
+			return El.stop(e)
+		}
 		@pinch function(zoom){
 			var imgWidth = $el.offsetWidth
 			scale(0,0)
-			El.on($el, "wheel", scale)
 			return scale
 			function scale(e, delta) {
-				console.log("pinch", arguments)
 				zoom += delta / 5
 				if (zoom < .5) zoom = .5
 				else if (zoom > 50) zoom = 50
