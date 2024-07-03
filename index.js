@@ -1296,7 +1296,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 			;(len === 1 ? addEvent : rmEvent)(document, MOVE, moveOne)
 			;(len === 2 ? addEvent : rmEvent)(document, MOVE, moveTwo)
-			return eventStop(e)
 			function touchPos(name, offset) {
 				var val = (
 					touchEl.getBBox ?
