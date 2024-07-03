@@ -97,18 +97,17 @@
 		so there is no need for waiting DOMContentLoaded
 		-->
 		<script src="../load.js" inline drop="reuse,require"></script>
-		<script src="min/up.js" min="min/0-{h}.js"
+		<script src="../shim/index.js" min="min/0-{h}.js"
 			banner="litejs.com/MIT-LICENSE.txt"
 			if="!Object.hasOwn"
-			cat="
-				../shim/index.js
-		"></script>
+		></script>
 		<script src="../index.js" min="min/1-{h}.js"></script>
 		<script src="hello.js" min></script>
 		<script src="../el/Segment7.tpl" type="ui" min></script>
 		<script src="../el/form.ui" type="ui" min></script>
 		<script src="../el/dialog.ui" type="ui" min></script>
 		<script src="view/main.ui" type="ui" min></script>
+		<script src="js/bindings.js" min></script>
 		<script src="js/app.js" min></script>
 		<noscript>
 			Please <a href="https://www.enable-javascript.com/">enable JavaScript</a> to use this app.

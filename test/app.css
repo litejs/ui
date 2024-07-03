@@ -33,6 +33,26 @@
 @import url("css/state.css");            /* 4 */
 @import url("css/theme/blue.css");       /* 5 */
 
+.shadow {
+	box-shadow: 2px 4px 8px hsl(220deg 55% 50%);
+}
+
+@keyframes wiggle {
+	0%   { transform: rotate(5deg)  scale(1.1);  }
+	50%  { transform: rotate(-5deg) scale(1.05); }
+	100% { transform: rotate(5deg)  scale(1.1);  }
+}
+
+.is-scale {
+	transition: box-shadow,transform .3s;
+	transform: scale(1.1);
+	box-shadow: 0 0 16px #888;
+}
+.is-wiggle {
+	box-shadow: 0 0 16px #888;
+	animation: wiggle .3s infinite;
+}
+
 /*** ie8 ***/
 .ie8 {}
 /*/

@@ -12,6 +12,12 @@ if (self !== top) {
 	throw top.location = self.location
 }
 
+console.log(
+	"%cStop!\n%cThis developer tool allows only others access to your account.\nSee https://en.wikipedia.org/wiki/Self-XSS",
+	"font:bold 5em monospace;color:red;text-shadow:3px 3px #000,-1px -1px #fff",
+	"font:2em sans-serif"
+)
+
 var app = LiteJS({
 	base: "view/",
 	lang: "en",
@@ -41,6 +47,10 @@ var app = LiteJS({
 	on: {
 		nav: function() {
 			console.log("Navigating to", app.route)
+		},
+		inc: function(ev, el, field) {
+			El.scope(el)[field]++
+			El.render(el)
 		},
 		txt: function() {
 			console.log("txt", arguments)
@@ -84,10 +94,9 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 	app.$d.people = [ "Yehuda Katz", "Alan Johnson", "Charles Jolley" ]
 
-	var timezone
+	var timezone, locale
 	, html = document.documentElement
 	, body = document.body
-	, link = /./
 
 
 	history.scrollRestoration = "manual"
@@ -97,6 +106,7 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 
 	try {
+		locale = Intl.DateTimeFormat().resolvedOptions().locale
 		timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 	} catch(e) {}
 
@@ -164,12 +174,6 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 
 
-	El.$b.focus = function(el) {
-		el.focus()
-	}
-	El.$b.init = function(el, fn) {
-		fn.call(this, el)
-	}
 
 	app.on("timerTest", function(e, el) {
 		setTimeout(function() {
@@ -221,8 +225,9 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 		}, 600)
 	})
 
+	El.on(window, "languagechange", function(event) {})
 
-	El.on(body, "click pointerdown", "input[readonly][type=checkbox]", Event.stop)
+	El.on(body, "click pointerdown", Event.stop, "input[readonly][type=checkbox]")
 	El.on(body, "click", function(e) {
 		var el = e.target
 		, link = !(e.altKey || e.shiftKey) && el.tagName == "A" && el.href.split("#")
@@ -235,17 +240,6 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 	})
 
 
-	if (window.console && console.log) {
-		link.toString = function() {
-			return "https://en.wikipedia.org/wiki/Self-XSS"
-		}
-		console.log(
-			"%cStop!\n%cThis developer tool lets you hack and only give others access to your own account.\nSee %s for more information.",
-			"font:bold 50px monospace;color:red;text-shadow:3px 3px #000,-1px -1px #fff",
-			"font:20px sans-serif",
-			link
-		)
-	}
 }(this, document, navigator)
 
 

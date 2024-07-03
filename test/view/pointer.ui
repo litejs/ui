@@ -5,52 +5,37 @@ anim-page
 	.rel
 		;css "background,height", ["#ddd","400px"]
 		.abs.w3.h3 BTN
-			;initTouch!
+			;moveExample!
 			;css "background", "#999"
 			;css "height,width", "180px"
+	h2 Sort
+	div ;draggableSort!"ul","li"; css "overflow","hidden"
+		ul.sortCol
+			li.anim First
+			li.anim Second
+			li.anim Third
+		ul.sortCol
+			li.anim Blue
 	h2 Events
 	div
-		;init: $s.count1=0
-		;txt: "Click " + count1
+		;$s!{count1:0}
+		@click "inc", 0, ["count1"]
+		;txt "Click " + $s.count1
 		;title! "Click " + count1
-		@click "txt"
 	div
-		;init: $s.count2=0
+		;$s!{count2:0}
+		;one!"click", "inc", 0, ["count2"]
 		@click "txt"
-		;txt: "One click " + count2
+		;txt: "One click " + $s.count2
 	div
-		;init: $s.count2=0
 		;txt: "Hover"
 		@mouseover,mouseout "txt"
 	div
-		;init: $s.count3=0
-		;txt: "Wheel " + count3
+		;$s! {count3:0}
+		;txt: "Wheel " + $s.count3
 		;on: "wheel", "txt"
 
-%js
-	El.$b.init = function() {}
-	El.$b.initTouch = function(el) {
-		var re = {
-			rotate: /rotate\(([-\d.]+)/
-		}
-		function transform(name, diff) {
-			var tr = el.style.transform
-			, cur = tr && tr.match(re[name])
-			, val = name + "(" + (cur ? +cur[1] + diff : diff)
-			el.style.transform = cur ? tr.replace(re[name], val) : val + "deg)"
-		}
-		El.on(el, "tap", function(e, diff) {
-			console.log("tap", arguments)
-		})
-		El.on(el, "rotate", function(e, diff) {
-			transform("rotate", diff)
-		})
-		El.on(el, "pan", function(e, touchEv, touchEl) {
-			El.css(touchEl, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"], 1)
-		})
-		El.on(el, "pinch", function(e, diff) {
-			El.css(el, "height,width", (el.offsetHeight + diff) + "px")
-			Event.stop(e)
-		})
-	}
-
+%css
+	.sortCol{padding:2px;display:block;width:100px;margin:4px;border:1px solid #ccc;height:250px;float:left}
+	.sortCol.is-active{border:1px solid green}
+	.sortCol>li{list-style:none;display:block;margin:4px;border:1px solid #ddd;padding:4px}
