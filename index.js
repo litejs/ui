@@ -25,8 +25,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
 	// http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
 	, ie678 = !+"\v1" // jshint ignore:line
-	// The documentMode is an IE only property, supported in IE8 and up.
-	, ie67 = ie678 && (document.documentMode | 0) < 8 // jshint ignore:line
 
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
@@ -453,7 +451,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (op === "@") {
 					text = text.replace(/([\w,.]+):?/, "on!'$1',")
 				}
-
 				if (parent.r) {
 					parent.t += "\n" + all
 				} else if (plugin || mapStart && (sel = "map")) {
@@ -909,9 +906,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		// Bug: IE5-7 doesn't set styles and removes events when you try to set them.
 		// IE6 label with a for attribute will re-select the first option of SELECT list instead of just giving focus.
 		// http://webbugtrack.blogspot.com/2007/09/bug-116-for-attribute-woes-in-ie6.html
+		// IE8 and below have a bug where changed 'name' not accepted on form submit
 		/* c8 ignore next 3 */
-		if (ie67 && (key === "id" || key === "name" || key === "checked" || key === "style")) {
-			// IE8 and below have a bug where changed 'name' not accepted on form submit
+		if (ie678 && (key === "id" || key === "name" || key === "checked" || key === "style")) {
 			el.mergeAttributes(document.createElement("<INPUT " + key + "='" + val + "'>"), false)
 		} else
 		/**/
