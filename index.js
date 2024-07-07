@@ -451,6 +451,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					parent = parentStack.pop()
 					stack.shift()
 				}
+				if (op === "@") {
+					text = text.replace(/([\w,.]+):?/, "on!'$1',")
+				}
 
 				if (parent.r) {
 					parent.t += "\n" + all
@@ -476,9 +479,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						} else if (op === "=") {
 							append(parent, text) // + "\n")
 						} else {
-							if (op === "@") {
-								text = text.replace(/([\w,]+):?/, "on!'$1',")
-							} else if (op === "") {
+							if (op === "") {
 								text = "txt _('" + text.replace(/'/g, "\\'") + "',$s)"
 							}
 							appendBind(parent, text, ";", op)
