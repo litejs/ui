@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><body>
+<style>
+.top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  line-height: 44px;
+  width: auto;
+  z-index: 7;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 4px;
+  padding: 0 13px;
+  box-shadow: 0 8px 6px -6px rgba(0,0,0,210);
+}
+.top + .App {
+  margin-top: 58px;
+}
+
+</style>
+<script type="ui">
+%def
+	main ../../binding/topfloat.js
+
+%view main #
+  // CSS selector declares an element, you can leave off the tag to get a div
+  .App-row.bg-1.top.t-1 ;topFloat!29
+    p LiteJS Minimal Example
+  .App.max-height
+    .App-row.bg-2
+      .Menu.js-viewHook
+        // Custom elements can be defined inline with 'el' plugin
+        %el Menu-item
+          a.Menu-item
+           /;cls "selected",(url||$ui.home).indexOf($el.href.split("#")[1]||$ui.home)==0
+        Menu-item[href="#home"] Home
+    .App-row ;css!"height", "2000px"
+      %slot
+    .Footer-spacer
+  .App-row.Footer.bg-1
+    h6 Bye
+
+%view home main
+.page
+  h2 Subheader Home
+  p Welcome
+  h2 Users
+  // In real application here would be data from api, not hardcoded array
+  ul ;each!userId in ["1", "2", "3", "4", "5"]
+    li
+      a User {userId}
+        ;href: "#users/" + userId
+
+%view users/{id} main
+.page
+  h2 User #{params.id}
+
+%start
+</script>
+<script src="../../load.js"></script>
+<script src="../../index.js"></script>
+<noscript><h1>Error</h1>This application requires JavaScript</noscript>
+</body></html>
+
