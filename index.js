@@ -282,18 +282,17 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						}
 						parent.c = tmp
 					}
-					if (!tmp.e) {
-						if (tmp.f) {
-							xhr.load(
-								tmp.f.replace(/^|,/g, "$&" + (View.base || "")).split(","),
-								readTemplates.bind(view, view.wait(tmp.f = null))
-							)
-						} else {
-							if (tmp.r === "404") {
-								viewParse("%view 404 #\nh2 Not found")
-							}
-							View("404").show({origin:params})
+					if (tmp.f) {
+						xhr.load(
+							tmp.f.replace(/^|,/g, "$&" + (View.base || "")).split(","),
+							readTemplates.bind(view, view.wait(tmp.f = ""))
+						)
+						return
+					} else if (!tmp.e) {
+						if (tmp.r === "404") {
+							viewParse("%view 404 #\nh2 Not found")
 						}
+						View("404").show({origin:params})
 						return
 					}
 				}
