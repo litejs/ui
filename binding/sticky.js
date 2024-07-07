@@ -3,7 +3,7 @@
 // .sticky.is-stuck { color: red; }
 
 /* global El, IntersectionObserver */
-El.$b.sticky = function sticky(el) {
+El.$b.sticky = function sticky(el, opts) {
 	;(sticky._ob || (sticky._ob = new IntersectionObserver(function(entries) {
 		entries.forEach(function(entry) {
 			El.cls(entry.target, "is-stuck", entry.intersectionRatio < 1)
