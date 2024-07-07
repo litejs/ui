@@ -895,7 +895,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		scope: elScope,
 		scrollLeft: scrollLeft,
 		scrollTop: scrollTop,
-		step: step
+		step: step,
+		stop: eventStop
 	})
 
 	function getAttr(el, key) {
