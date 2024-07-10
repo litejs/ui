@@ -1,4 +1,5 @@
 <body>
 
 <script src="https://litejs.com/litejs.full.min.js"></script>
+<noscript>This application requires JavaScript</noscript>
 <h1>LiteJS is simple!</h1><nav><hr><a href="#">Home</a> | <a href="#about">About</a><hr></nav><h2>Hello home</h2><!--slot1--><hr><p>Check out the source code of our website!</p></body>
