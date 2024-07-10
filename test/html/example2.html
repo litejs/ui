@@ -3,9 +3,6 @@
 <meta name="viewport" content="initial-scale=1,maximum-scale=1">
 <link rel="stylesheet" href="../css/base.css">
 <style>
-:root {
-	--main-bg-color: brown;
-}
 
 html {
 	height: 100%;
@@ -25,7 +22,6 @@ html {
 body,html{height:100%}
 </style>
 </head><body>
-<script type="ui" src="../el/modal.ui"></script>
 <script type="ui">
 
 %el Top-menu
@@ -38,7 +34,7 @@ nav
 
 %el Footer
 	hr
-	= The End 
+	p Check out the source code of our website!
 
 %view #pub #
 	h1 LiteJS is simple!
@@ -51,14 +47,8 @@ nav
 
 %view about #pub
 	h2 About
-	p if1
-		;if true
-	p if2
-		;if false
 
 %start
 </script>
-<script src="../load.js"></script>
-<script src="../shim/index.js"></script>
-<script src="../index.js"></script>
+<script src="https://litejs.com/litejs.full.min.js"></script>
 </body></html>

@@ -45,8 +45,8 @@ describe("ui", function() {
 	})
 
 	it ("should parse examples: {i}", [
-		[ "example1.html", '<h1></h1>', 1 ],
-		[ "example2.html", '<h1></h1>', 0 ],
+		[ "html/example1.html", '<h1></h1>', 1 ],
+		[ "html/example2.html", '<h1></h1>', 0 ],
 	], function(fileName, html, logCount, assert, mock) {
 		mock.swap(console, "log", mock.fn())
 		var newDoc = parser.parseFromString(fs.readFileSync(path.resolve("./test", fileName), "utf8"))

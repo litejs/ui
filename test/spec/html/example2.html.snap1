@@ -1,0 +1,4 @@
+<body>
+
+<script src="https://litejs.com/litejs.full.min.js"></script>
+<h1>LiteJS is simple!</h1><nav><hr><a href="#">Home</a> | <a href="#about">About</a><hr></nav><h2>About</h2><!--slot1--><hr><p>Check out the source code of our website!</p></body>
