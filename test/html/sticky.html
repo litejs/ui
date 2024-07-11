@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html><body>
+<style>
+.sticky { position: sticky; top: -1px; }
+.sticky.is-stuck { box-shadow: 0 8px 6px -6px rgba(0,0,0,210); }
+.sticky {
+  height: 44px;
+  line-height: 44px;
+  z-index: 7;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 4px;
+  padding: 0 13px;
+}
+ul { margin: 0; }
+
+</style>
+<script type="ui">
+%js
+	El.$b.sticky = function sticky(el, opts) {
+		;(sticky._ob || (sticky._ob = new IntersectionObserver(function(entries) {
+			entries.forEach(function(entry) {
+				El.cls(entry.target, "is-stuck", entry.intersectionRatio < 1)
+			})
+		}, { threshold: 1 }))).observe(el)
+		El.cls(el, "sticky")
+	}
+
+%view home #
+  .App.bg1.top ;topFloat!29
+    p LiteJS Minimal Example
+  .App ;each!letter in ["A", "B", "C", "D", "E"]
+    p Welcome {letter}
+      ;sticky!
+    ul ;each!userId in ["1", "2", "3", "4", "5"]
+      li User {letter} {userId}
+  .App.bg1
+    h2 Bye
+
+%start
+</script>
+<script src="https://litejs.com/litejs.full.min.js"></script>
+<noscript>This application requires JavaScript</noscript>
+</body></html>
+
