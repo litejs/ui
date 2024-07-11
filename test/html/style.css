@@ -1,0 +1,22 @@
+html {
+	/* Force a vertical scrollbar to prevent a jumpy page. */
+	overflow-y: scroll;
+}
+
+body {
+	margin: 0 auto 20vh;
+	max-width: 950px;
+	line-height: 1.5;
+	font-size: 18px;
+	color: #333;
+	padding: 18px;
+}
+
+.lg > body {
+	width: 990px;
+}
+
+h1, h2, h3 {
+	line-height: 1.2;
+}
+
