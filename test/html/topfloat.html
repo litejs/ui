@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html><body>
+<style>
+.top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  line-height: 44px;
+  width: auto;
+  z-index: 7;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 4px;
+  padding: 0 13px;
+  box-shadow: 0 8px 6px -6px rgba(0,0,0,210);
+}
+.top + .App {
+  margin-top: 58px;
+}
+.bg1 {
+	background: #ddd;
+}
+</style>
+<script type="ui">
+%js
+	El.$b.topFloat = function(el, offset) {
+		var h = el.offsetHeight + offset
+		, lastAbs = 0
+		, lastTop = 0
+		, toFix = 0
+		, css = El.css
+		El.on(window, "scroll", function() {
+			var pos
+			, top = El.scrollTop()
+
+			// scroll up
+			if (top < lastTop) {
+				if (top <= toFix) {
+					css(el, "position,top", ["fixed", toFix = 0])
+				} else {
+					pos = lastTop - h
+					if (toFix < 0 || lastAbs < pos) {
+						css(el, "position,top", ["absolute", (lastAbs = toFix = pos < 0 ? 0 : pos < lastAbs ? lastAbs : pos) + "px"])
+					}
+				}
+			} else if (toFix === 0) {
+				css(el, "position,top", ["absolute", lastTop + "px"])
+				lastAbs = lastTop
+				toFix = -1
+			}
+			lastTop = top
+		})
+	}
+
+%view home #
+  .App.bg1.top ;topFloat!29
+    p LiteJS Minimal Example
+  .App ;css!"height", "2000px"
+    p Welcome
+    h2 Users
+    ul ;each!userId in ["1", "2", "3", "4", "5"]
+      li User {userId}
+  .App.bg1
+    h2 Bye
+
+%start
+</script>
+<script src="https://litejs.com/litejs.full.min.js"></script>
+<noscript>This application requires JavaScript</noscript>
+</body></html>
+
