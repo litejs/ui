@@ -12,7 +12,7 @@ describe("Shim test", function() {
 			assert.equal(a, 3)
 		}, 1, 3)
 	})
-	.test("index.js", function(assert, mock) {
+	.test("shim.js", function(assert, mock) {
 
 		if (describe.env === "browser") {
 			var lib = window
@@ -62,7 +62,7 @@ describe("Shim test", function() {
 				some: null
 			})
 			mock.swap(Function.prototype, "bind", null)
-			var lib = require("../shim/index.js")
+			var lib = require("../shim.js")
 		}
 
 
@@ -240,7 +240,7 @@ describe("Shim test", function() {
 	})
 	.test("JSON", function(assert) {
 		var undef
-		, lib = describe.env === "browser" ? window : require("../shim/index.js")
+		, lib = describe.env === "browser" ? window : require("../shim.js")
 		, str1 = '{"a":1,"cb":"2\\n3\\\\","d":[-1,0,1,2,{"g\\b":true},false,"",null,null,null,1],"e":{"f":null}}'
 		, obj1 = {a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", NaN, Infinity, undef, {toJSON:function(){return 1}}],e:{f:null,o:undef}}
 		, obj2 = {a:1,cb:"2\n3\\",d:[-1,0,1,2,{"g\b":true},false,"", null, null, null, 1],e:{f:null}}
