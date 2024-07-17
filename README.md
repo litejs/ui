@@ -15,8 +15,8 @@ used on heavy-traffic websites since 2006.
  - Written in ES5, compatible with all browsers (including IE5.5).
  - No transpiling/compiling/bundling headache, just write a working code.
 
-See [wiki](https://github.com/litejs/ui/wiki)
-and [Quick-Start](https://github.com/litejs/litejs/wiki/Quick-Startfor) for more information.
+For usage instructions, see [wiki](https://github.com/litejs/ui/wiki)
+and [Quick-Start](https://github.com/litejs/litejs/wiki/Quick-Start) guide.
 
 
 ## Contributing
