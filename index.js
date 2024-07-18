@@ -183,7 +183,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return _e / 3
 	}
 
-	function addEvent(el, ev, fn) {
+	function addEvent(el, ev, fn, opts) {
 		var fn2 = fixFn[ev] && fixFn[ev](el, fn, ev) || fn
 		, ev2 = fixEv[ev] || ev
 
@@ -191,7 +191,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			// polyfilled addEventListener returns patched function
 			// Since Chrome 56 touchstart/move have the { passive: true } by default.
 			// preventDefault() won't work unless you set passive to false.
-			fn2 = html.addEventListener.call(el, ev2, fn2, false) || fn2
+			fn2 = html.addEventListener.call(el, ev2, fn2, opts != UNDEF ? opts : false) || fn2
 		}
 
 		on.call(el, ev, fn2, el, fn)
