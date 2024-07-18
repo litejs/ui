@@ -9,7 +9,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 !function(window, document, history, localStorage, location, navigator, Function, Object) {
 	window.El = El
-	window.LiteJS = LiteJS
+	asEmitter(window.LiteJS = LiteJS)
 
 	var UNDEF, lastExp, parser, pushBase, styleNode
 	, html = document.documentElement
@@ -406,6 +406,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		function viewEmit(view, event, a, b) {
 			view.emit(event, a, b)
 			View.emit(event, view, a, b)
+			LiteJS.emit(event, view, a, b)
 		}
 		function viewEval(str, scope) {
 			try {
