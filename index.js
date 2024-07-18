@@ -14,7 +14,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	var UNDEF, lastExp, parser, styleNode
 	, html = document.documentElement
 	, body = document.body
-	, histBase, histCb, histLast
+	, histBase
 	, splitRe = /[,\s]+/
 	, emptyArr = []
 	, assign = Object.assign
@@ -668,17 +668,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return View
 	}
 
-	function getUrl() {
-		return (
-			/*** pushState ***/
-			histBase ? location.pathname.slice(histBase.length) :
-			/**/
-			// bug in Firefox where location.hash is decoded
-			// bug in Safari where location.pathname is decoded
-			location.href.split("#")[1] || ""
-		).replace(/^[#\/\!]+|[\s\/]+$/g, "")
-	}
-	function setUrl(url, replace) {
+	function setUrl(url, replace, checkUrl) {
 		/*** pushState ***/
 		if (histBase) {
 			history[replace ? "replaceState" : "pushState"](null, null, histBase + url)
@@ -688,22 +678,15 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		/*** pushState ***/
 		}
 		/**/
-		return checkUrl()
-	}
-	function checkUrl() {
-		if (histLast != (histLast = getUrl())) {
-			if (histCb) histCb(histLast)
-			return true
-		}
+		return checkUrl && checkUrl()
 	}
 
 	LiteJS.go = setUrl
 	LiteJS.start = histStart
 	function histStart(cb) {
-		histCb = cb
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
-		var url
+		var histLast, url
 		, base = find(html, "base")
 		LiteJS.base = (base || location).href.replace(/[^\/]*(#.*)?$/, "")
 		if (base) base = base.href.replace(/.*:\/\/[^/]*|[^\/]*$/g, "")
@@ -733,8 +716,23 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		/**/
 			window.onhashchange = checkUrl
 		readTemplates(checkUrl)
+		function checkUrl() {
+			if (histLast != (histLast = getUrl())) {
+				if (cb) cb(histLast)
+				return true
+			}
+		}
+		function getUrl() {
+			return (
+				/*** pushState ***/
+				histBase ? location.pathname.slice(histBase.length) :
+				/**/
+				// bug in Firefox where location.hash is decoded
+				// bug in Safari where location.pathname is decoded
+				location.href.split("#")[1] || ""
+			).replace(/^[#\/\!]+|[\s\/]+$/g, "")
+		}
 	}
-
 
 	function Comm(name, render) {
 		var comm = document.createComment(name)
