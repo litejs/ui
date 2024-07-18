@@ -48,6 +48,7 @@
 	/*/
 		eval
 	/**/
+	, nop = Function()
 
 	/*** reuse ***/
 	// XHR memory leak mitigation
@@ -240,6 +241,5 @@
 	])
 	/**/
 
-	function nop() {}
 }(this, Function) // jshint ignore:line
 
