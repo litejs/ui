@@ -1130,14 +1130,13 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 
 	function render(node, $s) {
-		if (!node) return
-		var bind, next
-		, scope = node.$s || $s || closestScope(node)
-
-		if (node.nodeType != 1) {
-			if (node.render) node.render(scope)
+		if (!node || node.nodeType != 1) {
+			if (node && node.render) node.render()
 			return
 		}
+
+		var bind, next
+		, scope = node.$s || $s || closestScope(node)
 
 		/*** ie8 ***/
 		if (ie678 && node.tagName === "SELECT") {
