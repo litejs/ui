@@ -297,7 +297,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 				for (tmp in params) {
 					if (tmp.charAt(0) !== "_" && (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
-						syncResume.call(view, params[tmp], tmp, params, View)
+						syncResume(params[tmp], tmp, view, params)
 						syncResume = null
 					}
 				}

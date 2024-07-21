@@ -72,7 +72,7 @@ var app = LiteJS({
 		}
 	},
 	param: {
-		"userId pageId": function(value, name, params, ui) {
+		"userId pageId": function(value, name, view, params) {
 			console.log("PARAM", this, arguments)
 		}
 	},
