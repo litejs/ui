@@ -1,7 +1,7 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global xhr, navigator */
+/* global xhr */
 
 /*** debug ***/
 console.log("LiteJS is in debug mode, but it's fine for production")
@@ -1339,6 +1339,75 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			touchAngle = angle
 		}
 	}
+	/**/
+
+	/*** stat ***/
+	LiteJS.one("show", function() {
+		var baseHref = LiteJS.base
+		, dummy = { angle: window.orientation }
+		, perf = window.performance || dummy
+		, entries = perf.getEntries ? perf.getEntries() : [ perf.timing || dummy ]
+		, screen_ = screen
+		, timingKeys = "fetch,redirect,domainLookup,connect,request,response".split(",")
+		, stat = [
+			0,
+			Date.now() - (perf.timeOrigin || xhr._s),
+			window.outerWidth, window.outerHeight, window.innerWidth, window.innerHeight,
+			[
+				entries[0].type,
+				screen_.width, screen_.height,
+				window.devicePixelRatio,
+				(screen_.orientation || dummy).angle,
+				ie678,
+				!!navigator.brave,
+				navigator.standalone, navigator.maxTouchPoints, navigator.webdriver
+			].map(statVal) + "," + [
+				"display-mode:standalone",
+				"forced-colors:active",
+				"prefers-color-scheme:dark",
+				"prefers-contrast:more",
+				"prefers-reduced-motion),(update:slow"
+			].map(function(query) {
+				return statVal(matchMedia("(" + query + ")").matches)
+			}),
+			document.referrer,
+			baseHref
+		].concat(entries.flatMap(function(entry) {
+			var type = entry.entryType
+			return !type || type === "navigation" || type === "resource" ? [
+				(entry.name || "").replace(baseHref, ""),
+				entry.responseStatus,
+				entry.transferSize,
+				entry.encodedBodySize,
+				entry.decodedBodySize
+			].map(statVal) + "," + timingKeys.map(function(name) {
+				return statVal(entry[name == "fetch" ? "responseEnd" : name == "request" ? "responseStart" : name + "End"] - entry[name + "Start"])
+			}) : []
+		}))
+
+		LiteJS.emit("stat", stat)
+
+		function statVal(x) {
+			return x > -9 ? +x : isStr(x) ? replace(x, /,|;/g, escape) : "-"
+		}
+	})
+	addEvent(document, "visibilitychange", function() {})
+
+	addEvent(html, "click", function(ev) {
+		var el = ev.target
+		, collect = el.tagName == "A" && el.href && (
+			el.protocol === "mailto:" ? "m" :
+			el.host !== location.host ? "o" :
+			/\.(pdf|csv|docx?|xlsx?|zip)/.test(el.pathname) ? "d" :
+			collect
+		)
+		if (collect) {
+			LiteJS.emit("collect", collect, {
+				href: el.href,
+				title: getAttr(el, "title")
+			})
+		}
+	}, true)
 	/**/
 
 	function find(root, sel, startNode) {
