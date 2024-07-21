@@ -268,15 +268,15 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				, params = lastParams = _params || {} // jshint ignore:line
 				, view = lastView = this // jshint ignore:line
 				, tmp = params._v || view // Continue bubbleUp from _v
-				, close = view.o && view
 
+				params._c = view.o ? view : params._c
 				for (View.route = view.r; tmp; tmp = parent) {
 					viewEmit(syncResume = params._v = tmp, "ping", params, View)
 					syncResume = null
 					if (lastParams !== params) return
 					if ((parent = tmp.p)) {
 						if (parent.c && parent.c !== tmp) {
-							close = parent.c
+							params._c = parent.c
 						}
 						parent.c = tmp
 					}
@@ -302,7 +302,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					}
 				}
 				viewEmit(view, "nav")
-				bubbleDown(params, close)
+				bubbleDown(params)
 			},
 			wait: function() {
 				var params = lastParams
@@ -367,8 +367,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				current + sep + val
 			) : val))
 		}
-		function bubbleDown(params, close) {
+		function bubbleDown(params) {
 			var view = params._v
+			, close = params._c
 			, parent = view && view.p
 			if (!view || params._p && /{/.test(view.r)) {
 				return viewClose(close)
@@ -380,10 +381,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				viewEmit(parent, "openChild", view, close)
 				viewEmit(view, "open", params)
 				addKb(view.kb)
-				close = null
+				params._c = null
 			}
 			if ((params._d = params._v = view.c)) {
-				bubbleDown(params, close)
+				bubbleDown(params)
 			}
 			if ((lastView === view)) {
 				viewEmit(view, "show", params)
