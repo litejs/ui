@@ -505,8 +505,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			var params = _params || {}
 			, view = viewGet(url, params)
 			if (!view.o || lastUrl !== url) {
-				globalScope.url = lastExp = lastUrl = url
-				view.show(globalScope.params = params)
+				$d.url = lastExp = lastUrl = url
+				view.show($d.params = params)
 			}
 		}
 
