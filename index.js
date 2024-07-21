@@ -34,7 +34,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>+=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, fnCache = {}
-	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[as]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
+	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aos]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /[a-z_$][\w$]*/ig
 	, camelRe = /\-([a-z])/g
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
@@ -1158,8 +1158,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		, bind = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
 		if (bind !== true) try {
 			fn = fnCache[bind] || (fnCache[bind] = makeFn(bind))
-			scope.$o = fn.o
-			return fn(node, scope, attr)
+			return fn(node, scope, attr, fn.o)
 		} catch (e) {
 			logErr(e, attr + ": " + bind, node)
 		}
@@ -1179,7 +1178,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
 			else vars[i] += "=$s." + vars[i]
 		}
-		fn = Function("$el,$s,$a,$r", "var " + vars + ";return " + fn)
+		fn = Function("$el,$s,$a,$o,$r", "var " + vars + ";return " + fn)
 		fn.o = bindOnce
 		return fn
 	}
