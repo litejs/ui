@@ -66,6 +66,7 @@
 		"DOMMouseScroll"                            // older Firefox
 	)
 	, fixEv = Event.fixEv = {
+		pagehide: "onpagehide" in window ? UNDEF : "beforeunload",
 		wheel: wheelEv
 	}
 	, fixFn = Event.fixFn = {

@@ -90,11 +90,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, sources = []
 	, hasOwn = plugins.hasOwnProperty
 
-	// After iOS 13 iPad with default enabled "desktop" option
-	// is the only Macintosh with multi-touch
-	, iOS = /^(Mac|iP)/.test(navigator.platform)
-	// || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-
 	, Event = window.Event || window
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
@@ -114,12 +109,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	Event.asEmitter = asEmitter
 	Event.stop = eventStop
-
-	if (iOS) {
-		// iOS doesn't support beforeunload, use pagehide instead
-		fixEv.beforeunload = "pagehide"
-	}
-
 
 	xhr.css = injectCss
 	xhr.ui = sources.push.bind(sources)
@@ -1185,7 +1174,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	/*** kb ***/
 	var kbMaps = []
-	, kbMod = LiteJS.kbMod = iOS ? "metaKey" : "ctrlKey"
+	, kbMod = LiteJS.kbMod = /^(Mac|iP)/.test(navigator.platform) ? "metaKey" : "ctrlKey"
 	, kbCodes = LiteJS.kbCodes = ",,,,,,,,backspace,tab,,,,enter,,,shift,ctrl,alt,pause,caps,,,,,,,esc,,,,,,pgup,pgdown,end,home,left,up,right,down,,,,,ins,del,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cmd,,,,,,,,,,,,,,,,,,,,,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12".split(splitRe)
 
 	El.addKb = addKb
