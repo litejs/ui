@@ -11,10 +11,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	window.El = El
 	window.LiteJS = LiteJS
 
-	var UNDEF, lastExp, parser, styleNode
+	var UNDEF, lastExp, parser, pushBase, styleNode
 	, html = document.documentElement
 	, body = document.body
-	, histBase
 	, splitRe = /[,\s]+/
 	, emptyArr = []
 	, assign = Object.assign
@@ -65,7 +64,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		txt: elTxt,
 		val: elVal,
 		view: function(el, url) {
-			setAttr(el, "href", (histBase || "#") + expand(url || ""))
+			setAttr(el, "href", (pushBase || "#") + expand(url || ""))
 		}
 	}
 	, globalScope = {
@@ -662,8 +661,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	function setUrl(url, rep, checkUrl) {
 		/*** pushState ***/
-		if (histBase) {
-			history[rep ? "replaceState" : "pushState"](null, null, histBase + url)
+		if (pushBase) {
+			history[rep ? "replaceState" : "pushState"](null, null, pushBase + url)
 		} else {
 		/**/
 			location[rep ? "replace" : "assign"]("#" + url)
@@ -689,7 +688,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		}
 		if (base && history.pushState) {
-			histBase = base
+			pushBase = base
 
 			url = location.href.split("#")[1]
 			if (url && !getUrl()) {
@@ -717,7 +716,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		function getUrl() {
 			return replace(
 				/*** pushState ***/
-				histBase ? location.pathname.slice(histBase.length) :
+				pushBase ? location.pathname.slice(pushBase.length) :
 				/**/
 				// bug in Firefox where location.hash is decoded
 				// bug in Safari where location.pathname is decoded
