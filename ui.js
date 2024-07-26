@@ -669,7 +669,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		/*** pushState ***/
 		}
 		/**/
-		return checkUrl && checkUrl()
+		if (checkUrl) checkUrl()
 	}
 
 	LiteJS.go = setUrl
@@ -708,10 +708,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			window.onhashchange = checkUrl
 		readTemplates(checkUrl)
 		function checkUrl() {
-			if (histLast != (histLast = getUrl())) {
-				if (cb) cb(histLast)
-				return true
-			}
+			if (cb && histLast != (histLast = getUrl())) cb(histLast)
 		}
 		function getUrl() {
 			return replace(
