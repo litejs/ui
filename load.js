@@ -77,6 +77,10 @@
 		)) setTimeout_(sendErrors, 307)
 	}
 
+	function log(msg) {
+
+	}
+
 	function sendErrors() {
 		if (xhr.err) {
 			xhr.err(unsentErrors)

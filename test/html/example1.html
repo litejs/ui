@@ -5,9 +5,24 @@
 </head><body><script type="ui">
 
 h1 LiteJS <is> simple!
-p Not actually <!-- commented-out! -->
-p All content not under a view will be rendered immediately.
-footer Check out the source code of our website!
+main
+  p Not actually <!-- commented-out! -->
+  p All content not under a view will be rendered immediately.
+aside
+  h3 Latest changes
+  ul.dot
+    li
+      time[datetime="2024-06-20T12:00:00Z"].c2 1 hour ago
+      a[href="#1"] CodeQL can scan C# projects without requiring working builds (public beta)
+    li
+      time[datetime="2024-06-20T11:00:00Z"].c2 14 hours ago
+      a[href="#1"] Copilot Enterprise knows about pull requests, discussions, and files. Copilot Enterprise knows about pull requests, discussions, and files - June Updates
+  a[href="#1"].c2.right View changelog 🡒
+footer
+  dl
+    dt Things to do
+    dd Check out the source code
+    dd Contribute in GitHub
 
 </script>
 <script src="https://litejs.com/litejs.full.min.js"></script>

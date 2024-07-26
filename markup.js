@@ -4,7 +4,9 @@
 	function replace(a, b, c) {
 		return a.replace(b, c)
 	}
-	var replaceIf = Function("a,b,c", "return b.test(a)&&a.replace(b,c)")
+	function replaceIf(a, b, c) {
+		return b.test(a) && replace(a, b, c)
+	}
 
 	function markup(txt) {
 		var data = {

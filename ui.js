@@ -1386,6 +1386,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}))
 
 		LiteJS.emit("stat", stat)
+		console.log("stat", JSON.stringify(stat))
 
 		function statVal(x) {
 			return x > -9 ? +x : isStr(x) ? replace(x, /,|;/g, escape) : "-"

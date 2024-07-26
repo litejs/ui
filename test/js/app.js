@@ -22,11 +22,11 @@ var app = LiteJS({
 	base: "view/",
 	lang: "en",
 	locales: {
-		"ar": "Arabic",
+		//"ar": "Arabic",
 		"et": "Eesti keeles",
 		"fi": "Suomeksi",
-		"ru": "На русском",
-		"sv": "På Svenska",
+		//"ru": "На русском",
+		//"sv": "På Svenska",
 		//, "lt": "Lietuviškai"
 		//, "lv": "Latviski"
 		//, "pl": "Polski"
@@ -116,6 +116,7 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 		setLang(0, 0, app.$d.lang)
 		LiteJS.start(app.show)
 		function setLang(e, el, lang) {
+			console.log("setLang", arguments)
 			app.lang(lang)
 			app.lang(lang, extractLang(app))
 			app.lang(lang, extractLang(allJson))
