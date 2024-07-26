@@ -13,7 +13,7 @@
   "homepage": "https://litejs.com",
   "repository": "github:litejs/ui",
   "bugs": "https://github.com/litejs/dev/issues",
-  "main": "index.js",
+  "main": "ui.js",
   "files": [
     "*.js",
     "binding",
