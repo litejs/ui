@@ -1342,7 +1342,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	/**/
 
 	/*** stat ***/
-	LiteJS.one("show", function() {
+	one(LiteJS, "show", function() {
 		var baseHref = LiteJS.base
 		, dummy = { angle: window.orientation }
 		, perf = window.performance || dummy
@@ -1385,7 +1385,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}) : []
 		}))
 
-		LiteJS.emit("stat", stat)
+		emit(LiteJS, "stat", stat)
 		console.log("stat", JSON.stringify(stat))
 
 		function statVal(x) {
@@ -1403,7 +1403,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			collect
 		)
 		if (collect) {
-			LiteJS.emit("collect", collect, {
+			emit(LiteJS, "collect", collect, {
 				href: el.href,
 				title: getAttr(el, "title")
 			})
