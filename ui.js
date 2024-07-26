@@ -1467,8 +1467,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function isStr(str) {
 		return typeof str === "string"
 	}
-	// Maximum call rate for Function
-	// leading edge, trailing edge
+	// Maximum call rate for Function with optional leading edge and trailing edge
 	function rate(fn, ms, onStart, onEnd) {
 		var tick
 		, next = 0
@@ -1482,7 +1481,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					if (onStart) onStart()
 				} else fn()
 				next = now + ms
-			} else if (onEnd) {
+			}
+			if (onEnd) {
 				tick = setTimeout(onEnd, next - now)
 			}
 		}
