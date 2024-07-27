@@ -20,7 +20,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, assign = Object.assign
 	, create = Object.create
 	, isArr = Array.isArray
-	, slice = emptyArr.slice
 	, elReplace = Function("a,b,c", "(c=a&&b&&a.parentNode)&&c.replaceChild(b,a)")
 	, elRm = Function("e,k", "(k=e&&e.parentNode)&&k.removeChild(e)")
 	, getAttr = Function("e,k", "return e&&e.getAttribute&&e.getAttribute(k)")
@@ -50,7 +49,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, bindingsOn = acceptMany(addEvent, function(el, val, selector, data) {
 		return isStr(val) ? function(e) {
 			var target = selector ? closest(e.target, selector) : el
-			if (target) emit.apply(elScope(el).$ui, [val, e, target].concat(data))
+			if (target) emit.apply(el, [elScope(el).$ui, val, e, target].concat(data))
 		} :
 		selector ? function(e, a1, a2) {
 			if (matches(e.target, selector)) val(e, a1, a2)
@@ -90,6 +89,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	, plugins = {}
 	, sources = []
+	, slice = sources.slice
 	, hasOwn = plugins.hasOwnProperty
 
 	, Event = window.Event || window
@@ -164,58 +164,57 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 
 	function asEmitter(obj) {
-		obj.on = on
-		obj.off = off
-		obj.one = one
-		obj.emit = emit
-		// emitNext, emitLate
+		obj.on = wrap(on)
+		obj.off = wrap(off)
+		obj.one = wrap(one)
+		obj.emit = wrap(emit)
+
+		function wrap(fn) {
+			return function(a, b, c, d) {
+				fn(this === window ? wrap : this, a, b, c, d)
+				return obj
+			}
+		}
 	}
 
-	function on(type, fn, scope, _origin) {
-		var emitter = this === window ? emptyArr : this
-		, events = emitter._e || (emitter._e = create(NUL))
+	function on(emitter, type, fn, scope, _origin) {
+		var events = emitter._e || (emitter._e = create(NUL))
 		if (type && fn) {
-			if (isStr(fn)) fn = emit.bind(emitter, fn)
-			emit.call(emitter, "newListener", type, fn, scope, _origin)
+			if (isStr(fn)) fn = emit.bind(emitter, emitter, fn)
+			emit(emitter, "newListener", type, fn, scope, _origin)
 			;(events[type] || (events[type] = [])).unshift(scope, _origin, fn)
 		}
-		return this
 	}
 
-	function off(type, fn, scope) {
+	function off(emitter, type, fn, scope) {
 		var i, args
-		, emitter = this === window ? emptyArr : this
 		, events = emitter._e && emitter._e[type]
 		if (events) {
 			for (i = events.length - 2; i > 0; i -= 3) {
 				if ((events[i + 1] === fn || events[i] === fn) && events[i - 1] == scope) {
 					args = events.splice(i - 1, 3)
-					emit.call(emitter, "removeListener", type, args[2], args[0], args[1])
+					emit(emitter, "removeListener", type, args[2], args[0], args[1])
 					if (fn) break
 				}
 			}
 		}
-		return this
 	}
 
-	function one(type, fn, scope) {
-		var emitter = this === window ? emptyArr : this
+	function one(emitter, type, fn, scope) {
 		function remove() {
-			off.call(emitter, type, fn, scope)
-			off.call(emitter, type, remove, scope)
+			off(emitter, type, fn, scope)
+			off(emitter, type, remove, scope)
 		}
-		on.call(emitter, type, remove, scope)
-		on.call(emitter, type, fn, scope)
-		return this
+		on(emitter, type, remove, scope)
+		on(emitter, type, fn, scope)
 	}
 
-	function emit(type) {
+	function emit(emitter, type) {
 		var args, i
-		, emitter = this === window ? emptyArr : this
 		, _e = emitter._e
 		, arr = _e ? (_e[type] || emptyArr).concat(_e["*"] || emptyArr) : emptyArr
 		if ((_e = arr.length)) {
-			for (i = _e - 1, args = slice.call(arguments, 1); i > 1; i -= 3) {
+			for (i = _e - 1, args = slice.call(arguments, 2); i > 1; i -= 3) {
 				if (arr[i]) arr[i].apply(arr[i - 2] || emitter, args)
 			}
 		}
@@ -233,7 +232,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			fn2 = html.addEventListener.call(el, ev2, fn2, opts != UNDEF ? opts : false) || fn2
 		}
 
-		on.call(el, ev, fn2, el, fn)
+		on(el, ev, fn2, el, fn)
 	}
 
 	function rmEvent(el, ev, fn) {
@@ -341,7 +340,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			},
 			parse: (parser = viewParse),
 			ping: function(view, fn) {
-				View(view).on("ping", fn)
+				on(View(view), "ping", fn)
 			},
 			show: viewShow
 		})
@@ -411,9 +410,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		}
 		function viewEmit(view, event, a, b) {
-			view.emit(event, a, b)
-			View.emit(event, view, a, b)
-			LiteJS.emit(event, view, a, b)
+			emit(view, event, a, b)
+			emit(View, event, view, a, b)
+			emit(LiteJS, event, view, a, b)
 		}
 		function viewEval(str, scope) {
 			try {
@@ -667,7 +666,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				cls(html, lastOrient = next)
 			}
 
-			View.emit("resize")
+			emit(View, "resize")
 		}, 99)
 
 		if (breakpoints) {
@@ -970,6 +969,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				// NOTE: in Firefox location.hash is decoded; in Safari location.pathname is decoded
 				location.href.split("#")[1] || "", /^[#\/\!]+|[\s\/]+$/g, "")
 		}
+
 	}
 
 	function Comm(name, render) {
@@ -1014,7 +1014,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 
 	assign(El, bindings, {
-		emit: elEmit,
+		emit: emit,
 		empty: elEmpty,
 		kill: elKill,
 		off: acceptMany(rmEvent),
@@ -1241,9 +1241,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 	}
 
-	function elEmit(el) {
-		emit.apply(el, slice.call(arguments, 1))
-	}
 	function elEmpty(el) {
 		for (; el.lastChild; elKill(el.lastChild));
 	}
@@ -1258,7 +1255,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if ("on" + tr in el) return addEvent(el, tr, elKill.bind(el, el, el = UNDEF))
 			}
 			if (el._e) {
-				emit.call(el, "kill")
+				emit(el, "kill")
 				el._e = UNDEF
 			}
 			elRm(el)
@@ -1494,7 +1491,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			var len = e ? touches.push(e) : touches.length
 			, MOVE = "pointermove"
 			if (touchMode || len < 1) {
-				elEmit(touchEl, touchMode ? touchMode + END : "tap", e2, touchEv, touchEl)
+				emit(touchEl, touchMode ? touchMode + END : "tap", e2, touchEv, touchEl)
 				touchMode = UNDEF
 			}
 			if (len < 0) {
@@ -1544,7 +1541,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			// Chrome M35 and Firefox 55 followed up.
 			if (!touches[0]) {
 				var ev = e.ctrlKey ? "pinch" : e.altKey ? "rotate" : UNDEF
-				if (ev && emit.call(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
+				if (ev && emit(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
 					return eventStop(e)
 				}
 			}
@@ -1566,9 +1563,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				)
 				if (!touchMode) return
 				clearTimeout(touchTick)
-				elEmit(touchEl, touchMode + START, e, touchEv, touchEl)
+				emit(touchEl, touchMode + START, e, touchEv, touchEl)
 			}
-			elEmit(touchEl, touchMode, e, touchEv, touchEl)
+			emit(touchEl, touchMode, e, touchEv, touchEl)
 			function haveEv(name, set) {
 				return set && (evs[name] || evs[name + START] || evs[name + END]) && name
 			}
@@ -1583,12 +1580,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 			if (touchDist !== UNDEF) {
 				diff = dist - touchDist
-				if (diff) elEmit(touchEl, "pinch", e, diff, angle)
+				if (diff) emit(touchEl, "pinch", e, diff, angle)
 				// GestureEvent onGestureChange: function(e) {
 				//	e.target.style.transform =
 				//		'scale(' + e.scale  + startScale  + ') rotate(' + e.rotation + startRotation + 'deg)'
 				diff = angle - touchAngle
-				if (diff) elEmit(touchEl, "rotate", e, diff * (180/Math.PI))
+				if (diff) emit(touchEl, "rotate", e, diff * (180/Math.PI))
 			}
 			touchDist = dist
 			touchAngle = angle

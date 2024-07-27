@@ -1,0 +1,41 @@
+%view test-grid public
+	%css
+		.border-white, .border-white > .col, .border-white > .grid > .col {
+			border-color: #fff !important;
+		}
+	anim-page
+		h2 Main in the middle grid
+		.grid.b2.border-white
+			.col.lg-w6.lg-l3 main
+			.col.md-w6.lg-w3.lg-r6 A
+			.col.md-w6.lg-w3 B
+			.grid.w6.b2
+				.col.w6 C
+				.col.w6 D
+			.col.w6 E
+		h2 Test golden grid
+		.grid.b2.border-white
+			.col.w2g c1
+			.col.w3g c2
+			.col.w1g.md-w2g c3
+			.col.w1g.md-w3g c4
+			.col.w1g.md-w2g c5
+			.col.w1g.md-w4g c6
+			.col.w1g.md-w5g c7
+			.col.w1g.md-w2g.lg-w3g c8
+			.col.w1g.md-w3g.lg-w5g c9
+			.col.w1g.md-w2g.lg-w6g c10
+			.col.w1g.md-w4g.lg-w4g c11
+			.col.w1g.md-w5g.lg-w5g c12
+		h2 Test tiles
+		.grid.b2.border-white
+			;css: "height", "300px"
+			.grid.b2.w4.h8
+				.col.h6 c1
+				.col.h6 c2
+			.col.w8.h8 c3
+			.col.w8.h4 c6
+			.col.w4.h4 c7
+
+
+
