@@ -45,7 +45,7 @@ describe("ui", function() {
 	})
 
 	it ("should parse examples: {i}", [
-		[ "html/example1.html", '<h1></h1>', 1 ],
+		[ "html/simplest.html", '<h1></h1>', 1 ],
 		[ "html/example2.html", '<h1></h1>', 0 ],
 	], function(fileName, html, logCount, assert, mock) {
 		mock.swap(console, "log", mock.fn())
