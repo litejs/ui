@@ -1,0 +1,86 @@
+{
+  "desc": "UI translations",
+  "locales": {
+    "et": "Eesti keeles",
+    "fi": "Suomeksi",
+    "sv": "På Svenska",
+    "en": "In English"
+  },
+  "translations": {
+    "#": {
+      "desc": "Number extension namespace",
+      "data": [ 0, 1, 2, 10.1 ],
+      "translations": {
+        ".1": {
+          "desc": "Number with one decimal",
+          "usage": [ "{data;#.1}" ],
+          "en": "#.1",
+          "et": "#0,1"
+        }
+      }
+    },
+    "*": {
+      "desc": "Pluralization extension namespace",
+      "data": [ 0, 1, 2, 10 ],
+      "translations": {
+        "alarm": {
+          "_": {
+            "desc": "Show count of alarms",
+            "usage": [ "{data;*alarm}" ]
+          },
+          "et": "Üks häire;# häiret",
+          "en": "One alarm;# alarms"
+        },
+        "warn": {
+          "desc": "Show count of warnings",
+          "usage": [
+            "{data;*warn}"
+          ],
+          "lang": {
+            "et": "Üks hoiatus;# hoiatust",
+            "en": "One warning;# warnings"
+          }
+        }
+      }
+    },
+    "@": {
+      "desc": "Date and time extension namespace",
+      "data": [
+        1632381630,
+        "now"
+      ],
+      "translations": {
+        "LT": {
+          "desc": "Local time format",
+          "usage": [
+            "{data;@LT}"
+          ],
+          "lang": {
+            "et": "HH:mm",
+            "fi": "HH.mm"
+          }
+        }
+      }
+    },
+    "Home": {
+      "en": "Home",
+      "et": "Kodu",
+      "fi": "Koti"
+    },
+    "Settings": {
+      "en": "Settings",
+      "et": "Seaded",
+      "fi": "Asetukset"
+    },
+    "Users": {
+      "en": "Users",
+      "et": "Kasutajad",
+      "fi": "Käyttäjät"
+    },
+    "_welcome": {
+      "en": "Welcome",
+      "et": "Tere tulemast"
+    }
+  }
+}
+

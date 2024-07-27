@@ -19,7 +19,7 @@ console.log(
 )
 
 var app = LiteJS({
-	base: "view/",
+	path: "view/",
 	lang: "en",
 	locales: {
 		"ar": "Arabic",
