@@ -681,12 +681,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function histStart(cb) {
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
-		var histLast, url
+		var histLast
 		, baseEl = find(html, "base")
+		, url = getUrl()
 		if (baseEl && history.pushState) {
 			pushBase = replace(baseEl.href, /.*:\/\/[^/]*|[^\/]*$/g, "")
 
-			url = location.href.split("#")[1]
 			if (url && !getUrl()) {
 				setUrl(url, 1)
 			}
