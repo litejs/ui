@@ -682,17 +682,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		/*** pushState ***/
 		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
 		var histLast, url
-		, base = find(html, "base")
-		LiteJS.base = replace((base || location).href, /[^\/]*(#.*)?$/, "")
-		if (base) base = replace(base.href, /.*:\/\/[^/]*|[^\/]*$/g, "")
-		if (base && !history.pushState) {
-			url = location.pathname.slice(base.length)
-			if (url) {
-				location.replace(base + "#" + url)
-			}
-		}
-		if (base && history.pushState) {
-			pushBase = base
+		, baseEl = find(html, "base")
+		if (baseEl && history.pushState) {
+			pushBase = replace(baseEl.href, /.*:\/\/[^/]*|[^\/]*$/g, "")
 
 			url = location.href.split("#")[1]
 			if (url && !getUrl()) {
