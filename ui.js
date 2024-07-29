@@ -1400,7 +1400,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	function assignDeep(target, map) {
 		if (map) for (var k in map) if (hasOwn.call(map, k)) {
-			target[k] = isObj(map[k]) && isObj(target[k]) ? assignDeep(target[k], map[k]) : map[k]
+			if (isObj(map[k]) && isObj(target[k]) && hasOwn.call(target, k)) assignDeep(target[k], map[k])
+			else target[k] = map[k]
 		}
 		return target
 	}
