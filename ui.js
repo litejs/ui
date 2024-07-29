@@ -412,7 +412,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			try {
 				Function("$s,$ui,$d,$,$$", str)(scope, View, $d, View.$, View.$$)
 			} catch(e) {
-				logErr(e, "viewEval: " + str)
+				e.stack = "viewEval: " + str
+				/*** debug ***/
+				console.error(e.stack)
+				/**/
+				throw e
 			}
 		}
 		function viewGet(url, params) {
@@ -1136,7 +1140,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			fn = fnCache[bind] || (fnCache[bind] = makeFn(bind))
 			return fn(node, scope, attr, fn.o)
 		} catch (e) {
-			logErr(e, attr + ": " + bind, node)
+			e.stack = attr + ": " + bind
+			/*** debug ***/
+			console.error(e.stack, node)
+			/**/
+			throw e
 		}
 	}
 	function makeFn(fn) {
@@ -1436,13 +1444,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		) :
 		isArr(path) ? get(obj, path[0]) || get(obj, path[1]) || get(obj, path[2], fallback) :
 		fallback
-	}
-	function logErr(e, source, node) {
-		/*** debug ***/
-		console.error(source, node)
-		/**/
-		e.stack = source
-		throw e
 	}
 	function injectCss(cssText) {
 		if (!styleNode) {
