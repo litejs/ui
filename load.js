@@ -19,14 +19,14 @@
 
 
 !function(window, Function) {
-	xhr._s = new Date()
-	var rewrite = {
+	var initTime = xhr._t = +new Date()
+	, rewrite = {
 		//!{loadRewrite}
 	}
 	// Move setTimeout from window.prototype to window object for future patching in IE9.
 	, setTimeout_ = window.setTimeout = setTimeout
 	/*** debug ***/
-	// Expose xhr._c for tests.
+	// Expose xhr._c for testing.
 	, loaded = xhr._c = {}
 	/*/
 	, loaded = {}
@@ -56,37 +56,32 @@
 	, xhrs = []
 	/**/
 
+	, unsentLog = xhr._l = []
 	/*** onerror ***/
 	, lastError
-	, unsentErrors = xhr._e = []
 	, onerror = window.onerror = function(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
 		// file = document.currentScript.src || import.meta.url
 		if (lastError !== (lastError =
 			[ file
 			, line
-			, col || (window.event || unsentErrors).errorCharacter || "?"
+			, col || (window.event || unsentLog).errorCharacter || "?"
 			, message
 			].join(":")
-		) && 2 > unsentErrors.push(
-			[ +new Date()
-			, lastError
-			, error && (error.stack || error.stacktrace) || "-"
-			, "" + location
-			]
-		)) setTimeout_(sendErrors, 307)
-	}
-
-	function sendErrors() {
-		if (xhr.err) {
-			xhr.err(unsentErrors)
-		} else {
-			setTimeout_(sendErrors, 1307)
-		}
+		)) log("e", lastError, (error && (error.stack || error.stacktrace) || "-") + "\n" + location)
 	}
 	/*/
 	, onerror = nop
 	/**/
+
+	xhr.log = log
+	function log(type, msg, extra) {
+		if (unsentLog.push([ new Date() - initTime, type, msg, extra ]) < 2) sendLog()
+	}
+
+	function sendLog() {
+		setTimeout_(xhr.sendLog || sendLog, 1307)
+	}
 
 	// next === true is for sync call
 

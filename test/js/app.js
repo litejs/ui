@@ -1,14 +1,15 @@
 
 
-xhr.logErrors = function(unsentErrors) {
-	xhr("POST", "/errlog").send(JSON.stringify(unsentErrors))
-	unsentErrors.length = 0
-}
+El.on(document, "visibilitychange pagehide", (xhr.sendLog = function() {
+	var unsentLog = xhr._l
+	if (unsentLog[0]) navigator.sendBeacon("/log", JSON.stringify(unsentLog))
+	unsentLog.length = 0
+}))
 
 // Clickjacking defense, break out of frames.
 // If JavaScript is disabled, the site will not display at all.
 if (self !== top) {
-	xhr.logErrors(["Framed in " + top.location])
+	xhr.log("s", "Framed", "" + top.location)
 	throw top.location = self.location
 }
 

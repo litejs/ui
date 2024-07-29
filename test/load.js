@@ -76,11 +76,10 @@ describe("load.js", function() {
 		mock.tick(400)
 		lib.onerror("fault2", "t2.js", 21, 22, {backtrace:"c\nd"})
 		lib.onerror("fault3", "t3.js", 31, 32, {stacktrace:"e\nf"})
-		var log = xhr.err = mock.fn()
+		var log = xhr.sendLog = mock.fn()
 		assert.equal(log.called, 0)
-		mock.tick(2000)
+		mock.tick(3000)
 		assert.equal(log.called, 1)
-		assert.equal(log.calls[0].args[0].length, 3)
 		assert.end()
 	})
 	.should("load {0}", [

@@ -1439,12 +1439,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	function logErr(e, source, node) {
 		/*** debug ***/
-		console.error(e)
 		console.error(source, node)
 		/**/
-		if (window.onerror) {
-			window.onerror(e.message, e.fileName, e.lineNumber)
-		}
+		e.stack = source
+		throw e
 	}
 	function injectCss(cssText) {
 		if (!styleNode) {
