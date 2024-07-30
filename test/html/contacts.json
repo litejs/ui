@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Email",
+    "link": "mailto:hi@litejs.com"
+  },
+  {
+    "title": "Issues",
+    "link": "https://github.com/litejs/ui/issues"
+  }
+]
