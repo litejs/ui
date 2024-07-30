@@ -110,9 +110,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	/**/
 
-	Event.asEmitter = asEmitter
-	Event.stop = eventStop
-
 	xhr.css = injectCss
 	xhr.ui = sources.push.bind(sources)
 
@@ -792,6 +789,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	assign(El, {
 		append: append,
+		asEmitter: asEmitter,
 		$b: assign(bindings, {
 			each: function(el, name, list) {
 				var comm = Comm("each " + name, up)
