@@ -1,0 +1,88 @@
+
+= Hello
+
+By [!Barney Rubble /author/barney!] on [@2020-10-27@] /
+Leave a Comment /
+#Security /
+2 minutes of reading
+
+This is a paragpaph.
+ New line can be made with space.
+
+
+== Inline format
+
+Inline formats are between [].
+
+Text can be [*bold*.red][^sup^], [/italic/][,sub,], [_underline_], [~stricken~], [:marked:], [`code`], [+inserted+], and [-deleted-].
+
+No automaticaly recognized links, as not all link-like text need to be clickable.
+
+A named link is easy -- [!John Smith mailto:js@example.com!], [!mailto:js@example.com!], [!https://www.ee!].
+
+[!Wikipedia https://en.wikipedia.org/!]
+
+== Block format
+
+> Can be nested. [.left]
+> Without linebreak.
+>  With linebreak.
+>
+> > == Block
+> >
+> > Can be nestet
+>
+> -- Someone
+
+> Can be nested. [.right]
+> Without linebreak.
+>  With linebreak.
+>
+> > == Block
+> >
+> > Can be nestet
+>
+> -- Someone
+
+
+[!youtube:uhbDfi7Ee7k!]
+
+[! image.gif !] Left-aligned image. Lorem ipsum ...
+
+[! Right-aligned image. Curabitur quam ... image.gif !>]
+
+
+ - List 1
+ - List 2
+
+
+
+== My Great Heading [#custom-id]
+
+
+First Term
+: This is the definition of the first term.
+
+Second Term
+: This is one definition of the second term.
+: This is another definition of the second term.
+
+
+Soft hyphen (shy) 'a­a'
+&shy; --  \-  -?
+
+
+
+== Diagrams
+
+https://github.com/mermaid-js/mermaid
+https://github.com/bramp/js-sequence-diagrams
+
+```diagram
+Alice || Bob
+-> Hello Bob, how are you?
+| Bob thinks
+< I am good thanks!
+Alice knows |
+```
+

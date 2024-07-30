@@ -1,19 +1,143 @@
+
+*, *:before, *:after {
+	backface-visibility: inherit;
+	box-sizing: inherit;
+	color: inherit;
+}
+
 html {
+	backface-visibility: hidden;
+	box-sizing: border-box;
+	color: #333;
+	text-rendering: optimizeLegibility;
+	touch-action: manipulation;
 	/* Force a vertical scrollbar to prevent a jumpy page. */
 	overflow-y: scroll;
+	scrollbar-color: initial #eee;
+	background: #eee;
 }
 
 body {
 	margin: 0 auto 20vh;
-	max-width: 950px;
+	max-width: 990px;
 	line-height: 1.5;
 	font-size: 18px;
-	color: #333;
 	padding: 18px;
+}
+
+.right {
+	float: right;
+}
+.left {
+	float: left;
 }
 
 .lg > body {
 	width: 990px;
+}
+
+.lg main {
+	float: left;
+	width: 700px;
+}
+
+.lg aside {
+	float: right;
+	width: 250px;
+	background: #fcf6ea;
+	border: 1px solid #717477;
+	box-shadow: inset 0 0 12px -2px #888;
+	border-radius: 6px;
+	padding: 16px;
+}
+
+h1,h2,h3 {
+	font-weight: 300;
+	margin: 0;
+}
+
+del {
+	background-color: #fbb;
+	outline: 2px solid #fbb;
+}
+
+ins {
+	background-color: #d4fcbc;
+	outline: 2px solid #d4fcbc;
+}
+
+mark {
+	outline: 2px solid mark;
+}
+
+.lg blockquote.right {
+	width: 48%;
+	margin: 4px 0 4px 2%;
+}
+
+.lg blockquote.left {
+	width: 48%;
+	margin: 4px 2% 4px 0;
+}
+
+blockquote {
+	position: relative;
+	padding: 4px 0 4px 16px;
+	margin: 0;
+	border-left: 33px solid rgba(0, 0, 0, .1);
+	background: rgba(0, 0, 0, .05);
+	border-radius: 6px;
+}
+blockquote:before {
+	position: absolute;
+	/* top: 12px; */
+	left: -28px;
+	content: "\201c";
+	color: rgba(0, 0, 0, 0.15);
+	/* font-family: Georgia, serif; */
+	font-size: 3.051rem;
+	/* font-weight: 400; */
+	line-height: 1;
+}
+code {
+	outline: 3px double rgba(0, 0, 0, .1);
+	background: rgba(0, 0, 0, .05);
+	border-radius: 3px;
+}
+
+ul.dot {
+	border-left: 1px solid #717477;
+	list-style: none;
+	margin: 0 0 0 4px;
+	padding: 0 0 16px;
+}
+.dot > li {
+	margin: 16px 0 0 16px;
+}
+.dot > li:before {
+	background: #717477;
+	margin-left: -20px;
+	content: "";
+	float: left;
+	width: 7px;
+	height: 7px;
+	border-radius: 4px;
+}
+.dot > li > a {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+aside > a,
+.dot > li > time {
+	font: 14px/7px sans-serif;
+	margin-bottom: 8px;
+	display: block;
+}
+footer {
+	clear: both;
 }
 
 h1, h2, h3 {

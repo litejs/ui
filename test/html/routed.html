@@ -5,6 +5,21 @@
 </head><body>
 <script type="ui">
 
+%js
+	// All loaded *.json files will be handled by this function
+	xhr.json = function(str, url) {
+		$d[url.split(".")[0]] = JSON.parse(str)
+	}
+	var blogCache = {}
+	$ui.param("blogFile", function(value, name, view, params) {
+		if (blogCache[value]) return $d[name] = blogCache[value]
+		var cb = view.wait()
+		xhr("GET", value + ".text", function(err, body) {
+			$d[name] = blogCache[value] = body || "Error"
+			cb()
+		}).send()
+	})
+
 %el Top-menu
 nav
 	hr
@@ -26,8 +41,15 @@ nav
 %view home #pub
 	h2 Hello home
 
+%view blog/{blogFile} #pub
+	article ;d!blogFile
+
 %view about #pub
+	;f "contacts.json"
 	h2 About
+	ul
+		li ;each!row in contacts
+			a ;txt!row.title;href!row.link
 
 %start
 </script>

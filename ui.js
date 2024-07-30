@@ -98,6 +98,55 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
 
+	/*** markup ***/
+	, blockRe = /^(?:(=+|>| -) ([\s\S]+)|\[! *(\S*) *!] ?(.*))/
+	, tags = {
+		" -": "ul",
+		"!": "a",
+		"*": "b",
+		"+": "ins",
+		",": "sub",
+		"-": "del",
+		"/": "i",
+		":": "mark",
+		";": "span",
+		">": "blockquote",
+		"@": "time",
+		"^": "sup",
+		"_": "u",
+		"`": "code",
+		"~": "s"
+	}
+	function inline(tag, op, text, name, link, attr) {
+		return op && !isArr(text) ? "<" +
+			(tag = tags[op] || "h" + op.length) +
+			(tag == "a" ? " href=\"" + (link || text) + "\"" : op == "@" ? " datetime=\"" + name + "\"" : "") +
+			(attr ? " class=\"" + attr.slice(1) + "\">" : ">") +
+			(
+				op === ">" ? doc(replace(text, /^> ?/gm, "")) :
+				tag == "ul" ? "<li>" + text.split(/\n - (?=\S)/).map(inline).join("</li>\n<li>") + "</li>" :
+				inline(tag == "a" ? replace(name, /^\w+:\/{0,2}/, "") : text)
+			) +
+			"</" + tag + ">" :
+		replace(tag, /\[([-!*+,/:;@^_`~])((.+?)(?: (\S+?))?)\1(\.[.\w]+)?]/g, inline)
+	}
+	function block(tag, op, text, media, alt) {
+		return op && !isArr(text) ? inline(tag, op, text) :
+		media ? "<img src=\"" + media + "\" alt=\"" + alt + "\">" :
+		blockRe.test(tag) ? replace(tag, blockRe, block) :
+		tag === "---" ? "<hr>" : "<p>" + inline(tag) + "</p>"
+	}
+	function doc(txt) {
+		return replace(txt.trim(), /^ \b/gm, "<br>").split(/\n\n+/).map(block).join("\n")
+	}
+	bindings.t = function(el, text) {
+		el.innerHTML = inline(replace(text, /</g, "&lt;"))
+	}
+	bindings.d = function(el, text) {
+		el.innerHTML = doc(replace(text, /</g, "&lt;"))
+	}
+	/**/
+
 	/*** svg ***/
 	bindings.xlink = function(el, href) {
 		// In SVG2, xlink namespace is not needed, plain href can be used (Chrome50 2016, Firefox51 2017).
