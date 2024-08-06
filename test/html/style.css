@@ -15,14 +15,21 @@ html {
 	overflow-y: scroll;
 	scrollbar-color: initial #eee;
 	background: #eee;
+	background: repeating-linear-gradient(#eee, #eee 23px, #aaa 24px);
 }
 
 body {
 	margin: 0 auto 20vh;
 	max-width: 990px;
-	line-height: 1.5;
-	font-size: 18px;
-	padding: 18px;
+	font: 300 18px/24px "Helvetica", "sans-serif";
+	padding: 0 24px;
+}
+
+a {
+	color: blue;
+}
+a:hover {
+	color: green;
 }
 
 .right {
@@ -51,9 +58,63 @@ body {
 	padding: 16px;
 }
 
-h1,h2,h3 {
-	font-weight: 300;
-	margin: 0;
+/* https://vanseodesign.com/blog/demo/baseline-grid/ */
+
+h1 + nav {
+	margin-top: -49px;
+	font: 300 16px/24px "Helvetica", "sans-serif";
+}
+
+h1 {
+	font: 300 40px/48px "Helvetica", "sans-serif";
+	margin: 24px 0 48px;
+}
+h2 {
+	font: 300 26px/24px "Helvetica", "sans-serif";
+	margin: 12px 0;
+}
+p + h2 {
+	margin-top: 36px;
+}
+h3 {
+	line-height: 1.2;
+}
+
+p {
+	margin: 0 0 24px;
+
+}
+
+hr {
+	margin: -1px 0 0;
+	border: 0;
+	border-top: 1px solid red;
+}
+
+body>article {
+	width: 962px;
+	padding: 0 80px;
+	border: 1px solid #aaa;
+}
+
+img {
+	border: 1px solid #aaa;
+	width: 962px;
+	height: 540px;
+	margin: 6px -81px;
+	display: block;
+}
+
+img.l, img.r {
+	width: 480px;
+	height: 270px;
+	margin: 6px -18px 6px 18px;
+	float: right;
+}
+
+img.l {
+	margin: 6px 18px 6px 0;
+	float: left;
 }
 
 del {
@@ -69,6 +130,18 @@ ins {
 mark {
 	outline: 2px solid mark;
 }
+sup, sub {
+  vertical-align: top;
+  position: relative;
+  top: -0.65em;
+  font-size: 0.7em;
+}
+sub {
+  top: 0.4em;
+}
+ul {
+	margin: 0;
+}
 
 .lg blockquote.right {
 	width: 48%;
@@ -82,11 +155,12 @@ mark {
 
 blockquote {
 	position: relative;
-	padding: 4px 0 4px 16px;
-	margin: 0;
+	padding: 4px 8px 0;
+	margin: -4px 0 8px;
 	border-left: 33px solid rgba(0, 0, 0, .1);
 	background: rgba(0, 0, 0, .05);
 	border-radius: 6px;
+	width: 921px;
 }
 blockquote:before {
 	position: absolute;
@@ -140,7 +214,4 @@ footer {
 	clear: both;
 }
 
-h1, h2, h3 {
-	line-height: 1.2;
-}
 

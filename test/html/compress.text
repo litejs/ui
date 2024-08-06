@@ -1,0 +1,2 @@
+convert hot-air-balloon-8869138.jpg -resize 1920x1080^ -gravity center -extent 1920x1080 -quality 100 hot-air-balloon-8869138.100.jpg
+guetzli --quality 30 hot-air-balloon-8869138.100.jpg hot-air-balloon-8869138.30.jpg

@@ -45,12 +45,18 @@ A named link is easy -- {!John Smith mailto:js@example.com!}, {!mailto:js@exampl
 > -- Someone
 
 
-[!youtube:uhbDfi7Ee7k!]
+16:9 - 1920×1080 scaled down to 960×540
 
-[! image.gif !] Left-aligned image. Lorem ipsum ...
+convert input.jpg -resize 1920x1080^ -gravity center -extent 1920x1080 -quality 25 output.jpg
 
-[! Right-aligned image. Curabitur quam ... image.gif !>]
 
+[! hot-air-balloon-8869138.30.jpg !] 30%
+
+[! hot-air-balloon-8869138.g45.jpg !] 85g%
+
+[! hot-air-balloon-8869138.85.jpg !] 85%
+
+[! hot-air-balloon-8869138.90.jpg !] 90%
 
  - List 1
  - List 2
