@@ -260,7 +260,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	function LiteJS(opts) {
 		opts = assign({
-			path: "",
 			/*** breakpoints ***/
 			breakpoints: {
 				sm: 0,
@@ -269,6 +268,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			},
 			/**/
 			home: "home",
+			path: "",
 			root: body
 		}, opts)
 
@@ -701,7 +701,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			return lang && (iFormat[lang = ("" + lang).toLowerCase()] || iFormat[lang = lang.split("-")[0]]) && lang
 		}
 		function iSet(lang, translations) {
-			assignDeep(iData[lang = html.lang = $d.lang = localStorage.lang = iResolve(lang) || $d.lang || opts.lang], translations)
+			assignDeep(iData[lang = html.lang = $d.lang = localStorage.lang = iResolve(lang) || $d.lang || opts.lang || html.lang || "en"], translations)
 			return ($d._ = iFormat[lang] || format)
 		}
 		/**/
