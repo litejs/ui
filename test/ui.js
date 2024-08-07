@@ -5,16 +5,17 @@ describe("ui", function() {
 	, fs = require("fs")
 	, path = require("path")
 	, dom = require("@litejs/dom")
-	, xhr = global.xhr = require("../load.js").xhr
 	, document = dom.document
+	, localStorage = {}
 	, parser = new dom.DOMParser()
 	require("@litejs/cli/snapshot.js")
+	global.xhr = require("../load.js").xhr
 
 	it ("should import index.js", function(assert, mock) {
 		mock.swap(global, {
 			document: document,
 			history: {},
-			localStorage: {},
+			localStorage,
 			location: { href: "" }
 		})
 		if (!global.navigator) mock.swap(global, "navigator", {})

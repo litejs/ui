@@ -630,6 +630,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		/**/
 
 		/*** i18n ***/
+		View.lang = iSet
 		var iData = {}
 		, iFormat = create(null)
 		, iGlobals = assignDeep(create(null), opts.locales)
@@ -640,14 +641,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		})
 		assignDeep(iGlobals, opts.globals)
-		iSet([localStorage.lang, navigator.language, navigator.userLanguage].concat(navigator.languages, opts.lang).find(iResolve))
-		$d.locales = Object.keys(iFormat)
-		View.lang = iSet
+		iSet([localStorage.lang, navigator.language].concat(navigator.languages, opts.lang, html.lang, $d.locales = Object.keys(iFormat)).find(iResolve))
 		function iResolve(lang) {
 			return lang && (iFormat[lang = ("" + lang).toLowerCase()] || iFormat[lang = lang.split("-")[0]]) && lang
 		}
 		function iSet(lang, translations) {
-			assignDeep(iData[lang = html.lang = $d.lang = localStorage.lang = iResolve(lang) || $d.lang || opts.lang], translations)
+			if ((lang = iResolve(lang))) assignDeep(iData[html.lang = $d.lang = localStorage.lang = lang], translations)
 			return ($d._ = iFormat[lang] || format)
 		}
 		/**/
