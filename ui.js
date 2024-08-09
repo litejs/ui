@@ -34,7 +34,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, elSeq = 0
 	, elCache = {}
 	, formatRe = /{((?:("|')(?:\\\2|[\s\S])*?\2|[^"'{}])+?)}/g
-	, renderRe = /[;\s]*([-\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
+	, renderRe = /[;\s]*([-.\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>+=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
 	, fnCache = {}
@@ -70,8 +70,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	, globalScope = {
 		El: El,
-		_: format,
-		_f: format,
 		$b: bindings
 	}
 	, elArr = {
@@ -679,25 +677,92 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		/**/
 
 		/*** i18n ***/
-		View.lang = iSet
-		var iData = {}
-		, iFormat = create(null)
-		, iGlobals = assignDeep(create(null), opts.locales)
-		each(iGlobals, function(translations, iKey) {
-			translations = iData[iKey] = assignDeep(create(iGlobals), opts[iKey])
-			iFormat[iKey] = function(str, data) {
-				return format(get(translations, str, str || ""), data)
+		globalScope._ = format
+		var iFormat = create(NUL)
+		each(opts.locales, function(translations, lang, locales) {
+			translations = formatGet.t = assignDeep(assignDeep(create(opts.globals || NUL), locales), opts[lang])
+			iFormat[lang] = formatGet
+			var iAlias = {
+				"#": "number", "number": "#",
+				"*": "plural", "plural": "*",
+				"?": "pick", "pick": "?",
+				"@": "date", "date": "@",
+				"~": "pattern", "pattern": "~"
+			}
+			, cache = create(NUL)
+			, iExt = format.ext = {
+				lo: function(str) {
+					return isStr(str) ? str.toLowerCase() : ""
+				},
+				map: function(input, str, sep, lastSep) {
+					var arr = []
+					each(input, function(val) {
+						arr.push(formatGet(str, val))
+					})
+					lastSep = lastSep && arr.length > 1 ? lastSep + arr.pop() : ""
+					return arr.join(sep || ", ") + lastSep
+				},
+				pattern: function(str, re) {
+					var values = []
+					, t = translations["~"] || {}
+					, key = replace(str, RegExp(re || t[""] || "[\\d.]+", "g"), function(a) {
+						values.push(a)
+						return "#"
+					})
+					return str != key && replace(t[key], /#/g, values.shift.bind(values)) || str
+				},
+				pick: function(val, word) {
+					for (var t = translations["?"] || {}, arr = replace((t[word] || word), /([^;=,]+?)\?/g, "$1=$1;").split(/[;=,]/), i = 1|arr.length; i > 0; ) {
+						if ((i-=2) < 0 || arr[i] && (arr[i] == "" + val || +arr[i] <= val)) {
+							return arr[i + 1] ? replace(arr[i + 1], "#", val) : ""
+						}
+					}
+				},
+				plural: function(n, word, expr) {
+					var t = translations["*"] || {}
+					return (
+						cache[expr = t[""] || "n!=1"] || (cache[expr] = Function("a,n", "return (a[+(" + expr + ")]||a[0]).replace('#',n)"))
+					)((t[word] || "# " + word).split(";"), n)
+				},
+				up: function(str) {
+					return isStr(str) ? str.toUpperCase() : ""
+				}
+			}
+			function formatGet(str, data) {
+				return format(iGet(translations, str, str || ""), data, getExt)
+			}
+			function getExt(obj, str) {
+				var fn = cache[str] || (cache[str] = replace(replace(str, /;\s*([#*?@~])(.*)/, function(_, op, arg) {
+					return ";" + iAlias[op] + " '"+ arg +"'"
+				}), renderRe, function(_, name, op, args) {
+					fn = (_ === name) ? name : "$el." + name + "(" + fn + (args ? "," + args : "") + ")"
+				}), fn === str ? str : makeFn(fn, fn))
+				return str == "$" ? obj : isStr(fn) ? iGet(obj, str, "") : isFn(fn) ? fn(iExt, obj, translations) : ""
 			}
 		})
-		assignDeep(iGlobals, opts.globals)
-		iSet([localStorage.lang, navigator.language].concat(navigator.languages, opts.lang, html.lang, $d.locales = Object.keys(iFormat)).find(iResolve))
-		function iResolve(lang) {
-			return lang && (iFormat[lang = ("" + lang).toLowerCase()] || iFormat[lang = lang.split("-")[0]]) && lang
+		;[localStorage.lang, navigator.language].concat(navigator.languages, opts.lang, html.lang, $d.locales = Object.keys(iFormat))
+		.find(View.lang = function(lang, translations) {
+			if (lang && (iFormat[lang = ("" + lang).toLowerCase()] || iFormat[lang = lang.split("-")[0]])) {
+				assignDeep(iFormat[html.lang = $d.lang = localStorage.lang = lang].t, translations)
+				return ($d._ = iFormat[lang])
+			}
+		})
+		function format(str, data, getter) {
+			return replace(str, formatRe, function(all, path) {
+				return getter(data, path, "")
+			})
 		}
-		function iSet(lang, translations) {
-			if ((lang = iResolve(lang))) assignDeep(iData[html.lang = $d.lang = localStorage.lang = lang], translations)
-			return ($d._ = iFormat[lang] || format)
+		function iGet(obj, path, fallback) {
+			return isStr(path) ? (
+				isStr(obj[path]) ? obj[path] :
+				(path = path.split("."))[1] && isObj(obj = obj[path[0]]) && isStr(obj[path[1]]) ? obj[path[1]] :
+				fallback
+			) :
+			isArr(path) ? iGet(obj, path[0]) || iGet(obj, path[1]) || iGet(obj, path[2], fallback) :
+			fallback
 		}
+		/*/
+		globalScope._ = String
 		/**/
 
 		return View
@@ -881,7 +946,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			},
 			is: function(el, val, opts, prefix) {
 				if (!prefix) prefix = "is-"
-				var match = format(val, opts)
+				var match = globalScope._(val, opts)
 				cls(el, el[prefix + opts], 0)
 				cls(el, el[prefix + opts] = match && prefix + match)
 			},
@@ -1174,10 +1239,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			throw e + "\n" + attr + ": " + bind
 		}
 	}
-	function makeFn(fn) {
+	function makeFn(fn, raw) {
 		var i = 0
 		, bindOnce = []
-		fn = "$s&&(" + replace(fn, renderRe, function(match, name, op, args) {
+		fn = raw || "$s&&(" + replace(fn, renderRe, function(match, name, op, args) {
 			return (
 				(op === "!" && (bindOnce[i] = match)) ?
 				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
@@ -1189,7 +1254,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
 			else vars[i] += "=$s." + vars[i]
 		}
-		fn = Function("$el,$s,$a,$o,$r", "var " + vars + ";return " + fn)
+		fn = Function("$el,$s,$a,$o,$r", (vars[0] ? "var " + vars : "") + ";return " + fn)
 		fn.o = bindOnce
 		return fn
 	}
@@ -1464,19 +1529,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			first === "%" ? ((first = lastExp.lastIndexOf(rest.charAt(0))), (first > 0 ? lastExp.slice(0, first) : lastExp)) + rest :
 			(lastExp = str)
 		)
-	}
-	function format(str, data) {
-		return replace(str, formatRe, function(all, path) {
-			return get(data, path, "")
-		})
-	}
-	function get(obj, path, fallback) {
-		return isStr(path) ? (
-			obj[path] !== UNDEF ? obj[path] :
-			(path = path.split("."))[1] && isObj(obj = obj[path[0]]) && obj[path[1]] !== UNDEF ? obj[path[1]] : fallback
-		) :
-		isArr(path) ? get(obj, path[0]) || get(obj, path[1]) || get(obj, path[2], fallback) :
-		fallback
 	}
 	function injectCss(cssText) {
 		if (!styleNode) {

@@ -35,6 +35,26 @@ describe("ui", function() {
 	})
 
 	describe("i18n", function() {
+		var app = LiteJS({
+			globals: { v: "1" },
+			locales: { "et": "Eesti keeles", "en": "In English" },
+			en: {
+				"*": {
+					"": "n==0||n==1?n:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?2:3",
+					"file": "zero plików;1 plik;# pliki;# plików"
+				},
+				"~": {
+					"Room #": "Tuba #"
+				},
+				"?": {
+					They: "They;male=He;female=She"
+				},
+				Hello: "Hello {user.name}!",
+				HelloUp: "Hello {user.name;up 3,'b'}! Welcome to {x;up;lo}{bla;up}{bla;lo}",
+			},
+			et: { Hi: "Tere" }
+		})
+
 		it ("should detect language", [
 			[{}, [], undefined],
 			[{ locales: { "et": "Eesti keeles", "fi": "Suomeksi" }}, [ "et", "fi" ], "et"],
@@ -44,7 +64,39 @@ describe("ui", function() {
 			var app = LiteJS(opts)
 			assert.equal(app.$d.locales, locales)
 			assert.equal(app.$d.lang, lang)
+			assert.end()
+		})
 
+		it ("should take translations from opts", function(assert) {
+			assert.equal(app.$d.lang, "et")
+			assert.equal(app.$d._("et"), "Eesti keeles")
+			assert.equal(app.$d._("en"), "In English")
+			assert.equal(app.$d._("Hi"), "Tere")
+			assert.equal(app.$d._("v"), "1")
+			app.globals.v = "2"
+			assert.equal(app.$d._("v"), "2")
+			app.lang("en")
+			assert.equal(app.$d._("et"), "Eesti keeles")
+			assert.equal(app.$d._("en"), "In English")
+			assert.equal(app.$d._("Hi"), "Hi")
+			assert.equal(app.$d._("v"), "2")
+			assert.end()
+		})
+
+		it ("should format", function(assert) {
+			var _ = app.$d._
+			assert.equal(_(null), "")
+			assert.equal(_("Hello", {user: {name: "World"}}), "Hello World!")
+			assert.end()
+		})
+		it ("should format extensions", function(assert) {
+			var _ = app.$d._
+			assert.equal(_("HelloUp", {user: {name: "World"}, x:"here"}), "Hello WORLD! Welcome to here")
+			assert.equal(_(".{name;~},", {name: "Room 1"}), ".Tuba 1,")
+			assert.equal(_("{1;*file} {2;*file}"), "1 plik 2 pliki")
+			assert.equal(_("{sex;?They} was", {sex:"male"}), "He was")
+			assert.equal(_("{col;?;is-red?is-green?}", {col:"is-green"}), "is-green")
+			assert.equal(_("{a;map:'{$}',', ',', and '}", {a: {a:"Key", b:"Foo", c:"Bar"}}), "Key, Foo, and Bar")
 			assert.end()
 		})
 	})
