@@ -211,7 +211,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	function LiteJS(opts) {
 		opts = assign({
-			path: "",
 			/*** breakpoints ***/
 			breakpoints: {
 				sm: 0,
@@ -468,7 +467,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				}
 				if (tmp.f) {
 					return xhr.load(
-						replace(tmp.f, /^|,/g, "$&" + View.path).split(","),
+						replace(tmp.f, /^|,/g, "$&" + (View.path || "")).split(","),
 						readTemplates.bind(view, view.wait(tmp.f = ""))
 					)
 				} else if (!tmp.e) {
