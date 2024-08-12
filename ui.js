@@ -475,7 +475,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 							append(parent, text) // + "\n")
 						} else {
 							if (op === "") {
-								text = "txt _('" + replace(text, /'/g, "\\'") + "',$s)"
+								text = "txt _(" + quote(text) + ",$s)"
 							}
 							appendBind(parent, text, ";", op)
 						}
@@ -1497,6 +1497,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	function isStr(str) {
 		return typeof str === "string"
+	}
+	function quote(str) {
+		return "'" + replace(replace(str || "", /'/g, "\\'"), /\n/g, "\\n") + "'"
 	}
 	// Maximum call rate for Function with optional leading edge and trailing edge
 	function rate(fn, ms, onStart, onEnd) {
