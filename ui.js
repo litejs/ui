@@ -12,6 +12,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	asEmitter(window.LiteJS = LiteJS)
 
 	var UNDEF, lastExp, parser, pushBase, styleNode
+	, NUL = null
 	, html = document.documentElement
 	, body = document.body
 	, splitRe = /[,\s]+/
@@ -123,7 +124,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	function on(type, fn, scope, _origin) {
 		var emitter = this === window ? emptyArr : this
-		, events = emitter._e || (emitter._e = create(null))
+		, events = emitter._e || (emitter._e = create(NUL))
 		if (type && fn) {
 			if (isStr(fn)) fn = emit.bind(emitter, fn)
 			emit.call(emitter, "newListener", type, fn, scope, _origin)
@@ -658,7 +659,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function setUrl(url, rep, checkUrl) {
 		/*** pushState ***/
 		if (pushBase) {
-			history[rep ? "replaceState" : "pushState"](null, null, pushBase + url)
+			history[rep ? "replaceState" : "pushState"](NUL, NUL, pushBase + url)
 		} else {
 		/**/
 			location[rep ? "replace" : "assign"]("#" + url)
@@ -929,7 +930,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					isNum(before) ? el.childNodes[before < 0 ? el.childNodes.length - before - 2 : before] :
 					isArr(before) ? before[0] :
 					before
-				) || null)
+				) || NUL)
 				/*** debug ***/
 				if (el.namespaceURI && child.namespaceURI && el.namespaceURI !== child.namespaceURI && el.tagName !== "foreignObject" && child.tagName !== "svg") {
 					console.error("NAMESPACE CHANGE!", el, child)
@@ -1077,12 +1078,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 
 		return checkbox && !el.checked ?
-		(type === "radio" ? UNDEF : null) :
+		(type === "radio" ? UNDEF : NUL) :
 		el.valObject !== UNDEF ? el.valObject : el.value
 
 		function replacer(_, _key, offset) {
 			if (step == opts) key = key.slice(0, offset)
-			step = step[key] || (step[key] = step[key] === null || _key && +_key != _key ? {} : [])
+			step = step[key] || (step[key] = step[key] === NUL || _key && +_key != _key ? {} : [])
 			key = _key
 		}
 	}
@@ -1258,7 +1259,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			function touchPos(name, offset) {
 				var val = (
 					touchEl.getBBox ?
-					touchEl.getAttributeNS(null, name == "top" ? "y":"x") :
+					touchEl.getAttributeNS(NUL, name == "top" ? "y":"x") :
 					touchEl.style[name]
 				)
 				touchEv[name] = parseInt(val, 10) || 0
