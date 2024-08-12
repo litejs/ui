@@ -58,6 +58,17 @@ describe("ui", function() {
 				HelloUp: "Hello {user.name;up 3,'b'}! Welcome to {x;up;lo}{bla;up}{bla;lo}",
 			},
 			et: {
+				"@": {
+					"": "P E T K N R L pühapäev esmaspäev teisipäev kolmapäev neljapäev reede laupäev jaan veeb märts apr mai juuni juuli aug sept okt nov dets jaanuar veebruar märts aprill mai juuni juuli august september oktoober november detsember".split(" "),
+					am: "AM",
+					pm: "PM",
+					LT:    "HH:mm",
+					LTS:   "HH:mm:ss",
+					LD:    "DD.MM.Y",
+					LDD:   "D MMMM Y",
+					LDDT:  "D MMMM Y HH:mm",
+					LDDDT: "ddd, D MMMM Y HH:mm"
+				},
 				Hi: "Tere"
 			}
 		})
@@ -105,6 +116,87 @@ describe("ui", function() {
 			assert.equal(_("{col;?;is-red?is-green?}", {col:"is-green"}), "is-green")
 			assert.equal(_("{a;map:'{$}',', ',', and '}", {a: {a:"Key", b:"Foo", c:"Bar"}}), "Key, Foo, and Bar")
 
+			assert.end()
+		})
+		it("should format date", function(assert) {
+			// {start;date:'Y-MM-dd'}
+			// {start;@lt}
+
+			app.lang("et", {})
+
+			var _ = app.$d._
+			var date = app.$d._.ext.date
+
+			var d2n = 1234567890123
+			, d2d = new Date(d2n)
+			, d2s = "" + 1234567890123
+			, d1 = new Date(Date.UTC(1,1,3,4,5,6,7))
+
+			d1.setUTCFullYear(1)
+
+
+			assert
+			.equal( date(d1, "YY-MM-DD Y/M/D"), "01-02-03 1/2/3" )
+
+			// Pattern	Result (in a particular locale)
+			// EEE, MMM d, ''yY	Wed, July 10, '96
+			// h:mm a	12:08 PM
+			// hh 'o''clock' a, zzzz	12 o'clock PM, Pacific Daylight Time
+			// K:mm a, z	0:00 PM, PST
+
+			assert.equal( date(d1, "h 'o''clock' a"), "5 o'clock AM" )
+			assert.equal( date(d1, "Y YY"), "1 01" )
+			assert.equal( date(d1, "M MM MMM MMMM"), "2 02 veeb veebruar" )
+			assert.equal( date(d1, "D DD"), "3 03" )
+			assert.equal( date(d1, "d dd ddd"), "6 L laupäev" )
+			assert.equal( date(d2d, "u U"), "1234567890 1234567890123" )
+			assert.equal( date(d2d, "Q Z ZZ"), "1 +02:00 +0200" )
+			assert.equal( date(d2d, "SS"), "123" )
+
+
+			assert.equal( date("2009-02-13T23:31:30Z"), "2009-02-13T23:31:30Z" )
+			assert.equal( date("2009-02-15T23:31:30Z", "d dd ddd"), "1 E esmaspäev" )
+			assert.equal( date("2009-02-16T23:31:30Z", "d dd ddd"), "2 T teisipäev" )
+			assert.equal( date("2009-02-17T23:31:30Z", "d dd ddd"), "3 K kolmapäev" )
+			assert.equal( date("2009-02-18T23:31:30Z", "d dd ddd"), "4 N neljapäev" )
+			assert.equal( date("2009-02-19T23:31:30Z", "d dd ddd"), "5 R reede" )
+			assert.equal( date("2009-02-20T23:31:30Z", "d dd ddd"), "6 L laupäev" )
+			assert.equal( date("2009-02-21T23:31:30Z", "d dd ddd"), "7 P pühapäev" )
+
+			assert.equal( date(d2n), "2009-02-13T23:31:30Z" )
+			assert.equal( date(d2d), "2009-02-13T23:31:30Z" )
+			assert.equal( date(d2s), "2009-02-13T23:31:30Z" )
+			assert.equal( date(d2s, "LT"), "01:31" )
+			assert.equal( _("{at;@LT}", {at: d2s}), "01:31" )
+
+			assert.equal( date(d2s, "LT", 3), "02:31" )
+			Date._tz = 4
+			assert.equal( date(d2s, "HH:mm\n"), "03:31\n" )
+			Date._tz = void 0
+			assert.equal( date(NaN, "LT"), "Invalid Date" )
+
+			// should format ISO 8601 week numbers in local time
+			var key, map = {
+				"2005-01-01T01:02": "2004-W53-6 1:2",
+				"2005-01-02T01:02": "2004-W53-7 1:2",
+				"2005-12-31T01:02": "2005-W52-6 1:2",
+				"2007-01-01T01:02": "2007-W01-1 1:2",
+				"2007-12-30T01:02": "2007-W52-7 1:2",
+				"2007-12-31T01:02": "2008-W01-1 1:2",
+				"2008-01-01T01:02": "2008-W01-2 1:2",
+				"2008-12-28T01:02": "2008-W52-7 1:2",
+				"2008-12-29T01:02": "2009-W01-1 1:2",
+				"2008-12-30T01:02": "2009-W01-2 1:2",
+				"2008-12-31T01:02": "2009-W01-3 1:2",
+				"2009-01-01T01:02": "2009-W01-4 1:2",
+				"2009-12-31T01:02": "2009-W53-4 1:2",
+				"2010-01-01T01:02": "2009-W53-5 1:2",
+				"2010-01-02T01:02": "2009-W53-6 1:2",
+				"2010-01-03T01:02": "2009-W53-7 1:2"
+			}
+			for (key in map) assert.equal( date(key, "o-'W'ww-d h:m"), map[key] )
+
+			app.lang("en", {})
 			assert.end()
 		})
 		it ("should format numbers", function(assert) {

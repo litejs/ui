@@ -1,7 +1,7 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global xhr, navigator */
+/* global escape, navigator, xhr */
 
 /*** debug ***/
 console.log("LiteJS is in debug mode, but it's fine for production")
@@ -690,7 +690,34 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				"~": "pattern", "pattern": "~"
 			}
 			, cache = create(NUL)
+			, dateRe = /([Md])\1\1\1?|([YMDdHhmswSZ])(\2?)|[uUaSoQ]|'((?:''|[^'])*)'|(["\\\n\r\u2028\u2029])/g
+			, date1 = new Date()
+			, date2 = new Date()
 			, iExt = formatGet.ext = {
+				date: function(input, _mask, _zone) {
+					var undef
+					, offset = 4294967295
+					, d = input * (input > offset || input < -offset ? 1 : 1000) || Date.parse(input)
+					, t = translations["@"] || {}
+					, mask = t[_mask] || _mask || "UTC:Y-MM-DD'T'HH:mm:ss'Z'"
+					, zone = _zone != undef ? _zone : Date._tz != undef ? Date._tz : undef
+					, utc = mask.slice(0, 4) == "UTC:"
+					if (zone != undef && !utc) {
+						offset = 60 * zone
+						date1.setTime(d + offset * 6e4)
+						utc = mask = "UTC:" + mask
+					} else {
+						date1.setTime(d)
+						offset = utc ? 0 : -date1.getTimezoneOffset()
+					}
+					return isNaN(d) ? "" + date1 : (
+						cache[mask] || (cache[mask] = Function("d,a,o,l", "var t;return \"" + dateStr(mask, utc) + "\"")))(
+						date1,
+						date2,
+						offset,
+						t
+					)
+				},
 				lo: function(str) {
 					return isStr(str) ? str.toLowerCase() : ""
 				},
@@ -733,6 +760,42 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				up: function(str) {
 					return isStr(str) ? str.toUpperCase() : ""
 				}
+			}
+
+			function dateStr(mask, utc) {
+				var get = "d.get" + (utc ? "UTC" : "")
+				, dateMap = {
+					d: "Day()||7",
+					M: "Month()+1",
+					D: "Date()",
+					H: "Hours()",
+					h: "Hours()%12||12",
+					m: "Minutes()",
+					s: "Seconds()",
+					S: "Milliseconds()"
+				}
+				, setA = "a.setTime(+d+((4-(" + get + dateMap.d + "))*864e5))"
+				return replace((utc ? mask.slice(4) : mask), dateRe, function(match, MD, single, pad, text, esc) {
+					mask = (
+						esc            ? replace(replace(escape(esc), /%u/g, "\\u"), /%/g, "\\x") :
+						text !== UNDEF ? replace(text, /''/g, "'") :
+						MD || match == "dd" ? "l[''][" + get + (MD == "M" ? "Month()+" + (match == "MMM" ? 14 : 26) : "Day()" + (pad ? (pad = "") : "+7")) + "]" :
+						match == "u"   ? "(d/1000)>>>0" :
+						match == "U"   ? "+d" :
+						match == "Q"   ? "((" + get + "Month()/3)|0)+1" :
+						match == "a"   ? "l[" + get + dateMap.H + ">11?'pm':'am']" :
+						match == "o"   ? setA + ",a" + get.slice(1) + "FullYear()" :
+						single == "Y"  ? get + "FullYear()" + (pad == "Y" ? "%100" : "") :
+						single == "Z"  ? "(t=o)?(t<0?((t=-t),'-'):'+')+(t<600?'0':'')+(0|(t/60))" + (pad ? (pad = "") : "+':'") + "+((t%=60)>9?t:'0'+t):'Z'" :
+						single == "w"  ? "Math.ceil(((" + setA + "-a.s" + get.slice(3) + "Month(0,1))/864e5+1)/7)" :
+						get + dateMap[single || match]
+					)
+					return text !== UNDEF || esc ? mask : "\"+(" + (
+						match == "SS" ? "(t=" + mask + ")>9?t>99?t:'0'+t:'00'+t" :
+						pad ? "(t=" + mask + ")>9?t:'0'+t" :
+						mask
+					) + ")+\""
+				})
 			}
 
 			function numStr(format, t) {

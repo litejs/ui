@@ -11,7 +11,7 @@ LiteJS UI &ndash; [![Size][3]][4] [![Buy Me A Tea][5]][6]
 LiteJS UI is an old-school framework for high-quality web UIs,
 used on heavy-traffic websites since 2006.
 
- - Dependency-free, weighs around 20KB (+8KB polyfills for ancient browsers).
+ - Dependency-free, weighs around 23KB (+8KB polyfills for old browsers).
  - Written in ES5, compatible with all browsers (including IE5.5).
  - No transpiling/compiling/bundling headache, just write a working code.
 
