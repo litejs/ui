@@ -33,7 +33,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
-	, formatRe = /{((?:("|')(?:\\\2|[\s\S])*?\2|[^"'{}])+?)}/g
+	, formatRe = /{((?:("|')(?:\\\2|[\s\S])*?\2|.)+?)}/g
 	, renderRe = /[;\s]*([-.\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>+=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
@@ -683,14 +683,14 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			translations = formatGet.t = assignDeep(assignDeep(create(opts.globals || NUL), locales), opts[lang])
 			iFormat[lang] = formatGet
 			var iAlias = {
-				"#": "number", "number": "#",
+				"#": "num", "num": "#",
 				"*": "plural", "plural": "*",
 				"?": "pick", "pick": "?",
 				"@": "date", "date": "@",
 				"~": "pattern", "pattern": "~"
 			}
 			, cache = create(NUL)
-			, iExt = format.ext = {
+			, iExt = formatGet.ext = {
 				lo: function(str) {
 					return isStr(str) ? str.toLowerCase() : ""
 				},
@@ -701,6 +701,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					})
 					lastSep = lastSep && arr.length > 1 ? lastSep + arr.pop() : ""
 					return arr.join(sep || ", ") + lastSep
+				},
+				num: function(input, format) {
+					var t = translations["#"] || {}
+					return (
+						cache[format = t[format] || "#" + format] || (cache[format] = Function("d", "var N=d<0&&(d=-d),n,r,o;return " + numStr(format, t)))
+					)(input)
 				},
 				pattern: function(str, re) {
 					var values = []
@@ -728,12 +734,93 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					return isStr(str) ? str.toUpperCase() : ""
 				}
 			}
+
+			function numStr(format, t) {
+				// format;NaN;negFormat;0;Infinity;-Infinity;roundPoint
+				var conf = format.split(";")
+				, nan_value = conf[1] || "-"
+				, o = (t.ordinal||"").split(";")
+				, pre = {
+					a: "(o+=d<1e3?'':d<1e6?(d/=1e3,'k'):d<1e9?(d/=1e6,'M'):d<1e12?(d/=1e9,'G'):d<1e15?(d/=1e12,'T'):d<1e18?(d/=1e15,'P'):(d/=1e18,'E')),"
+				}
+				, post = {
+					o: "r+(o=" + JSON.stringify(o.slice(0,-1)) + "," + o.pop() + ")"
+				}
+				, m2 = /([^\d#]*)([\d# .,_·']*\/?\d+)(?:(\s*)([a-z%]+)(\d*))?(.*)/.exec(conf[0])
+				, m3 = /([.,\/])(\d*)$/.exec(m2[2])
+				, decimals = m3 && m3[2].length || 0
+				, full = m3 ? m2[2].slice(0, m3.index) : m2[2]
+				, num = replace(full, /\D+/g, "")
+				, sLen = num.length
+				, step = decimals ? +(m3[1] === "/" ? 1 / m3[2] : num + "." + m3[2]) : num
+				, decSep = m3 && m3[1]
+				, fn = "d===Infinity?(N?" + quote(conf[5]||nan_value) + ":" + quote(conf[4]||nan_value) + "):d>0||d===0?(o=" + quote(m2[3]) + "," + (pre[m2[4]] || "") + "n=" + (
+					// Use exponential notation to fix float rounding
+					// Math.round(1.005*100)/100 = 1 instead of 1.01
+					decimals ?
+					"d>1e-" + (decimals + 1) + "?(n=(d+'e" + decimals + "')/" + (step + "e" + decimals) + "":
+					"d>"+num+"e-1?(n=d/" + num
+				) + ",Math.floor(n" + (
+					conf[6] == 1 ? "%1?n+1:n" : "+" + (conf[6] || 0.5)
+				) + ")*" + step + "):0,r=" + (
+					m2[5] ? "(''+(+n.toPrecision(" + (m2[5]) + ")))" :
+					decimals ? "n.toFixed(" + decimals + ")" :
+					"n+''"
+				)
+
+				if (decimals) {
+					if (decSep == "/") {
+						fn += ".replace(/\\.\\d+/,'" + (
+							m3[2] == 5 ?
+							"⅕⅖⅗⅘'.charAt(5" :
+							"⅛¼⅜½⅝¾⅞'.charAt(8"
+						) + "*(n%1)-1))"
+					} else if (decSep != ".") {
+						fn += ".replace('.','" + decSep + "')"
+					}
+					if (sLen === 0) {
+						fn += ",n<1&&(r=r.slice(1)||'0')"
+					}
+				}
+				if (sLen > 1) {
+					if (decimals) sLen += decimals + 1
+					fn += ",r=(r.length<" + sLen + "?(1e15+r).slice(-" + sLen + "):r)"
+				}
+
+				if ((num = full.match(/[^\d#][\d#]+/g))) {
+					fn += ",r=" + numJunk(num.length - 1, 0, decimals ? decimals + 1 : 0)
+				}
+
+				fn += (
+					(m2[4] ? ",r=" + (post[m2[4]] || "r+o") : "") +
+					// negative format
+					",N&&n>0?" + replace(quote(conf[2] || "-#"), "#", "'+r+'") + ":" +
+					(conf[3] ? "n===0?" + quote(conf[3]) + ":" : "") +
+					(m2[1] ? quote(m2[1]) + "+r" : "r") +
+					(m2[6] ? "+" + quote(m2[6]) : "")
+				)
+
+				return fn + "):" + quote(nan_value)
+
+				function numJunk(i, lastLen, dec) {
+					var len = lastLen + num[i].length - 1
+
+					return "(n<1e" + len + (
+						lastLen ? "?r.slice(0,-" + (lastLen + dec) + "):" : "?r:"
+					) + (
+						len < 16 ? numJunk(i?i-1:i, len, dec) : "r.slice(0,-" + (lastLen + dec) + ")"
+					) + "+" + quote(num[i].charAt(0)) + "+r.slice(-" + (len + dec) + (
+						lastLen ? ",-" + (lastLen + dec) : ""
+					) + "))"
+				}
+			}
+
 			function formatGet(str, data) {
 				return format(iGet(translations, str, str || ""), data, getExt)
 			}
 			function getExt(obj, str) {
 				var fn = cache[str] || (cache[str] = replace(replace(str, /;\s*([#*?@~])(.*)/, function(_, op, arg) {
-					return ";" + iAlias[op] + " '"+ arg +"'"
+					return ";" + iAlias[op] + " " + quote(arg)
 				}), renderRe, function(_, name, op, args) {
 					fn = (_ === name) ? name : "$el." + name + "(" + fn + (args ? "," + args : "") + ")"
 				}), fn === str ? str : makeFn(fn, fn))
