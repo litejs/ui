@@ -52,7 +52,8 @@ describe("ui", function() {
 					"Room #": "Tuba #"
 				},
 				"?": {
-					They: "They;male=He;female=She"
+					They: "They;male=He;female=She",
+					relTime: "a few seconds;45=a minute;90="
 				},
 				Hello: "Hello {user.name}!",
 				HelloUp: "Hello {user.name;up 3,'b'}! Welcome to {x;up;lo}{bla;up}{bla;lo}",
@@ -347,6 +348,16 @@ describe("ui", function() {
 				"110th", "111th", "112th", "113th", "114th"
 			].forEach(assertOrdinal)
 
+			assert.end()
+		})
+		it("should get from objects", function(assert) {
+			var user = {
+				name: "Hi",
+				age: 25
+			}
+			var get = app.$d._.g
+			assert.equal(get(user, "name"), "Hi")
+			assert.equal(get(user, "name;up"), "HI")
 			assert.end()
 		})
 	})

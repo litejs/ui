@@ -681,6 +681,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		var iFormat = create(NUL)
 		each(opts.locales, function(translations, lang, locales) {
 			translations = formatGet.t = assignDeep(assignDeep(create(opts.globals || NUL), locales), opts[lang])
+			formatGet.g = getExt
 			iFormat[lang] = formatGet
 			var iAlias = {
 				"#": "num", "num": "#",
