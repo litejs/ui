@@ -704,8 +704,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				/*** pushState ***/
 				pushBase ? location.pathname.slice(pushBase.length) :
 				/**/
-				// bug in Firefox where location.hash is decoded
-				// bug in Safari where location.pathname is decoded
+				// NOTE: in Firefox location.hash is decoded; in Safari location.pathname is decoded
 				location.href.split("#")[1] || "", /^[#\/\!]+|[\s\/]+$/g, "")
 		}
 	}
@@ -874,7 +873,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		var current = getAttr(el, key)
 
 		/*** ie8 ***/
-		// Bug: IE5-7 doesn't set styles and removes events when you try to set them.
+		// NOTE: IE5-7 doesn't set styles and removes events when you try to set them.
 		// IE6 label with a for attribute will re-select the first option of SELECT list instead of just giving focus.
 		// http://webbugtrack.blogspot.com/2007/09/bug-116-for-attribute-woes-in-ie6.html
 		// IE8 and below have a bug where changed 'name' not accepted on form submit
@@ -1354,10 +1353,15 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return function f(el, name, val, selector, delay, data) {
 			if (el && name) {
 				var i = arguments.length
-				if (i > 3 && i < 6 && isNum(selector)) {
-					data = delay
-					delay = selector
-					selector = UNDEF
+				if (i > 3 && i < 6) {
+					if (isArr(selector)) {
+						data = selector
+						delay = selector = UNDEF
+					} else if (isNum(selector)) {
+						data = delay
+						delay = selector
+						selector = UNDEF
+					}
 				}
 				if (delay > 0) {
 					setTimeout(f, delay, el, name, val, selector, 0, data)

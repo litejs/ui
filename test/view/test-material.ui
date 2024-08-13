@@ -25,26 +25,26 @@ ul.mat-Menu.shadow-1
 				Button.raised.is-warning Warn
 			.col-3 Fab buttons
 			.col-9
-				Fab>\+
-					;data: "tooltip", "Hello1"
-					@click ["Fab-menu1","right-end","bottom",4], "showMenu"
-				Fab.Fab--red[data-tooltip-pos=left]>\—
-					;data: "tooltip", "World\n2"
-					;on: "click", ["Fab-menu2", "left-start", "bottom", 1], "showMenu"
-				Fab[data-tooltip-pos=right]>\+
-					;data: "tooltip", "Hello2"
-				Fab>\+
-					;data: "tooltip", "Hello3"
-				Fab[data-tooltip-pos=bottom]>\+
-					;data: "tooltip", "Hello4"
+				Fab>=+
+					;data-tooltip "Hello1"
+					@click "showMenu", ["Fab-menu1","right-end","bottom",4]
+				Fab.Fab--red[data-tooltip-pos=left]>=—
+					;data-tooltip "World\n2"
+					;on "click", "showMenu", 0, ["Fab-menu2", "left-start", "bottom", 1]
+				Fab[data-tooltip-pos=right]>=+
+					;data-tooltip "Hello2"
+				Fab>=+
+					;data-tooltip "Hello3"
+				Fab[data-tooltip-pos=bottom]>=+
+					;data-tooltip "Hello4"
 			.col-3 Checkboxes
 			.col-9
 				Checkbox
-					\ Default
+					= Default
 				MenuBtn.MenuBtn--back
-					;on: "click", ["MenuBtn--back"], "toggleClass"
+					;on: "click", "toggleClass", 0, ["MenuBtn--back"]
 				MenuBtn.MenuBtn--close
-					;on: "click", ["MenuBtn--close"], "toggleClass"
+					;on: "click", "toggleClass", 0, ["MenuBtn--close"]
 			.col-3 Sliders
 				;on: "click", "timerTest"
 			.col-9

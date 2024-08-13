@@ -37,7 +37,7 @@
 			pinch: function(e, diff) {
 				transform(el, "scale", diff/15, "1")
 				//css(el, "height,width", (el.offsetHeight + diff) + "px")
-				Event.stop(e)
+				El.stop(e)
 			}
 		})
 	}
