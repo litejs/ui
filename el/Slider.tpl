@@ -206,7 +206,7 @@
 			var diff = vert ? offset - e.pageY : e.pageX - offset
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
 			set((diff / px) + min, e, diff)
-			return Event.stop(e)
+			return El.stop(e)
 		}
 		function stop(e) {
 			if (drag) {

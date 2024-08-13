@@ -197,6 +197,7 @@
 	!function($ui) {
 		var menuTarget, menuEl, tipTarget, tipEl, tick, wait
 		, ripple = El(".waves-ripple")
+		, html = document.documentElement
 		El.near = near
 		function near(source, target, x, y, margin) {
 			var rect = target.getBoundingClientRect()
@@ -242,7 +243,7 @@
 				left: (left < 0 ? 0 : left) + "px"
 			})
 		}
-		El.on(document.body, "mouseover", onOver)
+		El.on(html, "mouseover", onOver)
 		El.on(window, "focusin", onOver)
 		$ui.on("show", closeTooltip)
 		function onOver(e) {
@@ -301,7 +302,7 @@
 		$ui.on("ping", closeMenu)
 		$ui.on("closeMenu", closeMenu)
 		$ui.on("showMenu", function(e, target, menu, x, y, margin) {
-			Event.stop(e)
+			El.stop(e)
 			var close = menuEl && menuTarget == target
 			closeMenu()
 			if (close) return
@@ -322,8 +323,8 @@
 				})
 			}
 		})
-		El.on(document.body, "click", closeMenu)
-		El.on(document.body, "pointerdown", pointerdown)
+		El.on(html, "click", closeMenu)
+		El.on(html, "pointerdown", pointerdown)
 		function pointerdown(e) {
 			var target = e.target
 			if (!El.hasClass(target, "waves") || target.disabled) return
@@ -346,7 +347,7 @@
 			end()
 			wait = 1
 			tick = setTimeout(end, 800)
-			El.one(document.body, "pointerup", end)
+			El.one(html, "pointerup", end)
 			ripple.offsetTop // force repaint
 			El.cls(ripple, "waves-ripple--play")
 		}

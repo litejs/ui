@@ -93,8 +93,8 @@
 		$$(".js-btn", el).on("click", resolve)
 		$ui.one("show", resolve)
 		if (scope.bgClose) El.on(el, "click", resolve)
-		El.on(el, "wheel", Event.stop)
-		El.on(el.lastChild, "click", Event.stop)
+		El.on(el, "wheel", El.stop)
+		El.on(el.lastChild, "click", El.stop)
 		if (scope.vibrate && navigator.vibrate) {
 			vibrate = navigator.vibrate(scope.vibrate)
 		}

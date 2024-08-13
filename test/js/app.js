@@ -228,14 +228,14 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 	El.on(window, "languagechange", function(event) {})
 
-	El.on(body, "click pointerdown", Event.stop, "input[readonly][type=checkbox]")
+	El.on(body, "click pointerdown", El.stop, "input[readonly][type=checkbox]")
 	El.on(body, "click", function(e) {
 		var el = e.target
 		, link = !(e.altKey || e.shiftKey) && el.tagName == "A" && el.href.split("#")
 
 		if (link && link[0] == LiteJS.base) {
 			if (e[El.kbMod] ? window.open(el.href, "_blank") : !LiteJS.go(link[1])) {
-				return Event.stop(e)
+				return El.stop(e)
 			}
 		}
 	})
