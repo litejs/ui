@@ -588,10 +588,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				var bind = getAttr(plugin.e, BIND_ATTR)
 				, view = View(plugin.n, usePluginContent(plugin), plugin.x)
 				if (bind) {
-					bind = replace(bind, renderRe, function(_, name, op, args) {
+					viewEval(replace(bind, renderRe, function(_, name, op, args) {
 						return "($s." + name + (isFn(view[name]) ? "(" + (args || "") + ")" : "=" + args) + "),"
-					}) + "1"
-					viewEval(bind, view)
+					}) + "1", view)
 				}
 			}
 		})
