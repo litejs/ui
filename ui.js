@@ -112,7 +112,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	/**/
 
 	xhr.css = injectCss
-	xhr.ui = sources.push.bind(sources)
+	xhr.ui = function(src) {
+		sources.push(src)
+	}
 
 	function asEmitter(obj) {
 		obj.on = on
