@@ -569,11 +569,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		})
 		addPlugin("el", {
 			c: 1,
-			d: function(plugin) {
-				var parent = plugin.u
-				, el = usePluginContent(plugin)
+			d: function(plugin, el) {
+				el = usePluginContent(plugin)
 				elCache[plugin.n] = el
-				return parent
 			}
 		})
 		plugins.svg = plugins.el
