@@ -891,7 +891,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				return str == "$" ? obj : isStr(fn) ? iGet(obj, str, "") : isFn(fn) ? fn(iExt, obj, translations) : ""
 			}
 		})
-		;[localStorage.lang, navigator.language].concat(navigator.languages, opts.lang, html.lang, $d.locales = Object.keys(iFormat))
+		;[localStorage.lang, opts.lang, navigator.language].concat(navigator.languages, html.lang, $d.locales = Object.keys(iFormat))
 		.find(View.lang = function(lang, translations) {
 			if (lang && (iFormat[lang = ("" + lang).toLowerCase()] || iFormat[lang = lang.split("-")[0]])) {
 				assignDeep(iFormat[html.lang = $d.lang = localStorage.lang = lang].t, translations)
