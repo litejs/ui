@@ -102,7 +102,10 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 
 	history.scrollRestoration = "manual"
 
-	El.cls(html, "is-app", "standalone" in navigator ? navigator.standalone : matchMedia("(display-mode:standalone)").matches)
+	El.cls(html, {
+		"is-app": "standalone" in navigator ? navigator.standalone : matchMedia("(display-mode:standalone)").matches,
+		"is-dark": localStorage.dark ? localStorage.dark > 0 : matchMedia("(prefers-color-scheme:dark)").matches
+	})
 	// matchMedia("(prefers-color-scheme:light)").matches
 
 
@@ -129,9 +132,8 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 		, lang = app.$d.lang
 		, out = extract(translations, "")
 		if (missing[0]) {
-			console.warn("WARNING: %s translations missing: %s", lang, missing.join(", "))
+			console.error("Missing translation %s:", lang, missing.join(", "))
 		}
-		console.log("extractLang", lang, out)
 		return out
 
 		function extract(map, path) {

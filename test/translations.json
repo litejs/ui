@@ -24,10 +24,8 @@
       "data": [ 0, 1, 2, 10 ],
       "translations": {
         "alarm": {
-          "_": {
-            "desc": "Show count of alarms",
-            "usage": [ "{data;*alarm}" ]
-          },
+          "desc": "Show count of alarms",
+          "usage": [ "{data;*alarm}" ],
           "et": "Üks häire;# häiret",
           "en": "One alarm;# alarms"
         },
@@ -36,10 +34,8 @@
           "usage": [
             "{data;*warn}"
           ],
-          "lang": {
-            "et": "Üks hoiatus;# hoiatust",
-            "en": "One warning;# warnings"
-          }
+          "et": "Üks hoiatus;# hoiatust",
+          "en": "One warning;# warnings"
         }
       }
     },
@@ -55,10 +51,8 @@
           "usage": [
             "{data;@LT}"
           ],
-          "lang": {
-            "et": "HH:mm",
-            "fi": "HH.mm"
-          }
+          "et": "HH:mm",
+          "fi": "HH.mm"
         }
       }
     },

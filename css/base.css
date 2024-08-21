@@ -17,7 +17,6 @@
 
 *, *:before, *:after {
 	color: inherit;
-	text-decoration: inherit;
 	-webkit-box-sizing: inherit;          /* 3 */
 	   -moz-box-sizing: inherit;
 	        box-sizing: inherit;

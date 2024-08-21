@@ -38,9 +38,9 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 			a.hand
 				;each!"l",locales
 				;txt " - " + l.toUpperCase() + " - "
-				@click [l],"setLang"
-				;cls: "selected", l==lang
-				;cls: "lang-" + l
+				@click "setLang",[l]
+				;cls "selected", l==lang
+				;cls "lang-" + l
 		a[href="#home"].home-link Header
 		span.sizeHint Responsive
 
