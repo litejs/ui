@@ -17,8 +17,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, body = document.body
 	, splitRe = /[,\s]+/
 	, emptyArr = []
+	, plugins = {}
+	, sources = []
 	, assign = Object.assign
+	, bind = El.bind.bind(El.call)
 	, create = Object.create
+	, hasOwn = bind(plugins.hasOwnProperty)
 	, isArr = Array.isArray
 	, slice = emptyArr.slice
 	, elReplace = Function("a,b,c", "(c=a&&b&&a.parentNode)&&c.replaceChild(b,a)")
@@ -88,9 +92,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			return deep
 		}
 	}
-	, plugins = {}
-	, sources = []
-	, hasOwn = plugins.hasOwnProperty
 
 	, Event = window.Event || window
 	, fixEv = Event.fixEv || (Event.fixEv = {})
@@ -181,7 +182,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		var emitter = this === window ? emptyArr : this
 		, events = emitter._e || (emitter._e = create(NUL))
 		if (type && fn) {
-			if (isStr(fn)) fn = emit.bind(emitter, emitter, fn)
+			if (isStr(fn)) fn = bind(emit, emitter, emitter, fn)
 			emit(emitter, "newListener", type, fn, scope, _origin)
 			;(events[type] || (events[type] = [])).unshift(scope, _origin, fn)
 		}
@@ -335,8 +336,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		, $d = elScope(View("#", root).e, root)
 
 		$d.$ui = assign(View, {
-			$: find.bind(View, root),
-			$$: findAll.bind(View, root),
+			$: bind(find, View, root),
+			$$: bind(findAll, View, root),
 			$d: $d,
 			def: viewDef,
 			get: viewGet,
@@ -520,7 +521,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (tmp.f) {
 					return xhr.load(
 						replace(tmp.f, /^|,/g, "$&" + (View.path || "")).split(","),
-						readTemplates.bind(view, view.wait(tmp.f = ""))
+						bind(readTemplates, view, view.wait(tmp.f = ""))
 					)
 				} else if (!tmp.e) {
 					if (tmp.r === "404") {
@@ -531,7 +532,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 
 			for (tmp in params) {
-				if (tmp.charAt(0) !== "_" && (syncResume = hasOwn.call(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
+				if (tmp.charAt(0) !== "_" && (syncResume = hasOwn(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
 					syncResume(params[tmp], tmp, view, params)
 					syncResume = UNDEF
 				}
@@ -638,10 +639,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		addPlugin("view", {
 			c: 1,
 			d: function(plugin) {
-				var bind = getAttr(plugin.e, BIND_ATTR)
+				var expr = getAttr(plugin.e, BIND_ATTR)
 				, view = View(plugin.n, usePluginContent(plugin), plugin.x)
-				if (bind) {
-					viewEval(replace(bind, renderRe, function(_, name, op, args) {
+				if (expr) {
+					viewEval(replace(expr, renderRe, function(_, name, op, args) {
 						return "($s." + name + (isFn(view[name]) ? "(" + (args || "") + ")" : "=" + args) + "),"
 					}) + "1", view)
 				}
@@ -749,7 +750,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						values.push(a)
 						return "#"
 					})
-					return str != key && replace(t[key], /#/g, values.shift.bind(values)) || str
+					return str != key && replace(t[key], /#/g, bind(values.shift, values)) || str
 				},
 				pick: function(val, word) {
 					for (var t = translations["?"] || {}, arr = replace((t[word] || word), /([^;=,]+?)\?/g, "$1=$1;").split(/[;=,]/), i = 1|arr.length; i > 0; ) {
@@ -1097,7 +1098,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (enabled) {
 					elReplace(el._if, el)
 				} else {
-					elReplace(el, el._if || (el._if = Comm("if", render.bind(el, el))))
+					elReplace(el, el._if || (el._if = Comm("if", bind(render, el, el))))
 					return true
 				}
 			},
@@ -1127,8 +1128,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		get: getAttr,
 		hasClass: hasClass,
 		matches: matches,
-		next: walk.bind(El, "nextSibling"),
-		prev: walk.bind(El, "previousSibling"),
+		next: bind(walk, El, "nextSibling"),
+		prev: bind(walk, El, "previousSibling"),
 		rate: rate,
 		replace: elReplace,
 		scope: elScope,
@@ -1258,7 +1259,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (isObj(tr)) bindingsCss(el, tr)
 				tr = "transitionend"
 				// transitionend fires for each property transitioned
-				if ("on" + tr in el) return addEvent(el, tr, elKill.bind(el, el, el = UNDEF))
+				if ("on" + tr in el) return addEvent(el, tr, bind(elKill, el, el, el = UNDEF))
 			}
 			if (el._e) {
 				emit(el, "kill")
@@ -1366,7 +1367,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			return
 		}
 
-		var bind, next
+		var el, next
 		, scope = node.$s || $s || closestScope(node)
 
 		/*** ie8 ***/
@@ -1376,21 +1377,21 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		/**/
 
 		if (hydrate(node, BIND_ATTR, scope)) return
-		for (bind = node.firstChild; bind; bind = next) {
-			next = bind.nextSibling
-			render(bind, scope)
+		for (el = node.firstChild; el; el = next) {
+			next = el.nextSibling
+			render(el, scope)
 		}
 		hydrate(node, "data-out", scope)
 	}
 
 	function hydrate(node, attr, scope) {
 		var fn
-		, bind = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
-		if (bind !== true) try {
-			fn = fnCache[bind] || (fnCache[bind] = makeFn(bind))
+		, expr = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
+		if (expr !== true) try {
+			fn = fnCache[expr] || (fnCache[expr] = makeFn(expr))
 			return fn(node, scope, attr, fn.o)
 		} catch (e) {
-			throw e + "\n" + attr + ": " + bind
+			throw e + "\n" + attr + ": " + expr
 		}
 	}
 	function makeFn(fn, raw) {
@@ -1424,7 +1425,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		if (map) {
 			kbMaps.unshift(map)
 			if (killEl) {
-				addEvent(killEl, "kill", rmKb.bind(map, map))
+				addEvent(killEl, "kill", bind(rmKb, map, map))
 			}
 		}
 	}
@@ -1634,7 +1635,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					return
 				}
 				if (isObj(name)) {
-					for (delay in name) if (hasOwn.call(name, delay)) {
+					for (delay in name) if (hasOwn(name, delay)) {
 						f(el, delay, name[delay], selector, 0, data)
 					}
 					return
@@ -1651,8 +1652,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 	}
 	function assignDeep(target, map) {
-		if (map) for (var k in map) if (hasOwn.call(map, k)) {
-			if (isObj(map[k]) && isObj(target[k]) && hasOwn.call(target, k)) assignDeep(target[k], map[k])
+		if (map) for (var k in map) if (hasOwn(map, k)) {
+			if (isObj(map[k]) && isObj(target[k]) && hasOwn(target, k)) assignDeep(target[k], map[k])
 			else target[k] = map[k]
 		}
 		return target
@@ -1672,7 +1673,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		if (arr) {
 			if (isStr(arr)) arr = arr.split(splitRe)
 			if (isArr(arr)) arr.forEach(fn, scope)
-			else for (key in arr) if (hasOwn.call(arr, key)) fn.call(scope, arr[key], key, arr)
+			else for (key in arr) if (hasOwn(arr, key)) fn.call(scope, arr[key], key, arr)
 		}
 	}
 	function expand(str) {
