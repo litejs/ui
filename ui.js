@@ -37,7 +37,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
-	, formatRe = /{((?:("|')(?:\\\2|[\s\S])*?\2|.)+?)}/g
+	, formatRe = /{((?:("|')(?:\\.|[^\\])*?\2|.)+?)}/g
 	, renderRe = /[;\s]*([-.\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>+=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|\n|$)+/g
@@ -750,7 +750,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						values.push(a)
 						return "#"
 					})
-					return str != key && replace(t[key], /#/g, bind(values.shift, values)) || str
+					return str != key && t[key] ? replace(t[key], /#/g, bind(values.shift, values)) : str
 				},
 				pick: function(val, word) {
 					for (var t = translations["?"] || {}, arr = replace((t[word] || word), /([^;=,]+?)\?/g, "$1=$1;").split(/[;=,]/), i = 1|arr.length; i > 0; ) {
@@ -808,6 +808,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 			function numStr(format, t) {
 				// format;NaN;negFormat;0;Infinity;-Infinity;roundPoint
+				// 🯰🯱🯲🯳🯴🯵🯶🯷🯸🯹
 				var conf = format.split(";")
 				, nan_value = conf[1] || "-"
 				, o = (t.ordinal||"").split(";")
@@ -890,11 +891,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				return format(iGet(translations, str, str || ""), data, getExt)
 			}
 			function getExt(obj, str) {
-				var fn = cache[str] || (cache[str] = replace(replace(str, /;\s*([#*?@~])(.*)/, function(_, op, arg) {
+				var fn = cache[str] || (cache[str] = (replace(replace(str, /;\s*([#*?@~])(.*)/, function(_, op, arg) {
 					return ";" + iAlias[op] + " " + quote(arg)
 				}), renderRe, function(_, name, op, args) {
 					fn = (_ === name) ? name : "$el." + name + "(" + fn + (args ? "," + args : "") + ")"
-				}), fn === str ? str : makeFn(fn, fn))
+				}), fn === str ? str : makeFn(fn, fn)))
 				return str == "$" ? obj : isStr(fn) ? iGet(obj, str, "") : isFn(fn) ? fn(iExt, obj, translations) : ""
 			}
 		})

@@ -37,16 +37,12 @@ describe("ui", function() {
 	describe("i18n", function() {
 		var app = LiteJS({
 			globals: { v: "1" },
-			locales: { "et": "Eesti keeles", "en": "In English" },
+			locales: { et: "Eesti keeles", en: "In English", pl: "", uk: "" },
 			en: {
 				"#": {
 					ordinal: "th;st;nd;rd;o[n%=100]||o[(n-20)%10]||o[0]",
 					temp: "+1°C;-°C;-#°C",
 					temp1: "+0,1°C;-°C;-#°C"
-				},
-				"*": {
-					"": "n==0||n==1?n:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?2:3",
-					"file": "zero plików;1 plik;# pliki;# plików"
 				},
 				"~": {
 					"Room #": "Tuba #"
@@ -58,6 +54,7 @@ describe("ui", function() {
 				Hello: "Hello {user.name}!",
 				HelloUp: "Hello {user.name;up 3,'b'}! Welcome to {x;up;lo}{bla;up}{bla;lo}",
 			},
+			uk: {},
 			et: {
 				"@": {
 					"": "P E T K N R L pühapäev esmaspäev teisipäev kolmapäev neljapäev reede laupäev jaan veeb märts apr mai juuni juuli aug sept okt nov dets jaanuar veebruar märts aprill mai juuni juuli august september oktoober november detsember".split(" "),
@@ -108,25 +105,78 @@ describe("ui", function() {
 			assert.equal(_("Hello", {user: {name: "World"}}), "Hello World!")
 			assert.end()
 		})
-		it ("should format extensions", function(assert) {
+		describe("extensions", function() {
 			var _ = app.$d._
-			assert.equal(_("HelloUp", {user: {name: "World"}, x:"here"}), "Hello WORLD! Welcome to here")
-			assert.equal(_(".{name;~},", {name: "Room 1"}), ".Tuba 1,")
-			assert.equal(_("{1;*file} {2;*file}"), "1 plik 2 pliki")
-			assert.equal(_("{sex;?They} was", {sex:"male"}), "He was")
-			assert.equal(_("{col;?;is-red?is-green?}", {col:"is-green"}), "is-green")
-			assert.equal(_("{a;map:'{$}',', ',', and '}", {a: {a:"Key", b:"Foo", c:"Bar"}}), "Key, Foo, and Bar")
+			test("pick", function(assert) {
+				var pick = _.ext.pick
+				assert
+				.equal(pick(11, "low;30=med;60="), "low")
+				.equal(pick(31, "low,30=med,60="), "med")
+				.equal(pick(60, "low,30,med,60,,"), "")
+				.equal(pick(61, "low;30=med;60="), "")
+				.equal(pick(62, "low;30=med;60"), "")
+				.equal(pick("", "low;30=med;;"), "low")
+				.equal(pick("male", "They;male=He;female=She"), "He")
+				.equal(pick("other", "They;male=He;female=She"), "They")
+				// shorthand
+				.equal(pick("is-green", "na;is-red?is-green?"), "is-green")
+				assert.equal(_("{sex;?They} was", {sex:"male"}), "He was")
+				assert.equal(_("{col;?;is-red?is-green?}", {col:"is-green"}), "is-green")
+				assert.end()
+			})
+			test("pattern", function(assert) {
+				var _ = app.lang("en")
+				var pattern = _.ext.pattern
+				assert
+				.equal(pattern("Room 12"), "Tuba 12")
+				.equal(pattern("Room #"), "Room #")
+				.equal(pattern("House 1"), "House 1")
+				assert.equal(_("A {name;~}", {name: "Room 13"}), "A Tuba 13")
+				assert.equal(_("A {name;~}", {name: "Room 1"}), "A Tuba 1")
+				assert.end()
+			})
+			test("plural", function(assert) {
+				var _ = app.lang("en", {})
+				assert.equal(_("{1;*file} {2;*file}"), "1 file 2 file")
+				_ = app.lang("pl", {
+					"*": {
+						"": "n==0||n==1?n:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?2:3",
+						book: "Zero książek;Jedna książka;# książki;# książek",
+						file: "zero plików;1 plik;# pliki;# plików"
+					},
+				})
+				assert
+				.equal(_.ext.plural(1, "file"), "1 plik")
+				.equal(_.ext.plural(2, "file"), "2 pliki")
+				.equal(_.ext.plural(4, "file"), "4 pliki")
+				.equal(_.ext.plural(5, "file"), "5 plików")
+				assert.equal(_("{1;*file} {2;*file}"), "1 plik 2 pliki")
+				assert.equal(_("{1;*book} {2;*book} {5;*book} {22;*book}"), "Jedna książka 2 książki 5 książek 22 książki")
+				_ = app.lang("uk", {
+					"*": {
+						"": "n%1?3:n%10==1&&n%100!=11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2",
+						day: "1 день;# дні;# днів;# дня"
+					},
+				})
+				assert.equal(_("{1;*day} {2;*day} {5;*day} {1.3;*day} {2.3;*day} {5.3;*day}"), "1 день 2 дні 5 днів 1.3 дня 2.3 дня 5.3 дня")
 
-			assert.end()
+				assert.end()
+			})
+			test("extensions", function(assert) {
+				var _ = app.lang("en")
+				assert.equal(_("HelloUp", {user: {name: "World"}, x:"here"}), "Hello WORLD! Welcome to here")
+				assert.equal(_("{a;map:'{$}',', ',', and '}", {a: {a:"Key", b:"Foo", c:"Bar"}}), "Key, Foo, and Bar")
+
+				assert.end()
+			})
 		})
 		it("should format date", function(assert) {
 			// {start;date:'Y-MM-dd'}
 			// {start;@lt}
 
-			app.lang("et", {})
+			var _ = app.lang("et", {})
 
-			var _ = app.$d._
-			var date = app.$d._.ext.date
+			var date = _.ext.date
 
 			var d2n = 1234567890123
 			, d2d = new Date(d2n)
