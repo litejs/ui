@@ -1751,7 +1751,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			elKill(el)
 			return el.src
 		}), function(res) {
-			res = res.concat(sources, (next || res).innerHTML).filter(Boolean)
+			res = res.concat(sources, next && next.src && next.innerHTML).filter(Boolean)
 			if (res[sources.length = 0]) {
 				if (!parser) LiteJS.ui = LiteJS()
 				each(res, parser)
