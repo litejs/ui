@@ -506,6 +506,24 @@ describe("ui", function() {
 		assert.end()
 	})
 
+	describe("bindings", function() {
+		test ("if", function(assert, mock) {
+			//mock.swap(console, "log", mock.fn())
+			var document = new dom.Document()
+			, app = LiteJS({
+				root: document.body
+			})
+			xhr.ui('p[title="a b"]\n hr ;if enabled')
+			LiteJS.start()
+			assert.equal(document.body.innerHTML, '<p title="a b"><!--if--></p>')
+			app.$d.enabled = true
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<p title="a b"><hr></p>')
+			assert.end()
+		})
+	})
+
+
 	it ("should parse examples: {i}", [
 		[ "html/simplest.html", '<h1></h1>', 1 ],
 		[ "html/routed.html", '<h1></h1>', 0 ],

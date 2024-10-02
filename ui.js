@@ -1099,7 +1099,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (enabled) {
 					elReplace(el._if, el)
 				} else {
-					elReplace(el, el._if || (el._if = Comm("if", bind(render, el, el))))
+					elReplace(el, el._if || (el._if = Comm("if", bind(render, el, el, this))))
 					return true
 				}
 			},
