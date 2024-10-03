@@ -54,6 +54,19 @@ Expects box-sizing: border-box;
 .h1 , .md .md-h1 , .lg .md-h1 , .lg .lg-h1  { height: 8.3333%; }
 
 
+.l12, .md .md-l12, .lg .md-l12, .lg .lg-l12 { left: 100%; }
+.l11, .md .md-l11, .lg .md-l11, .lg .lg-l11 { left: 91.6667%; }
+.l10, .md .md-l10, .lg .md-l10, .lg .lg-l10 { left: 83.3333%; }
+.l9,  .md .md-l9,  .lg .md-l9,  .lg .lg-l9  { left: 75%; }
+.l8,  .md .md-l8,  .lg .md-l8,  .lg .lg-l8  { left: 66.6667%; }
+.l7,  .md .md-l7,  .lg .md-l7,  .lg .lg-l7  { left: 58.3333%; }
+.l6,  .md .md-l6,  .lg .md-l6,  .lg .lg-l6  { left: 50%; }
+.l5,  .md .md-l5,  .lg .md-l5,  .lg .lg-l5  { left: 41.6667%; }
+.l4,  .md .md-l4,  .lg .md-l4,  .lg .lg-l4  { left: 33.3333%; }
+.l3,  .md .md-l3,  .lg .md-l3,  .lg .lg-l3  { left: 25%; }
+.l2,  .md .md-l2,  .lg .md-l2,  .lg .lg-l2  { left: 16.6667%; }
+.l1,  .md .md-l1,  .lg .md-l1,  .lg .lg-l1  { left: 8.3333%; }
+
 /*
 .col:first-child:nth-last-child(2), .col:first-child:nth-last-child(2) ~ .col {
 	width: 50%;
