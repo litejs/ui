@@ -1,27 +1,27 @@
 
-.p0, .p00, .p01, .p02, .p03, .p04 { padding-top:    0; padding-bottom:    0; }
-.p1, .p10, .p11, .p12, .p13, .p14 { padding-top:  4px; padding-bottom:  4px; }
-.p2, .p20, .p21, .p22, .p23, .p24 { padding-top:  8px; padding-bottom:  8px; }
-.p3, .p30, .p31, .p32, .p33, .p34 { padding-top: 12px; padding-bottom: 12px; }
-.p4, .p40, .p41, .p42, .p43, .p44 { padding-top: 16px; padding-bottom: 16px; }
+.p0,  .p01, .p02, .p03, .p04 { padding-top:    0; padding-bottom:    0; }
+.p10, .p1,  .p12, .p13, .p14 { padding-top:  4px; padding-bottom:  4px; }
+.p20, .p21, .p2,  .p23, .p24 { padding-top:  8px; padding-bottom:  8px; }
+.p30, .p31, .p32, .p3,  .p34 { padding-top: 12px; padding-bottom: 12px; }
+.p40, .p41, .p42, .p43, .p4  { padding-top: 16px; padding-bottom: 16px; }
 
-.p0, .p00, .p10, .p20, .p30, .p40 { padding-left:    0; padding-right:    0; }
-.p1, .p01, .p11, .p21, .p31, .p41 { padding-left:  4px; padding-right:  4px; }
-.p2, .p02, .p12, .p22, .p32, .p42 { padding-left:  8px; padding-right:  8px; }
-.p3, .p03, .p13, .p23, .p33, .p43 { padding-left: 12px; padding-right: 12px; }
-.p4, .p04, .p14, .p24, .p34, .p44 { padding-left: 16px; padding-right: 16px; }
+.p0,  .p10, .p20, .p30, .p40 { padding-left:    0; padding-right:    0; }
+.p01, .p1,  .p21, .p31, .p41 { padding-left:  4px; padding-right:  4px; }
+.p02, .p12, .p2,  .p32, .p42 { padding-left:  8px; padding-right:  8px; }
+.p03, .p13, .p23, .p3,  .p43 { padding-left: 12px; padding-right: 12px; }
+.p04, .p14, .p24, .p34, .p4  { padding-left: 16px; padding-right: 16px; }
 
-.m0, .m00, .m01, .m02, .m03, .m04 { margin-top:    0; margin-bottom:    0; }
-.m1, .m10, .m11, .m12, .m13, .m14 { margin-top:  4px; margin-bottom:  4px; }
-.m2, .m20, .m21, .m22, .m23, .m24 { margin-top:  8px; margin-bottom:  8px; }
-.m3, .m30, .m31, .m32, .m33, .m34 { margin-top: 12px; margin-bottom: 12px; }
-.m4, .m40, .m41, .m42, .m43, .m44 { margin-top: 16px; margin-bottom: 16px; }
+.m0,  .m01, .m02, .m03, .m04 { margin-top:    0; margin-bottom:    0; }
+.m10, .m1,  .m12, .m13, .m14 { margin-top:  4px; margin-bottom:  4px; }
+.m20, .m21, .m2,  .m23, .m24 { margin-top:  8px; margin-bottom:  8px; }
+.m30, .m31, .m32, .m3,  .m34 { margin-top: 12px; margin-bottom: 12px; }
+.m40, .m41, .m42, .m43, .m4  { margin-top: 16px; margin-bottom: 16px; }
 
-.m0, .m00, .m10, .m20, .m30, .m40 { margin-left:    0; margin-right:    0; }
-.m1, .m01, .m11, .m21, .m31, .m41 { margin-left:  4px; margin-right:  4px; }
-.m2, .m02, .m12, .m22, .m32, .m42 { margin-left:  8px; margin-right:  8px; }
-.m3, .m03, .m13, .m23, .m33, .m43 { margin-left: 12px; margin-right: 12px; }
-.m4, .m04, .m14, .m24, .m34, .m44 { margin-left: 16px; margin-right: 16px; }
+.m0,  .m10, .m20, .m30, .m40 { margin-left:    0; margin-right:    0; }
+.m01, .m1,  .m21, .m31, .m41 { margin-left:  4px; margin-right:  4px; }
+.m02, .m12, .m2,  .m32, .m42 { margin-left:  8px; margin-right:  8px; }
+.m03, .m13, .m23, .m3,  .m43 { margin-left: 12px; margin-right: 12px; }
+.m04, .m14, .m24, .m34, .m4  { margin-left: 16px; margin-right: 16px; }
 
 .grid.p1, .grid.p1 > .row > .col, .grid.p1 > .col { padding: 2px; }
 .grid.p2, .grid.p2 > .row > .col, .grid.p2 > .col { padding: 4px; }
