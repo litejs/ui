@@ -27,11 +27,11 @@
 .grid.p2, .grid.p2 > .row > .col, .grid.p2 > .col { padding: 4px; }
 .grid.p3, .grid.p3 > .row > .col, .grid.p3 > .col { padding: 6px; }
 .grid.p4, .grid.p4 > .row > .col, .grid.p4 > .col { padding: 8px; }
-.grid.p1 > .grid, .grid.p2 > .grid, .grid.p3 > .grid, .grid.p4 > .grid { padding: 0; }
+.grid > .grid { padding: 0; }
 
 .grid.b1, .grid.b1 > .row > .col, .grid.b1 > .col { border: 2px solid transparent; }
 .grid.b2, .grid.b2 > .row > .col, .grid.b2 > .col { border: 4px solid transparent; }
 .grid.b3, .grid.b3 > .row > .col, .grid.b3 > .col { border: 6px solid transparent; }
 .grid.b4, .grid.b4 > .row > .col, .grid.b4 > .col { border: 8px solid transparent; }
-.grid.b1 > .grid, .grid.b2 > .grid, .grid.b3 > .grid, .grid.b4 > .grid { border: none; }
+.grid > .grid { border: none; }
 
