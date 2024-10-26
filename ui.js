@@ -322,8 +322,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		})
 
-		var root = opts.root
-		, viewFn, lastView, lastUrl, syncResume
+		var viewFn, lastView, lastUrl, syncResume
 		, fnStr = ""
 		, reStr = ""
 		, reEsc = /[.*+?^${}()|[\]/\\]/g
@@ -333,7 +332,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		, views = View.views = {}
 		, paramCb = {}
 		, lastParams = paramCb
-		, $d = elScope(View("#", root).e, root)
+		, root = View("#", opts.root).e
+		, $d = elScope(root, root)
 
 		$d.$ui = assign(View, {
 			$: bind(find, View, root),
