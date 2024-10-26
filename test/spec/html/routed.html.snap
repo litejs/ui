@@ -2,4 +2,4 @@
 
 <script src="https://litejs.com/litejs.full.min.js"></script>
 <noscript>This application requires JavaScript</noscript>
-<h1>LiteJS is simple!</h1><nav><hr><a href="#">Home</a> | <a href="#about">About</a><hr></nav><h2>Hello home</h2><!--slot1--><hr><p>Check out the source code of our website!</p></body>
+<h1>LiteJS &lt;routed views> are simple!</h1><hr><nav><a href="#">Home</a><a href="#about">About</a></nav><hr><main><h2>Hello home</h2><p>This is a single-page application using hash-based URLs.</p><p>Navigating between menu items updates the DOM without reloading the page.</p><p>By default, 'home' is the initial view.</p><dl><dt>Things to do</dt><dd>Inspect downloaded resources in the Developer Tools' Network tab.</dd><dd>View the source code of this web page.</dd><dd>Contribute on <a href="https://github.com/litejs/">GitHub</a>.</dd></dl></main><!--slot1--><footer><hr><p><a href="simplest.html">← Previous simplest example</a><a href="svg-spa.html" class="right">Next full-SVG Single-Page Application example →</a></p><p class="text-sm">Built with passion and a bit of JavaScript magic ✨</p></footer></body>

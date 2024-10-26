@@ -1,57 +1,77 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<title>LiteJS routing example</title>
+<title>LiteJS routed view example</title>
 <meta name="viewport" content="initial-scale=1,maximum-scale=1">
 <link rel="icon" href="data:image/x-icon;,">
 <link rel="stylesheet" href="style.css">
 </head><body>
 <script type="ui">
 
-%js
-	// All loaded *.json files will be handled by this function
-	xhr.json = function(str, url) {
-		$d[url.split(".")[0]] = JSON.parse(str)
-	}
-	var blogCache = {}
-	$ui.param("blogFile", function(value, name, view, params) {
-		if (blogCache[value]) return $d[name] = blogCache[value]
-		var cb = view.wait()
-		xhr("GET", value + ".text", function(err, body) {
-			$d[name] = blogCache[value] = body || "Error"
-			cb()
-		}).send()
-	})
-
-%el Top-menu
-nav
-	hr
-	a[href="#"] Home
-	= | 
-	a[href="#about"] About
-	hr
-
-%el Footer
-	hr
-	p Check out the source code of our website!
-
+// An internal view `#pub` without a route can used as a parent for other views,
+// put inside $ui root element (document.body by default)
 %view #pub #
-	h1 LiteJS is simple!
-	Top-menu
-	%slot
-	Footer
+  h1 LiteJS <routed views> are simple!
+  hr
+  nav
+    a[href="#"] Home
+    a[href="#about"] About
+  hr
+  %slot
+  footer
+    hr
+    p
+      a[href="simplest.html"] ← Previous simplest example
+      a[href="svg-spa.html"].right Next full-SVG Single-Page Application example →
+    p.text-sm Built with passion and a bit of JavaScript magic ✨
 
+
+// Public view `home` uses `#pub` as it's parent
 %view home #pub
-	h2 Hello home
+main
+  h2 Hello home
+  p This is a single-page application using hash-based URLs.
+  p Navigating between menu items updates the DOM without reloading the page.
+  p By default, 'home' is the initial view.
+  dl
+    dt Things to do
+    dd Inspect downloaded resources in the Developer Tools' Network tab.
+    dd View the source code of this web page.
+    dd ;t 'Contribute on [!GitHub https://github.com/litejs/!].'
 
-%view blog/{blogFile} #pub
-	article ;d!blogFile
 
 %view about #pub
-	;f "contacts.json"
-	h2 About
-	ul
-		li ;each!row in contacts
-			a ;txt!row.title;href!row.link
+// A view can load a file, and the 'xhr.json' function parses it and stores the content in the root data object.
+;f "contacts.json"
+main
+  h2 About
+  p Following links are loaded from a json file
+  ul
+    li ;each!row in contacts
+      a ;txt row.title;href!row.link
+
+
+%view blog/{blogFile} #pub
+main
+	article ;d!blogFile
+
+
+%js
+  // All loaded *.json files will be handled by this function
+  xhr.json = function(str, url) {
+    // $d is root data object
+    $d[url.split(".")[0]] = JSON.parse(str)
+  }
+  var blogCache = {}
+  // Handle named route parameter.
+  $ui.param("blogFile", function(value, name, view, params) {
+    if (blogCache[value]) return $d[name] = blogCache[value]
+    var cb = view.wait()
+    xhr("GET", value + ".text", function(err, body) {
+      $d[name] = blogCache[value] = body || "Error"
+      cb()
+    }).send()
+  })
+
 
 %start
 </script>

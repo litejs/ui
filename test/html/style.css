@@ -2,7 +2,6 @@
 *, *:before, *:after {
 	backface-visibility: inherit;
 	box-sizing: inherit;
-	color: inherit;
 }
 
 html {
@@ -32,28 +31,19 @@ body {
 	float: left;
 }
 
-.lg > body {
-	width: 990px;
-}
-
-.lg main {
-	float: left;
-	width: 700px;
-}
-
-.lg aside {
-	float: right;
-	width: 250px;
-	background: #fcf6ea;
-	border: 1px solid #717477;
-	box-shadow: inset 0 0 12px -2px #888;
-	border-radius: 6px;
-	padding: 16px;
-}
-
 h1,h2,h3 {
 	font-weight: 300;
 	margin: 0;
+}
+
+nav>a {
+	position: relative;
+	margin-right: 20px;
+}
+nav>a+a:after {
+	position: absolute;
+	left: -14px;
+	content: '|';
 }
 
 del {
@@ -136,11 +126,19 @@ aside > a,
 	margin-bottom: 8px;
 	display: block;
 }
-footer {
+hr {
 	clear: both;
 }
 
 h1, h2, h3 {
 	line-height: 1.2;
+}
+
+.text-sm {
+	font-size: 80%;
+}
+
+.info {
+	color: #04f;
 }
 

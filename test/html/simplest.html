@@ -4,17 +4,26 @@
 <meta name="viewport" content="initial-scale=1,maximum-scale=1">
 <link rel="icon" href="data:image/x-icon;,">
 <link rel="stylesheet" href="style.css">
-</head><body><script type="ui">
+</head><body>
+<script type="ui">
 
 h1 LiteJS <is> simple!
+hr
 main
+  p This is simple template rendered in browser.
+  p.info All content not under a `%view` will be rendered immediately.
   p Not actually <!-- commented-out! -->
-  p All content not under a view will be rendered immediately.
-footer
   dl
     dt Things to do
-    dd Check out the source code
-    dd Contribute in GitHub
+    dd Inspect downloaded resources in the Developer Tools' Network tab.
+    dd View the source code of this web page.
+    dd ;t 'Contribute on [!GitHub https://github.com/litejs/!].'
+footer
+  hr
+  p
+    a[href="https://github.com/litejs/ui/wiki"] ← Wiki
+    a[href="routed.html"].right Next example with routed views →
+  p.text-sm Built with passion and a bit of JavaScript magic ✨
 
 </script>
 <script src="https://litejs.com/litejs.full.min.js"></script>
