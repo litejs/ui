@@ -50,6 +50,7 @@ describe("Shim test", function() {
 				entries: null,
 				every: null,
 				filter: null,
+				find: null,
 				flat: null,
 				flatMap: null,
 				forEach: null,
@@ -166,6 +167,8 @@ describe("Shim test", function() {
 			[true, true, true, true, true, true, false, false]
 		)
 		assert.equal(tmp.filter(function(i) { return typeof i === "string" }), ["a", "2"])
+		assert.equal(tmp.find(function(i) { return i === 1 }), 1)
+		assert.equal(tmp.find(function(i) { return i === 4 }), undef)
 		assert.equal(tmp.some(function(i) { return i === 1 }), true)
 		assert.equal(tmp.some(function(i) { return i === "1" }), false)
 		assert.equal(tmp.every(function(i) { return i !== 4 }), true)

@@ -377,6 +377,7 @@
 
 	b += "if(a.call(b,t[i],i,t))"
 	patch("filter",      b + "o.push(t[i])" + c)
+	patch("find",        b + "return t[i]")
 	patch("some",        b + "return!0;return!1")
 
 	patch("flat",        "return a<1?S.call(t):(b=t.concat.apply([],t))&&a>1&&b.some(X)?b.flat(a-1):b", 0, isArray)

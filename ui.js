@@ -26,7 +26,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, isArr = Array.isArray
 	, slice = emptyArr.slice
 	, elReplace = Function("a,b,c", "(c=a&&b&&a.parentNode)&&c.replaceChild(b,a)")
-	, elRm = Function("e,k", "(k=e&&e.parentNode)&&k.removeChild(e)")
+	, elRm = Function("e,k", "e&&(k=e.parentNode)&&k.removeChild(e)")
 	, getAttr = Function("e,k", "return e&&e.getAttribute&&e.getAttribute(k)")
 	, replace = Function("a,b,c", "return a.replace(b,c)")
 
@@ -47,7 +47,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, camelRe = /\-([a-z])/g
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
-	, txtAttr = "textContent" in html ? "textContent" : "innerText"
+	, txtAttr = "textContent" in html ? "textContent" /* c8 ignore next */ : "innerText"
 	, bindingsCss = acceptMany(function(el, key, val) {
 		el.style[replace(key, camelRe, camelFn)] = val
 	})
@@ -1267,8 +1267,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				el._e = UNDEF
 			}
 			elRm(el)
-			el.$s = UNDEF
 			if (el.nodeType < 2) {
+				el.$s = UNDEF
 				elEmpty(el)
 				if (el.valObject !== UNDEF) {
 					el.valObject = UNDEF
