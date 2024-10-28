@@ -37,7 +37,7 @@ describe("ui", function() {
 	describe("i18n", function() {
 		var app = LiteJS({
 			globals: { v: "1" },
-			locales: { et: "Eesti keeles", en: "In English", pl: "", uk: "" },
+			locales: { en: "In English", et: "Eesti keeles", pl: "", uk: "" },
 			en: {
 				"#": {
 					ordinal: "th;st;nd;rd;o[n%=100]||o[(n-20)%10]||o[0]",
@@ -84,22 +84,25 @@ describe("ui", function() {
 		})
 
 		it ("should take translations from opts", function(assert) {
-			assert.equal(app.$d.lang, "et")
-			assert.equal(app.$d._("et"), "Eesti keeles")
-			assert.equal(app.$d._("en"), "In English")
-			assert.equal(app.$d._("Hi"), "Tere")
-			assert.equal(app.$d._("v"), "1")
-			app.globals.v = "2"
-			assert.equal(app.$d._("v"), "2")
-			app.lang("en")
+			// In node22 there is node.language defined.
+			// Prior this the first language is taken
+			assert.equal(app.$d.lang, "en")
 			assert.equal(app.$d._("et"), "Eesti keeles")
 			assert.equal(app.$d._("en"), "In English")
 			assert.equal(app.$d._("Hi"), "Hi")
+			assert.equal(app.$d._("v"), "1")
+			app.globals.v = "2"
+			assert.equal(app.$d._("v"), "2")
+			app.lang("et")
+			assert.equal(app.$d._("et"), "Eesti keeles")
+			assert.equal(app.$d._("en"), "In English")
+			assert.equal(app.$d._("Hi"), "Tere")
 			assert.equal(app.$d._("v"), "2")
 			assert.end()
 		})
 
 		it ("should format", function(assert) {
+			app.lang("en")
 			var _ = app.$d._
 			assert.equal(_(null), "")
 			assert.equal(_("Hello", {user: {name: "World"}}), "Hello World!")
@@ -519,6 +522,32 @@ describe("ui", function() {
 			app.$d.enabled = true
 			El.render(app.root)
 			assert.equal(document.body.innerHTML, '<p title="a b"><hr></p>')
+			app.$d.enabled = false
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<p title="a b"><!--if--></p>')
+			assert.end()
+		})
+		test ("each", function(assert, mock) {
+			//mock.swap(console, "log", mock.fn())
+			var document = new dom.Document()
+			, app = LiteJS({
+				root: document.body
+			})
+			xhr.ui('ul\n li ;each!i in list;txt i.id')
+			app.$d.list = [{id:2}, {id:3}]
+			LiteJS.start()
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<ul><li>2</li><li>3</li><!--each i--></ul>')
+			app.$d.list[2] = {id:4}
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<ul><li>2</li><li>3</li><li>4</li><!--each i--></ul>')
+			app.$d.list.shift()
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<ul><li>3</li><li>4</li><!--each i--></ul>')
+			app.$d.list = [{id:0}, {id:1}]
+			El.render(app.root)
+			// Replace does not work
+			assert.equal(document.body.innerHTML, '<ul><li>3</li><li>4</li><!--each i--></ul>')
 			assert.end()
 		})
 	})
