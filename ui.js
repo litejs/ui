@@ -1434,19 +1434,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		map = kbMaps.indexOf(map)
 		if (map > -1) kbMaps.splice(map, 1)
 	}
-	function runKb(e, code, chr) {
-		var fn, map
-		, i = 0
-		, el = e.target
-		, input = /INPUT|TEXTAREA|SELECT/i.test((el.nodeType < 2 ? el : el.parentNode).tagName)
-
-		for (; (map = kbMaps[i++]) && (
-			!(fn = !input || map.input ? map[code] || map[chr] || map.num && code > 47 && code < 58 && (chr|=0, map.num) || map.all : fn) &&
-			map.bubble
-		););
-		if (isStr(fn)) setUrl(fn)
-		if (isFn(fn)) fn(e, chr, el)
-	}
 
 	addEvent(document, "keydown", function(e) {
 		if (kbMaps[0]) {
@@ -1459,17 +1446,29 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			if (code == 8 && kbMaps[0].backspace) {
 				eventStop(e)
 			}
-			runKb(e, code, key)
-			if (e.shiftKey && code != 16) runKb(e, code, "shift+" + key)
+			runKb(key)
+			if (e.shiftKey && code != 16) runKb("shift+" + key)
 			// people in Poland use Right-Alt+S to type in Ś.
 			// Right-Alt+S is mapped internally to Ctrl+Alt+S.
 			// THANKS: Marcin Wichary - disappearing Polish Ś [https://medium.engineering/fa398313d4df]
 			if (e.altKey) {
-				if (code != 18) runKb(e, code, "alt+" + key)
+				if (code != 18) runKb("alt+" + key)
 			} else if (code != 17) {
-				if (e.ctrlKey) runKb(e, code, "ctrl+" + key)
-				if (e[kbMod] && code != 91) runKb(e, code, "mod+" + key)
+				if (e.ctrlKey) runKb("ctrl+" + key)
+				if (e[kbMod] && code != 91) runKb("mod+" + key)
 			}
+		}
+		function runKb(chr) {
+			for (
+				var fn, map
+				, i = 0
+				, el = e.target
+				, input = /INPUT|TEXTAREA|SELECT/i.test((el.nodeType < 2 ? el : el.parentNode).tagName);
+				(map = kbMaps[i++]) && !(
+					fn = !input || map.input ? map[code] || map[chr] || map.num && code > 47 && code < 58 && (chr|=0, map.num) || map.all : fn
+				) && map.bubble; );
+			if (isStr(fn)) setUrl(fn)
+			if (isFn(fn)) fn(e, chr, el)
 		}
 	})
 	/**/
