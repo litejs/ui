@@ -70,7 +70,7 @@
 %svg Chart-line
 	g.Chart-line
 		;svgToLast
-		path ;svgLine: points, {radius: radius}
+		path ;svgLine points, {radius: radius}
 
 %svg Chart-axes
 	g.labels.x-labels
