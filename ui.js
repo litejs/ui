@@ -1054,8 +1054,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	})
 
 	assign(El, {
-		append: append,
-		asEmitter: asEmitter,
 		$b: assign(bindings, {
 			each: function(el, name, list) {
 				var comm = Comm("each " + name, up)
@@ -1122,10 +1120,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				})
 			}
 		}),
+		$d: globalScope,
+		append: append,
+		asEmitter: asEmitter,
 		blur: blur,
 		cache: elCache,
 		closest: closest,
-		$d: globalScope,
 		get: getAttr,
 		hasClass: hasClass,
 		matches: matches,
@@ -1600,6 +1600,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	/**/
 
+	function closest(el, sel) {
+		return el && html.closest.call(el.nodeType < 2 ? el : el.parentNode, sel)
+	}
 	function find(root, sel, startNode) {
 		return html.querySelector.call(startNode || root, sel)
 	}
@@ -1608,9 +1611,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	function matches(el, sel) {
 		return el && html.matches.call(el, sel)
-	}
-	function closest(el, sel) {
-		return el && html.closest.call(el.nodeType < 2 ? el : el.parentNode, sel)
 	}
 	function walk(attr, el, sel) {
 		for (; el && !matches(el = el[attr], sel); );
