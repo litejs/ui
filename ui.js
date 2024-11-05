@@ -1129,6 +1129,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		get: getAttr,
 		hasClass: hasClass,
 		matches: matches,
+		nearest: nearest,
 		next: bind(walk, El, "nextSibling"),
 		prev: bind(walk, El, "previousSibling"),
 		rate: rate,
@@ -1611,6 +1612,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	function matches(el, sel) {
 		return el && html.matches.call(el, sel)
+	}
+	function nearest(el, sel) {
+		return el ? find(el, sel) || nearest(el.parentNode, sel) : NUL
 	}
 	function walk(attr, el, sel) {
 		for (; el && !matches(el = el[attr], sel); );
