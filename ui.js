@@ -1056,30 +1056,36 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	assign(El, {
 		$b: assign(bindings, {
 			each: function(el, name, list) {
+				/*** debug ***/
+				if (el._li) throw "Binding each must be type of once: each!" + name
+				/**/
+
 				var comm = Comm("each " + name, up)
 				, pos = 0
 				, nodes = []
+
 				comm.$s = this
 				elReplace(el, comm)
-				up()
-				return { a: add, r: remove, u: up }
+				each(list, add)
+				return { a: add, u: up }
 
 				function add(item) {
 					var clone = nodes[pos] = el.cloneNode(true)
 					, subScope = elScope(clone, comm)
+					append(comm.parentNode, clone, (pos ? nodes[pos - 1] : comm).nextSibling)
 					subScope.$i = pos++
 					subScope.$len = list.length
 					subScope[name] = item
 					clone[BIND_ATTR] = el[BIND_ATTR]
-					append(comm.parentNode, clone, comm)
+					/*** debug ***/
+					clone._li = up
+					/**/
 					render(clone)
 				}
-				function remove(i) {
-					elKill(nodes.splice(i, 1)[0])
-				}
 				function up() {
-					for (; pos; ) remove(--pos)
-					each(list, add)
+					for (var i = list.length; pos > i; ) elKill(nodes[--pos])
+					for (nodes.length = i; pos < i; ) add(list[pos])
+					for (; i--; ) nodes[i].$s[name] = list[i]
 				}
 			},
 			el: function(el, tag, fallback) {

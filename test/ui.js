@@ -533,21 +533,17 @@ describe("ui", function() {
 			, app = LiteJS({
 				root: document.body
 			})
-			xhr.ui('ul\n li ;each!i in list;txt i.id')
+			xhr.ui('ul\n li.first\n\n li ;each!i in list;txt i.id\n li.last')
 			app.$d.list = [{id:2}, {id:3}]
 			LiteJS.start()
 			El.render(app.root)
-			assert.equal(document.body.innerHTML, '<ul><li>2</li><li>3</li><!--each i--></ul>')
+			assert.equal(document.body.innerHTML, '<ul><li class="first"></li><!--each i--><li>2</li><li>3</li><li class="last"></li></ul>')
 			app.$d.list[2] = {id:4}
 			El.render(app.root)
-			assert.equal(document.body.innerHTML, '<ul><li>2</li><li>3</li><li>4</li><!--each i--></ul>')
+			assert.equal(document.body.innerHTML, '<ul><li class="first"></li><!--each i--><li>2</li><li>3</li><li>4</li><li class="last"></li></ul>')
 			app.$d.list.shift()
 			El.render(app.root)
-			assert.equal(document.body.innerHTML, '<ul><li>3</li><li>4</li><!--each i--></ul>')
-			app.$d.list = [{id:0}, {id:1}]
-			El.render(app.root)
-			// Replace does not work
-			assert.equal(document.body.innerHTML, '<ul><li>3</li><li>4</li><!--each i--></ul>')
+			assert.equal(document.body.innerHTML, '<ul><li class="first"></li><!--each i--><li>3</li><li>4</li><li class="last"></li></ul>')
 			assert.end()
 		})
 	})
