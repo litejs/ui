@@ -25,6 +25,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, hasOwn = bind(plugins.hasOwnProperty)
 	, isArr = Array.isArray
 	, slice = emptyArr.slice
+	, closest = bind(walk, El, "parentElement")
 	, elReplace = Function("a,b,c", "(c=a&&b&&a.parentNode)&&c.replaceChild(b,a)")
 	, elRm = Function("e,k", "e&&(k=e.parentNode)&&k.removeChild(e)")
 	, getAttr = Function("e,k", "return e&&e.getAttribute&&e.getAttribute(k)")
@@ -1607,9 +1608,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	/**/
 
-	function closest(el, sel) {
-		return el && html.closest.call(el.nodeType < 2 ? el : el.parentNode, sel)
-	}
 	function find(root, sel, startNode) {
 		return html.querySelector.call(startNode || root, sel)
 	}
