@@ -678,7 +678,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		/*** i18n ***/
 		globalScope._ = format
 		var iFormat = create(NUL)
-		each(opts.locales, function(translations, lang, locales) {
+		each(opts.locales || { en: "en" }, function(translations, lang, locales) {
 			translations = formatGet.t = assignDeep(assignDeep(create(opts.globals || NUL), locales), opts[lang])
 			formatGet.g = getExt
 			iFormat[lang] = formatGet

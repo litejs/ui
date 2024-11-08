@@ -72,7 +72,7 @@ describe("ui", function() {
 		})
 
 		it ("should detect language", [
-			[{}, [], undefined],
+			[{}, ["en"], "en"],
 			[{ locales: { "et": "Eesti keeles", "fi": "Suomeksi" }}, [ "et", "fi" ], "et"],
 			[{ lang: "fi", locales: { "et": "Eesti keeles", "fi": "Suomeksi" }}, [ "et", "fi" ], "fi"],
 		], function(opts, locales, lang, assert) {
