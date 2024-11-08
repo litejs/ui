@@ -1104,7 +1104,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			},
 			is: function(el, val, opts, prefix) {
 				if (!prefix) prefix = "is-"
-				var match = globalScope._(val, opts)
+				var match = elScope(el)._.ext.pick(val, opts)
 				cls(el, el[prefix + opts], 0)
 				cls(el, el[prefix + opts] = match && prefix + match)
 			},

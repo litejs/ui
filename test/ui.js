@@ -527,6 +527,24 @@ describe("ui", function() {
 			assert.equal(document.body.innerHTML, '<p title="a b"><!--if--></p>')
 			assert.end()
 		})
+		test ("is", function(assert, mock) {
+			//mock.swap(console, "log", mock.fn())
+			var document = new dom.Document()
+			, app = LiteJS({
+				root: document.body
+			})
+			xhr.ui('p ;is isVal,"none,red?green?black=blue"')
+			app.$d.isVal = "red"
+			LiteJS.start()
+			assert.equal(document.body.innerHTML, '<p class="is-red"></p>')
+			app.$d.isVal = "black"
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<p class="is-blue"></p>')
+			app.$d.isVal = "un"
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<p class="is-none"></p>')
+			assert.end()
+		})
 		test ("each", function(assert, mock) {
 			//mock.swap(console, "log", mock.fn())
 			var document = new dom.Document()
