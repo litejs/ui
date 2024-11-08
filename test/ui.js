@@ -546,6 +546,25 @@ describe("ui", function() {
 			assert.equal(document.body.innerHTML, '<ul><li class="first"></li><!--each i--><li>3</li><li>4</li><li class="last"></li></ul>')
 			assert.end()
 		})
+		test ("el", function(assert, mock) {
+			//mock.swap(console, "log", mock.fn())
+			var document = new dom.Document()
+			, app = LiteJS({
+				root: document.body
+			})
+			xhr.ui('%el El-a\n li.a\n%el El-b\n li.b\n%el El-c\n li.c\nul>.sub ;el subEl,"El-c"')
+			app.$d.subEl = "El-a"
+			LiteJS.start()
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<ul><li class="a sub"></li></ul>')
+			app.$d.subEl = "El-b"
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<ul><li class="b sub"></li></ul>')
+			app.$d.subEl = "El-d"
+			El.render(app.root)
+			assert.equal(document.body.innerHTML, '<ul><li class="c sub"></li></ul>')
+			assert.end()
+		})
 	})
 
 

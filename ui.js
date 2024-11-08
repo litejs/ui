@@ -363,14 +363,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		})
 
-		function appendBind(el, val, sep, q) {
-			var current = getAttr(el, BIND_ATTR)
-			setAttr(el, BIND_ATTR, (current ? (
-				q === "^" ?
-				val + sep + current :
-				current + sep + val
-			) : val))
-		}
 		function bubbleDown(params) {
 			var view = params._v
 			, close = params._c
@@ -1089,15 +1081,18 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				}
 			},
 			el: function(el, tag, fallback) {
-				var child = El(elCache[tag] ? tag : fallback)
-				, tmp = getAttr(el, BIND_ATTR)
-				, tmp2 = getAttr(child, BIND_ATTR)
-				if (tmp) setAttr(child, BIND_ATTR, tmp2 ? tmp + ";" + tmp2 : tmp)
-				if ((tmp = el.className)) cls(child, tmp)
-				child.$s = el.$s
-				elReplace(el, child)
-				render(child)
-				return child
+				tag = elCache[tag] ? tag : fallback
+				if (el._el !== tag) {
+					var child = El(tag)
+					, tmp = child._elb = el._el ? el._elb : el[BIND_ATTR]
+					if (tmp) appendBind(child, tmp, ";", "^")
+					child.$s = el.$s
+					child._el = tag
+					elReplace(el, child)
+					if ((tmp = child._elc = el._el ? (elKill(el), el._elc) : el.className)) cls(child, tmp)
+					render(child)
+					return true
+				}
 			},
 			"if": function(el, enabled) {
 				if (enabled) {
@@ -1215,6 +1210,15 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				/**/
 			}
 		}
+	}
+
+	function appendBind(el, val, sep, q) {
+		var current = getAttr(el, BIND_ATTR)
+		setAttr(el, BIND_ATTR, (current ? (
+			q === "^" ?
+			val + sep + current :
+			current + sep + val
+		) : val))
 	}
 
 	function hasClass(el, name) {
