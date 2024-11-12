@@ -181,7 +181,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		var emitter = this === window ? emptyArr : this
 		, events = emitter._e || (emitter._e = create(NUL))
 		if (type && fn) {
-			if (isStr(fn)) fn = bind(emit, emitter, emitter, fn)
 			emit(emitter, "newListener", type, fn, scope, _origin)
 			;(events[type] || (events[type] = [])).unshift(scope, _origin, fn)
 		}
