@@ -25,9 +25,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, hasOwn = bind(plugins.hasOwnProperty)
 	, isArr = Array.isArray
 	, slice = emptyArr.slice
-	, elReplace = Function("a,b,c", "(c=a&&b&&a.parentNode)&&c.replaceChild(b,a)")
-	, elRm = Function("e,k", "e&&(k=e.parentNode)&&k.removeChild(e)")
-	, getAttr = Function("e,k", "return e&&e.getAttribute&&e.getAttribute(k)")
+	, elReplace = Function("a,b,c", "a&&b&&(c=a.parentNode)&&c.replaceChild(b,a)")
+	, elRm = Function("a,b", "a&&(b=a.parentNode)&&b.removeChild(a)")
+	, getAttr = Function("a,b", "return a&&a.getAttribute&&a.getAttribute(b)")
 	, replace = Function("a,b,c", "return a.replace(b,c)")
 
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
