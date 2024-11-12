@@ -565,7 +565,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					plugin.e.p = plugin
 				}
 			}
-			if (proto.r) proto.d = Function("p", "p.r(p.o||p.t)")
+			if (proto.r) proto.d = Function("p", "p.r(p.o+p.t)")
 			assign(Plugin.prototype, proto)
 		}
 		function usePluginContent(plugin) {
@@ -604,9 +604,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		addPlugin("def",  { r: viewDef })
 		addPlugin("js",   { r: viewEval })
 		addPlugin("each", {
-			r: function(params) {
+			r: function() {
 				var txt = this.t
-				each(params, function(param) {
+				each(this.o, function(param) {
 					viewParse(replace(txt, /{key}/g, param))
 				})
 			}
@@ -620,9 +620,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		})
 		plugins.svg = plugins.el
 		addPlugin("map", {
-			r: function() {
+			r: function(txt) {
 				var plugin = this
-				, txt = plugin.o + plugin.t
 				appendBind(plugin.u, plugin.s ? txt.slice(1) : txt, plugin.s)
 			}
 		})
