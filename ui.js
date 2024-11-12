@@ -172,8 +172,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		// emitNext, emitLate
 		function wrap(fn) {
 			return function(a, b, c, d, e) {
-				fn(this, a, b, c, d, e)
-				return this
+				return fn(this, a, b, c, d, e)
 			}
 		}
 	}
