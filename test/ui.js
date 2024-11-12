@@ -509,6 +509,26 @@ describe("ui", function() {
 		assert.end()
 	})
 
+	describe("plugins", function() {
+		function before(newEl, nextSib) {
+			nextSib.parentNode.insertBefore(newEl, nextSib)
+		}
+
+		test ("injectCss", function(assert) {
+			var app = LiteJS({
+				root: document.body
+			})
+
+			before(El("head"), app.root)
+
+			assert.notOk(document.querySelector("style"))
+			xhr.ui('%css\n .x{top:1px}')
+			LiteJS.start()
+			assert.ok(document.querySelector("style"))
+			assert.end()
+		})
+	})
+
 	describe("bindings", function() {
 		test ("if", function(assert, mock) {
 			//mock.swap(console, "log", mock.fn())
@@ -587,9 +607,16 @@ describe("ui", function() {
 
 
 	it ("should parse examples: {i}", [
-		[ "html/simplest.html", '<h1></h1>', 1 ],
-		[ "html/routed.html", '<h1></h1>', 0 ],
-	], function(fileName, html, logCount, assert, mock) {
+		[ "html/simplest.html", 1 ],
+		[ "html/routed.html", 0 ],
+		[ "html/svg-spa.html", 0 ],
+		[ "html/form.html", 1 ],
+	], function(fileName, logCount, assert, mock) {
+		mock.swap(global, {
+			document,
+			El,
+			LiteJS,
+		})
 		mock.swap(console, "log", mock.fn())
 		var newDoc = parser.parseFromString(fs.readFileSync(path.resolve("./test", fileName), "utf8"))
 		, app = LiteJS({ root: newDoc.body })
@@ -599,6 +626,7 @@ describe("ui", function() {
 			El.kill(el)
 			app.parse(source)
 		})
+		assert.matchSnapshot("./test/spec/" + fileName, newDoc.body.outerHTML)
 		Object.keys(app.views).forEach(function(view) {
 			if (view.charAt(0) === "#") return
 			app.show(view)
