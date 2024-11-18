@@ -498,7 +498,7 @@ describe("ui", function() {
 		[ '#h3.h4[title=Hello][title~="World !"]', '<div id="h3" class="h4" title="Hello World !"></div>' ],
 		[ 'a[href=about][href^="#"]\na[href=about][href$=".html"]', '<a href="#about"></a><a href="about.html"></a>'],
 		[ "h3 ;txt:'Hi'\ninput[type=checkbox][readonly]", '<h3>Hi</h3><input type="checkbox" readonly>' ],
-		[ 'p[title="a b"]\n hr ;if 1', '<p title="a b"><hr></p>' ],
+		[ 'p[title="a b"]\r\n hr ;if 1', '<p title="a b"><hr></p>' ],
 		[ 'p ;css "top,left", "0px"\n hr ;if 0', '<p style="top:0px;left:0px"><!--if--></p>' ],
 	], function(str, html, assert, mock) {
 		document.body.innerHTML = ""
