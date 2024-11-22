@@ -603,6 +603,21 @@ describe("ui", function() {
 			assert.equal(document.body.innerHTML, '<ul><li class="c sub"></li></ul>')
 			assert.end()
 		})
+		test ("$s", function(assert, mock) {
+			//mock.swap(console, "log", mock.fn())
+			var document = new dom.Document()
+			, app = LiteJS({
+				root: document.body
+			})
+			xhr.ui('p\n hr ^$s {b:1}')
+			LiteJS.start()
+			var p = El.scope(app.$('p'))
+			, hr = El.scope(app.$('hr'))
+			assert.notStrictEqual(p, hr)
+			assert.notOk(p.b)
+			assert.equal(hr.b, 1)
+			assert.end()
+		})
 	})
 
 

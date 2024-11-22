@@ -7,8 +7,8 @@ describe("event", function() {
 			history: {},
 			localStorage: {},
 			location: { href: "" },
-			navigator: global.navigator || {}
 	})
+	if (!global.navigator) global.navigator = {}
 
 	function Emitter() {}
 	var lib = require("../ui.js")
