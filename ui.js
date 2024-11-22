@@ -374,7 +374,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				render(view.o)
 				viewEmit(parent, "openChild", view, close)
 				viewEmit(view, "open", params)
+				/*** kb ***/
 				addKb(view.kb)
+				/**/
 				params._c = UNDEF
 			}
 			if ((params._d = params._v = view.c)) {
@@ -392,7 +394,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				viewClose(view.c)
 				elKill(view.o)
 				view.o = UNDEF
+				/*** kb ***/
 				rmKb(view.kb)
+				/**/
 				viewEmit(view, "close")
 			}
 		}
