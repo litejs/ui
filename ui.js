@@ -40,7 +40,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, formatRe = /{((?:("|')(?:\\.|[^\\])*?\2|.)+?)}/g
 	, renderRe = /[;\s]*([-.\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
-	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>+=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|$)/gm
+	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|$)/gm
 	, fnCache = {}
 	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aos]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /[a-z_$][\w$]*/ig
@@ -470,8 +470,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						append(parent, parent = El(sel))
 					}
 					if (text && op != "/") {
-						if (op === ">" || op === "+") {
-							replace(indent + (op === "+" ? text : " " + text), templateRe, work)
+						if (op === ">") {
+							replace(indent + " " + text, templateRe, work)
 						} else if (op === "=") {
 							append(parent, text) // + "\n")
 						} else {

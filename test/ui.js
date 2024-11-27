@@ -494,6 +494,7 @@ describe("ui", function() {
 
 	it ("should parse elements: {i}", [
 		[ "h1", '<h1></h1>' ],
+		[ "h1 > h2 +5", '<h1><h2>+5</h2></h1>' ],
 		[ "h2[a][b-c]", '<h2 a="a" b-c="b-c"></h2>' ],
 		[ '#h3.h4[title=Hello][title~="World !"]', '<div id="h3" class="h4" title="Hello World !"></div>' ],
 		[ 'a[href=about][href^="#"]\na[href=about][href$=".html"]', '<a href="#about"></a><a href="about.html"></a>'],
