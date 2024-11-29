@@ -23,3 +23,69 @@
 .h4of5, .md .md-h4of5, .lg .md-h4of5, .lg .lg-h4of5 { height: 80%; }
 /**/
 
+
+.w1-10 { width: 10%; }
+.w1-9 { width: 11.11%; }
+.w1-8 { width: 12.5%; }
+.w1-7 { width: 14.29%; }
+.w1-6 { width: 16.67%; }
+.w1-5 { width: 20%; }
+.w2-9 { width: 22.22%; }
+.w1-4 { width: 25%; }
+.w2-7 { width: 28.57%; }
+.w1-3 { width: 33.33%; }
+.w3-8 { width: 37.5%; }
+.w2-5 { width: 40%; }
+.w3-7 { width: 42.86%; }
+.w4-9 { width: 44.44%; }
+.w1-2 { width: 50%; }
+.w5-9 { width: 55.56%; }
+.w3-5 { width: 60%; }
+.w5-8 { width: 62.5%; }
+.w2-3 { width: 66.67%; }
+.w3-4 { width: 75%; }
+.w7-9 { width: 77.78%; }
+.w4-5 { width: 80%; }
+.w5-6 { width: 83.33%; }
+.w6-7 { width: 85.71%; }
+.w7-8 { width: 87.5%; }
+.w8-9 { width: 88.89%; }
+.w9-10 { width: 90%; }
+.w1-1 { width: 100%; }
+
+
+/*
+.w90, .md .md-w90, .lg .md-w90, .lg.lg .lg-w90 { width: 90%; }
+.w80, .md .md-w80, .lg .md-w80, .lg.lg .lg-w80 { width: 80%; }
+.w70, .md .md-w70, .lg .md-w70, .lg.lg .lg-w70 { width: 70%; }
+.w60, .md .md-w60, .lg .md-w60, .lg.lg .lg-w60 { width: 60%; }
+.w40, .md .md-w40, .lg .md-w40, .lg.lg .lg-w40 { width: 40%; }
+.w30, .md .md-w30, .lg .md-w30, .lg.lg .lg-w30 { width: 40%; }
+.w20, .md .md-w20, .lg .md-w20, .lg.lg .lg-w20 { width: 20%; }
+.w10, .md .md-w10, .lg .md-w10, .lg.lg .lg-w10 { width: 10%; }
+
+.h80, .md .md-h80, .lg .md-h80, .lg.lg .lg-h80 { height: 80%; }
+.h60, .md .md-h60, .lg .md-h60, .lg.lg .lg-h60 { height: 60%; }
+.h40, .md .md-h40, .lg .md-h40, .lg.lg .lg-h40 { height: 40%; }
+.h20, .md .md-h20, .lg .md-h20, .lg.lg .lg-h20 { height: 20%; }
+
+.l80, .md .md-l80, .lg .md-l80, .lg.lg .lg-l80 { left: 80%; }
+.l60, .md .md-l60, .lg .md-l60, .lg.lg .lg-l60 { left: 60%; }
+.l40, .md .md-l40, .lg .md-l40, .lg.lg .lg-l40 { left: 40%; }
+.l20, .md .md-l20, .lg .md-l20, .lg.lg .lg-l20 { left: 20%; }
+
+.col:first-child:nth-last-child(2), .col:first-child:nth-last-child(2) ~ .col {
+	width: 50%;
+}
+.col:first-child:nth-last-child(3), .col:first-child:nth-last-child(3) ~ .col {
+	width: 33.333%;
+}
+.col:first-child:nth-last-child(4), .col:first-child:nth-last-child(4) ~ .col {
+	width: 25%;
+}
+.col:first-child:nth-last-child(5), .col:first-child:nth-last-child(5) ~ .col {
+	width: 20%;
+}
+*/
+
+
