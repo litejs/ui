@@ -537,15 +537,18 @@ describe("ui", function() {
 			, app = LiteJS({
 				root: document.body
 			})
-			xhr.ui('p[title="a b"]\n hr ;if enabled')
+			xhr.ui('%view a #\n p[title="a b"]\n hr ;if enabled\n%view b #\n.b')
 			LiteJS.start()
-			assert.equal(document.body.innerHTML, '<p title="a b"><!--if--></p>')
+			app.show("a")
+			assert.equal(document.body.innerHTML, '<p title="a b"></p><!--if-->')
 			app.$d.enabled = true
 			El.render(app.root)
-			assert.equal(document.body.innerHTML, '<p title="a b"><hr></p>')
+			assert.equal(document.body.innerHTML, '<p title="a b"></p><hr>')
 			app.$d.enabled = false
 			El.render(app.root)
-			assert.equal(document.body.innerHTML, '<p title="a b"><!--if--></p>')
+			assert.equal(document.body.innerHTML, '<p title="a b"></p><!--if-->')
+			app.show("b")
+			assert.equal(document.body.innerHTML, '<div class="b"></div>')
 			assert.end()
 		})
 		test ("is", function(assert, mock) {

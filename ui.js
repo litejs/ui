@@ -1097,9 +1097,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			},
 			"if": function(el, enabled) {
 				if (enabled) {
-					elReplace(el._if, el)
+					elReplace(el._r, el)
 				} else {
-					elReplace(el, el._if || (el._if = Comm("if", bind(render, el, el, this))))
+					elReplace(el, el._r || (el._r = Comm("if", bind(render, el, el, this))))
 					return true
 				}
 			},
@@ -1279,6 +1279,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			elRm(el)
 			if (el.nodeType < 2) {
 				el.$s = UNDEF
+				elKill(el._r) // Replacement element like comment from if binding
 				elEmpty(el)
 				if (el.valObject !== UNDEF) {
 					el.valObject = UNDEF
