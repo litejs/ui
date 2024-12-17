@@ -1671,9 +1671,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function blur() {
 		// IE8 can throw on accessing document.activeElement.
 		try {
-			var el = document.activeElement
-			, tag = el.tagName
-			if (tag === "A" || tag === "BUTTON") el.blur()
+			document.activeElement.blur()
 		} catch(e) {}
 	}
 	function camelFn(_, a) {

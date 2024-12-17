@@ -4,7 +4,7 @@ describe("ui", function() {
 	var El, LiteJS, View
 	, fs = require("fs")
 	, path = require("path")
-	, dom = require("@litejs/dom")
+	, dom = require("@litejs/dom/interactive")
 	, document = dom.document
 	, localStorage = {}
 	, parser = new dom.DOMParser()
@@ -32,6 +32,27 @@ describe("ui", function() {
 		var app = LiteJS()
 		assert.notStrictEqual(El.$d, app.$d)
 		assert.end()
+	})
+
+	describe("El", function() {
+		var app = LiteJS({
+			root: document.body
+		})
+		xhr.ui('input.in1')
+		LiteJS.start()
+		function before(newEl, nextSib) {
+			nextSib.parentNode.insertBefore(newEl, nextSib)
+		}
+
+		test ("blur", function(assert) {
+			var input = app.$(".in1")
+			assert.ok(input.tagName, "INPUT")
+			input.focus()
+			assert.strictEqual(document.activeElement, input)
+			El.blur()
+			assert.equal(document.activeElement, null)
+			assert.end()
+		})
 	})
 
 	describe("i18n", function() {
@@ -545,10 +566,12 @@ describe("ui", function() {
 			El.render(app.root)
 			assert.equal(document.body.innerHTML, '<p title="a b"></p><hr>')
 			app.$d.enabled = false
-			El.render(app.root)
+			app.show(true)
 			assert.equal(document.body.innerHTML, '<p title="a b"></p><!--if-->')
 			app.show("b")
 			assert.equal(document.body.innerHTML, '<div class="b"></div>')
+			app.show("c")
+			assert.equal(document.body.innerHTML, '<h2>Not found</h2>')
 			assert.end()
 		})
 		test ("is", function(assert, mock) {
