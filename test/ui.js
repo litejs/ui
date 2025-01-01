@@ -401,6 +401,7 @@ describe("ui", function() {
 			assert.end()
 		})
 		it("should format ordinal", function(assert) {
+			// 1ˢᵗ, 2ⁿᵈ, 3ʳᵈ, 4ᵗʰ .. 4º" or 4ª
 			function assertOrdinal(i) {
 				assert.equal(app.$d._.ext.num(parseInt(i), "1o"), i)
 			}
