@@ -11,7 +11,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	window.El = El
 	asEmitter(window.LiteJS = LiteJS)
 
-	var UNDEF, lastExp, parser, pushBase, styleNode
+	var UNDEF, parser, pushBase, styleNode
 	, NUL = null
 	, html = document.documentElement
 	, body = document.body
@@ -543,7 +543,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			var params = $d.params = { _t: Date.now() }
 			, view = viewGet(url, params)
 			if (!view.o || lastUrl !== url) {
-				$d.url = lastExp = lastUrl = url
+				$d.url = lastUrl = expand(url)
 				viewPing(view, params)
 			}
 		}
@@ -1684,13 +1684,14 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			else for (key in arr) if (hasOwn(arr, key)) fn.call(scope, arr[key], key, arr)
 		}
 	}
-	function expand(str) {
+	function expand(str, ns) {
 		var first = str.charAt(0)
 		, rest = str.slice(1)
+		, lastExp = expand[ns]
 		return (
 			first === "+" ? lastExp + rest :
 			first === "%" ? ((first = lastExp.lastIndexOf(rest.charAt(0))), (first > 0 ? lastExp.slice(0, first) : lastExp)) + rest :
-			(lastExp = str)
+			(expand[ns] = str)
 		)
 	}
 	function injectCss(cssText) {

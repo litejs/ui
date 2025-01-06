@@ -250,7 +250,7 @@ div
 	h2 Users
 	ul.users
 		li ;each!user in people
-			a ;txt user;view!"users/"+$i
+			a ;txt user;view!"+/"+$i
 
 %view users/{userId} public
 div
