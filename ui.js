@@ -68,9 +68,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		set: acceptMany(setAttr),
 		txt: elTxt,
 		val: elVal,
-		view: function(el, url) {
-			setAttr(el, "href", (pushBase || "#") + expand(url || ""))
-		}
 	}
 	, globalScope = {
 		El: El,
@@ -1109,6 +1106,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				cls(el, el[prefix + opts], 0)
 				cls(el, el[prefix + opts] = match && prefix + match)
 			},
+			name: function(el, name) {
+				setAttr(el, "name", expand(name, 1))
+			},
 			ref: function(el, name) {
 				this[name] = el
 			},
@@ -1120,6 +1120,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						else scope[arg] = setAttr(el, arg, "")
 					})
 				})
+			},
+			view: function(el, url) {
+				setAttr(el, "href", (pushBase || "#") + expand(url || ""))
 			}
 		}),
 		$d: globalScope,
