@@ -1560,8 +1560,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		function touchWheel(e) {
 			// IE10 enabled pinch-to-zoom gestures from multi-touch trackpad’s as mousewheel event with ctrlKey.
 			// Chrome M35 and Firefox 55 followed up.
+			// alt+wheel may be OS level zoom, use shiftKey as alternative
 			if (!touches[0]) {
-				var ev = e.ctrlKey ? "pinch" : e.altKey ? "rotate" : UNDEF
+				var ev = e.ctrlKey ? "pinch" : e.altKey || e.shiftKey ? "rotate" : UNDEF
 				if (ev && emit(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
 					return eventStop(e)
 				}
