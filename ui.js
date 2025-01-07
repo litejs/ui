@@ -37,7 +37,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
-	, renderRe = /[;\s]*([-.\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
+	, renderRe = /[;\s]*([-.\w$]+)(?:(!?)[ :]*((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, fnCache = {}
 	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aos]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
@@ -1427,9 +1427,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		, bindOnce = []
 		fn = raw || "$s&&(" + replace(fn, renderRe, function(match, name, op, args) {
 			return (
-				(op === "!" && (bindOnce[i] = match)) ?
-				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
-				""
+				op ? (bindOnce[i] = match, "($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||") : ""
 			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
 		}) + "$r)"
 		var vars = replace(fn, fnRe, "").match(wordRe) || []
