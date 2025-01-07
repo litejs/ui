@@ -26,14 +26,14 @@ anim-page
 		;$s!{count2:0}
 		;one!"click", "inc", 0, ["count2"]
 		@click "txt"
-		;txt: "One click " + $s.count2
+		;txt "One click " + $s.count2
 	div
-		;txt: "Hover"
+		;txt "Hover"
 		@mouseover,mouseout "txt"
 	div
 		;$s! {count3:0}
-		;txt: "Wheel " + $s.count3
-		;on: "wheel", "txt"
+		;txt "Wheel " + $s.count3
+		;on "wheel", "txt"
 
 %css
 	.sortCol{padding:2px;display:block;width:100px;margin:4px;border:1px solid #ccc;height:250px;float:left}

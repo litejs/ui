@@ -4,15 +4,15 @@
 	anim-page
 		h2 Testman
 		div
-			;cls: "hide", !describe.result
+			;cls "hide", !describe.result
 			div * Refresh to test again
 			a.btn[href="#testman/lcov"] See code coverage
 		div
-			;cls: "hide", !!describe.result
+			;cls "hide", !!describe.result
 			.btn Run
-				;on: "click", Fn("test()")
+				;on! "click", Fn("test()")
 		pre.code
-			;txt: describe.result || ""
+			;txt describe.result || ""
 
 @js
 	El.data.JSON = JSON
@@ -35,7 +35,7 @@
 @view testman/lcov public
 	anim-page
 		h2 Code coverage report
-			;init: coverageUtils.addDerivedInfo(__coverage__)
+			;init coverageUtils.addDerivedInfo(__coverage__)
 		table.code
 			thead
 				tr
@@ -45,43 +45,43 @@
 					th Functions
 					th Lines
 			tbody
-				;each: file in __coverage__
+				;each! "file", __coverage__
 				tr
-					;nop: data.sum = coverageUtils.summarizeFileCoverage(file)
+					;nop! data.sum = coverageUtils.summarizeFileCoverage(file)
 					td
 						a
-							;txt: file.path.slice(31)
-							;href: "#testman/lcov/" + encodeURIComponent(file.path)
-					td ;txt: "{pct}% ({covered}/{total})".format(sum.statements)
-					td ;txt: "{pct}% ({covered}/{total})".format(sum.branches)
-					td ;txt: "{pct}% ({covered}/{total})".format(sum.functions)
-					td ;txt: "{pct}% ({covered}/{total})".format(sum.lines)
+							;txt file.path.slice(31)
+							;href! "#testman/lcov/" + encodeURIComponent(file.path)
+					td ;txt "{pct}% ({covered}/{total})".format(sum.statements)
+					td ;txt "{pct}% ({covered}/{total})".format(sum.branches)
+					td ;txt "{pct}% ({covered}/{total})".format(sum.functions)
+					td ;txt "{pct}% ({covered}/{total})".format(sum.lines)
 			tfoot
 				tr
-					;nop: data.sum = coverageUtils.summarizeCoverage(__coverage__)
+					;nop! data.sum = coverageUtils.summarizeCoverage(__coverage__)
 					th Total
-					th ;txt: "{pct}% ({covered}/{total})".format(sum.statements)
-					th ;txt: "{pct}% ({covered}/{total})".format(sum.branches)
-					th ;txt: "{pct}% ({covered}/{total})".format(sum.functions)
-					th ;txt: "{pct}% ({covered}/{total})".format(sum.lines)
+					th ;txt "{pct}% ({covered}/{total})".format(sum.statements)
+					th ;txt "{pct}% ({covered}/{total})".format(sum.branches)
+					th ;txt "{pct}% ({covered}/{total})".format(sum.functions)
+					th ;txt "{pct}% ({covered}/{total})".format(sum.lines)
 
 @view testman/lcov/{file} public
 	anim-page
 		h2 Testman coverage
-			;nop: coverageUtils.addDerivedInfo(__coverage__)
+			;nop coverageUtils.addDerivedInfo(__coverage__)
 		div
-			;nop: data.file = __coverage__[decodeURIComponent(route.file)]
-			;nop: data.source = ""
+			;nop data.file = __coverage__[decodeURIComponent(route.file)]
+			;nop data.source = ""
 			h3 {file.path}
 			.rel.code
 				.t-right
-					;each: line in file.code
+					;each! "line", file.code
 					div
-						;nop: data.count = file.l[loopKey]
-						;nop: data.count !== void 0 && (data.count+="")
-						;cls: "error", count==="0"
-						;txt: count || "-"
-						;nop: _super.source += line + "\n"
+						;nop data.count = file.l[loopKey]
+						;nop data.count !== void 0 && (data.count+="")
+						;cls "error", count==="0"
+						;txt count || "-"
+						;nop _super.source += line + "\n"
 				pre.abs
-					;txt: data.source
+					;txt data.source
 

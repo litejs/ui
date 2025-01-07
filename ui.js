@@ -1417,7 +1417,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				(op === "!" && (bindOnce[i] = match)) ?
 				"($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||" :
 				""
-			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "set']($el,'" + name + "'") + (args ? "," + replace(args, /^\s*(\w+) in /,"'$1',") : "") + ")||"
+			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
 		}) + "$r)"
 		var vars = replace(fn, fnRe, "").match(wordRe) || []
 		for (i = vars.length; i--; ) {

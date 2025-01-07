@@ -231,17 +231,17 @@ anim-page
 	h2 Home
 	.div ;el "Cards"
 	div Yes
-	div ;txt: _("_welcome")
-	div ;txt: _(welcomeText)
-	div ;txt: _(nonExistingWelcomeText)
+	div ;txt _("_welcome")
+	div ;txt _(welcomeText)
+	div ;txt _(nonExistingWelcomeText)
 	div
-		;if: Math.random() > .5
-		;txt: "If"
+		;if Math.random() > .5
+		;txt "If"
 	.time ="Init '\" " + started
 	.time
 		;txt! "Load " + new Date()
 	.time
-		;txt: "Load " + new Date()
+		;txt "Load " + new Date()
 	ul>li+li+li
 
 
@@ -249,13 +249,13 @@ anim-page
 div
 	h2 Users
 	ul.users
-		li ;each!user in people
-			a ;txt user;view!"+/"+$i
+		li ;each! "user", people
+			a ;txt user;view! "+/"+$i
 
 %view users/{userId} public
 div
 	h1 ;txt people[params.userId]
-	div ;css!"height","150vh"
+	div ;css! "height","150vh"
 
 %view test public
 anim-page
@@ -279,7 +279,7 @@ anim-page
 %view login public
 anim-page
 	form[action="javascript:"][method=POST]
-		;emitForm:"login"
+		;emitForm! "login"
 		fieldset.grid-2.login
 			legend Login
 			.error {params.error||""}

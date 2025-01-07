@@ -263,7 +263,7 @@
 %el Toggle
 	label.Toggle.reset[tabindex=0]
 		input[type=checkbox].hide
-			;readonly: row && !row.write
-			;checked: model && (row && row.opts ? row.opts === model.get(row.path) : !!model.get(row.path))
+			;readonly! row && !row.write
+			;checked! model && (row && row.opts ? row.opts === model.get(row.path) : !!model.get(row.path))
 		.Toggle-knob.anim
 

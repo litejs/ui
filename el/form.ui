@@ -160,7 +160,7 @@ label.row
 		%child
 		.input__hint
 			= _(description)
-			;if: description
+			;if! description
 
 %el Form-subheader
 .col
@@ -176,14 +176,14 @@ Form-row
 	input.field
 
 %el Form-ro
-Form-row>span ;txt: value
+Form-row>span ;txt! value
 
 %el Form-hidden
 div>input.field[type=hidden]
 
 %el Form-boolean
 Form-row
-	input.field[type=checkbox] ;value: value
+	input.field[type=checkbox] ;value! value
 
 %el Form-boolean-ro
 Form-row>span
@@ -206,9 +206,9 @@ Form-ro
 
 %el Form-enum
 Form-row
-	select.field ;each:val in $d["enum"]
+	select.field ;each! "val", $d["enum"]
 		option
-			;val:: val
+			;val! val
 			= _("" + val)
 
 %el Form-enum-ro
@@ -217,10 +217,10 @@ Form-ro
 %el Form-list
 Form-row
 	select.field
-		;list: api(resourceCollection.format(params, $d)), required ? 0 : [""], value
+		;list api(resourceCollection.format(params, $d)), required ? 0 : [""], value
 		option
-			;val:: item.id
-			;txt:: _(item.name)
+			;val! item.id
+			;txt! _(item.name)
 
 %el Form-list-ro
 Form-row>span
@@ -235,8 +235,8 @@ Form-row>span
 			= _(description)
 		.js-items.cf
 		a.btn.right
-			;if: !$d.noAdd
-			;txt: _($d.name + ".Add")
+			;if! !$d.noAdd
+			;txt! _($d.name + ".Add")
 			@click: $d.add
 
 %el Form-array-item
@@ -246,7 +246,7 @@ Form-row>span
 		;set "data-tooltip", _("Delete")
 		@click $d.del
 	b
-		;if: title
-		;txt: title
+		;if! title
+		;txt! title
 	.grid.b2.js-item
 

@@ -138,7 +138,7 @@
 %el Dialog-numpad
 .row.js-numpad
 	@click ".btn", function(){}
-	;each: num in [1,2,3,4,5,6,7,8,9,"CLEAR",0]
+	;each! "num",[1,2,3,4,5,6,7,8,9,"CLEAR",0]
 	.col.w4>.btn {num}
 
 %js
@@ -149,21 +149,21 @@
 
 %el Dialog
 .Dialog.grid.p2.anim
-	.col.ts3 ;txt!_(title, map)
-	.col.js-body ;md!_(body, map)
+	.col.ts3 ;txt! _(title, map)
+	.col.js-body ;md! _(body, map)
 	.col
-		.group ;each: action in actions
+		.group ;each! action in actions
 			.btn.js-btn
-				;txt!_(action.title)
-				;class!"w" + (12/actions.length)
-				;nop: this.focus()
-				;set: "data-action", action.action
-				;class!"is-" + action.action, action.action
+				;txt! _(action.title)
+				;class! "w" + (12/actions.length)
+				;nop! this.focus()
+				;set! "data-action", action.action
+				;class! "is-" + action.action, action.action
 
 %el Modal
 .Modal.max.fix.anim
 	.Modal-bg.max.abs
 	.Modal-content.Modal--blur.grid.p2.anim
-		;cls!"Modal--blur",!1,1
+		;cls! "Modal--blur",!1,1
 		%slot
 

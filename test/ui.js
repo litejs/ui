@@ -599,7 +599,7 @@ describe("ui", function() {
 			, app = LiteJS({
 				root: document.body
 			})
-			xhr.ui('ul\n li.first\n\n li ;each!i in list;txt i.id\n li.last')
+			xhr.ui('ul\n li.first\n\n li ;each!"i",list;txt i.id\n li.last')
 			app.$d.list = [{id:2}, {id:3}]
 			LiteJS.start()
 			El.render(app.root)
