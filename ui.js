@@ -149,7 +149,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		el.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", href)
 	}
 	if (window.SVGElement) {
-		each("animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect script set stop svg switch symbol text textPath tspan use view", function(name) {
+		each("animate animateMotion animateTransform circle clipPath defs ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence g image line linearGradient marker mask mpath path pattern polygon polyline radialGradient rect set stop svg text textPath tspan use", function(name) {
 			elCache[name] = document.createElementNS("http://www.w3.org/2000/svg", name)
 		})
 		// a style title
