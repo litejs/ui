@@ -286,8 +286,8 @@ describe("ui", function() {
 				"5 5 0 0 -5 -5"
 			)
 			assert.equal(
-				_("{a;#1} {b;#1} {a;#1;-} {b;#1;-} {a;#1;;;;∞} {b;#1;;;;;-lot's} {c;#1;;;ZERO}", {a: Infinity, b: -Infinity, c: 0}),
-				"- - - - ∞ -lot's ZERO"
+				_("{a;#1} {b;#1} {a;#1;-} {b;#1;-} {a;#1;;;;∞} {b;#1;;;;;-lots} {c;#1;;;ZERO}", {a: Infinity, b: -Infinity, c: 0}),
+				"- - - - ∞ -lots ZERO"
 			)
 			assert.equal(_("{.34;#,###.05}"), ".35")
 

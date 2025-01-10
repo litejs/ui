@@ -37,7 +37,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
-	, formatRe = /{((?:("|')(?:\\.|[^\\])*?\2|.)+?)}/g
 	, renderRe = /[;\s]*([-.\w$]+)(?:([ :!])((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|$)/gm
@@ -202,6 +201,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	function one(type, fn, scope) {
 		var emitter = this === window ? emptyArr : this
+
 		function remove() {
 			off.call(emitter, type, fn, scope)
 			off.call(emitter, type, remove, scope)
@@ -897,9 +897,22 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		})
 		function format(str, data, getter) {
-			return replace(str, formatRe, function(all, path) {
-				return getter(data, path, "")
-			})
+			for (var char, inQuote, inExpr, depth = 0, pos = 0, len = str.length; pos < len; ) {
+				char = str.charAt(pos++)
+				if (char == "'" || char == "\"") { // '"
+					inQuote = (!inExpr || char === inQuote) ? "" : char
+				} else if (inQuote) {
+					if (char == "\\") pos++
+				} else if (char == "{" && depth++ < 1) {
+					inExpr = pos
+				} else if (char == "}" && inExpr && --depth < 1) {
+					char = getter(data, str.slice(inExpr, pos - 1), "")
+					str = str.slice(0, inExpr - 1) + char + str.slice(pos)
+					pos = inExpr + char.length - 1
+					len = str.length
+				}
+			}
+			return str
 		}
 		function iGet(obj, path, fallback) {
 			return isStr(path) ? (
