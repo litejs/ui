@@ -67,6 +67,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		txt: elTxt,
 		val: elVal,
 	}
+	, bindOnce = []
 	, globalScope = {
 		El: El,
 		$b: bindings
@@ -1417,17 +1418,15 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		, expr = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
 		if (expr !== true) try {
 			fn = fnCache[expr] || (fnCache[expr] = makeFn(expr))
-			return fn(node, scope, attr, fn.o)
+			return fn(node, scope, attr, bindOnce)
 		} catch (e) {
 			throw e + "\n" + attr + ": " + expr
 		}
 	}
-	function makeFn(fn, raw) {
-		var i = 0
-		, bindOnce = []
+	function makeFn(fn, raw, i) {
 		fn = raw || "$s&&(" + replace(fn, renderRe, function(match, name, op, args) {
 			return (
-				op ? (bindOnce[i] = match, "($el[$a]=$el[$a].replace($o[" + (i++)+ "],''),0)||") : ""
+				op ? "($el[$a]=$el[$a].replace($o[" + (i = bindOnce.indexOf(match), i < 0 ? bindOnce.push(match) - 1 : i)+ "],''),0)||" : ""
 			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
 		}) + "$r)"
 		var vars = replace(fn, fnRe, "").match(wordRe) || []
@@ -1436,7 +1435,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			else vars[i] += "=$s." + vars[i]
 		}
 		fn = Function("$el,$s,$a,$o,$r", (vars[0] ? "var " + vars : "") + ";return " + fn)
-		fn.o = bindOnce
 		return fn
 	}
 
