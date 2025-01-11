@@ -15,10 +15,14 @@
   "main": "ui.js",
   "files": [
     "*.js",
+    "bin",
     "binding",
     "css",
     "el"
   ],
+  "bin": {
+    "lj-extract-lang": "./bin/extract-lang.js"
+  },
   "scripts": {
     "test": "lj t"
   },

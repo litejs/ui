@@ -120,43 +120,11 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 		setLang(0, 0, app.$d.lang)
 		LiteJS.start(app.show)
 		function setLang(e, el, lang) {
-			app.lang(lang)
-			app.lang(lang, extractLang(app))
-			app.lang(lang, extractLang(allJson))
+			app.lang(lang, extractLang(app, lang))
+			app.lang(lang, extractLang(allJson, lang))
 			El.render(app.root)
 		}
 	}, 1)
-
-	function extractLang(translations) {
-		var missing = []
-		, lang = app.$d.lang
-		, out = extract(translations, "")
-		if (missing[0]) {
-			console.error("Missing translation %s:", lang, missing.join(", "))
-		}
-		return out
-
-		function extract(map, path) {
-			var key
-			, out = {}
-			, translations = map.translations
-			if (!translations) return map[lang]
-			for (key in translations) {
-				out[key] = extract(translations[key], path + key + ".")
-				if (
-					out[key] === key ||
-					out[key] === void 0 && missing.push(path + key) ||
-					isObject(out[key]) && Object.keys(out[key]).length < 1
-				) delete out[key]
-			}
-			return out
-		}
-		function isObject(obj) {
-			return obj && obj.constructor === Object
-		}
-	}
-
-
 
 
 
