@@ -1,5 +1,10 @@
 {
-  "build": "lj b --out=test/index.html test/dev.html",
+  "build": {
+    "out": "test/index.html",
+    "_": [
+      "test/dev.html"
+    ]
+  },
   "lint": {
     "jshint": ".github/jshint.json",
     "_": [
