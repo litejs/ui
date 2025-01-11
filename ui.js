@@ -1127,7 +1127,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				this[name] = el
 			},
 			$s: function(el) {
-				var scope = elScope(el, el)
+				var scope = this
 				each(slice.call(arguments, 1), function(args) {
 					each(args, function(arg, i) {
 						if (isStr(i)) scope[i] = arg
@@ -1427,7 +1427,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		fn = raw || "$s&&(" + replace(fn, renderRe, function(match, name, op, args) {
 			return (
 				op ? "($el[$a]=$el[$a].replace($o[" + (i = bindOnce.indexOf(match), i < 0 ? bindOnce.push(match) - 1 : i)+ "],''),0)||" : ""
-			) + "$b['" + (bindings[name] ? name + "'].call($s,$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
+			) + "$b['" + (bindings[name] ? name + "'].call($s" + (name == "$s" ? "=El.scope($el,$el)": "") + ",$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
 		}) + "$r)"
 		var vars = replace(fn, fnRe, "").match(wordRe) || []
 		for (i = vars.length; i--; ) {
