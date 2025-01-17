@@ -6,7 +6,7 @@
 	test-form ../../binding/persist.js
 	test-svg #mat,../../binding/svg.js,../../el/Pie.tpl,test-svg.ui
 	testman,+/lcov,+/lcov/{file} %.ui
-	test-material-ui #mat,../../el/Slider.tpl,test-material.ui
+	test-material-ui #mat,../../el/Slider.ui,test-material.ui
 	test/crop ../../el/crop.ui
 	slot %.ui
 

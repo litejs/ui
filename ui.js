@@ -230,8 +230,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 		if (ev2 !== "" && "on" + ev2 in el) {
 			// polyfilled addEventListener returns patched function
-			// Since Chrome 56 touchstart/move have the { passive: true } by default.
-			// preventDefault() won't work unless you set passive to false.
+			// Chrome56 touchstart/move sets {passive:true} by default; use {passive:false} to enable preventDefault()
 			fn2 = html.addEventListener.call(el, ev2, fn2, opts != UNDEF ? opts : false) || fn2
 		}
 

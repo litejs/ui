@@ -1,0 +1,229 @@
+
+%css
+	.Slider,
+	.Toggle {
+		background: none;
+		height: 32px;
+		position: relative;
+		touch-action: none;
+		width: 200px;
+		color: #000;
+		font-size: 14px;
+		line-height: 32px;
+	}
+	.Slider-fill,
+	.Slider:before,
+	.Toggle:before {
+		background: rgba(0, 0, 0, .5);
+		border-radius: 2px;
+		height: 4px;
+		position: absolute;
+		top: 14px;
+		transition: inherit;
+	}
+	.Slider:before,
+	.Toggle:before {
+		background: #ccc;
+		content: "";
+		display: block;
+		width: 100%;
+	}
+	.Slider-knob,
+	.Toggle-knob {
+		border-radius: 50%;
+		box-shadow: 0 0 0 0 rgb(0, 0, 0, .2), 0 1px 4px rgba(0, 0, 0, .2);
+		height: 20px;
+		position: relative; /* for IE6 overflow:visible bug */
+		transition: inherit;
+		width: 20px;
+	}
+	.Slider-knob {
+		float: right;
+		margin: -8px -10px 0 0;
+		outline: none;
+		background: #f5f5f5;
+	}
+	:hover > * > .Slider-knob,
+	:focus > * > .Slider-knob {
+		box-shadow: 0 0 0 8px rgb(0, 0, 0, .2), 0 1px 4px rgba(0, 0, 0, .3);
+	}
+	.Slider-knob.is-active {
+		box-shadow: 0 0 0 12px rgb(0, 0, 0, .2), 0 1px 5px 5px rgba(0, 0, 0, .3);
+	}
+	/* value bubble */
+	.Slider-knob:before,
+	.Slider-knob:after {
+		background: inherit;
+		border-radius: 16px;
+		content: "";
+		height: 32px;
+		left: -6px;
+		min-width: 32px;
+		opacity: 0;
+		pointer-events: none;
+		position: absolute;
+		top: 0px;
+		transform: rotate(45deg);
+		transition: inherit;
+	}
+	.Slider-knob:after {
+		content: attr(data-val);
+		left: 10px;
+		padding: 0 4px;
+		transform: translate(-50%, 0);
+	}
+	:focus > * > .Slider-knob:before,
+	:hover > * > .Slider-knob:before,
+	.Slider-knob.is-active:before {
+		border-radius: 50% 50% 0 50%;
+		box-shadow: 3px 3px 3px 1px rgba(0, 0, 0, .3);
+		opacity: 1;
+		top: -43px;
+	}
+	:focus > * > .Slider-knob:after,
+	:hover > * > .Slider-knob:after,
+	.Slider-knob.is-active:after {
+		box-shadow: -4px -3px 3px -2px rgba(0, 0, 0, .15), 4px -3px 3px -2px rgba(0, 0, 0, .15);
+		opacity: 1;
+		top: -43px;
+	}
+	input:checked + .Toggle-knob {
+		background-color: #00a651;
+		left: 16px;
+	}
+	.Slider.color .Slider-fill {
+		background: red;
+	}
+	.Slider.color .Slider-fill+.Slider-fill {
+		background: green;
+	}
+	.Slider.color .Slider-fill+.Slider-fill+.Slider-fill {
+		background: blue;
+	}
+	.Slider.no-first > .Slider-fill:last-child {
+		background: #ccc;
+	}
+
+%js
+	var elOn = El.on
+	, elOff = El.off
+	, elCls = El.cls
+	, elGet = El.get
+	El.$b.SliderInit = function(el, range) {
+		range = (range || elGet(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
+		var knobLen, offset, px, drag, min, max, minPx, maxPx, value
+		//, vert = El.hasClass(el, "is-vertical")
+		, vert = false
+		, attr = vert ? "offsetHeight" : "offsetWidth"
+		, fill = el.firstChild
+		, knob = fill.lastChild
+		, emit = El.rate(El.emit.bind(el, el, "change"), 500)
+		elOn(window, "blur", stop)
+		setTimeout(el.val = set, 10, value||0)
+		function load() {
+			min = +(range[0] || 0)
+			max = +(range[1] || 100)
+			knobLen = knob[attr]>>1
+			minPx = 0
+			maxPx = el[attr] - knobLen - knobLen
+			px = maxPx / (max - min)
+		}
+		elOn(el, "pointerdown", function(e) {
+			drag = true
+			load()
+			var tmp = el.getBoundingClientRect()
+			offset = (vert ? tmp.top + maxPx + El.scrollTop() + knobLen : tmp.left + El.scrollLeft()) + knobLen
+			tmp = offset - e.clientX + (value-min||0)*px
+			if (tmp < knobLen && tmp > -knobLen) offset -= tmp
+			if (el.childNodes.length > 1) {
+				var next
+				, x = maxPx
+				, diff = vert ? offset - e.pageY : e.pageX - offset
+				for (tmp = fill = el.firstChild; tmp; tmp = tmp.nextSibling) {
+					next = diff - tmp[attr] + knobLen
+					if (next < 0 ? -next <= x : next < x) {
+						fill = tmp
+						knob = tmp.firstChild
+						x = next < 0 ? -next : next
+					}
+				}
+				if (fill.previousSibling) {
+					maxPx = fill.previousSibling[attr] - knobLen
+					if (range[3]) maxPx -= px * range[3]
+				}
+				if (fill.nextSibling) {
+					minPx = fill.nextSibling[attr] - knobLen
+					if (range[3]) minPx += px * range[3]
+				}
+			}
+			move(e)
+			listen(elOn)
+		})
+		function move(e) {
+			var diff = vert ? offset - e.pageY : e.pageX - offset
+			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
+			set((diff / px) + min, e, diff)
+			return El.stop(e)
+		}
+		function stop(e) {
+			if (drag) {
+				drag = false
+				listen(elOff)
+				set(value)
+			}
+		}
+		function listen(onOff) {
+			elCls(el, "anim", !drag)
+			elCls(knob, "is-active", drag)
+			onOff(document, "pointerup", stop)
+			onOff(document, "pointermove", move)
+		}
+		function set(val, e, pos) {
+			load()
+			val = El.step(val < min ? min : val > max ? max : val || 0, +(range[2] || 1))
+			if (value !== void 0 && (!drag || pos !== void 0)) {
+				El.css(fill, vert ? "height" : "width", ((pos || (val-min)*px)+knobLen) + "px", 0)
+			}
+			if (value !== val) {
+				el.value = value = val
+				if (drag && e) emit(e)
+				var format = elGet(el, "format")
+				El.set(knob, "data-val", format ? $d._(format, {val:val}) : val)
+			}
+		}
+	}
+
+%el Slider
+button.Slider.anim.reset ;SliderInit!
+	.Slider-fill
+		.Slider-knob[tabindex=0]
+
+%el Slider2
+button.Slider.anim.reset ;SliderInit!
+	.Slider-fill
+		.Slider-knob[tabindex=0]
+	.Slider-fill
+		.Slider-knob[tabindex=0]
+
+%el Slider3
+button.Slider.reset ;SliderInit!
+	.Slider-fill
+		.Slider-knob[tabindex=0]
+	.Slider-fill
+		.Slider-knob[tabindex=0]
+	.Slider-fill
+		.Slider-knob[tabindex=0]
+
+%el Toggle
+button.Toggle.reset ;SliderInit! "0:1"
+	;css: "width","36px"
+	.Slider-fill.anim
+		.Slider-knob.anim[tabindex=0]
+
+%el Togglea
+label.Toggle.reset[tabindex=0]
+	input[type=checkbox].hide
+		;readonly! row && !row.write
+		;checked! model && (row && row.opts ? row.opts === model.get(row.path) : !!model.get(row.path))
+	.Toggle-knob.anim
+
