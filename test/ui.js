@@ -66,13 +66,13 @@ describe("ui", function() {
 					temp1: "+0,1°C;-°C;-#°C"
 				},
 				"~": {
-					"Room #": "Tuba #"
+					"room #": "tuba #"
 				},
 				"?": {
 					They: "They;male=He;female=She",
 					relTime: "a few seconds;45=a minute;90="
 				},
-				Hello: "Hello {user.name}!",
+				hello: "hello {user.name}!",
 				HelloUp: "Hello {user.name;up 3,'b'}! Welcome to {x;up;lo}{bla;up}{bla;lo}",
 			},
 			uk: {},
@@ -126,6 +126,11 @@ describe("ui", function() {
 			app.lang("en")
 			var _ = app.$d._
 			assert.equal(_(null), "")
+			assert.equal(_("Hi"), "Hi")
+			assert.equal(_("Hi."), "Hi.")
+			assert.equal(_("Hi.ho"), "Hi.ho")
+			assert.equal(_(".ho"), ".ho")
+			assert.equal(_("hello", {user: {name: "World"}}), "hello World!")
 			assert.equal(_("Hello", {user: {name: "World"}}), "Hello World!")
 			assert.end()
 		})
@@ -140,6 +145,8 @@ describe("ui", function() {
 				.equal(pick(61, "low;30=med;60="), "")
 				.equal(pick(62, "low;30=med;60"), "")
 				.equal(pick("", "low;30=med;;"), "low")
+				.equal(pick(null, "low;30=med;;"), "low")
+				.equal(pick(undefined, "low;30=med;;"), "low")
 				.equal(pick("male", "They;male=He;female=She"), "He")
 				.equal(pick("other", "They;male=He;female=She"), "They")
 				// shorthand

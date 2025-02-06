@@ -914,13 +914,18 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 			return str
 		}
-		function iGet(obj, path, fallback) {
+		function iGet(obj, path, fallback, tmp) {
 			return isStr(path) ? (
 				isStr(obj[path]) ? obj[path] :
+				isStr(obj[tmp = path.toLowerCase()]) ? (
+					path.slice(1) === tmp.slice(1) ? obj[tmp].charAt(0).toUpperCase() + obj[tmp].slice(1) :
+					path === tmp.toUpperCase() ? obj[tmp].toUpperCase() :
+					obj[tmp]
+				) :
 				(path = path.split("."))[1] && isObj(obj = obj[path[0]]) && isStr(obj[path[1]]) ? obj[path[1]] :
 				fallback
 			) :
-			isArr(path) ? iGet(obj, path[0]) || iGet(obj, path[1]) || iGet(obj, path[2], fallback) :
+			isArr(path) ? iGet(obj, path[0], tmp) || iGet(obj, path[1], tmp) || iGet(obj, path[2], fallback) :
 			fallback
 		}
 		/*/
