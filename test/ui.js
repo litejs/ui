@@ -159,7 +159,9 @@ describe("ui", function() {
 				var _ = app.lang("en")
 				var pattern = _.ext.pattern
 				assert
+				.equal(pattern("room 01"), "tuba 01")
 				.equal(pattern("Room 12"), "Tuba 12")
+				.equal(pattern("ROOM 0.1"), "TUBA 0.1")
 				.equal(pattern("Room #"), "Room #")
 				.equal(pattern("House 1"), "House 1")
 				assert.equal(_("A {name;~}", {name: "Room 13"}), "A Tuba 13")

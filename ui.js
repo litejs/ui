@@ -740,7 +740,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						values.push(a)
 						return "#"
 					})
-					return str != key && t[key] ? replace(t[key], /#/g, bind(values.shift, values)) : str
+					return str != key ? replace(iGet(t, key, str), /#/g, bind(values.shift, values)) : str
 				},
 				pick: function(val, word) {
 					for (var t = translations["?"] || {}, arr = replace((t[word] || word), /([^;=,]+?)\?/g, "$1=$1;").split(/[;=,]/), i = 1|arr.length; i > 0; ) {
