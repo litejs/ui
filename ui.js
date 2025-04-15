@@ -1507,8 +1507,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, touches = []
 	, touchEv = {}
 
-	// tap, swipe + left/right/up/down
-	each("pan pinch rotate tap", function(name) {
+	// swipe + left/right/up/down
+	each("hold pan pinch rotate tap", function(name) {
 		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
 		fixFn[name] = touchInit
 	})
