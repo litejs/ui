@@ -7,7 +7,7 @@
 			li
 				;for!"row", ["A", "B", "C"]
 				span Row {row}
-				input[name=a0][type=checkbox][data-bind="checked:Math.random()>.5"]
-				input[name=a1][type=checkbox][data-bind="disabled:Math.random()>.5"]
+				input[name=a0][type=checkbox][_b="checked:Math.random()>.5"]
+				input[name=a1][type=checkbox][_b="disabled:Math.random()>.5"]
 		h2 App settings
 

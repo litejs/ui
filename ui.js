@@ -34,7 +34,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	// http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
 	, ie678 = !+"\v1" // jshint ignore:line
 
-	, BIND_ATTR = "data-bind"
 	, elSeq = 0
 	, elCache = {}
 	, renderRe = /[;\s]*([-.\w$]+)(?:(!?)[ :]*((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
@@ -629,7 +628,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		addPlugin("view", {
 			c: 1,
 			d: function(plugin) {
-				var expr = getAttr(plugin.e, BIND_ATTR)
+				var expr = getAttr(plugin.e, "_b")
 				, view = View(plugin.n, usePluginContent(plugin), plugin.x)
 				if (expr) {
 					viewEval(replace(expr, renderRe, function(_, name, op, args) {
@@ -1084,7 +1083,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					subScope.$i = pos++
 					subScope.$len = list.length
 					subScope[name] = item
-					clone[BIND_ATTR] = el[BIND_ATTR]
+					clone._b = el._b
 					/*** debug ***/
 					clone._li = up
 					/**/
@@ -1100,7 +1099,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				tag = elCache[tag] ? tag : fallback
 				if (el._el !== tag) {
 					var child = El(tag)
-					, tmp = child._elb = el._el ? el._elb : el[BIND_ATTR]
+					, tmp = child._elb = el._el ? el._elb : el._b
 					if (tmp) appendBind(child, tmp, ";", "^")
 					child.$s = el.$s
 					child._el = tag
@@ -1233,8 +1232,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 
 	function appendBind(el, val, sep, q) {
-		var current = getAttr(el, BIND_ATTR)
-		setAttr(el, BIND_ATTR, (current ? (
+		var current = getAttr(el, "_b")
+		setAttr(el, "_b", (current ? (
 			q === "^" ?
 			val + sep + current :
 			current + sep + val
@@ -1409,7 +1408,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 		/**/
 
-		if (hydrate(node, BIND_ATTR, scope)) return
+		if (hydrate(node, "_b", scope)) return
 		for (el = node.firstChild; el; el = next) {
 			next = el.nextSibling
 			render(el, scope)
