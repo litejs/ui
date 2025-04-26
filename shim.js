@@ -35,7 +35,7 @@
 	, IS_NODE = !window.document
 	, document = patch("document", {body:{},documentElement:{}})
 	, location = patch("location", {href:""})
-	, navigator = patch("navigator")
+	, navigator = patch("navigator", {})
 	/*/
 	, document = window.document
 	, IS_NODE = false
@@ -522,7 +522,6 @@
 		return !force && O[key] || (O[patched.push(key_), key] = (
 			isStr(src) ?
 			Function("o,O,P,S,F,X,Y", "return function(a,b,c){var t=this,A=arguments;" + src + "}")(hasOwn, O[key], P, patched.slice, force, arg1, arg2) :
-			src === UNDEF ? {} :
 			src
 		))
 	}
