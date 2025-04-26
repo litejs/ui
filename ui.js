@@ -1652,16 +1652,13 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function acceptMany(fn, prepareVal) {
 		return function f(el, name, val, selector, delay, data) {
 			if (el && name) {
-				var i = arguments.length
-				if (i > 3 && i < 6) {
-					if (isArr(selector)) {
-						data = selector
-						delay = selector = UNDEF
-					} else if (isNum(selector)) {
-						data = delay
-						delay = selector
-						selector = UNDEF
-					}
+				if (isNum(selector)) {
+					data = delay
+					delay = selector
+					selector = UNDEF
+				} else if (isArr(selector) || isObj(selector)) {
+					data = selector
+					delay = selector = UNDEF
 				}
 				if (delay > 0) {
 					setTimeout(f, delay, el, name, val, selector, 0, data)
@@ -1669,16 +1666,15 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				}
 				if (isObj(name)) {
 					for (delay in name) if (hasOwn(name, delay)) {
-						f(el, delay, name[delay], selector, 0, data)
+						f(el, delay, name[delay], val, 0, data)
 					}
 					return
 				}
 				if (prepareVal) val = prepareVal(el, val, selector, data)
 				selector = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
-				var arr = ("" + name).split(splitRe), len = arr.length
 				for (delay = 0; (el = selector[delay++]); ) {
-					for (i = 0; i < len; ) {
-						if (arr[i]) fn(el, arr[i++], isArr(val) ? val[i - 1] : val)
+					for (var arr = ("" + name).split(splitRe), i = 0, len = arr.length; i < len; ) {
+						if (arr[i]) fn(el, arr[i++], isArr(val) ? val[i - 1] : val, data)
 					}
 				}
 			}
