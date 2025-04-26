@@ -160,7 +160,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 
 	function asEmitter(obj) {
-		obj.on = on
+		obj.on = wrap(on)
 		obj.off = off
 		obj.one = one
 		obj.emit = wrap(emit)
@@ -172,14 +172,14 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 	}
 
-	function on(type, fn, scope, _origin) {
-		var emitter = this === window ? emptyArr : this
-		, events = emitter._e || (emitter._e = create(NUL))
-		if (type && fn) {
+	function on(emitter, type, fn, scope, _origin) {
+		if (emitter && type && fn) {
+			if (emitter === window) emitter = emptyArr
 			emit(emitter, "newListener", type, fn, scope, _origin)
+			var events = emitter._e || (emitter._e = create(NUL))
 			;(events[type] || (events[type] = [])).unshift(scope, _origin, fn)
 		}
-		return this
+		return emitter
 	}
 
 	function off(type, fn, scope) {
@@ -205,8 +205,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			off.call(emitter, type, fn, scope)
 			off.call(emitter, type, remove, scope)
 		}
-		on.call(emitter, type, remove, scope)
-		on.call(emitter, type, fn, scope)
+		on(emitter, type, remove, scope)
+		on(emitter, type, fn, scope)
 		return this
 	}
 
@@ -233,7 +233,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			fn2 = html.addEventListener.call(el, ev2, fn2, opts != UNDEF ? opts : false) || fn2
 		}
 
-		on.call(el, ev, fn2, el, fn)
+		on(el, ev, fn2, el, fn)
 	}
 
 	function rmEvent(el, ev, fn) {
@@ -341,7 +341,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			},
 			parse: (parser = viewParse),
 			ping: function(view, fn) {
-				View(view).on("ping", fn)
+				on(View(view), "ping", fn)
 			},
 			show: viewShow
 		})
