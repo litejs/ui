@@ -1,7 +1,7 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global escape, navigator, xhr */
+/* global escape, navigator, xhr, addEventListener */
 
 /*** debug ***/
 console.log("LiteJS is in debug mode, but it's fine for production")
@@ -1545,7 +1545,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					touchPos("left", "offsetWidth")
 					touchPos("top", "offsetHeight")
 					if (e.button === 2 || matches(touchEl, "INPUT,TEXTAREA,SELECT,.no-drag")) return
-					touchTick = setTimeout(moveOne, 1500, e, 1)
+					touchTick = setTimeout(moveOne, LiteJS.holdDelay || 800, e, 1)
 				}
 				moveOne(e || touches[0])
 			}
