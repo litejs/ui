@@ -53,8 +53,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			var target = selector ? closest(e.target, selector) : el
 			if (target) emit.apply(target, [elScope(el).$ui, val, e, target].concat(data))
 		} :
-		selector ? function(e, a1, a2) {
-			if (matches(e.target, selector)) val(e, a1, a2)
+		selector ? function(e, touchEv, touchEl) {
+			if (matches(touchEl = e.target, selector)) val(e, touchEv, touchEl, data)
 		} :
 		val
 	})
