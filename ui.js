@@ -1534,7 +1534,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				emit(touchEl, touchMode ? touchMode + END : "tap", e2, touchEv, touchEl)
 				touchMode = UNDEF
 			}
-			if (len < 0) {
+			if (len < 1) {
 				touchEl = UNDEF
 			}
 			if (len === 1) {
