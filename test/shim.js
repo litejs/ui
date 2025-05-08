@@ -27,6 +27,7 @@ describe("Shim test", function() {
 				fromEntries: null
 			})
 			mock.swap(String.prototype, {
+				at: null,
 				endsWith: null,
 				//startsWith: null,
 				trim: null
@@ -47,6 +48,7 @@ describe("Shim test", function() {
 				of: null
 			})
 			mock.swap(Array.prototype, {
+				at: null,
 				entries: null,
 				every: null,
 				filter: null,
@@ -173,6 +175,23 @@ describe("Shim test", function() {
 		assert.equal(tmp.some(function(i) { return i === "1" }), false)
 		assert.equal(tmp.every(function(i) { return i !== 4 }), true)
 		assert.equal(tmp.every(function(i) { return i === 1 }), false)
+
+		tmp = ["a", "b", "c"]
+		assert.equal(tmp.at(0), "a")
+		assert.equal(tmp.at(1.1), "b")
+		assert.equal(tmp.at(2), "c")
+		assert.equal(tmp.at(3), undef)
+		assert.equal(tmp.at(-1), "c")
+		assert.equal(tmp.at(-3.1), "a")
+		assert.equal(tmp.at(-4), undef)
+
+		assert.equal("abc".at(0), "a")
+		assert.equal("abc".at(1.1), "b")
+		assert.equal("abc".at(2), "c")
+		assert.equal("abc".at(3), undef)
+		assert.equal("abc".at(-1), "c")
+		assert.equal("abc".at(-3.1), "a")
+		assert.equal("abc".at(-4), undef)
 
 		assert.equal("aaa".startsWith("ab"), false)
 		assert.equal("aba".startsWith("ab"), true)

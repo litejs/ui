@@ -17,11 +17,12 @@
 /* c8 ignore start */
 !function(window, Date, Function, Infinity, P) {
 
-	// Array#flat()         - Chrome69, Edge79, Firefox62, Safari12
-	// window.PointerEvent  - Chrome55, Edge12, Firefox59, Safari13,   IE11
-	// navigator.sendBeacon - Chrome39, Edge14, Firefox31, Safari11.1
-	// Object.fromEntries   - Chrome73, Edge79, Firefox63, Safari12.1, Opera60, Node.js12.0.0
-	// queueMicrotask       - Chrome71, Edge79, Firefox69, Safari12.1
+	// Array#flat()         - Chrome69, Firefox62, Safari12
+	// window.PointerEvent  - Chrome55, Firefox59, Safari13,   IE11
+	// navigator.sendBeacon - Chrome39, Firefox31, Safari11.1
+	// Object.fromEntries   - Chrome73, Firefox63, Safari12.1, Opera60, Node.js12.0.0
+	// queueMicrotask       - Chrome71, Firefox69, Safari12.1
+	// "".at(), [].at()     - Chrome92, Firefox90, Safari15.4
 
 	var UNDEF, isArray, oKeys
 	, O = window
@@ -384,8 +385,11 @@
 	patch("flatMap",     "return X.apply(t,A).flat()", 0, O.map)
 	//patch("entries", "a=this;b=-1;return{next:function(){c=a.length<=++b;return{done:c,value:c?void 0:a[b]}}}")
 
+	a = "b=t.length;a=a<0?b+a|0:a|0;return a>=b||a<0?X:t"
+	patch("at",          a + "[a]")
 
 	O = String[P]
+	patch("at",          a + ".charAt(a)")
 	patch("endsWith", "return(a+='')===t.slice(-a.length)")
 	patch("startsWith", "return t.lastIndexOf(a,0)===0")
 	patch("trim", "return t.replace(/^\\s+|\\s+$/g,'')")
