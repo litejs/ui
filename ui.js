@@ -13,6 +13,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	var UNDEF, parser, pushBase, styleNode, canCapture
 	, NUL = null
+	// THIS will be undefined in strict mode and window in sloppy mode
+	, THIS = this
 	, html = document.documentElement
 	, body = document.body
 	, splitRe = /[,\s]+/
@@ -289,7 +291,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				return view
 			}
 			view = this
-			if (!(view instanceof View)) return new View(route, el, parent)
+			if (view === THIS) return new View(route, el, parent)
 			views[view.r = route] = view
 			view.e = isStr(el) ? find(html, el) : el
 			view.p = parent && View(parent)
