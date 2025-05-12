@@ -4,7 +4,7 @@ describe("ui", function() {
 	var El, LiteJS, View
 	, fs = require("fs")
 	, path = require("path")
-	, dom = require("@litejs/dom/interactive")
+	, dom = require("@litejs/cli").dom
 	, document = dom.document
 	, localStorage = {}
 	, parser = new dom.DOMParser()
