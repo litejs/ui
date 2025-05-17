@@ -24,6 +24,7 @@
 
 @import url("css/variables.css");
 @import url("../css/base.css");             /* 1 */
+@import url("../css/global.css");           /* 1 */
 @import url("../css/anim.css");             /* 1 */
 @import url("../css/grid.css");             /* 3 */
 @import url("../css/grid-golden.css");      /* 3 */
