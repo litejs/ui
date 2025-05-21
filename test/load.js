@@ -1,5 +1,6 @@
 
 describe("load.js", function() {
+	var lib, xhr
 	var xhrMap = {
 		"err": { text: "404" },
 		"a.js": { text: "var a" },
@@ -27,8 +28,7 @@ describe("load.js", function() {
 	global.ActiveXObject = function ActiveXObject() {
 		var res
 		, xhr = this
-		xhr.readyState = 0
-		xhr.status = 0
+		xhr.readyState = xhr.status = 0
 		xhr.responseText = null
 		xhr.getResponseHeader = function(name) {}
 		xhr.getAllResponseHeaders = function() {}
@@ -57,7 +57,6 @@ describe("load.js", function() {
 			}
 		}
 	}
-	var lib, xhr
 
 	function xhrReset() {
 		xhrRes = []
@@ -186,5 +185,29 @@ describe("load.js", function() {
 			assert.end()
 		})
 	})
+
+	describe("Theme initializer", () => {
+		it ("should set theme", [
+			[ "", {} ],
+			[ "", { localStorage: {}, matchMedia: () => ({ matches: false }) } ],
+			[ "", { localStorage: { theme: "light" } } ],
+			[ "is-dark", { localStorage: { theme: "dark" } } ],
+			[ "is-dark", { localStorage: {}, matchMedia: () => ({ matches: true }) } ],
+		], function(theme, window, assert, mock) {
+			var doc = { documentElement: { className: "" } }
+			mock.swap(global, "document", doc)
+			mock.swap(require.extensions, ".js", function(module, filename) {
+				Object.assign(module.exports, window)
+				module._compile(require("fs").readFileSync(filename, "utf8"), filename)
+			})
+
+			delete require.cache[require.resolve("../load.js")]
+			lib = require("../load.js")
+
+			assert.equal(doc.documentElement.className, theme)
+			assert.end()
+		})
+	})
+
 })
 

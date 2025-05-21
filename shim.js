@@ -246,7 +246,7 @@
 	}
 
 	createStorage("session")    // Chrome5, FF2, IE8, Safari4
-	createStorage("local")      // Chrome5, FF3.5, IE8, Safari4
+	createStorage("local")      // Chrome5, FF3.5, IE8, Safari4, IE8
 
 	// IE8 has console, however, the console object does not exist if the console is not opened.
 	patch("console", {log: nop, error: nop})

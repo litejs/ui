@@ -1,7 +1,7 @@
 
 /*! litejs.com/MIT-LICENSE.txt */
 
-/* global location */
+/* global document, location */
 
 // With initial congestion window set to 2 and 1452 bytes of data in a segment.
 //  - 1 round trip to get 2904 bytes, Initial Window (IW) = 2
@@ -71,6 +71,19 @@
 		function sendLog() {
 			setTimeout_(xhr.sendLog || sendLog, 1307)
 		}
+	}
+	/**/
+
+
+	/*** theme ***/
+	, ALT_THEME = "dark"
+	, matchMedia = window.matchMedia
+	, localStorage = window.localStorage
+	if (ALT_THEME == (
+		localStorage && localStorage.theme ||
+		matchMedia && matchMedia("(prefers-color-scheme:dark)").matches && ALT_THEME
+	)) {
+		document.documentElement.className = "is-" + ALT_THEME
 	}
 	/**/
 
