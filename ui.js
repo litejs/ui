@@ -47,8 +47,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
 	, txtAttr = "textContent" in html ? "textContent" /* c8 ignore next */ : "innerText"
-	, bindingsCss = acceptMany(function(el, key, val) {
-		el.style[replace(key, camelRe, camelFn)] = val
+	, bindingsCss = acceptMany(function(el, key, val, current) {
+		current = el.style[key = replace(key, camelRe, camelFn)]
+		el.style[key] = val
+		return current
 	})
 	, bindingsOn = acceptMany(addEvent, function(el, val, selector, data) {
 		return isStr(val) ? function(e) {
@@ -1286,6 +1288,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				el.className = name
 			}
 		}
+		return current
 	}
 
 	function elEmpty(el) {
@@ -1675,8 +1678,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (prepareVal) val = prepareVal(el, val, selector, data)
 				selector = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
 				for (delay = 0; (el = selector[delay++]); ) {
-					for (var arr = ("" + name).split(splitRe), i = 0, len = arr.length; i < len; ) {
-						if (arr[i]) fn(el, arr[i++], isArr(val) ? val[i - 1] : val, data)
+					for (var result, arr = ("" + name).split(splitRe), i = 0, len = arr.length; i < len; ) {
+						if (arr[i]) {
+							result = fn(el, arr[i++], isArr(val) ? val[i - 1] : val, data)
+							if (!prepareVal && data > 0) f(el, name, result, "", data)
+						}
 					}
 				}
 			}
