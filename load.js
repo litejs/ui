@@ -18,13 +18,11 @@
 // xhr("PUT", url).send(null) Works in all major browsers
 
 
-!function(window, Function) {
+!function(window) {
 	var initTime = xhr._t = +new Date()
 	, rewrite = {
 		//!{loadRewrite}
 	}
-	// Move setTimeout from window.prototype to window object for future patching in IE9.
-	, setTimeout_ = window.setTimeout = setTimeout
 	/*** debug ***/
 	// Expose xhr._c for testing.
 	, loaded = xhr._c = {}
@@ -32,27 +30,28 @@
 	, loaded = {}
 	/**/
 
-	/*** activex ***/
-	// XMLHttpRequest in IE7-8 do not accept PATCH, use ActiveX.
-	// IE disallows adding custom properties to ActiveX objects and read/write readystatechange after send().
-	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Function("return new ActiveXObject('Microsoft.XMLHTTP')")
-	/**/
-
+	/*** ie9 ***/
+	, Fn = Function
 	, execScript =
 		// IE5-10, Chrome1-12
 		window.execScript ||
-	/*** inject ***/
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
 		// In case of local execution `e('eval')` returns undefined
-		Function("e,eval", "try{return e('eval')}catch(e){}")(eval) ||
-		Function("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
-	/*/
-		eval
-	/**/
+		Fn("e,eval", "try{return e('eval')}catch(e){}")(eval) ||
+		Fn("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
 
-	/*** reuse ***/
+	// Move setTimeout from window.prototype to window object for future patching in IE9.
+	, setTimeout_ = window.setTimeout = setTimeout
+
 	// XHR memory leak mitigation
 	, xhrs = []
+
+	// XMLHttpRequest in IE7-8 do not accept PATCH, use ActiveX.
+	// IE disallows adding custom properties to ActiveX objects and read/write readystatechange after send().
+	, XMLHttpRequest = +"\v1" && window.XMLHttpRequest || Fn("return new ActiveXObject('Microsoft.XMLHTTP')")
+	/*/
+	, execScript = eval
+	, setTimeout_ = setTimeout
 	/**/
 
 	, unsentLog = xhr._l = []
@@ -81,12 +80,12 @@
 	function sendLog() {
 		setTimeout_(xhr.sendLog || sendLog, 1307)
 	}
-
-	// next === true is for sync call
+	/**/
 
 	window.xhr = xhr
+	// next === true is for sync call
 	function xhr(method, url, next, attr1, attr2) {
-		var req = /*** reuse ***/ xhrs.pop() || /**/ new XMLHttpRequest()
+		var req = /*** ie9 ***/ xhrs.pop() || /**/ new XMLHttpRequest()
 
 		// To be able to reuse the XHR object properly,
 		// use the open method first and set onreadystatechange later.
@@ -160,7 +159,7 @@
 					attr2
 				)
 				req.onreadystatechange = next = null
-				/*** reuse ***/
+				/*** ie9 ***/
 				xhrs.push(req)
 				/**/
 			}
@@ -217,7 +216,7 @@
 			}
 			if (res[pos] === "" || !files[pos]) {
 				if (++pos < len) exec()
-				/*** inject ***/
+				/*** ie9 ***/
 				// inject can be async
 				else if (pos === len && execScript !== eval) setTimeout_(exec, 1)
 				/**/
@@ -236,5 +235,5 @@
 	])
 	/**/
 
-}(this, Function) // jshint ignore:line
+}(this) // jshint ignore:line
 
