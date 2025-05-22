@@ -53,7 +53,7 @@ describe("load.js", function() {
 			xhr.responseText = res.text || ""
 			if (xhr.onreadystatechange) {
 				xhr.onreadystatechange()
-				xhr.onreadystatechange()
+				if (xhr.onreadystatechange) xhr.onreadystatechange()
 			}
 		}
 	}

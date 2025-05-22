@@ -49,7 +49,6 @@
 	/*/
 		eval
 	/**/
-	, nop = Function()
 
 	/*** reuse ***/
 	// XHR memory leak mitigation
@@ -71,7 +70,7 @@
 		)) log("e", lastError, (error && (error.stack || error.stacktrace) || "-") + "\n" + location)
 	}
 	/*/
-	, onerror = nop
+	, onerror = Function()
 	/**/
 
 	xhr.log = log
@@ -160,7 +159,7 @@
 					attr1,
 					attr2
 				)
-				req.onreadystatechange = next = nop
+				req.onreadystatechange = next = null
 				/*** reuse ***/
 				xhrs.push(req)
 				/**/
