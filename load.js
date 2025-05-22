@@ -19,16 +19,14 @@
 
 
 !function(window) {
-	var initTime = xhr._t = +new Date()
-	, rewrite = {
+	var rewrite = {
 		//!{loadRewrite}
 	}
-	/*** debug ***/
-	// Expose xhr._c for testing.
-	, loaded = xhr._c = {}
-	/*/
-	, loaded = {}
+	/*** log ***/
+	, initTime = xhr._t = +new Date()
 	/**/
+	// Expose xhr._c for testing.
+	, loaded = /*** debug ***/ xhr._c = /**/ {}
 
 	/*** ie9 ***/
 	, Fn = Function
@@ -54,8 +52,8 @@
 	, setTimeout_ = setTimeout
 	/**/
 
+	/*** log ***/
 	, unsentLog = xhr._l = []
-	/*** onerror ***/
 	, lastError
 	, onerror = window.onerror = function(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
@@ -68,17 +66,11 @@
 			].join(":")
 		)) log("e", lastError, (error && (error.stack || error.stacktrace) || "-") + "\n" + location)
 	}
-	/*/
-	, onerror = Function()
-	/**/
-
-	xhr.log = log
-	function log(type, msg, extra) {
+	, log = xhr.log = function(type, msg, extra) {
 		if (unsentLog.push([ new Date() - initTime, type, msg, extra ]) < 2) sendLog()
-	}
-
-	function sendLog() {
-		setTimeout_(xhr.sendLog || sendLog, 1307)
+		function sendLog() {
+			setTimeout_(xhr.sendLog || sendLog, 1307)
+		}
 	}
 	/**/
 
@@ -191,7 +183,7 @@
 
 		function cb(err, str, fileName, filePos) {
 			loaded[fileName] = 2
-			res[filePos] = err ? (onerror(err, fileName), "") : str
+			res[filePos] = err ? (/*** log ***/ onerror(err, fileName),/**/ "") : str
 			exec()
 		}
 		function exec() {
@@ -209,7 +201,9 @@
 							})
 						}
 					} catch(e) {
+						/*** log ***/
 						onerror(e, files[pos])
+						/**/
 					}
 					res[pos] = ""
 				}
