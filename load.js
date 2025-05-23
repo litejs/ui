@@ -36,7 +36,7 @@
 		// THANKS: Juriy Zaytsev - Global eval [http://perfectionkills.com/global-eval-what-are-the-options/]
 		// In case of local execution `e('eval')` returns undefined
 		Fn("e,eval", "try{return e('eval')}catch(e){}")(eval) ||
-		Fn("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.removeChild(b.insertBefore(s,b.firstChild))")
+		Fn("a", "var d=document,b=d.body,s=d.createElement('script');s.text=a;b.appendChild(s)")
 
 	// Move setTimeout from window.prototype to window object for future patching in IE9.
 	, setTimeout_ = window.setTimeout = setTimeout

@@ -165,8 +165,7 @@ describe("load.js", function() {
 		mock.swap(global, "document", {
 			createElement: function(tag) { return {} },
 			body: {
-				removeChild: function() {},
-				insertBefore: function(child) {
+				appendChild: function(child) {
 					xhrRes.push(child.text)
 				}
 			}
