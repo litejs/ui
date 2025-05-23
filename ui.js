@@ -1446,7 +1446,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}) + "$r)"
 		var vars = replace(fn, fnRe, "").match(wordRe) || []
 		for (i = vars.length; i--; ) {
-			if (vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
+			if (window[vars[i]] || vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
 			else vars[i] += "=$s." + vars[i]
 		}
 		fn = Function("$el,$s,$a,$o,$r", (vars[0] ? "var " + vars : "") + ";return " + fn)
