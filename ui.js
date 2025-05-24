@@ -392,20 +392,20 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				viewEmit(view, "show", params)
 				blur()
 			}
-		}
-
-		function viewClose(view, open) {
-			if (view && view.o) {
-				viewEmit(view.p, "closeChild", view, open)
-				viewClose(view.c)
-				elKill(view.o)
-				view.o = UNDEF
-				/*** kb ***/
-				rmKb(view.kb)
-				/**/
-				viewEmit(view, "close")
+			function viewClose(view, open) {
+				if (view && view.o) {
+					viewEmit(view.p, "closeChild", view, open)
+					viewClose(view.c)
+					elKill(view.o)
+					view.o = UNDEF
+					/*** kb ***/
+					rmKb(view.kb)
+					/**/
+					viewEmit(view, "close")
+				}
 			}
 		}
+
 		function viewDef(str) {
 			for (var match, re = /(\S+) (\S+)/g; (match = re.exec(str)); ) {
 				each(match[1], def)
