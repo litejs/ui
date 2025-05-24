@@ -41,7 +41,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, renderRe = /[;\s]*([-.\w$]+)(?:(!?)[ :]*((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, fnCache = {}
-	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aos]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
+	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aosS]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /[a-z_$][\w$]*/ig
 	, camelRe = /\-([a-z])/g
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
@@ -1433,7 +1433,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		, expr = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
 		if (expr !== true) try {
 			fn = fnCache[expr] || (fnCache[expr] = makeFn(expr))
-			return fn(node, scope, attr, bindOnce)
+			return fn(node, scope, attr, bindOnce, elScope)
 		} catch (e) {
 			throw e + "\n" + attr + ": " + expr
 		}
@@ -1442,14 +1442,14 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		fn = raw || "$s&&(" + replace(fn, renderRe, function(match, name, op, args) {
 			return (
 				op ? "($el[$a]=$el[$a].replace($o[" + (i = bindOnce.indexOf(match), i < 0 ? bindOnce.push(match) - 1 : i)+ "],''),0)||" : ""
-			) + "$b['" + (bindings[name] ? name + "'].call($s" + (name == "$s" ? "=El.scope($el,$el)": "") + ",$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
+			) + "$b['" + (bindings[name] ? name + "'].call($s" + (name == "$s" ? "=$S($el,$el)": "") + ",$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
 		}) + "$r)"
 		var vars = replace(fn, fnRe, "").match(wordRe) || []
 		for (i = vars.length; i--; ) {
 			if (window[vars[i]] || vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
 			else vars[i] += "=$s." + vars[i]
 		}
-		fn = Function("$el,$s,$a,$o,$r", (vars[0] ? "var " + vars : "") + ";return " + fn)
+		fn = Function("$el,$s,$a,$o,$S,$r", (vars[0] ? "var " + vars : "") + ";return " + fn)
 		return fn
 	}
 
