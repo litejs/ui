@@ -945,17 +945,13 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return View
 	}
 
-	function setUrl(url, rep, checkUrl) {
+	function setUrl(url, rep) {
 		/*** pushState ***/
 		if (pushBase) {
 			history[rep ? "replaceState" : "pushState"](NUL, NUL, pushBase + url)
-		} else {
+		} else
 		/**/
 			location[rep ? "replace" : "assign"]("#" + url)
-		/*** pushState ***/
-		}
-		/**/
-		if (checkUrl) checkUrl()
 	}
 
 	LiteJS.go = setUrl
