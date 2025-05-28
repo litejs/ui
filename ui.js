@@ -174,6 +174,14 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				return fn(this, a, b, c, d, e)
 			}
 		}
+		function one(type, fn, scope) {
+			var emitter = this
+			on(emitter, type, function remove() {
+				off.call(emitter, type, remove, scope)
+				fn.apply(scope, arguments)
+			}, scope)
+			return emitter
+		}
 	}
 
 	function on(emitter, type, fn, scope, _origin) {
@@ -199,18 +207,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				}
 			}
 		}
-		return this
-	}
-
-	function one(type, fn, scope) {
-		var emitter = this === window ? emptyArr : this
-
-		function remove() {
-			off.call(emitter, type, fn, scope)
-			off.call(emitter, type, remove, scope)
-		}
-		on(emitter, type, remove, scope)
-		on(emitter, type, fn, scope)
 		return this
 	}
 

@@ -164,7 +164,7 @@ describe("event", function() {
 
 		.equal(emitter.one("ev", scope1.handler, scope2), emitter)
 		.equal(emitter.one("ev2", ev2), emitter)
-		.equal(emitter.emit("ev", "emit4"), 3)
+		.equal(emitter.emit("ev", "emit4"), 2)
 		.equal(emitted.length, (expected.push("scope1 emit4"), expected.push("scope2 emit4")))
 		.equal(emitted, expected)
 
