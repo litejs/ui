@@ -24,8 +24,7 @@ anim-page
 		;title! "Click " + count1
 	div
 		;$s!{count2:0}
-		;one!"click", "inc", 0, ["count2"]
-		@click "txt"
+		@click!"inc", 0, ["count2"]
 		;txt "One click " + $s.count2
 	div
 		;txt "Hover"
