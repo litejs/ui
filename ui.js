@@ -449,7 +449,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					stack.shift()
 				}
 				if (op === "@") {
-					text = replace(text, /([\w,.]+):?/, "on!'$1',")
+					text = replace(text, /([\w,.]+)[!:]?/, /^\w+!/.test(text) ? "one!'$1'," : "on!'$1',")
 				}
 				if (parent.r) {
 					parent.t += "\n" + all
