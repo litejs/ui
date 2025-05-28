@@ -52,20 +52,17 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		el.style[key] = val
 		return current
 	})
-	, bindingsOn = acceptMany(addEvent, function(el, val, selector, data) {
-		return isStr(val) ? function(e) {
-			var target = selector ? closest(e.target, selector) : el
-			if (target) emit.apply(target, [elScope(el).$ui, val, e, target].concat(data))
-		} :
-		selector ? function(e, touchEv, touchEl) {
-			if (matches(touchEl = e.target, selector)) val(e, touchEv, touchEl, data)
-		} :
-		val
-	})
+	, bindingsOn = acceptMany(addEvent, 1)
 	, bindings = {
 		cls: acceptMany(cls),
 		css: bindingsCss,
 		on: bindingsOn,
+		one: acceptMany(function(el, ev, fn) {
+			addEvent(el, ev, function remove() {
+				rmEvent(el, ev, remove)
+				fn.apply(el, arguments)
+			})
+		}, 1),
 		set: acceptMany(setAttr),
 		txt: elTxt,
 		val: elVal,
@@ -1036,14 +1033,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		empty: elEmpty,
 		kill: elKill,
 		off: acceptMany(rmEvent),
-		one: acceptMany(function(el, ev, fn) {
-			function remove() {
-				rmEvent(el, ev, fn)
-				rmEvent(el, ev, remove)
-			}
-			addEvent(el, ev, fn)
-			addEvent(el, ev, remove)
-		}),
 		render: render,
 		rm: elRm
 	})
@@ -1667,7 +1656,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					}
 					return
 				}
-				if (prepareVal) val = prepareVal(el, val, selector, data)
+				if (prepareVal) val = delegate(el, val, selector, data)
 				selector = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
 				for (delay = 0; (el = selector[delay++]); ) {
 					for (var result, arr = ("" + name).split(splitRe), i = 0, len = arr.length; i < len; ) {
@@ -1678,6 +1667,16 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					}
 				}
 			}
+		}
+		function delegate(el, val, selector, data) {
+			return isStr(val) ? function(e) {
+				var target = selector ? closest(e.target, selector) : el
+				if (target) emit.apply(target, [elScope(el).$ui, val, e, target].concat(data))
+			} :
+			selector ? function(e, touchEv, touchEl) {
+				if (matches(touchEl = e.target, selector)) val(e, touchEv, touchEl, data)
+			} :
+			val
 		}
 	}
 	function assignDeep(target, map) {
