@@ -382,7 +382,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				bubbleDown(params)
 			}
 			if ((lastView === view)) {
-				viewEmit(view, "show", params)
+				for (; view; view = view.p) {
+					viewEmit(view, "pong", params, View)
+				}
+				viewEmit(lastView, "show", params)
 				blur()
 			}
 			function viewClose(view, open) {
