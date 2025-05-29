@@ -919,7 +919,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 		function iGet(obj, path, fallback, tmp) {
 			return isStr(path) ? (
-				isStr(obj[path]) ? obj[path] :
+				NUL != obj[path] ? obj[path] :
 				isStr(obj[tmp = path.toLowerCase()]) ? (
 					path.slice(1) === tmp.slice(1) ? obj[tmp].charAt(0).toUpperCase() + obj[tmp].slice(1) :
 					path === tmp.toUpperCase() ? obj[tmp].toUpperCase() :
