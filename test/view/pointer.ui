@@ -17,6 +17,12 @@ anim-page
 		ul.sortCol
 			li.anim Blue
 	h2 Events
+	div Click fn {count0}
+		^$s!{count0:1}
+		@click function() {
+			$s.count0++
+			El.render($el)
+		}
 	div
 		;$s!{count1:0}
 		@click "inc", 0, ["count1"]

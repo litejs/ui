@@ -435,7 +435,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			var parent = El("div")
 			, stack = [-1]
 			, parentStack = []
-			, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-\w:.#[\]~^$*|]=?)*) ?([\/>=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|$)/gm
+			, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-#:.\w[\]](?:[~^$*|]?=)?)*) ?([\/>=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|$)/gm
 
 			function work(all, indent, plugin, sel, q, op, text, mapEnd, mapStart, offset) {
 				if (offset && all === indent) return
