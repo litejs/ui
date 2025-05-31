@@ -499,8 +499,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		function viewPing(view, params) {
 			var parent
 			, tmp = params._v || view // Continue bubbleUp from _v
-			lastParams = params
-			lastView = view
 			params._c = view.o ? view : params._c
 			for (View.route = view.r; tmp; tmp = parent) {
 				viewEmit(syncResume = params._v = tmp, "ping", params, View)
@@ -531,7 +529,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					syncResume = UNDEF
 				}
 			}
-			viewEmit(view, "nav")
 			bubbleDown(params)
 		}
 		function viewShow(url) {
@@ -544,6 +541,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			, view = viewGet(url, params)
 			if (!view.o || lastUrl !== url) {
 				$d.url = lastUrl = expand(url)
+				viewEmit(lastView = view, "nav", lastParams = params)
 				viewPing(view, params)
 			}
 		}
