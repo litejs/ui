@@ -66,8 +66,8 @@
 			].join(":")
 		)) log("e", lastError, (error && (error.stack || error.stacktrace) || "-") + "\n" + location)
 	}
-	, log = xhr.log = function(type, msg, extra) {
-		if (unsentLog.push([ new Date() - initTime, type, msg, extra ]) < 2) sendLog()
+	, log = xhr.log = function(type, msg, a, b) {
+		if (unsentLog.push([ new Date() - initTime, type, msg].concat(a || [], b || [])) < 2) sendLog()
 		function sendLog() {
 			setTimeout_(xhr.sendLog || sendLog, 1307)
 		}
