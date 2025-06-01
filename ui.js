@@ -310,11 +310,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				params._p = 1 + (params._p | 0) // pending
 				return function() {
 					if (--params._p || lastParams !== params || syncResume) return
-					if (params._d) {
-						bubbleDown(params)
-					} else if (params._v) {
-						viewPing(lastView, params)
-					}
+					bubbleUp(params)
 				}
 			}
 		})
@@ -360,6 +356,42 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		})
 
+		function bubbleUp(params) {
+			var parent
+			, view = lastView
+			, tmp = params._v || view // Continue bubbleUp from _v
+			params._c = view.o ? view : params._c
+			for (View.route = view.r; tmp; tmp = parent) {
+				viewEmit(syncResume = params._v = tmp, "ping", params, View)
+				syncResume = UNDEF
+				if (lastParams !== params) return
+				if ((parent = tmp.p)) {
+					if (parent.c && parent.c !== tmp) {
+						params._c = parent.c
+					}
+					parent.c = tmp
+				}
+				if (tmp.f) {
+					return xhr.load(
+						replace(tmp.f, /^|,/g, "$&" + (View.path || "")).split(","),
+						bind(readTemplates, view, view.wait(tmp.f = ""))
+					)
+				} else if (!tmp.e) {
+					if (tmp.r === "404") {
+						viewParse("%view 404 #\nh2 Not found")
+					}
+					return viewShow("404")
+				}
+			}
+
+			for (tmp in params) {
+				if (tmp.charAt(0) !== "_" && (syncResume = hasOwn(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
+					syncResume(params[tmp], tmp, view, params)
+					syncResume = UNDEF
+				}
+			}
+			bubbleDown(params)
+		}
 		function bubbleDown(params) {
 			var view = params._v
 			, close = params._c
@@ -378,7 +410,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				/**/
 				params._c = UNDEF
 			}
-			if ((params._d = params._v = view.c)) {
+			if ((params._v = view.c)) {
 				bubbleDown(params)
 			}
 			if ((lastView === view)) {
@@ -499,41 +531,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				histStart(viewShow)
 			}
 		}
-		function viewPing(view, params) {
-			var parent
-			, tmp = params._v || view // Continue bubbleUp from _v
-			params._c = view.o ? view : params._c
-			for (View.route = view.r; tmp; tmp = parent) {
-				viewEmit(syncResume = params._v = tmp, "ping", params, View)
-				syncResume = UNDEF
-				if (lastParams !== params) return
-				if ((parent = tmp.p)) {
-					if (parent.c && parent.c !== tmp) {
-						params._c = parent.c
-					}
-					parent.c = tmp
-				}
-				if (tmp.f) {
-					return xhr.load(
-						replace(tmp.f, /^|,/g, "$&" + (View.path || "")).split(","),
-						bind(readTemplates, view, view.wait(tmp.f = ""))
-					)
-				} else if (!tmp.e) {
-					if (tmp.r === "404") {
-						viewParse("%view 404 #\nh2 Not found")
-					}
-					return viewShow("404")
-				}
-			}
-
-			for (tmp in params) {
-				if (tmp.charAt(0) !== "_" && (syncResume = hasOwn(paramCb, tmp) && paramCb[tmp] || paramCb["*"])) {
-					syncResume(params[tmp], tmp, view, params)
-					syncResume = UNDEF
-				}
-			}
-			bubbleDown(params)
-		}
 		function viewShow(url) {
 			if (url === true) {
 				if (lastParams._p > 0) return
@@ -545,7 +542,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			if (!view.o || lastUrl !== url) {
 				$d.url = lastUrl = expand(url)
 				viewEmit(lastView = view, "nav", lastParams = params)
-				viewPing(view, params)
+				bubbleUp(params)
 			}
 		}
 
