@@ -64,7 +64,7 @@
 			, col || (window.event || unsentLog).errorCharacter || "?"
 			, message
 			].join(":")
-		)) log("e", lastError, (error && (error.stack || error.stacktrace) || "-") + "\n" + location)
+		)) log("e", lastError, error && (error.stack || error.stacktrace) || "-", location)
 	}
 	, log = xhr.log = function(type, msg, a, b) {
 		if (unsentLog.push([ new Date() - initTime, type, msg].concat(a || [], b || [])) < 2) sendLog()
