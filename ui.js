@@ -489,9 +489,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (offset && all === indent) return
 
 				for (q = indent.length; q <= stack[0]; ) {
-					if (parent.p) {
-						if (parent.p.c && !parent.p.e.childNodes[0]) break
-						parent.p.d(parent.p)
+					if ((offset = parent.p)) {
+						if (offset.c && !offset.e.childNodes[0]) break
+						offset.d(offset)
 					}
 					parent = parentStack.pop()
 					stack.shift()
