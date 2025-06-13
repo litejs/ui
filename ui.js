@@ -467,10 +467,23 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			return View(url ? viewFn(url, params || {}, "404") : View.home)
 		}
 		function viewParse(str) {
+			if (!str) return
 			var parent = El("div")
 			, stack = [-1]
 			, parentStack = []
 			, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-#:.\w[\]](?:[~^$*|]?=)?)*) ?([\/>=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|$)/gm
+			replace(str, templateRe, work)
+			work("", "")
+			if (parent.childNodes[0]) {
+				append(root, parent.childNodes)
+				render(root)
+				/*** debug ***/
+				console.log("Outside view defined elements are rendered immediately into UI")
+				/**/
+			}
+			if (parent.i) {
+				histStart(viewShow)
+			}
 
 			function work(all, indent, plugin, sel, q, op, text, mapEnd, mapStart, offset) {
 				if (offset && all === indent) return
@@ -517,18 +530,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						}
 					}
 				}
-			}
-			replace(str, templateRe, work)
-			work("", "")
-			if (parent.childNodes[0]) {
-				append(root, parent.childNodes)
-				render(root)
-				/*** debug ***/
-				console.log("Outside view defined elements are rendered immediately into UI")
-				/**/
-			}
-			if (parent.i) {
-				histStart(viewShow)
 			}
 		}
 		function viewShow(url) {
@@ -1773,7 +1774,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			elKill(el)
 			return el.src
 		}), function(res) {
-			res = res.concat(sources, next && next.src && next.innerHTML).filter(Boolean)
+			res = res.concat(sources, next && next.src && next.innerHTML)
 			if (res[sources.length = 0]) {
 				if (!parser) LiteJS.ui = LiteJS()
 				each(res, parser)
