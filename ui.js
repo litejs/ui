@@ -568,8 +568,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					plugin.e.p = plugin
 				}
 			}
-			if (proto.r) proto.d = Function("p", "p.r(p.o+p.t)")
-			assign(Plugin.prototype, proto)
+			assign(Plugin.prototype, isFn(proto) ? { d: Function("p", "p.r(p.o+p.t)"), r: proto } : proto)
 		}
 		function usePluginContent(plugin) {
 			var el = plugin.e
@@ -603,16 +602,14 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				parent._cp = parent.childNodes.length - 1
 			}
 		})
-		addPlugin("css",  { r: injectCss })
-		addPlugin("def",  { r: viewDef })
-		addPlugin("js",   { r: viewEval })
-		addPlugin("each", {
-			r: function() {
-				var txt = this.t
-				each(this.o, function(param) {
-					viewParse(replace(txt, /{key}/g, param))
-				})
-			}
+		addPlugin("css", injectCss)
+		addPlugin("def", viewDef)
+		addPlugin("js", viewEval)
+		addPlugin("each", function() {
+			var txt = this.t
+			each(this.o, function(param) {
+				viewParse(replace(txt, /{key}/g, param))
+			})
 		})
 		addPlugin("el", {
 			d: function(plugin, el) {
@@ -621,11 +618,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		}, 1)
 		plugins.svg = plugins.el
-		addPlugin("map", {
-			r: function(txt) {
-				var plugin = this
-				appendBind(plugin.u, plugin.s ? txt.slice(1) : txt, plugin.s)
-			}
+		addPlugin("map", function(txt) {
+			var plugin = this
+			appendBind(plugin.u, plugin.s ? txt.slice(1) : txt, plugin.s)
 		})
 		addPlugin("view", {
 			d: function(plugin) {
