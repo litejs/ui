@@ -32,9 +32,21 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, getAttr = Function("a,b", "return a&&a.getAttribute&&a.getAttribute(b)")
 	, replace = Function("a,b,c", "return a.replace(b,c)")
 
+	/*** ie9 ***/
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
 	// http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
 	, ie678 = !+"\v1" // jshint ignore:line
+	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
+	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
+	, txtAttr = "textContent" in html ? "textContent" : "innerText"
+	, elTxt = function(el, txt) {
+		if (el[txtAttr] !== txt) el[txtAttr] = txt
+	}
+	/*/
+	, elTxt = function(el, txt) {
+		if (el.textContent !== txt) el.textContent = txt
+	}
+	/**/
 
 	, elSeq = 0
 	, elCache = {}
@@ -44,9 +56,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aosS]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /[a-z_$][\w$]*/ig
 	, camelRe = /\-([a-z])/g
-	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
-	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
-	, txtAttr = "textContent" in html ? "textContent" /* c8 ignore next */ : "innerText"
 	, bindingsCss = acceptMany(function(el, key, val, current) {
 		current = el.style[key = replace(key, camelRe, camelFn)]
 		el.style[key] = val
@@ -1148,12 +1157,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function setAttr(el, key, val) {
 		var current = getAttr(el, key)
 
-		/*** ie8 ***/
 		// NOTE: IE5-7 doesn't set styles and removes events when you try to set them.
 		// IE6 label with a for attribute will re-select the first option of SELECT list instead of just giving focus.
 		// http://webbugtrack.blogspot.com/2007/09/bug-116-for-attribute-woes-in-ie6.html
 		// IE8 and below have a bug where changed 'name' not accepted on form submit
-		/* c8 ignore next 3 */
+		/* c8 ignore next 4 */
+		/*** ie9 ***/
 		if (ie678 && (key === "id" || key === "name" || key === "checked" || key === "style")) {
 			el.mergeAttributes(document.createElement("<INPUT " + key + "='" + val + "'>"), false)
 		} else
@@ -1300,9 +1309,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			closestScope(el)
 		)
 	}
-	function elTxt(el, txt) {
-		if (el[txtAttr] !== txt) el[txtAttr] = txt
-	}
 	function elVal(el, val) {
 		if (!el) return ""
 		var input, step, key, value
@@ -1387,7 +1393,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		var el, next
 		, scope = node.$s || $s || closestScope(node)
 
-		/*** ie8 ***/
+		/*** ie9 ***/
 		if (ie678 && node.tagName === "SELECT") {
 			node.parentNode.insertBefore(node, node)
 		}
