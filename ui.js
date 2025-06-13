@@ -546,7 +546,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		}
 
-		function addPlugin(name, proto) {
+		function addPlugin(name, proto, expectContent) {
 			plugins[name] = Plugin
 			function Plugin(parent, op, sep) {
 				var plugin = this
@@ -560,7 +560,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					plugin.o = op
 					plugin.s = sep
 				} else {
-					if (plugin.c) {
+					if (expectContent) {
 						elCache = create(plugin.c = elCache)
 					}
 					plugin.e = El(name === "svg" ? name : "div")
@@ -614,12 +614,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		})
 		addPlugin("el", {
-			c: 1,
 			d: function(plugin, el) {
 				el = usePluginContent(plugin)
 				elCache[plugin.n] = el
 			}
-		})
+		}, 1)
 		plugins.svg = plugins.el
 		addPlugin("map", {
 			r: function(txt) {
@@ -628,7 +627,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		})
 		addPlugin("view", {
-			c: 1,
 			d: function(plugin) {
 				var expr = getAttr(plugin.e, "_b")
 				, view = View(plugin.n, usePluginContent(plugin), plugin.x)
@@ -638,7 +636,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					}) + "1", view)
 				}
 			}
-		})
+		}, 1)
 
 		/*** breakpoints ***/
 		var lastSize, lastOrient
