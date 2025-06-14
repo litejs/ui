@@ -311,7 +311,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		on(el, ev, fn2, el, fn)
 	}
 
-	function rmEvent(el, ev, fn) {
+	function rmEvent(el, ev, fn, opts) {
 		var evs = el._e && el._e[ev]
 		, id = evs && evs.indexOf(fn)
 		, ev2 = fixEv[ev] || ev
@@ -320,7 +320,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				evs[id + 1]._rm()
 			}
 			if (ev2 !== "" && "on" + ev2 in el) {
-				html.removeEventListener.call(el, ev2, evs[id + 1])
+				html.removeEventListener.call(el, ev2, evs[id + 1], opts)
 			}
 			evs.splice(id - 1, 3)
 		}
