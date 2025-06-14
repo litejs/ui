@@ -1,7 +1,7 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global escape, navigator, xhr, addEventListener */
+/* global escape, navigator, xhr */
 
 /*** debug ***/
 console.log("LiteJS is in debug mode, but it's fine for production")
@@ -11,7 +11,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	window.El = El
 	asEmitter(window.LiteJS = LiteJS)
 
-	var UNDEF, parser, pushBase, styleNode, canCapture
+	var UNDEF, parser, pushBase, styleNode
 	, NUL = null
 	// THIS will be undefined in strict mode and window in sloppy mode
 	, THIS = this
@@ -297,10 +297,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return _e / 3
 	}
 
-	try {
-		addEventListener("t", NUL, { get capture() { canCapture = 1 }})
-	} catch(e){}
-
 	function addEvent(el, ev, fn, opts) {
 		var fn2 = fixFn[ev] && fixFn[ev](el, fn, ev) || fn
 		, ev2 = fixEv[ev] || ev
@@ -309,9 +305,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			// polyfilled addEventListener returns patched function
 			// useCapture defaults to false
 			// Chrome56 touchstart/move sets {passive:true} by default; use {passive:false} to enable preventDefault()
-			fn2 = html.addEventListener.call(
-				el, ev2, fn2, !canCapture && isObj(opts) ? !!opts.capture : opts || false
-			) || fn2
+			fn2 = html.addEventListener.call(el, ev2, fn2, opts) || fn2
 		}
 
 		on(el, ev, fn2, el, fn)

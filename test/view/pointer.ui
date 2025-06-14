@@ -1,4 +1,24 @@
 
+%js
+	El.$b.captureTest = function(el, asObj) {
+		var arr=[]
+		, txt = el.textContent + " "
+		, up = el.parentNode
+		console.log("captureTest", asObj)
+		El.on(up, "click", push(1), 0, asObj ? { capture: true } : true)
+		El.on(up, "click", push(4), 0, asObj ? { capture: false } : false)
+		El.on(el, "click", push(2), 0, asObj ? { capture: true } : true)
+		El.on(el, "click", push(3), 0, asObj ? { capture: false } : false)
+		function push(num) {
+			return function() {
+				if (arr.push(num) > 3) {
+					El.txt(el, txt + (""+arr == "1,2,3,4") + " " + arr)
+					arr = []
+				}
+			}
+		}
+	}
+
 %view pointer public
 anim-page
 	h2 Test touch 1
@@ -39,6 +59,13 @@ anim-page
 		;$s! {count3:0}
 		;txt "Wheel " + $s.count3
 		;on "wheel", "txt"
+	h2 addEventListener options
+	div
+		div inner boolean
+			;captureTest!false
+	div
+		div inner object
+			;captureTest!true
 
 %css
 	.sortCol{padding:2px;display:block;width:100px;margin:4px;border:1px solid #ccc;height:250px;float:left}

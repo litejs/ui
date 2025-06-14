@@ -24,7 +24,7 @@
 	// queueMicrotask       - Chrome71, Firefox69, Safari12.1
 	// "".at(), [].at()     - Chrome92, Firefox90, Safari15.4
 
-	var UNDEF, isArray, oKeys
+	var UNDEF, canCapture, isArray, oKeys
 	, O = window
 	, patched = (window.xhr || window)._p = []
 	, jsonRe = /[\x00-\x1f\x22\x5c]/g
@@ -434,10 +434,19 @@
 	, closest = patch("closest", walk.bind(window, "parentNode", 1))
 	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
 
+	try {
+		b = "removeEventListener"
+		c = "O.call(t,a,b,X(c)?!!c.capture:!!c)"
+		O[a = "addEventListener"]("t", null, { get capture() { canCapture = 1 }})
+		if (!canCapture) {
+			patch("c:" + a, c, 1, isObj)
+			patch("c:" + b, c, 1, isObj)
+		}
+	} catch(e){}
 	// The addEventListener is supported in Internet Explorer from version 9.
 	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 	// - IE8 always prevents the default of the mousewheel event.
-	patch("addEventListener", "return(t.attachEvent('on'+a,b=X(t,a,b)),b)", 0, function(el, ev, fn) {
+	patch(a, "return(t.attachEvent('on'+a,b=X(t,a,b)),b)", 0, function(el, ev, fn) {
 		return function() {
 			var e = new Event(ev)
 			if (e.clientX !== UNDEF) {
@@ -447,7 +456,8 @@
 			fn.call(el, e)
 		}
 	})
-	patch("removeEventListener", "t.detachEvent('on'+a,b)")
+	patch(b, "t.detachEvent('on'+a,b)")
+
 
 	// Note: querySelector in IE8 supports only CSS 2.1 selectors
 	patch((a = "querySelector"), (b = "return X(t,a,Y)"), ie678, find, 1)
@@ -518,6 +528,9 @@
 	}
 	function isStr(value) {
 		return typeof value === "string"
+	}
+	function isObj(obj) {
+		return !!obj && obj.constructor === Object
 	}
 	function nop() {}
 
