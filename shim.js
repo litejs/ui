@@ -111,7 +111,8 @@
 	patch(b, a, ie6789, isFn)
 
 	// 20 fps is good enough
-	patch("request" + (a = "AnimationFrame"), "return setTimeout(a,50)")
+	a = "AnimationFrame"
+	patch("request" + a, "return setTimeout(a,50)")
 	// window.mozRequestAnimationFrame    || // Firefox 4-23
 	// window.webkitRequestAnimationFrame || // Chrome 10-24
 	// window.msRequestAnimationFrame     || // IE 10 PP2+
@@ -389,7 +390,7 @@
 	patch("at",          a + "[a]")
 
 	O = String[P]
-	patch("at",          a + ".charAt(a)")
+	patch("s:at",        a + ".charAt(a)")
 	patch("endsWith", "return(a+='')===t.slice(-a.length)")
 	patch("startsWith", "return t.lastIndexOf(a,0)===0")
 	patch("trim", "return t.replace(/^\\s+|\\s+$/g,'')")
