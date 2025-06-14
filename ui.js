@@ -74,7 +74,75 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}, 1),
 		set: acceptMany(setAttr),
 		txt: elTxt,
-		val: elVal,
+		/*** form ***/
+		val: function elVal(el, val) {
+			if (!el) return ""
+			var input, step, key, value
+			, i = 0
+			, type = el.type
+			, opts = el.options
+			, checkbox = type === "checkbox" || type === "radio"
+
+			if (el.tagName === "FORM") {
+				// Disabled controls do not receive focus,
+				// are skipped in tabbing navigation, cannot be successfully posted.
+				//
+				// Read-only elements receive focus but cannot be modified by the user,
+				// are included in tabbing navigation, are successfully posted.
+				//
+				// Read-only checkboxes can be changed by the user
+
+				for (opts = {}; (input = el.elements[i++]); ) if (!input.disabled && (key = input.name || input.id)) {
+					value = elVal(input, val != UNDEF ? val[key] : UNDEF)
+					if (value !== UNDEF) {
+						step = opts
+						replace(key, /\[(.*?)\]/g, replacer)
+						step[key || step.length] = value
+					}
+				}
+				return opts
+			}
+
+			if (val !== UNDEF) {
+				if (opts) {
+					for (value = (isArr(val) ? val : [ val ]).map(String); (input = opts[i++]); ) {
+						input.selected = value.indexOf(input.value) > -1
+					}
+				} else if (el.val) {
+					el.val(val)
+				} else if (checkbox) {
+					el.checked = !!val
+				} else {
+					el.value = val
+				}
+				return
+			}
+
+			if (opts) {
+				if (type === "select-multiple") {
+					for (val = []; (input = opts[i++]); ) {
+						if (input.selected && !input.disabled) {
+							val.push(input.valObject || input.value)
+						}
+					}
+					return val
+				}
+				// IE8 throws error when accessing to options[-1]
+				value = el.selectedIndex
+				el = value > -1 && opts[value] || el
+			}
+
+			return checkbox && !el.checked ?
+			(type === "radio" ? UNDEF : NUL) :
+			el.valObject !== UNDEF ? el.valObject : el.value
+
+			function replacer(_, _key, offset) {
+				if (step == opts) key = key.slice(0, offset)
+				step = step[key] || (step[key] = step[key] === NUL || _key && +_key != _key ? {} : [])
+				key = _key
+			}
+		}
+		/**/
 	}
 	, bindOnce = []
 	, globalScope = {
@@ -1308,73 +1376,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			parent ? ((parent = elScope(parent)), el.$s = assign(create(parent), { $up: parent })) :
 			closestScope(el)
 		)
-	}
-	function elVal(el, val) {
-		if (!el) return ""
-		var input, step, key, value
-		, i = 0
-		, type = el.type
-		, opts = el.options
-		, checkbox = type === "checkbox" || type === "radio"
-
-		if (el.tagName === "FORM") {
-			// Disabled controls do not receive focus,
-			// are skipped in tabbing navigation, cannot be successfully posted.
-			//
-			// Read-only elements receive focus but cannot be modified by the user,
-			// are included in tabbing navigation, are successfully posted.
-			//
-			// Read-only checkboxes can be changed by the user
-
-			for (opts = {}; (input = el.elements[i++]); ) if (!input.disabled && (key = input.name || input.id)) {
-				value = elVal(input, val != UNDEF ? val[key] : UNDEF)
-				if (value !== UNDEF) {
-					step = opts
-					replace(key, /\[(.*?)\]/g, replacer)
-					step[key || step.length] = value
-				}
-			}
-			return opts
-		}
-
-		if (val !== UNDEF) {
-			if (opts) {
-				for (value = (isArr(val) ? val : [ val ]).map(String); (input = opts[i++]); ) {
-					input.selected = value.indexOf(input.value) > -1
-				}
-			} else if (el.val) {
-				el.val(val)
-			} else if (checkbox) {
-				el.checked = !!val
-			} else {
-				el.value = val
-			}
-			return
-		}
-
-		if (opts) {
-			if (type === "select-multiple") {
-				for (val = []; (input = opts[i++]); ) {
-					if (input.selected && !input.disabled) {
-						val.push(input.valObject || input.value)
-					}
-				}
-				return val
-			}
-			// IE8 throws error when accessing to options[-1]
-			value = el.selectedIndex
-			el = value > -1 && opts[value] || el
-		}
-
-		return checkbox && !el.checked ?
-		(type === "radio" ? UNDEF : NUL) :
-		el.valObject !== UNDEF ? el.valObject : el.value
-
-		function replacer(_, _key, offset) {
-			if (step == opts) key = key.slice(0, offset)
-			step = step[key] || (step[key] = step[key] === NUL || _key && +_key != _key ? {} : [])
-			key = _key
-		}
 	}
 
 	function closestScope(node) {
