@@ -30,6 +30,7 @@
 
 	/*** ie9 ***/
 	, Fn = Function
+	, nop = Fn()
 	, execScript =
 		// IE5-10, Chrome1-12
 		window.execScript ||
@@ -163,9 +164,12 @@
 					attr1,
 					attr2
 				)
-				req.onreadystatechange = next = null
 				/*** ie9 ***/
+				// ActiveXObject does not accept `null` for onreadystatechange
+				req.onreadystatechange = next = nop
 				xhrs.push(req)
+				/*/
+				req.onreadystatechange = next = null
 				/**/
 			}
 		}
