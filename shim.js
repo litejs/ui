@@ -436,9 +436,11 @@
 	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
 
 	try {
+		O[a = "addEventListener"]("t", null, Object.defineProperties({}, {
+			capture: { get: function() { canCapture = 1 } }
+		}))
 		b = "removeEventListener"
 		c = "O.call(t,a,b,X(c)?!!c.capture:!!c)"
-		O[a = "addEventListener"]("t", null, { get capture() { canCapture = 1 }})
 		if (!canCapture) {
 			patch("c:" + a, c, 1, isObj)
 			patch("c:" + b, c, 1, isObj)
