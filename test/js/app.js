@@ -196,9 +196,9 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 		}, 600)
 	})
 
-	El.on(window, "languagechange", function(event) {})
+	//El.on(window, "languagechange", function(event) {})
 
-	El.on(body, "click pointerdown", El.stop, "input[readonly][type=checkbox]")
+	//El.on(body, "click pointerdown", El.stop, "input[readonly][type=checkbox]")
 	El.on(body, "click", function(e) {
 		var el = e.target
 		, link = !(e.altKey || e.shiftKey) && el.tagName == "A" && el.href.split("#")
