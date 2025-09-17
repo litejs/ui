@@ -335,11 +335,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function LiteJS(opts) {
 		opts = assign({
 			/*** breakpoints ***/
-			breakpoints: {
-				sm: 0,
-				md: 601,
-				lg: 1025
-			},
+			breakpoints: "sm,601=md,1025=lg",
 			/**/
 			home: "home",
 			root: body
@@ -704,30 +700,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}, 1)
 
 		/*** breakpoints ***/
-		var lastSize, lastOrient
-		, breakpoints = opts.breakpoints
-		, setBreakpointsRated = rate(function() {
+		var breakpoints = opts.breakpoints
+		, setBreakpointsRated = rate(function(width) {
 			// document.documentElement.clientWidth is 0 in IE5
-			var point, next
-			, width = html.offsetWidth
-
-			for (point in breakpoints) {
-				if (breakpoints[point] > width) break
-				next = point
-			}
-
-			if (next != lastSize) {
-				cls(html, lastSize, 0)
-				cls(html, lastSize = next)
-			}
-
-			next = width > html.offsetHeight ? "land" : "port"
-
-			if (next != lastOrient) {
-				cls(html, lastOrient, 0)
-				cls(html, lastOrient = next)
-			}
-
+			bindingsIs(html, (width = html.offsetWidth), breakpoints, "")
+			bindingsIs(html, +(width > html.offsetHeight), "port,1=land", "")
 			emit(View, "resize")
 		}, 99)
 
@@ -807,11 +784,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					return str != key ? replace(/#/g, bind(values.shift, values), iGet(t, key, str)) : str
 				},
 				pick: function(val, word) {
-					for (var t = translations["?"] || {}, arr = replace(/([^;=,]+?)\?/g, "$1=$1;", (t[word] || word)).split(/[;=,]/), i = 1|arr.length; i > 0; ) {
-						if ((i-=2) < 0 || arr[i] && (arr[i] == "" + val || +arr[i] <= val)) {
-							return arr[i + 1] ? replace("#", val, arr[i + 1]) : ""
-						}
-					}
+					var t = translations["?"] || {}
+					return pick(val, t[word] || word)
 				},
 				plural: function(n, word, expr) {
 					var t = translations["*"] || {}
@@ -1170,12 +1144,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					return true
 				}
 			},
-			is: function(el, val, opts, prefix) {
-				if (!isStr(prefix)) prefix = "is-"
-				var match = elScope(el)._.ext.pick(val, opts)
-				cls(el, el[prefix + opts], 0)
-				cls(el, el[prefix + opts] = match && prefix + match)
-			},
+			is: bindingsIs,
 			name: function(el, name) {
 				setAttr(el, "name", expand(name, 1))
 			},
@@ -1611,6 +1580,19 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 	/**/
 
+	function bindingsIs(el, val, opts, prefix) {
+		if (!isStr(prefix)) prefix = "is-"
+		var match = pick(val, opts)
+		cls(el, el[prefix + opts], 0)
+		cls(el, el[prefix + opts] = match && prefix + match)
+	}
+	function pick(val, word) {
+		for (var arr = replace(/([^;=,]+?)\?/g, "$1=$1;", word).split(/[;=,]/), i = 1|arr.length; i > 0; ) {
+			if ((i-=2) < 0 || arr[i] && (arr[i] == "" + val || +arr[i] <= val)) {
+				return arr[i + 1] ? replace("#", val, arr[i + 1]) : ""
+			}
+		}
+	}
 	function closest(el, sel) {
 		return el && html.closest.call(el.nodeType < 2 ? el : el.parentNode, sel)
 	}
