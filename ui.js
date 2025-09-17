@@ -31,6 +31,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, elRm = Function("a,b", "a&&(b=a.parentNode)&&b.removeChild(a)")
 	, getAttr = Function("a,b", "return a&&a.getAttribute&&a.getAttribute(b)")
 	, replace = Function("a,b,c", "return c.replace(a,b)")
+	, toCamel = replace.bind(NUL, /\-([a-z])/g, Function("a,b", "return b.toUpperCase()"))
 
 	/*** ie9 ***/
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
@@ -55,9 +56,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, fnCache = {}
 	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aorsS]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /[a-z_$][\w$]*/ig
-	, camelRe = /\-([a-z])/g
 	, bindingsCss = acceptMany(function(el, key, val, current) {
-		current = el.style[key = replace(camelRe, camelFn, key)]
+		current = el.style[key = toCamel(key)]
 		el.style[key] = val
 		return current
 	})
@@ -1684,9 +1684,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		try {
 			document.activeElement.blur()
 		} catch(e) {}
-	}
-	function camelFn(_, a) {
-		return a.toUpperCase()
 	}
 	function each(arr, fn, scope, key) {
 		if (arr) {
