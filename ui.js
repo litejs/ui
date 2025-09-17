@@ -1313,7 +1313,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				if (isObj(tr)) bindingsCss(el, tr)
 				tr = "transitionend"
 				// transitionend fires for each property transitioned
-				if ("on" + tr in el) return addEvent(el, tr, bind(elKill, el, el, el = UNDEF))
+				if ("on" + tr in el) return addEvent(el, tr, bind(elKill, el, el))
 			}
 			if (el._e) {
 				emit(el, "kill")
