@@ -30,7 +30,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, elReplace = Function("a,b,c", "a&&b&&(c=a.parentNode)&&c.replaceChild(b,a)")
 	, elRm = Function("a,b", "a&&(b=a.parentNode)&&b.removeChild(a)")
 	, getAttr = Function("a,b", "return a&&a.getAttribute&&a.getAttribute(b)")
-	, replace = Function("a,b,c", "return a.replace(b,c)")
+	, replace = Function("a,b,c", "return c.replace(a,b)")
 
 	/*** ie9 ***/
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
@@ -57,7 +57,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, wordRe = /[a-z_$][\w$]*/ig
 	, camelRe = /\-([a-z])/g
 	, bindingsCss = acceptMany(function(el, key, val, current) {
-		current = el.style[key = replace(key, camelRe, camelFn)]
+		current = el.style[key = replace(camelRe, camelFn, key)]
 		el.style[key] = val
 		return current
 	})
@@ -96,7 +96,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					value = elVal(input, val != UNDEF ? val[key] : UNDEF)
 					if (value !== UNDEF) {
 						step = opts
-						replace(key, /\[(.*?)\]/g, replacer)
+						replace(/\[(.*?)\]/g, replacer, key)
 						step[key || step.length] = value
 					}
 				}
@@ -195,27 +195,27 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			(tag == "a" ? " href=\"" + (link || text) + "\"" : op == "@" ? " datetime=\"" + name + "\"" : "") +
 			(attr ? " class=\"" + attr.slice(1) + "\">" : ">") +
 			(
-				op === ">" ? doc(replace(text, /^> ?/gm, "")) :
+				op === ">" ? doc(replace(/^> ?/gm, "", text)) :
 				tag == "ul" ? "<li>" + text.split(/\n - (?=\S)/).map(inline).join("</li>\n<li>") + "</li>" :
-				inline(tag == "a" ? replace(name, /^\w+:\/{0,2}/, "") : text)
+				inline(tag == "a" ? replace(/^\w+:\/{0,2}/, "", name) : text)
 			) +
 			"</" + tag + ">" :
-		replace(tag, /\[([-!*+,/:;@^_`~])((.+?)(?: (\S+?))?)\1(\.[.\w]+)?]/g, inline)
+		replace(/\[([-!*+,/:;@^_`~])((.+?)(?: (\S+?))?)\1(\.[.\w]+)?]/g, inline, tag)
 	}
 	function block(tag, op, text, media, alt) {
 		return op && !isArr(text) ? inline(tag, op, text) :
 		media ? "<img src=\"" + media + "\" alt=\"" + alt + "\">" :
-		blockRe.test(tag) ? replace(tag, blockRe, block) :
+		blockRe.test(tag) ? replace(blockRe, block, tag) :
 		tag === "---" ? "<hr>" : "<p>" + inline(tag) + "</p>"
 	}
 	function doc(txt) {
-		return replace(txt.trim(), /^ \b/gm, "<br>").split(/\n\n+/).map(block).join("\n")
+		return replace(/^ \b/gm, "<br>", txt.trim()).split(/\n\n+/).map(block).join("\n")
 	}
 	bindings.t = function(el, text) {
-		el.innerHTML = inline(replace(text, /</g, "&lt;"))
+		el.innerHTML = inline(replace(/</g, "&lt;", text))
 	}
 	bindings.d = function(el, text) {
-		el.innerHTML = doc(replace(text, /</g, "&lt;"))
+		el.innerHTML = doc(replace(/</g, "&lt;", text))
 	}
 	/**/
 
@@ -364,11 +364,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 			if (route.charAt(0) !== "#") {
 				fnStr += "m[" + (view.s = routeSeq++) + "]?("
-				reStr += "|(" + replace(route, routeRe, function(_, expr) {
+				reStr += "|(" + replace(routeRe, function(_, expr) {
 					return expr ?
 						(fnStr += "p['" + expr + "']=m[" + (routeSeq++) + "],") && "([^/]+?)" :
-						replace(_, reEsc, "\\$&")
-				}) + ")"
+						replace(reEsc, "\\$&", _)
+				}, route) + ")"
 				fnStr += "'" + route + "'):"
 				viewFn = 0
 			}
@@ -444,7 +444,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				}
 				if (tmp.f) {
 					return xhr.load(
-						replace(tmp.f, /^|,/g, "$&" + (View.path || "")).split(","),
+						replace(/^|,/g, "$&" + (View.path || ""), tmp.f).split(","),
 						bind(readTemplates, view, view.wait(tmp.f = ""))
 					)
 				} else if (!tmp.e) {
@@ -543,7 +543,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			, stack = [-1]
 			, parentStack = []
 			, templateRe = /([ \t]*)(%?)((?:("|')(?:\\.|[^\\])*?\4|[-#:.\w[\]](?:[~^$*|]?=)?)*) ?([\/>=@^;]|)(([\])}]?).*?([[({]?))(?=\x1f|$)/gm
-			replace(str, templateRe, work)
+			replace(templateRe, work, str)
 			work("", "")
 			if (parent.childNodes[0]) {
 				append(root, parent.childNodes)
@@ -568,7 +568,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					stack.shift()
 				}
 				if (op === "@") {
-					text = replace(text, /([\w,.]+)[!:]?/, /^\w+!/.test(text) ? "one!'$1'," : "on!'$1',")
+					text = replace(/([\w,.]+)[!:]?/, /^\w+!/.test(text) ? "one!'$1'," : "on!'$1',", text)
 				}
 				if (parent.r) {
 					parent.t += "\n" + all
@@ -590,7 +590,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					}
 					if (text && op != "/") {
 						if (op === ">") {
-							replace(indent + " " + text, templateRe, work)
+							replace(templateRe, work, indent + " " + text)
 						} else if (op === "=") {
 							append(parent, text) // + "\n")
 						} else {
@@ -679,7 +679,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		addPlugin("each", function() {
 			var txt = this.t
 			each(this.o, function(param) {
-				viewParse(replace(txt, /{key}/g, param))
+				viewParse(replace(/{key}/g, param, txt))
 			})
 		})
 		addPlugin("el", {
@@ -698,9 +698,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				var expr = getAttr(plugin.e, "_b")
 				, view = View(plugin.n, usePluginContent(plugin), plugin.x)
 				if (expr) {
-					viewEval(replace(expr, renderRe, function(_, name, op, args) {
+					viewEval(replace(renderRe, function(_, name, op, args) {
 						return "($s." + name + (isFn(view[name]) ? "(" + (args || "") + ")" : "=" + args) + "),"
-					}) + "1", view)
+					}, expr) + "1", view)
 				}
 			}
 		}, 1)
@@ -802,16 +802,16 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				pattern: function(str, re) {
 					var values = []
 					, t = translations["~"] || {}
-					, key = replace(str, RegExp(re || t[""] || "[\\d.]+", "g"), function(a) {
+					, key = replace(RegExp(re || t[""] || "[\\d.]+", "g"), function(a) {
 						values.push(a)
 						return "#"
-					})
-					return str != key ? replace(iGet(t, key, str), /#/g, bind(values.shift, values)) : str
+					}, str)
+					return str != key ? replace(/#/g, bind(values.shift, values), iGet(t, key, str)) : str
 				},
 				pick: function(val, word) {
-					for (var t = translations["?"] || {}, arr = replace((t[word] || word), /([^;=,]+?)\?/g, "$1=$1;").split(/[;=,]/), i = 1|arr.length; i > 0; ) {
+					for (var t = translations["?"] || {}, arr = replace(/([^;=,]+?)\?/g, "$1=$1;", (t[word] || word)).split(/[;=,]/), i = 1|arr.length; i > 0; ) {
 						if ((i-=2) < 0 || arr[i] && (arr[i] == "" + val || +arr[i] <= val)) {
-							return arr[i + 1] ? replace(arr[i + 1], "#", val) : ""
+							return arr[i + 1] ? replace("#", val, arr[i + 1]) : ""
 						}
 					}
 				},
@@ -839,10 +839,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					S: "Milliseconds()"
 				}
 				, setA = "a.setTime(+d+((4-(" + get + dateMap.d + "))*864e5))"
-				return replace((utc ? mask.slice(4) : mask), dateRe, function(match, MD, single, pad, text, esc) {
+				return replace(dateRe, function(match, MD, single, pad, text, esc) {
 					mask = (
-						esc            ? replace(replace(escape(esc), /%u/g, "\\u"), /%/g, "\\x") :
-						text !== UNDEF ? replace(text, /''/g, "'") :
+						esc            ? replace(/%/g, "\\x", replace(/%u/g, "\\u", escape(esc))) :
+						text !== UNDEF ? replace(/''/g, "'", text) :
 						MD || match == "dd" ? "l[''][" + get + (MD == "M" ? "Month()+" + (match == "MMM" ? 14 : 26) : "Day()" + (pad ? (pad = "") : "+7")) + "]" :
 						match == "u"   ? "(d/1000)>>>0" :
 						match == "U"   ? "+d" :
@@ -859,7 +859,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 						pad ? "(t=" + mask + ")>9?t:'0'+t" :
 						mask
 					) + ")+\""
-				})
+				}, (utc ? mask.slice(4) : mask))
 			}
 
 			function numStr(format, t) {
@@ -878,7 +878,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				, m3 = /([.,\/])(\d*)$/.exec(m2[2])
 				, decimals = m3 && m3[2].length || 0
 				, full = m3 ? m2[2].slice(0, m3.index) : m2[2]
-				, num = replace(full, /\D+/g, "")
+				, num = replace(/\D+/g, "", full)
 				, sLen = num.length
 				, step = decimals ? +(m3[1] === "/" ? 1 / m3[2] : num + "." + m3[2]) : num
 				, decSep = m3 && m3[1]
@@ -922,7 +922,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				fn += (
 					(m2[4] ? ",r=" + (post[m2[4]] || "r+o") : "") +
 					// negative format
-					",N&&n>0?" + replace(quote(conf[2] || "-#"), "#", "'+r+'") + ":" +
+					",N&&n>0?" + replace("#", "'+r+'", quote(conf[2] || "-#")) + ":" +
 					(conf[3] ? "n===0?" + quote(conf[3]) + ":" : "") +
 					(m2[1] ? quote(m2[1]) + "+r" : "r") +
 					(m2[6] ? "+" + quote(m2[6]) : "")
@@ -947,11 +947,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				return format(iGet(translations, str, str || ""), data, getExt)
 			}
 			function getExt(obj, str) {
-				var fn = cache[str] || (cache[str] = (replace(replace(str, /;\s*([#*?@~])(.*)/, function(_, op, arg) {
-					return ";" + iAlias[op] + " " + quote(arg)
-				}), renderRe, function(_, name, op, args) {
+				var fn = cache[str] || (cache[str] = (replace(renderRe, function(_, name, op, args) {
 					fn = (_ === name) ? name : "$el." + name + "(" + fn + (args ? "," + args : "") + ")"
-				}), fn === str ? str : makeFn(fn, fn)))
+				}, replace(/;\s*([#*?@~])(.*)/, function(_, op, arg) {
+					return ";" + iAlias[op] + " " + quote(arg)
+				}, str)), fn === str ? str : makeFn(fn, fn)))
 				return str == "$" ? obj : isStr(fn) ? iGet(obj, str, "") : isFn(fn) ? fn(iExt, obj, translations) : ""
 			}
 		})
@@ -1019,7 +1019,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		, baseEl = find(html, "base")
 		, url = getUrl()
 		if (baseEl && history.pushState) {
-			pushBase = replace(baseEl.href, /.*:\/\/[^/]*|[^\/]*$/g, "")
+			pushBase = replace(/.*:\/\/[^/]*|[^\/]*$/g, "", baseEl.href)
 
 			if (url && !getUrl()) {
 				setUrl(url, 1)
@@ -1041,12 +1041,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			if (cb && histLast != (histLast = getUrl())) cb(histLast)
 		}
 		function getUrl() {
-			return replace(
+			return replace(/^[#\/\!]+|[\s\/]+$/g, "",
 				/*** pushState ***/
 				pushBase ? location.pathname.slice(pushBase.length) :
 				/**/
 				// NOTE: in Firefox location.hash is decoded; in Safari location.pathname is decoded
-				location.href.split("#")[1] || "", /^[#\/\!]+|[\s\/]+$/g, "")
+				location.href.split("#")[1] || "")
 		}
 	}
 
@@ -1058,7 +1058,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function El(name) {
 		var attr
 		, attrs = {}
-		, el = replace(name, selectorRe, function(_, op, key, fn, val, quotation) {
+		, el = replace(selectorRe, function(_, op, key, fn, val, quotation) {
 			attr = 1
 			val = quotation ? val.slice(1, -1) : val || key
 			attrs[op =
@@ -1072,7 +1072,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				attrs[op] + (fn === "~" ? " " : "") + val :
 				val
 			return ""
-		}) || "div"
+		}, name) || "div"
 
 		// NOTE: IE-s cloneNode consolidates the two text nodes together as one
 		// http://brooknovak.wordpress.com/2009/08/23/ies-clonenode-doesnt-actually-clone/
@@ -1322,7 +1322,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				name = current.split(SP).indexOf(name) > -1 ? current : current + SP + name
 			}
 		} else {
-			name = current ? replace(SP + current + SP, SP + name + SP, SP).trim() : current
+			name = current ? replace(SP + name + SP, SP, SP + current + SP).trim() : current
 		}
 
 		if (current != name) {
@@ -1413,12 +1413,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 	}
 	function makeFn(fn, raw, i) {
-		fn = raw || "$s&&(" + replace(fn, renderRe, function(match, name, op, args) {
+		fn = raw || "$s&&(" + replace(renderRe, function(match, name, op, args) {
 			return (
 				op ? "($el[$a]=$el[$a].replace($o[" + (i = bindOnce.indexOf(match), i < 0 ? bindOnce.push(match) - 1 : i)+ "],''),0)||" : ""
 			) + "$b['" + (bindings[name] ? name + "'].call($s" + (name == "$s" ? "=$S($el,$el)": "") + ",$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
-		}) + "$r)"
-		var vars = replace(fn, fnRe, "").match(wordRe) || []
+		}, fn) + "$r)"
+		var vars = replace(fnRe, "", fn).match(wordRe) || []
 		for (i = vars.length; i--; ) {
 			if (window[vars[i]] || vars.indexOf(vars[i]) !== i) vars.splice(i, 1)
 			else vars[i] += "=$s." + vars[i]
@@ -1728,7 +1728,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		return typeof str === "string"
 	}
 	function quote(str) {
-		return "'" + replace(replace(str || "", /'/g, "\\'"), /\n/g, "\\n") + "'"
+		return "'" + replace(/\n/g, "\\n", replace(/'/g, "\\'", str || "")) + "'"
 	}
 	// Maximum call rate for Function with optional leading edge and trailing edge
 	function rate(fn, ms, onStart, onEnd) {
