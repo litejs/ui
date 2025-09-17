@@ -128,18 +128,6 @@ describe("event", function() {
 		.equal(emitter.emit("all", "emit12"), 0)
 		.equal(emitted, expected)
 
-		// emit newListener and removeListener
-		emitted.length = expected.length = 0
-		assert
-		.equal(em3.on("removeListener", ev3remove), em3)
-		.equal(em3.on("newListener", ev3new), em3)
-		.equal(emitted.length, 0)
-		.equal(em3.on("ev3", ev3a, emitter, ev3b), em3)
-		.equal(emitted.length, expected.push("ev3new:ev3", emitter, ev3b))
-		.equal(em3.off("ev3", ev3a, emitter, ev3b), em3)
-		.equal(emitted.length, expected.push("ev3remove:ev3", emitter, ev3b))
-		.equal(emitted, expected)
-
 		// remove all listeners
 		emitted.length = expected.length = 0
 		assert

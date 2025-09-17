@@ -261,7 +261,6 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function on(emitter, type, fn, scope, _origin) {
 		if (emitter && type && fn) {
 			if (emitter === window) emitter = emptyArr
-			emit(emitter, "newListener", type, fn, scope, _origin)
 			var events = emitter._e || (emitter._e = create(NUL))
 			;(events[type] || (events[type] = [])).unshift(scope, _origin, fn)
 		}
@@ -269,14 +268,13 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	}
 
 	function off(type, fn, scope) {
-		var i, args
+		var i
 		, emitter = this === window ? emptyArr : this
 		, events = emitter._e && emitter._e[type]
 		if (events) {
 			for (i = events.length - 2; i > 0; i -= 3) {
 				if ((events[i + 1] === fn || events[i] === fn) && events[i - 1] == scope) {
-					args = events.splice(i - 1, 3)
-					emit(emitter, "removeListener", type, args[2], args[0], args[1])
+					events.splice(i - 1, 3)
 					if (fn) break
 				}
 			}
