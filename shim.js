@@ -287,15 +287,21 @@
 	// https://bugzilla.mozilla.org/show_bug.cgi?id=666448
 	patch("escape", "return X(a)", esc("a", 0) != "a", esc)
 
-	// From Chrome23/Firefox21 parseInt parses leading-zero strings as decimal, not octal
+	// Since Chrome23/Firefox21 parseInt parses leading-zero strings as decimal, not octal
 	b = patch("g:parseInt", "return X(a,(b>>>0)||(Y.test(''+a)?16:10))", _parseInt("08") !== 8, _parseInt, /^\s*[-+]?0[xX]/)
 
 	O = Number
 	patch("parseInt", b)
 	patch("parseFloat", parseFloat)
 	patch("isNaN", "return a!==a")
-	patch("isInteger", "return X(a)&&Math.floor(a)===a", 0, patch("isFinite", "return typeof a==='number'&&isFinite(a)"))
-	patch("isSafeInteger", "return a<=X", 0, patch("MAX_SAFE_INTEGER", 9007199254740991))
+	a = Math.pow
+	c = "_SAFE_INTEGER"
+	patch("EPSILON", a(2, -52))
+	patch(
+		"isSafeInteger", "return Y(a)&&a>=X&&a<=-X", 0,
+		patch("MIN" + c, -patch("MAX" + c, a(2, 53)-1)),
+		patch("isInteger", "return X(a)&&a%1===0", 0, patch("isFinite", "return typeof a==='number'&&isFinite(a)"))
+	)
 
 	O = Date
 	patch("now", "return+new Date")
