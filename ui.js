@@ -75,9 +75,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		set: acceptMany(setAttr),
 		txt: elTxt,
 		/*** form ***/
-		val: function elVal(el, val) {
-			if (!el) return ""
-			var input, step, key, value
+		val: function elVal(el, val, input) {
+			try {
+				if (!el || !input && document.activeElement === el) return
+			} catch (e) {}
+			var step, key, value
 			, i = 0
 			, type = el.type
 			, opts = el.options
