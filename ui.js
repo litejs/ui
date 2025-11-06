@@ -75,11 +75,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		set: acceptMany(setAttr),
 		txt: elTxt,
 		/*** form ***/
-		val: function elVal(el, val, input) {
-			try {
-				if (!el || !input && document.activeElement === el) return
-			} catch (e) {}
-			var step, key, value
+		val: function elVal(el, val, ignoreFocus) {
+			if (!el) return
+			var input, step, key, value
 			, i = 0
 			, type = el.type
 			, opts = el.options
@@ -95,7 +93,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 				// Read-only checkboxes can be changed by the user
 
 				for (opts = {}; (input = el.elements[i++]); ) if (!input.disabled && (key = input.name || input.id)) {
-					value = elVal(input, val != UNDEF ? val[key] : UNDEF)
+					value = elVal(input, val != UNDEF ? val[key] : UNDEF, ignoreFocus)
 					if (value !== UNDEF) {
 						step = opts
 						replace(/\[(.*?)\]/g, replacer, key)
@@ -106,6 +104,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 
 			if (val !== UNDEF) {
+				try {
+					if (!ignoreFocus && document.activeElement === el) return
+				} catch (e) {}
 				if (opts) {
 					for (value = (isArr(val) ? val : [ val ]).map(String); (input = opts[i++]); ) {
 						input.selected = value.indexOf(input.value) > -1
