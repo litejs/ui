@@ -39,7 +39,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, ie678 = !+"\v1" // jshint ignore:line
 	// innerText is implemented in IE4, textContent in IE9, Node.text in Opera 9-10
 	// Safari 2.x innerText results an empty string when style.display=="none" or Node is not in DOM
-	, txtAttr = "textContent" in html ? "textContent" : "innerText"
+	, txtAttr = El.T = "textContent" in html ? "textContent" : "innerText"
 	, elTxt = function(el, txt) {
 		if (el[txtAttr] !== txt) el[txtAttr] = txt
 	}
