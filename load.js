@@ -56,6 +56,7 @@
 	/*** log ***/
 	, unsentLog = xhr._l = []
 	, lastError
+	// load.js is expected to be the first script to run and no prior window.onerror exists.
 	, onerror = window.onerror = function(message, file, line, col, error) {
 		// Do not send multiple copies of the same error.
 		// file = document.currentScript.src || import.meta.url
@@ -251,4 +252,3 @@
 	/**/
 
 }(this) // jshint ignore:line
-

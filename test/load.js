@@ -79,6 +79,9 @@ describe("load.js", function() {
 		assert.equal(log.called, 0)
 		mock.tick(3000)
 		assert.equal(log.called, 1)
+		xhr.log("i", "j")
+		mock.tick(2000)
+		assert.equal(log.called, 1)
 		assert.end()
 	})
 	.should("load {0}", [
