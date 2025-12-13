@@ -197,7 +197,12 @@ describe("load.js", function() {
 			var doc = { documentElement: { className: "" } }
 			mock.swap(global, "document", doc)
 			mock.swap(require.extensions, ".js", function(module, filename) {
-				Object.assign(module.exports, window)
+				var exp = {}
+				if ("matchMedia" in window) exp.matchMedia = window.matchMedia
+				if (window.localStorageThrow) {
+					Object.defineProperty(exp, "localStorage", { get: function(){ throw window.localStorageThrow } })
+				} else if ("localStorage" in window) exp.localStorage = window.localStorage
+				module.exports = exp
 				module._compile(require("fs").readFileSync(filename, "utf8"), filename)
 			})
 
@@ -207,7 +212,23 @@ describe("load.js", function() {
 			assert.equal(doc.documentElement.className, theme)
 			assert.end()
 		})
+		it("should use matchMedia when localStorage throws", function(assert, mock) {
+			var doc = { documentElement: { className: "" } }
+			mock.swap(global, "document", doc)
+			mock.swap(require.extensions, ".js", function(module, filename) {
+				module.exports = {
+					matchMedia: function(){ return { matches: true } }
+				}
+				Object.defineProperty(module.exports, "localStorage", { get: function(){ throw Error("blocked") } })
+				module._compile(require("fs").readFileSync(filename, "utf8"), filename)
+			})
+
+			delete require.cache[require.resolve("../load.js")]
+			require("../load.js")
+
+			assert.equal(doc.documentElement.className, "is-dark")
+			assert.end()
+		})
 	})
 
 })
-

@@ -77,12 +77,14 @@
 
 
 	/*** theme ***/
+	, savedTheme
 	, ALT_THEME = "dark"
-	, matchMedia = window.matchMedia
-	, localStorage = window.localStorage
+	try {
+		savedTheme = window.localStorage.theme
+	} catch(e){}
 	if (ALT_THEME == (
-		localStorage && localStorage.theme ||
-		matchMedia && matchMedia("(prefers-color-scheme:dark)").matches && ALT_THEME
+		savedTheme ||
+		(savedTheme = window.matchMedia) && savedTheme("(prefers-color-scheme:dark)").matches && ALT_THEME
 	)) {
 		document.documentElement.className = "is-" + ALT_THEME
 	}
