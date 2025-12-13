@@ -14,7 +14,6 @@
 
 
 /* global El, xhr, escape */
-/* c8 ignore start */
 !function(window, Date, Function, Infinity, P) {
 
 	// Array#flat()         - Chrome69, Firefox62, Safari12
@@ -49,6 +48,7 @@
 	, b = "setInterval"
 	, setInterval = (window[b] = window[b])
 	, c
+	/* node:coverage ignore next 19 */
 	, ie678 = !+"\v1" && a < 9 // jshint ignore:line
 	, ie6789 = ie678 || a == 9
 	, ie67 = ie678 && a < 8
@@ -71,6 +71,7 @@
 		wheel: wheelEv
 	}
 	, fixFn = Event.fixFn = {
+		/* node:coverage ignore next 17 */
 		wheel: wheelEv !== "wheel" && function(el, fn) {
 			// DOMMouseScroll Firefox 1 MouseScrollEvent.detail - number of lines to scroll (-32768/+32768 = page up/down)
 			return function(e) {
@@ -119,6 +120,7 @@
 	patch("cancel" + a, "clearTimeout(a)")
 
 
+	/* node:coverage ignore next 8 */
 	if (!IS_NODE && !(onhashchange in window) || ie67) {
 		patch(onhashchange, null)
 		setInterval(function() {
@@ -131,6 +133,7 @@
 	// Missing PointerEvents with Scribble enable on Safari 14
 	// https://mikepk.com/2020/10/iOS-safari-scribble-bug/
 	// https://bugs.webkit.org/show_bug.cgi?id=217430
+	/* node:coverage ignore next 50 */
 	if (!window.PointerEvent) {
 		// IE10
 		if (window[MS + EV]) {
@@ -176,6 +179,7 @@
 					}
 					_fn.call(el, e)
 				}
+				/* node:coverage ignore next 19 */
 				function touchToPointer(e) {
 					var touch
 					, touches = e.changedTouches
@@ -310,6 +314,7 @@
 	O = O[P]
 	// IE8 toJSON does not return milliseconds
 	// FF37 returns invalid extended ISO-8601, `29349-01-26T00:00:00.000Z` instead of `+029349-01-26T00:00:00.000Z`
+	/* node:coverage ignore next */
 	b = O[a = "toISOString"] && new Date(8e14)[a]().length < 27 || ie678
 	patch(a, patch("toJSON", [
 		"a=t.getUTCFullYear();if(a!==a)throw RangeError('Invalid time');return(b=a<0?'-':a>9999?'+':'')+X(a<0?-a:a,'-',b?6:4", "Month()+1,'-'", "Date(),'T'",
@@ -445,6 +450,7 @@
 	, closest = patch("closest", walk.bind(window, "parentNode", 1))
 	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
 
+	/* node:coverage ignore next 13 */
 	try {
 		O[a = "addEventListener"]("t", null, Object.defineProperties({}, {
 			capture: { get: function() { canCapture = 1 } }
@@ -460,6 +466,7 @@
 	// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 	// - IE8 always prevents the default of the mousewheel event.
 	patch(a, "return(t.attachEvent('on'+a,b=X(t,a,b)),b)", 0, function(el, ev, fn) {
+		/* node:coverage ignore next 8 */
 		return function() {
 			var e = new Event(ev)
 			if (e.clientX !== UNDEF) {
@@ -527,6 +534,7 @@
 
 	// ie6789
 	// The documentMode is an IE only property, supported from IE8.
+	/* node:coverage ignore next 8 */
 	if (ie678) {
 		try {
 			// Remove background image flickers on hover in IE6
@@ -539,11 +547,12 @@
 	function isFn(value) {
 		return typeof value === "function"
 	}
-	function isStr(value) {
-		return typeof value === "string"
-	}
+	/* node:coverage ignore next 3 */
 	function isObj(obj) {
 		return !!obj && obj.constructor === Object
+	}
+	function isStr(value) {
+		return typeof value === "string"
 	}
 	function nop() {}
 
@@ -556,7 +565,3 @@
 		))
 	}
 }(this, Date, Function, Infinity, "prototype") // jshint ignore:line
-/* c8 ignore stop */
-
-
-

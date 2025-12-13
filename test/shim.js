@@ -87,6 +87,9 @@ describe("Shim test", function() {
 
 		lib.sessionStorage.setItem("a", 1)
 		assert.equal(lib.sessionStorage.getItem("a"), "1")
+		assert.equal(lib.sessionStorage.removeItem("a"), undef)
+		assert.equal(lib.sessionStorage.getItem("a"), undef)
+		assert.equal(lib.sessionStorage.clear(), undef)
 
 		assert.equal(lib.escape("a", 0), "a")
 		assert.equal([1, 2].reverse(), [2, 1])
@@ -127,6 +130,31 @@ describe("Shim test", function() {
 		assert.equal((function(){ return Array.from(arguments, function(x){ return x + x }) })(1,2,3), [2, 4, 6])
 		assert.equal((function(){ return Array.from(arguments, function(x){ return x + this.x }, {x:1}) })(4,5), [5, 6])
 		assert.equal(Array.from([1, 2, 3], function(x){ return x + x}), [2, 4, 6])
+
+		var html = lib.document.documentElement
+		, root = html.firstChild = { nodeType: 1, tagName: "DIV", id: "rr", className: "root", parentNode: html, getAttribute: function(name) {
+			return this[name]
+		} }
+		, span1 = root.firstChild = { nodeType: 1, tagName: "SPAN", className: "foo bar", id: "child", parentNode: root }
+		, span2 = span1.nextSibling = { nodeType: 1, tagName: "SPAN", className: "baz", id: "sib", parentNode: root }
+		, link = span1.firstChild = { nodeType: 1, tagName: "A", className: "bar", id: "grand", parentNode: span1 }
+		span2.previousSibling = span1
+		span2.nextSibling = link.nextSibling = null
+
+		assert.equal(html.querySelector(".foo"), span1)
+		assert.equal(html.querySelector(".root .foo"), span1)
+		assert.equal(html.querySelector(".fo"), null)
+		assert.equal(html.querySelector("[id]"), root)
+		assert.equal(html.querySelector("[id='rr']"), root)
+		assert.equal(html.querySelector("[id^=r]"), root)
+		assert.equal(html.querySelector(""), root)
+		assert.throws(function() {
+			html.querySelector(1)
+		})
+		assert.equal(html.querySelectorAll("span"), [span1, span2])
+		assert.equal(html.matches.call(span1, "#child.foo"), true)
+		assert.equal(html.matches(":empty"), false)
+		assert.equal(html.closest(link, ".root"), root)
 
 		var beaconCalls = []
 		mock.swap(global, "xhr", function(method, url, unload) {
@@ -295,6 +323,8 @@ describe("Shim test", function() {
 		assert.equal(    JSON.parse(str1), obj2)
 		assert.equal(lib.JSON.stringify(obj1), str1)
 		assert.equal(    JSON.stringify(obj1), str1)
+		assert.equal(lib.JSON.stringify("\x01"), '"\\x01"')
+		assert.equal(    JSON.stringify("\x01"), '"\\u0001"')
 		assert.equal(lib.JSON.parse('"a\u2029b\\u2029c"'), "a\u2029b\u2029c")
 		assert.equal(    JSON.parse('"a\u2029b\\u2029c"'), "a\u2029b\u2029c")
 		assert.end()
