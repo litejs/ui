@@ -352,7 +352,7 @@
 
 	// TODO:2021-02-25:lauri:Accept iterable objects
 	//patch("from", "a=S.call(a);return b?a.map(b,c):a")
-	patch("from", "a=X(a)?a.split(''):b?a:S.call(a);return b?a.map(b,c):a", 0, isStr)
+	patch("from", "a=X(a)?a.split(''):S.call(a);return b?a.map(b,c):a", 0, isStr)
 	patch("of", "return S.call(A)")
 
 	O = O[P]

@@ -123,6 +123,9 @@ describe("Shim test", function() {
 		tmp = function(){ return Array.from(arguments) }
 		assert.equal(tmp(1,2,3), [ 1, 2, 3 ])
 		assert.equal(Array.from("äbc"), ["ä", "b", "c"])
+		assert.equal(tmp(1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+		assert.equal((function(){ return Array.from(arguments, function(x){ return x + x }) })(1,2,3), [2, 4, 6])
+		assert.equal((function(){ return Array.from(arguments, function(x){ return x + this.x }, {x:1}) })(4,5), [5, 6])
 		assert.equal(Array.from([1, 2, 3], function(x){ return x + x}), [2, 4, 6])
 
 		assert.equal(Array.of(), [])
