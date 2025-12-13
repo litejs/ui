@@ -158,6 +158,24 @@ describe("load.js", function() {
 		})
 		mock.tick(500)
 	})
+	.should("handle rejected promise-like response", function(assert, mock) {
+		mock.time()
+		xhrReset()
+		xhrMap["n.thenable"] = { text: "var n" }
+		xhr.thenable = function(str) {
+			return { then: function(cb, eb) {
+				setTimeout(function() {
+					eb("boom")
+				}, 1)
+			}}
+		}
+		xhr.load(["n.thenable"], function(res) {
+			assert.equal(res, [""])
+			assert.ok(xhr._l.length > 0)
+			assert.end()
+		})
+		mock.tick(500)
+	})
 	.should("fall back to injection", function(assert, mock) {
 		xhrReset()
 		mock.swap(global, "eval", mock.fn(null))

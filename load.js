@@ -214,10 +214,7 @@
 						var execResult = (xhr[files[pos].replace(/[^?]+\.|\?.*/g, "")] || execScript)(res[pos], files[pos])
 						if (execResult && execResult.then) {
 							res[pos] = 0
-							return execResult.then(function() {
-								res[pos] = ""
-								exec()
-							})
+							return execResult.then(advanceExec, advanceExec)
 						}
 					} catch(e) {
 						/*** log ***/
@@ -240,6 +237,11 @@
 					}
 				}
 			}
+		}
+		function advanceExec(err) {
+			if (err) onerror(err, files[pos])
+			res[pos] = ""
+			exec()
 		}
 	}
 
