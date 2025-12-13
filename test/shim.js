@@ -128,6 +128,22 @@ describe("Shim test", function() {
 		assert.equal((function(){ return Array.from(arguments, function(x){ return x + this.x }, {x:1}) })(4,5), [5, 6])
 		assert.equal(Array.from([1, 2, 3], function(x){ return x + x}), [2, 4, 6])
 
+		var beaconCalls = []
+		mock.swap(global, "xhr", function(method, url, unload) {
+			beaconCalls.push([method, url, unload])
+			return {
+				setRequestHeader: mock.fn(),
+				send: function(data) { beaconCalls.push(["send", data]) }
+			}
+		})
+		assert.equal(lib.navigator.sendBeacon("/beacon", "ping"), true)
+		assert.equal(beaconCalls, [["POST", "/beacon", void 0], ["send", "ping"]])
+
+		mock.swap(global, "xhr", function() {
+			throw Error("fail")
+		})
+		assert.equal(lib.navigator.sendBeacon("/fail", "ping"), false)
+
 		assert.equal(Array.of(), [])
 		assert.equal(Array.of(7), [7])
 		assert.equal(Array.of(undef), [undef])
@@ -365,5 +381,3 @@ describe("Custom code", function() {
 		return typeof fn === "function"
 	}
 })
-
-

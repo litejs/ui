@@ -406,9 +406,13 @@
 	patch("sendBeacon", function(url, data) {
 		// The synchronous XMLHttpRequest blocks the process of unloading the document,
 		// which in turn causes the next navigation appear to be slower.
-		url = xhr("POST", url, xhr.unload)
-		url.setRequestHeader("Content-Type", "text/plain;charset=UTF-8")
-		url.send(data)
+		try {
+			url = xhr("POST", url, xhr.unload)
+			url.setRequestHeader("Content-Type", "text/plain;charset=UTF-8")
+			url.send(data)
+			return true
+		} catch(e){}
+		return false
 	})
 
 	// The HTML5 document.head DOM tree accessor
