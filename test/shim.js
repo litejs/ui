@@ -1,8 +1,8 @@
 
 describe("Shim test", function() {
+	var haveCompressionStream = typeof CompressionStream !== "undefined" && typeof Response !== "undefined"
 
-	this
-	.test("setTimeout additional parameters", function(assert) {
+	test("setTimeout additional parameters", function(assert) {
 		assert.plan(2)
 		var interval = setInterval(function(a) {
 			assert.equal(a, 2)
@@ -12,7 +12,7 @@ describe("Shim test", function() {
 			assert.equal(a, 3)
 		}, 1, 3)
 	})
-	.test("shim.js", function(assert, mock) {
+	test("shim.js", function(assert, mock) {
 
 		if (describe.env === "browser") {
 			var lib = window
@@ -312,7 +312,8 @@ describe("Shim test", function() {
 		assert.end()
 
 	})
-	.test("JSON", function(assert) {
+
+	test("JSON", function(assert) {
 		var undef
 		, lib = describe.env === "browser" ? window : require("../shim.js")
 		, str1 = '{"a":1,"cb":"2\\n3\\\\","d":[-1,0,1,2,{"g\\b":true},false,"",null,null,null,1],"e":{"f":null}}'
@@ -328,6 +329,19 @@ describe("Shim test", function() {
 		assert.equal(lib.JSON.parse('"a\u2029b\\u2029c"'), "a\u2029b\u2029c")
 		assert.equal(    JSON.parse('"a\u2029b\\u2029c"'), "a\u2029b\u2029c")
 		assert.end()
+	})
+
+	test("CompressionStream", haveCompressionStream && async function(assert) {
+		var res = await Array.from(
+			new Uint8Array(
+				await new Response(
+					new Blob([new TextEncoder().encode("hello world")])
+					.stream()
+					.pipeThrough(new CompressionStream("deflate"))
+				).arrayBuffer()
+			)
+		).map(b => b.toString(16).padStart(2, '0')).join('')
+		assert.equal(res, "789ccb48cdc9c95728cf2fca4901001a0b045d")
 	})
 })
 
