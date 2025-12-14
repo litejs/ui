@@ -25,6 +25,7 @@
 
 	var UNDEF, canCapture, isArray, oKeys
 	, O = window
+	, NULL = null
 	, patched = (window.xhr || window)._p = []
 	, jsonRe = /[\x00-\x1f\x22\x5c]/g
 	, JSONmap = {"\b":"\\b","\f":"\\f","\n":"\\n","\r":"\\r","\t":"\\t","\"":"\\\"","\\":"\\\\"}
@@ -122,7 +123,7 @@
 
 	/* node:coverage ignore next 8 */
 	if (!IS_NODE && !(onhashchange in window) || ie67) {
-		patch(onhashchange, null)
+		patch(onhashchange, NULL)
 		setInterval(function() {
 			if (lastHash !== (lastHash = location.href.split("#")[1]) && isFn(window[onhashchange])) {
 				window[onhashchange]()
@@ -238,7 +239,7 @@
 				return (data[id] = "" + val)
 			},
 			getItem: function(id) {
-				return data[id]
+				return data[id] || NULL
 			},
 			removeItem: function(id) {
 				delete data[id]
@@ -274,7 +275,7 @@
 			// IE 8 serializes `undefined` as `"undefined"`
 			return (
 				isStr(o) ? "\"" + o.replace(jsonRe, jsonFn) + "\"" :
-				o !== o || o == null || o === Infinity || o === -Infinity ? "null" :
+				o !== o || o == NULL || o === Infinity || o === -Infinity ? "null" :
 				typeof o == "object" ? (
 					isFn(o.toJSON) ? stringify(o.toJSON()) :
 					isArray(o) ? "[" + o.map(stringify) + "]" :
@@ -452,7 +453,7 @@
 
 	/* node:coverage ignore next 13 */
 	try {
-		O[a = "addEventListener"]("t", null, Object.defineProperties({}, {
+		O[a = "addEventListener"]("t", NULL, Object.defineProperties({}, {
 			capture: { get: function() { canCapture = 1 } }
 		}))
 		b = "removeEventListener"
@@ -521,7 +522,7 @@
 			if (first) return el
 			out.push(el)
 		}
-		return first ? null : out
+		return first ? NULL : out
 	}
 
 	function find(node, sel, first) {

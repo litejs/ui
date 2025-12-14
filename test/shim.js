@@ -88,7 +88,7 @@ describe("Shim test", function() {
 		lib.sessionStorage.setItem("a", 1)
 		assert.equal(lib.sessionStorage.getItem("a"), "1")
 		assert.equal(lib.sessionStorage.removeItem("a"), undef)
-		assert.equal(lib.sessionStorage.getItem("a"), undef)
+		assert.equal(lib.sessionStorage.getItem("a"), null)
 		assert.equal(lib.sessionStorage.clear(), undef)
 
 		assert.equal(lib.escape("a", 0), "a")
