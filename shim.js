@@ -486,8 +486,8 @@
 
 
 	function selectorFn(str) {
-		if (str != null && !isStr(str)) throw Error("Invalid selector")
-		return selectorCache[str || ""] ||
+		if (!str || !isStr(str)) throw Error("Invalid selector")
+		return selectorCache[str] ||
 		(selectorCache[str] = Function("m,c", "return function(_,v,a,b){return " +
 			str.split(selectorSplitRe).map(function(sel) {
 				var relation, from

@@ -147,7 +147,9 @@ describe("Shim test", function() {
 		assert.equal(html.querySelector("[id]"), root)
 		assert.equal(html.querySelector("[id='rr']"), root)
 		assert.equal(html.querySelector("[id^=r]"), root)
-		assert.equal(html.querySelector(""), root)
+		assert.throws(function() {
+			html.querySelector("")
+		})
 		assert.throws(function() {
 			html.querySelector(1)
 		})
