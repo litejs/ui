@@ -40,6 +40,9 @@ describe("Shim test", function() {
 				parseFloat: null,
 				parseInt: null,
 			})
+			mock.swap(Math, {
+				log10: null
+			})
 			mock.swap(Date, "now", null)
 			mock.swap(Date.prototype, { toJSON: null, toISOString: null })
 			mock.swap(Array, {
@@ -296,6 +299,11 @@ describe("Shim test", function() {
 		assert.equal(Number.isSafeInteger(-9007199254740991), true)
 		assert.equal(Number.isSafeInteger(-9007199254740992), false)
 		assert.equal(Number.isSafeInteger(1.1), false)
+
+		assert.equal(Math.log10(1), 0)
+		assert.ok(Math.abs(Math.log10(1000) - 3) < 1e-12)
+		assert.equal(Math.log10(0), -Infinity)
+		assert.equal(Number.isNaN(Math.log10(-1)), true)
 
 		assert.equal(new Date(6e13-1).toJSON(),  "3871-04-29T10:39:59.999Z")
 		assert.equal(new Date(6e13-1).toISOString(),  "3871-04-29T10:39:59.999Z")

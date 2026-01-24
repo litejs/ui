@@ -295,11 +295,14 @@
 	// Since Chrome23/Firefox21 parseInt parses leading-zero strings as decimal, not octal
 	b = patch("g:parseInt", "return X(a,(b>>>0)||(Y.test(''+a)?16:10))", _parseInt("08") !== 8, _parseInt, /^\s*[-+]?0[xX]/)
 
+	O = Math
+	patch("log10", "return X(a)/Y", 0, O.log, O.LN10)
+
+	a = O.pow
 	O = Number
 	patch("parseInt", b)
 	patch("parseFloat", parseFloat)
 	patch("isNaN", "return a!==a")
-	a = Math.pow
 	c = "_SAFE_INTEGER"
 	patch("EPSILON", a(2, -52))
 	patch(
