@@ -115,11 +115,14 @@ describe("Shim test", function() {
 		assert.ok(Object.hasOwn(tmp, "a"))
 		assert.ok(!Object.hasOwn(Object.create(tmp), "a"))
 		tmp = Object.create(null)
+		tmp.A = 2
+		assert.ok(!Object.hasOwn(tmp, "a"))
+		assert.ok(Object.hasOwn(tmp, "A"))
 		assert.equal(tmp.constructor, undef)
 		assert.equal(tmp.toString, undef)
-		assert.equal(Object.entries(tmp), [])
+		assert.equal(Object.entries(tmp), [["A", 2]])
 		assert.equal(Object.entries(obj), [["a", 1], ["b", 2]])
-		assert.equal(Object.keys(tmp), [])
+		assert.equal(Object.keys(tmp), ["A"])
 		assert.equal(Object.keys(obj), ["a", "b"])
 		assert.equal(Object.values(obj), [1, 2])
 
