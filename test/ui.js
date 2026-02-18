@@ -536,6 +536,20 @@ describe("ui", function() {
 		})
 	})
 
+	test("append with negative before index", function(assert) {
+		var el = document.createElement("div")
+		El.append(el, document.createElement("a"))
+		El.append(el, document.createElement("b"))
+		El.append(el, document.createElement("c"))
+		// before=-1: insert before last child
+		El.append(el, document.createElement("d"), -1)
+		assert.equal(el.innerHTML, "<a></a><b></b><d></d><c></c>")
+		// before=-2: insert before second to last
+		El.append(el, document.createElement("e"), -2)
+		assert.equal(el.innerHTML, "<a></a><b></b><e></e><d></d><c></c>")
+		assert.end()
+	})
+
 	it ("should parse elements: {i}", [
 		[ "h1", '<h1></h1>' ],
 		[ "h1 > h2 +5", '<h1><h2>+5</h2></h1>' ],

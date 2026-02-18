@@ -1243,7 +1243,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 					el = before.parentNode
 				}
 				el.insertBefore(child, (
-					isNum(before) ? el.childNodes[before < 0 ? el.childNodes.length - before - 2 : before] :
+					isNum(before) ? el.childNodes[before < 0 ? el.childNodes.length + before : before] :
 					isArr(before) ? before[0] :
 					before
 				) || NUL)
