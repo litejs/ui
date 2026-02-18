@@ -1399,7 +1399,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	/*** kb ***/
 	var kbMaps = []
-	, kbMod = LiteJS.kbMod = /^(Mac|iP)/.test(navigator.platform) ? "metaKey" : "ctrlKey"
+	, kbMod = LiteJS.kbMod = /\bMac|\biP/.test(navigator.userAgent) ? "metaKey" : "ctrlKey"
 	, kbCodes = LiteJS.kbCodes = ",,,,,,,,backspace,tab,,,,enter,,,shift,ctrl,alt,pause,caps,,,,,,,esc,,,,,,pgup,pgdown,end,home,left,up,right,down,,,,,ins,del,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cmd,,,,,,,,,,,,,,,,,,,,,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12".split(splitRe)
 
 	El.addKb = addKb
