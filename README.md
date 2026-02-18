@@ -13,10 +13,22 @@ used on heavy-traffic websites since 2006.
 
  - Dependency-free, weighs around 25kB (+8kB polyfills for old browsers).
  - Written in ES5, compatible with all browsers (including IE5.5).
- - No transpiling/compiling/bundling headache, just write a working code.
+   Works seamlessly in ESM projects too.
+ - No transpiling/compiling/bundling headache, just write working code.
+
+Includes templates, view routing, data binding, i18n, keyboard shortcuts, and touch gestures.
 
 For usage instructions, see [Quick-Start](https://github.com/litejs/litejs/wiki/Quick-Start) guide
 and [wiki](https://github.com/litejs/ui/wiki).
+
+## Examples
+
+ - [Simplest example](https://litejs.github.io/ui/simplest.html) —
+   [source](/litejs/ui/blob/main/test/html/simplest.html)
+ - [Built-in routing](https://litejs.github.io/ui/routed.html) —
+   [source](/litejs/ui/blob/main/test/html/routed.html)
+ - [Full SVG SPA](https://litejs.github.io/ui/svg-spa.html) —
+   [source](/litejs/ui/blob/main/test/html/svg-spa.html)
 
 
 ## Contributing
@@ -24,7 +36,7 @@ and [wiki](https://github.com/litejs/ui/wiki).
 Follow [Coding Style Guide](https://github.com/litejs/litejs/wiki/Style-Guide),
 run tests `npm install; npm test`.
 
-> Copyright (c) 2006-2024 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+> Copyright (c) 2006-2026 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [MIT License](https://litejs.com/MIT-LICENSE.txt) |
 [GitHub repo](https://github.com/litejs/ui) |
 [npm package](https://npmjs.org/package/@litejs/ui) |
