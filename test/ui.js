@@ -53,6 +53,19 @@ describe("ui", function() {
 			assert.equal(document.activeElement, null)
 			assert.end()
 		})
+
+		test("acceptMany with whitespace", function(assert) {
+			var el = document.createElement("div")
+			El.cls(el, "a b")
+			assert.equal(el.className, "a b")
+
+			El.cls(el, " c")
+			assert.equal(el.className, "a b c")
+
+			El.cls(el, "d ")
+			assert.equal(el.className, "a b c d")
+			assert.end()
+		})
 	})
 
 	describe("i18n", function() {

@@ -24,7 +24,7 @@
     "lj-extract-lang": "./bin/extract-lang.js"
   },
   "scripts": {
-    "test": "lj t"
+    "test": "lj t test/index.js"
   },
   "devDependencies": {
     "@litejs/cli": "25.5.0"
