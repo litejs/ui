@@ -3,6 +3,10 @@
 
 /* global escape, navigator, xhr */
 
+// Conditional compilation via toggle comments (processed by build tool):
+//   /*** name ***/  code   /**/              - `code` active in source; build can strip it
+//   /*** name ***/  code1  /*/  code2  /**/  - `code1` active in source, `code2` commented out; build can swap
+
 /*** debug ***/
 console.log("LiteJS is in debug mode, but it's fine for production")
 /**/
@@ -13,7 +17,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	var UNDEF, parser, pushBase, styleNode
 	, NUL = null
-	// THIS will be undefined in strict mode and window in sloppy mode
+	// THIS will be `undefined` in strict mode and `window` in sloppy mode
 	, THIS = this
 	, html = document.documentElement
 	, body = document.body
@@ -22,11 +26,13 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	, plugins = {}
 	, sources = []
 	, assign = Object.assign
+	// bind(fn, ctx, ...args)() calls fn.call(ctx, ...args); closureless partial application
 	, bind = El.bind.bind(El.call)
 	, create = Object.create
 	, hasOwn = bind(plugins.hasOwnProperty)
 	, isArr = Array.isArray
 	, slice = emptyArr.slice
+	// Closureless utilities via Function() to avoid capturing outer scope
 	, elReplace = Function("a,b,c", "a&&b&&(c=a.parentNode)&&c.replaceChild(b,a)")
 	, elRm = Function("a,b", "a&&(b=a.parentNode)&&b.removeChild(a)")
 	, getAttr = Function("a,b", "return a&&a.getAttribute&&a.getAttribute(b)")
@@ -51,9 +57,12 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 
 	, elSeq = 0
 	, elCache = {}
+	// Parses ";name! args" binding expressions from _b attribute
 	, renderRe = /[;\s]*([-.\w$]+)(?:(!?)[ :]*((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
+	// Parses CSS selectors: .class #id [attr=val] :pseudo
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, fnCache = {}
+	// Matches tokens to exclude from scope variable extraction: strings, keywords, member access, labels
 	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aorsS]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /[a-z_$][\w$]*/ig
 	, bindingsCss = acceptMany(function(el, key, val, current) {
@@ -147,11 +156,13 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 		/**/
 	}
+	// Stores "!" once-bindings; index used in compiled fn to strip from _b after first run
 	, bindOnce = []
 	, globalScope = {
 		El: El,
 		$b: bindings
 	}
+	// Array-like wrapper methods for multi-element collections (mixed into arrays by ElWrap)
 	, elArr = {
 		append: function(el) {
 			var elWrap = this
@@ -169,6 +180,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 	}
 
+	// fixEv: maps custom event names to native (e.g., touch→"" for non-DOM events)
+	// fixFn: transforms event handlers for browser compat (e.g., touch→pointer init)
 	, Event = window.Event || window
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
@@ -261,6 +274,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}
 	}
 
+	// Events stored as triplets [scope, _origin, fn] in emitter._e[type]
+	// _origin tracks the unwrapped fn before fixFn (for rmEvent lookup)
+	// emptyArr substitutes window as emitter (can't safely add _e property to window)
 	function on(emitter, type, fn, scope, _origin) {
 		if (emitter && type && fn) {
 			if (emitter === window) emitter = emptyArr
@@ -344,6 +360,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			root: body
 		}, opts)
 
+		// View properties:
+		//   .r  route pattern    .e  template element    .p  parent view
+		//   .c  active child     .o  rendered clone      .f  file dependencies (csv)
+		//   .s  route sequence#  .kb keyboard shortcuts
 		function View(route, el, parent) {
 			var view = views[route]
 			if (view) {
@@ -424,6 +444,7 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		})
 
+		// params._p pending async count; ._v current view in traversal; ._c view to close; ._t navigation timestamp
 		function bubbleUp(params) {
 			var parent
 			, view = lastView
@@ -615,6 +636,11 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		}
 
+		// Plugin properties:
+		//   .n  name           .x  parent view name  .u  parent DOM element
+		//   .e  container el   .d  done callback     .c  saved elCache (for %el/%view)
+		// When proto is a function, plugin accumulates raw text:
+		//   .r  raw handler    .t  accumulated text   .o  original op+text  .s  separator
 		function addPlugin(name, proto, expectContent) {
 			plugins[name] = Plugin
 			function Plugin(parent, op, sep) {
@@ -1372,6 +1398,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		hydrate(node, "data-out", scope)
 	}
 
+	// Reads binding expression from DOM attr (_b or data-out), compiles via makeFn, executes.
+	// Caches expr on node[attr] to avoid re-reading DOM; true = no bindings (already processed).
+	// Returns truthy if binding replaced the element (if/each), so render() skips children.
 	function hydrate(node, attr, scope) {
 		var fn
 		, expr = node[attr] || (node[attr] = setAttr(node, attr, "") || true)
@@ -1382,6 +1411,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			throw e + "\n" + attr + ": " + expr
 		}
 	}
+	// Compiles binding expression string (e.g. ";txt foo;cls 'active',bar") into a Function.
+	// Extracts free variable names and aliases them from scope ($s.varName).
+	// raw parameter bypasses the $s guard wrapper (used by i18n getExt).
 	function makeFn(fn, raw, i) {
 		fn = raw || "$s&&(" + replace(renderRe, function(match, name, op, args) {
 			return (
@@ -1611,6 +1643,9 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	function nearest(el, sel) {
 		return el ? find(el, sel) || nearest(el.parentNode, sel) : NUL
 	}
+	// Wraps fn to accept: space-separated names, object maps {name:val}, CSS selectors, delays.
+	// prepareVal=1: wraps val as event delegate (string val→emit on view, fn+selector→delegation)
+	// After arg normalization, selector is reused as element array, delay as loop counter.
 	function acceptMany(fn, prepareVal) {
 		return function f(el, name, val, selector, delay, data) {
 			if (el && name) {
