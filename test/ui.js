@@ -50,7 +50,7 @@ describe("ui", function() {
 			input.focus()
 			assert.strictEqual(document.activeElement, input)
 			El.blur()
-			assert.equal(document.activeElement, null)
+			assert.equal(document.activeElement, document.body)
 			assert.end()
 		})
 
@@ -64,6 +64,101 @@ describe("ui", function() {
 
 			El.cls(el, "d ")
 			assert.equal(el.className, "a b c d")
+			assert.end()
+		})
+
+		test("step", function(assert) {
+			assert.equal(El.step(7, 5), "5")
+			assert.equal(El.step(8, 5), "10")
+			assert.equal(El.step(-7, 5), "-5")
+			assert.equal(El.step(7, 0.5), "7.0")
+			assert.equal(El.step(7, 5, 1), "10")
+			assert.equal(El.step(5, 5, 1), "5")
+			assert.end()
+		})
+
+		test("stop", function(assert) {
+			var stopped = false, prevented = false
+			var result = El.stop({
+				stopPropagation: function() { stopped = true },
+				preventDefault: function() { prevented = true }
+			})
+			assert.ok(stopped)
+			assert.ok(prevented)
+			assert.strictEqual(result, false)
+			assert.strictEqual(El.stop(null), false)
+			assert.end()
+		})
+
+		test("hasClass", function(assert) {
+			var el = document.createElement("div")
+			el.className = "foo bar baz"
+			assert.ok(El.hasClass(el, "foo"))
+			assert.ok(El.hasClass(el, "bar"))
+			assert.notOk(El.hasClass(el, "fo"))
+			assert.notOk(El.hasClass(el, ""))
+			assert.end()
+		})
+
+		test("closest and matches", function(assert) {
+			var el = document.createElement("div")
+			el.innerHTML = "<ul><li><a>hi</a></li></ul>"
+			var a = el.querySelector("a")
+			assert.ok(El.matches(a, "a"))
+			assert.notOk(El.matches(null, "a"))
+			assert.equal(El.closest(a, "ul").tagName, "UL")
+			assert.equal(El.closest(null, "ul"), null)
+			assert.equal(El.nearest(el, "a").tagName, "A")
+			assert.equal(El.nearest(null, "a"), null)
+			assert.end()
+		})
+
+		test("kill event", function(assert) {
+			var el = document.createElement("div")
+			document.body.appendChild(el)
+			var killed = false
+			El.on(el, "kill", function() { killed = true })
+			El.kill(el)
+			assert.ok(killed)
+			assert.end()
+		})
+
+		test("set with object", function(assert) {
+			var el = document.createElement("div")
+			El.set(el, { "data-a": "1", "data-b": "2" })
+			assert.equal(El.get(el, "data-a"), "1")
+			assert.equal(El.get(el, "data-b"), "2")
+			assert.end()
+		})
+
+		test("val", function(assert) {
+			var input = document.createElement("input")
+			input.type = "text"
+			input.value = "hello"
+			assert.equal(El.val(input), "hello")
+			El.val(input, "world")
+			assert.equal(input.value, "world")
+
+			// unchecked checkbox returns null
+			var cb = document.createElement("input")
+			cb.type = "checkbox"
+			cb.value = "on"
+			assert.equal(El.val(cb), null)
+
+			// checked checkbox returns value
+			var cb2 = document.createElement("input")
+			cb2.type = "checkbox"
+			cb2.value = "on"
+			cb2.checked = true
+			assert.equal(El.val(cb2), "on")
+
+			// unchecked radio returns undefined
+			var radio = document.createElement("input")
+			radio.type = "radio"
+			assert.equal(El.val(radio), undefined)
+
+			assert.equal(El.val(null), undefined)
+
 			assert.end()
 		})
 	})
@@ -211,6 +306,7 @@ describe("ui", function() {
 			test("extensions", function(assert) {
 				var _ = app.lang("en")
 				assert.equal(_("HelloUp", {user: {name: "World"}, x:"here"}), "Hello WORLD! Welcome to here")
+				assert.equal(_("{a;map:'{n}'}", {a: [{n:'a'},{n:'b'},{n:'c'}]}), "a, b, c")
 				assert.equal(_("{a;map:'{$}',', ',', and '}", {a: {a:"Key", b:"Foo", c:"Bar"}}), "Key, Foo, and Bar")
 
 				assert.end()
@@ -554,7 +650,9 @@ describe("ui", function() {
 		[ "h1", '<h1></h1>' ],
 		[ "h1 > h2 +5", '<h1><h2>+5</h2></h1>' ],
 		[ "h2[a][b-c]", '<h2 a="a" b-c="b-c"></h2>' ],
-		[ '#h3.h4[title=Hello][title~="World !"]', '<div id="h3" class="h4" title="Hello World !"></div>' ],
+		[ '#h3.h4[title=Hello][title~="World !"].foo', '<div id="h3" class="h4 foo" title="Hello World !"></div>' ],
+		// setAttr class will overwrite
+		[ '#h3.h4[title=Hello][title~="World !"][class=bar]', '<div id="h3" class="bar" title="Hello World !"></div>' ],
 		[ 'a[href=about][href^="#"]\na[href=about][href$=".html"]', '<a href="#about"></a><a href="about.html"></a>'],
 		[ "h3 ;txt:'Hi'\ninput[type=checkbox][readonly]", '<h3>Hi</h3><input type="checkbox" readonly>' ],
 		[ 'p[title="a b"]\r\n hr ;if 1', '<p title="a b"><hr></p>' ],
