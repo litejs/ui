@@ -1180,8 +1180,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		rate: rate,
 		replace: elReplace,
 		scope: elScope,
-		scrollLeft: scrollLeft,
-		scrollTop: scrollTop,
+		scrollLeft: bind(scrollPos, NUL, "pageXOffset", "scrollLeft"),
+		scrollTop: bind(scrollPos, NUL, "pageYOffset", "scrollTop"),
 		step: step,
 		stop: eventStop
 	})
@@ -1730,11 +1730,8 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			}
 		}
 	}
-	function scrollLeft() {
-		return window.pageXOffset || html.scrollLeft || body.scrollLeft || 0
-	}
-	function scrollTop() {
-		return window.pageYOffset || html.scrollTop || body.scrollTop || 0
+	function scrollPos(page, key) {
+		return window[page] || html[key] || body[key] || 0
 	}
 	function step(num, factor, mid) {
 		var x = ("" + factor).split(".")
