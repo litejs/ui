@@ -1,6 +1,6 @@
 {
   "name": "@litejs/ui",
-  "version": "25.10.0",
+  "version": "26.2.0",
   "description": "UI engine for LiteJS full-stack framework",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -27,6 +27,6 @@
     "test": "lj t test/index.js"
   },
   "devDependencies": {
-    "@litejs/cli": "25.5.0"
+    "@litejs/cli": "26.2.1"
   }
 }
