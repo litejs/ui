@@ -1,5 +1,5 @@
 
-%def #mat ../../el/material.tpl
+%def #mat ../../el/material.ui
 %def
 	settings %.ui,%.css
 	test-form,test-grid,pointer %.ui

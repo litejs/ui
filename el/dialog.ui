@@ -152,7 +152,7 @@
 	.col.ts3 ;txt! _(title, map)
 	.col.js-body ;md! _(body, map)
 	.col
-		.group ;each! action in actions
+		.group ;each! 'action',actions
 			.btn.js-btn
 				;txt! _(action.title)
 				;class! "w" + (12/actions.length)
@@ -166,4 +166,3 @@
 	.Modal-content.Modal--blur.grid.p2.anim
 		;cls! "Modal--blur",!1,1
 		%slot
-
