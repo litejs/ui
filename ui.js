@@ -681,9 +681,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 			return child
 		}
 
-		addPlugin("start", {
+		addPlugin("ui", {
 			d: Function("p", "p.u.i=1")
 		})
+		plugins.start = plugins.ui
 		addPlugin("slot", {
 			d: function(plugin) {
 				var slotName = plugin.n || ++elSeq
@@ -1784,7 +1785,10 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 		}), function(res) {
 			res = res.concat(sources, next && next.src && next.innerHTML)
 			if (res[sources.length = 0]) {
-				if (!parser) LiteJS.ui = LiteJS()
+				if (!parser) {
+					var m = res.join("\n").match(/\n%ui\s+(\{[\s\S]*\})\s*$/)
+					LiteJS.ui = LiteJS(m && Function("return " + m[1])())
+				}
 				each(res, parser)
 			}
 			if (isFn(next)) next()
