@@ -8,7 +8,7 @@
 //   /*** name ***/  code1  /*/  code2  /**/  - `code1` active in source, `code2` commented out; build can swap
 
 /*** debug ***/
-console.log("LiteJS is in debug mode, but it's fine for production")
+console.log("LiteJS is in debug mode and that's fine for production")
 /**/
 
 !function(window, document, history, localStorage, location, navigator, Function, Object) {
