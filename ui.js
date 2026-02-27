@@ -1120,36 +1120,29 @@ console.log("LiteJS is in debug mode, but it's fine for production")
 	assign(El, {
 		$b: assign(bindings, {
 			each: function(el, name, list) {
-				/*** debug ***/
-				if (el._li) throw "Binding each must be type of once: each!" + name
-				/**/
-
-				var comm = Comm("each " + name, up)
+				var comm = el._c || (el._c = Comm("each " + name, up))
 				, pos = 0
 				, nodes = []
-
 				comm.$s = this
 				elReplace(el, comm)
-				each(list, add)
-				return { a: add, u: up }
+				up()
+				return { u: up }
 
-				function add(item) {
-					var clone = nodes[pos] = el.cloneNode(true)
-					, subScope = elScope(clone, comm)
-					append(comm.parentNode, clone, (pos ? nodes[pos - 1] : comm).nextSibling)
-					subScope.$i = pos++
-					subScope.$len = list.length
-					subScope[name] = item
-					clone._b = el._b
-					/*** debug ***/
-					clone._li = up
-					/**/
-					render(clone)
-				}
 				function up() {
-					for (var i = list.length; pos > i; ) elKill(nodes[--pos])
-					for (nodes.length = i; pos < i; ) add(list[pos])
-					for (; i--; ) nodes[i].$s[name] = list[i]
+					if (!list) return
+					for (var sub, keys = Object.keys(list), i = keys.length; pos > i; ) elKill(nodes[--pos])
+					for (nodes.length = i; pos < i; ) {
+						sub = nodes[pos] = el.cloneNode(true)
+						sub._b = el._b
+						append(comm.parentNode, sub, (pos++ ? nodes[pos - 2] : comm).nextSibling)
+						elScope(sub, comm)
+					}
+					for (; i--; ) {
+						sub = nodes[i].$s
+						sub[name] = list[sub.$k = keys[sub.$i = i]]
+						sub.$len = pos
+						render(nodes[i])
+					}
 				}
 			},
 			el: function(el, tag, fallback) {
