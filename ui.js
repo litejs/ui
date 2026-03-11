@@ -709,6 +709,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		addPlugin("el", {
 			d: function(plugin, el) {
 				el = usePluginContent(plugin)
+				/*** debug ***/
+				if (elCache[plugin.n]) console.error("El '%s' exist! Loading .ui file twice will execute %js also twice", plugin.n)
+				/**/
 				elCache[plugin.n] = el
 			}
 		}, 1)
