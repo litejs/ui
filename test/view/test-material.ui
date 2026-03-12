@@ -30,7 +30,7 @@ ul.mat-Menu.shadow-1
 					@click "showMenu", ["Fab-menu1","right-end","bottom",4]
 				Fab.Fab--red[data-tooltip-pos=left]>=—
 					;data-tooltip "World\n2"
-					;on "click", "showMenu", 0, ["Fab-menu2", "left-start", "bottom", 1]
+					@contextmenu,holdstart "showMenu", ["Fab-menu2", "left-start", "bottom", 1]
 				Fab[data-tooltip-pos=right]>=+
 					;data-tooltip "Hello2"
 				Fab>=+

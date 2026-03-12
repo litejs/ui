@@ -21,13 +21,20 @@
 
 %view pointer public
 anim-page
-	h2 Test touch 1
-	.rel
-		;css "background,height", ["#ddd","400px"]
-		.abs.w3.h3 BTN
-			;moveExample!
-			;css "background", "#999"
-			;css "height,width", "180px"
+	.grid.b4
+		.col.w6
+			h2 Test touch 1
+			.rel
+				;css "background,height", ["#ddd","300px"]
+				.abs.w3.h3 BTN
+					;moveExample!
+					;css "background", "#999"
+					;css "height,width", "180px"
+		.col.w6
+			h2 Test touch SVG
+			svg ;css "background,height,width", ["#ddd","300px","100%"]
+				rect ;svgMoveExample!
+					;set "x,y,width,height,fill", ["10","10","80","80","#999"]
 	h2 Sort
 	div ;draggableSort!"ul","li"; css "overflow","hidden"
 		ul.sortCol

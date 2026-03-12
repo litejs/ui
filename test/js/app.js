@@ -152,7 +152,7 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 		}, 1000, 1, 2, 3)
 	})
 
-	app.on("toggleClass", function(e, el, clName, target) {
+	app.on("toggleClass", function(e, el, clName) {
 		El.cls(el, clName, !El.hasClass(el, clName))
 	})
 

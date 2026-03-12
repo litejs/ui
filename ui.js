@@ -1,7 +1,7 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global escape, navigator, xhr */
+/* global escape, getComputedStyle, navigator, xhr */
 
 // Conditional compilation via toggle comments (processed by build tool):
 //   /*** name ***/  code   /**/              - `code` active in source; build can strip it
@@ -1486,16 +1486,15 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	/**/
 
 	/*** touch ***/
-	var touchEl, touchDist, touchAngle, touchMode, touchTick
+	var e0, touchDist, touchAngle, touchMode, touchTick
 	, START = "start"
 	, END = "end"
 	, touches = []
-	, touchEv = {}
 
 	// swipe + left/right/up/down
 	each("hold pan pinch rotate tap", function(name) {
 		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
-		fixFn[name] = touchInit
+		fixFn[name] = fixFn[name + START] = fixFn[name + END] = touchInit
 	})
 	function touchInit(el) {
 		if (!el._ti) {
@@ -1510,20 +1509,15 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			var len = e ? touches.push(e) : touches.length
 			, MOVE = "pointermove"
 			if (touchMode || len < 1) {
-				emit(touchEl, touchMode ? touchMode + END : "tap", e2, touchEv, touchEl)
+				emit(el, touchMode ? touchMode + END : "tap", e2, el)
 				touchMode = UNDEF
-			}
-			if (len < 1) {
-				touchEl = UNDEF
 			}
 			if (len === 1) {
 				if (e) {
-					touchEl = e.currentTarget || e.target
-					touchEv.X = e.clientX
-					touchEv.Y = e.clientY
+					e0 = e
 					touchPos("left", "offsetWidth")
 					touchPos("top", "offsetHeight")
-					if (e.button === 2 || matches(touchEl, "INPUT,TEXTAREA,SELECT,.no-drag")) return
+					if (e.button === 2 || matches(el, "INPUT,TEXTAREA,SELECT,.no-drag")) return
 					touchTick = setTimeout(moveOne, LiteJS.holdDelay || 800, e, 1)
 				}
 				moveOne(e || touches[0])
@@ -1535,15 +1529,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			;(len === 1 ? addEvent : rmEvent)(document, MOVE, moveOne)
 			;(len === 2 ? addEvent : rmEvent)(document, MOVE, moveTwo)
 			function touchPos(name, offset) {
-				var val = (
-					touchEl.getBBox ?
-					touchEl.getAttributeNS(NUL, name == "top" ? "y":"x") :
-					touchEl.style[name]
-				)
-				touchEv[name] = parseInt(val, 10) || 0
-				if (val && val.indexOf("%") > -1) {
-					touchEv[name] *= touchEl.parentNode[offset] / 100
-				}
+				var val = getAttr(el, name == "top" ? "y" : "x") || getComputedStyle(el)[name]
+				, num = parseInt(val, 10) || 0
+				e0[name] = val && val.indexOf("%") > -1 ? num * el.parentNode[offset] / 100 : num
 			}
 		}
 		function touchUp(e) {
@@ -1561,7 +1549,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			// alt+wheel may be OS level zoom, use shiftKey as alternative
 			if (!touches[0]) {
 				var ev = e.ctrlKey ? "pinch" : e.altKey || e.shiftKey ? "rotate" : UNDEF
-				if (ev && emit(e.currentTarget || e.target, ev, e, e.deltaY/20, 0)) {
+				if (ev && (e.diff = e.deltaY / 20, e.angle = 0, emit(el, ev, e, el))) {
 					return eventStop(e)
 				}
 			}
@@ -1571,21 +1559,23 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			if (touches[0].buttons && touches[0].buttons !== (e.buttons || [0, 1, 4, 2][e.which || 0])) {
 				return touchUp(e)
 			}
-			touchEv.x = e.clientX - touchEv.X
-			touchEv.y = e.clientY - touchEv.Y
-			touchEv.leftPos = touchEv.x + touchEv.left
-			touchEv.topPos  = touchEv.y + touchEv.top
+			e.x0 = e0.clientX
+			e.y0 = e0.clientY
+			e.dx = e.clientX - e.x0
+			e.dy = e.clientY - e.y0
+			e.ex = e.dx + e0.left
+			e.ey = e.dy + e0.top
 			if (!touchMode) {
-				var evs = touchEl._e
+				var evs = el._e
 				touchMode = (
-					haveEv("pan", touchEv.x > 10 || touchEv.x < -10 || touchEv.y > 10 || touchEv.y < -10) ||
+					haveEv("pan", e.dx > 10 || e.dx < -10 || e.dy > 10 || e.dy < -10) ||
 					haveEv("hold", fromTimer)
 				)
 				if (!touchMode) return
 				clearTimeout(touchTick)
-				emit(touchEl, touchMode + START, e, touchEv, touchEl)
+				emit(el, touchMode + START, e, el)
 			}
-			emit(touchEl, touchMode, e, touchEv, touchEl)
+			emit(el, touchMode, e, el)
 			function haveEv(name, set) {
 				return set && (evs[name] || evs[name + START] || evs[name + END]) && name
 			}
@@ -1593,19 +1583,26 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		function moveTwo(e) {
 			touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
 			var diff
-			, x = touchEv.X - touches[1].clientX
-			, y = touchEv.Y - touches[1].clientY
+			, x = e0.clientX - touches[1].clientX
+			, y = e0.clientY - touches[1].clientY
 			, dist = Math.sqrt(x*x + y*y) | 0
 			, angle = Math.atan2(y, x)
 
 			if (touchDist !== UNDEF) {
 				diff = dist - touchDist
-				if (diff) emit(touchEl, "pinch", e, diff, angle)
+				if (diff) {
+					e.diff = diff
+					e.angle = angle
+					emit(el, "pinch", e, el)
+				}
 				// GestureEvent onGestureChange: function(e) {
 				//	e.target.style.transform =
 				//		'scale(' + e.scale  + startScale  + ') rotate(' + e.rotation + startRotation + 'deg)'
 				diff = angle - touchAngle
-				if (diff) emit(touchEl, "rotate", e, diff * (180/Math.PI))
+				if (diff) {
+					e.diff = diff * (180/Math.PI)
+					emit(el, "rotate", e, el)
+				}
 			}
 			touchDist = dist
 			touchAngle = angle
@@ -1665,27 +1662,26 @@ console.log("LiteJS is in debug mode and that's fine for production")
 					}
 					return
 				}
-				if (prepareVal) val = delegate(el, val, selector, data)
-				selector = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
-				for (delay = 0; (el = selector[delay++]); ) {
-					for (var result, arr = ("" + name).split(splitRe), i = 0, len = arr.length; i < len; i++) {
-						if (arr[i]) {
-							result = fn(el, arr[i], isArr(val) ? val[i] : val, data)
-							if (!prepareVal && data > 0) f(el, name, result, "", data)
+				var result, node
+				, arr = ("" + name).split(splitRe)
+				, i = 0, len = arr.length
+				, value = prepareVal && (selector || isStr(val)) ? function(e, mem, target) {
+					target = selector ? closest(e.target, selector) : el
+					if (target) {
+						if (isStr(val)) emit.apply(NUL, [elScope(target).$ui, val, e, target].concat(data))
+						else if (isFn(val)) val.apply(target, [e, target].concat(data))
+					}
+				} : val
+				, els = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
+				for (; (node = els[i++]); ) {
+					for (delay = 0; delay < len; delay++) {
+						if (arr[delay]) {
+							result = fn(node, arr[delay], isArr(value) ? value[delay] : value, data)
+							if (!prepareVal && data > 0) f(node, name, result, "", data)
 						}
 					}
 				}
 			}
-		}
-		function delegate(el, val, selector, data) {
-			return isStr(val) ? function(e) {
-				var target = selector ? closest(e.target, selector) : el
-				if (target) emit.apply(target, [elScope(el).$ui, val, e, target].concat(data))
-			} :
-			selector ? function(e, touchEv, touchEl) {
-				if (matches(touchEl = e.target, selector)) val(e, touchEv, touchEl, data)
-			} :
-			val
 		}
 	}
 	function assignDeep(target, map) {

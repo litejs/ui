@@ -25,19 +25,28 @@
 			holdend: function(e) {
 				cls(el, "is-wiggle", 0)
 			},
-			hold: function(e, touchEv) {
-				css(el, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"])
+			hold: function(e) {
+				css(el, "top,left", [e.ey + "px", e.ex + "px"])
 			},
-			pan: function(e, touchEv, touchEl) {
-				css(touchEl, "top,left", [touchEv.topPos + "px", touchEv.leftPos + "px"])
+			pan: function(e) {
+				css(el, "top,left", [e.ey + "px", e.ex + "px"])
 			},
-			rotate: function(e, diff) {
-				transform(el, "rotate", diff, "0deg")
+			rotate: function(e) {
+				transform(el, "rotate", e.diff, "0deg")
 			},
-			pinch: function(e, diff) {
-				transform(el, "scale", diff/15, "1")
+			pinch: function(e) {
+				transform(el, "scale", e.diff/50, "1")
 				//css(el, "height,width", (el.offsetHeight + diff) + "px")
 				El.stop(e)
+			}
+		})
+	}
+
+	$b.svgMoveExample = function(el) {
+		El.on(el, {
+			pan: function(e) {
+				set(el, "x", e.ex)
+				set(el, "y", e.ey)
 			}
 		})
 	}
