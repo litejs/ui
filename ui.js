@@ -1490,9 +1490,11 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	, START = "start"
 	, END = "end"
 	, touches = []
+	, tapCount = 0
+	, tapTime = 0
 
 	// swipe + left/right/up/down
-	each("hold pan pinch rotate tap", function(name) {
+	each("hold pan pinch rotate tap tap2", function(name) {
 		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
 		fixFn[name] = fixFn[name + START] = fixFn[name + END] = touchInit
 	})
@@ -1508,9 +1510,14 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			clearTimeout(touchTick)
 			var len = e ? touches.push(e) : touches.length
 			, MOVE = "pointermove"
-			if (touchMode || len < 1) {
-				emit(el, touchMode ? touchMode + END : "tap", e2, el)
+			if (touchMode) {
+				emit(el, touchMode + END, e2, el)
 				touchMode = UNDEF
+			} else if (len < 1) {
+				var now = Date.now()
+				tapCount = e2.count = now - tapTime < (LiteJS.tapDelay || 400) ? tapCount + 1 : 1
+				tapTime = now
+				if (!emit(el, "tap" + tapCount, e2, el)) emit(el, "tap", e2, el)
 			}
 			if (len === 1) {
 				if (e) {

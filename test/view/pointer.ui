@@ -44,6 +44,12 @@ anim-page
 		ul.sortCol
 			li.anim Blue
 	h2 Events
+	div Tap {tapCount}
+		^$s!{tapCount:0}
+		@tap function(e) {
+			$s.tapCount = e.count
+			El.render($el)
+		}
 	div Click fn {count0}
 		^$s!{count0:1}
 		@click function() {
@@ -52,12 +58,12 @@ anim-page
 		}
 	div
 		;$s!{count1:0}
-		@click "inc", 0, ["count1"]
+		@click "inc", ["count1"]
 		;txt "Click " + $s.count1
 		;title! "Click " + count1
 	div
 		;$s!{count2:0}
-		@click!"inc", 0, ["count2"]
+		@click!"inc", ["count2"]
 		;txt "One click " + $s.count2
 	div
 		;txt "Hover"
