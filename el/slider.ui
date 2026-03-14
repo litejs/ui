@@ -109,7 +109,7 @@
 	, elOff = El.off
 	, elCls = El.cls
 	, elGet = El.get
-	El.$b.SliderInit = function(el, range) {
+	El.$b.sliderInit = function(el, range) {
 		range = (range || elGet(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
 		var knobLen, offset, px, drag, min, max, minPx, maxPx, value
 		//, vert = El.hasClass(el, "is-vertical")
@@ -194,19 +194,19 @@
 	}
 
 %el Slider
-button.Slider.anim.reset ;SliderInit!
+button.Slider.anim.reset ;sliderInit!
 	.Slider-fill
 		.Slider-knob[tabindex=0]
 
 %el Slider2
-button.Slider.anim.reset ;SliderInit!
+button.Slider.anim.reset ;sliderInit!
 	.Slider-fill
 		.Slider-knob[tabindex=0]
 	.Slider-fill
 		.Slider-knob[tabindex=0]
 
 %el Slider3
-button.Slider.reset ;SliderInit!
+button.Slider.reset ;sliderInit!
 	.Slider-fill
 		.Slider-knob[tabindex=0]
 	.Slider-fill
@@ -215,7 +215,7 @@ button.Slider.reset ;SliderInit!
 		.Slider-knob[tabindex=0]
 
 %el Toggle
-button.Toggle.reset ;SliderInit! "0:1"
+button.Toggle.reset ;sliderInit! "0:1"
 	;css: "width","36px"
 	.Slider-fill.anim
 		.Slider-knob.anim[tabindex=0]
