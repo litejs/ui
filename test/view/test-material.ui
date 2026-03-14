@@ -27,10 +27,10 @@ ul.Menu.shadow-1
 			.col-9
 				Fab>=+
 					;data-tooltip "Hello1"
-					@click "showMenu", ["Fab-menu1","right-end","bottom",4]
+					@click "menu", ["Fab-menu1","right-end","bottom",4]
 				Fab.Fab--red[data-tooltip-pos=left]>=—
 					;data-tooltip "World\n2"
-					@contextmenu,holdstart "showMenu", ["Fab-menu2", "left-start", "bottom", 1]
+					@contextmenu,holdstart "menu", ["Fab-menu2", "left-start", "bottom", 1]
 				Fab[data-tooltip-pos=right]>=+
 					;data-tooltip "Hello2"
 				Fab>=+
