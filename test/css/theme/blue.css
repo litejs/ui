@@ -29,15 +29,6 @@ html {
 	outline: 5px solid transparent;
 }
 
-::-moz-selection {             /* 1 */
-	text-shadow: none;     /* 2 */
-	background: var(--bg-color);
-}
-
-::selection {                  /* 1 */
-	text-shadow: none;     /* 2 */
-	background: var(--bg-color);
-}
 /*
 @media (pointer:coarse) {
 	Primary Input is a coarse pointer device

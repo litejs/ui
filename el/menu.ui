@@ -16,7 +16,6 @@
 		font-weight: 500;
 		max-width: 90%;
 		text-align: center;
-		pointer-events: none;
 		z-index: 8;
 	}
 	.Tooltip[data-pos]:before {
@@ -147,6 +146,7 @@
 			// without relTarg is event on click
 			if (!relTarg && e.type !== "focusin" || target === tipTarget) return
 			if (!text && tipTarget) {
+				if (tipEl && tipEl.contains(target)) return
 				for (; target = target.parentNode; ) {
 					if (target === tipTarget) return
 				}
