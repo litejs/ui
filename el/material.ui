@@ -87,25 +87,6 @@
 		transform: scale(1);
 		opacity: 1;
 	}
-	.waves {
-		position: relative;
-		overflow: hidden;
-	}
-	.waves-ripple {
-		position: absolute;
-		border-radius: 50%;
-		background-color: #000;
-		opacity: 0;
-		transform: scale(0);
-		transition: opacity .6s cubic-bezier(0, 0, .2, 1) 0s, transform 0s cubic-bezier(0, 0, .2, 1) .6s;
-		pointer-events: none;
-	}
-	.waves.is-active > .waves-ripple,
-	.waves-ripple--play {
-		opacity: .4;
-		transform: scale(1);
-		transition: opacity 1s cubic-bezier(0, 0, .2, 1) 0ms, transform .4s cubic-bezier(0, 0, .2, 1) 0ms;
-	}
 	.shadow-1 {
 		box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
 	}
@@ -195,8 +176,7 @@
 
 %js
 	!function($ui) {
-		var menuTarget, menuEl, tipTarget, tipEl, tick, wait
-		, ripple = El(".waves-ripple")
+		var menuTarget, menuEl, tipTarget, tipEl
 		, html = document.documentElement
 		El.near = near
 		function near(source, target, x, y, margin) {
@@ -243,8 +223,7 @@
 				left: (left < 0 ? 0 : left) + "px"
 			})
 		}
-		El.on(html, "mouseover", onOver)
-		El.on(window, "focusin", onOver)
+		El.on(html, "mouseover focusin", onOver)
 		$ui.on("show", closeTooltip)
 		function onOver(e) {
 			var x, y, pos
@@ -299,8 +278,7 @@
 				El.cls(menuTarget, "is-active", menuEl = menuTarget = null)
 			}
 		}
-		$ui.on("ping", closeMenu)
-		$ui.on("closeMenu", closeMenu)
+		$ui.on("ping,closeMenu", closeMenu)
 		$ui.on("showMenu", function(e, target, menu, x, y, margin) {
 			El.stop(e)
 			var close = menuEl && menuTarget == target
@@ -324,38 +302,6 @@
 			}
 		})
 		El.on(html, "click", closeMenu)
-		El.on(html, "pointerdown", pointerdown)
-		function pointerdown(e) {
-			var target = e.target
-			if (!El.hasClass(target, "waves") || target.disabled) return
-			var rect = target.getBoundingClientRect()
-			, fromMouse = !El.hasClass(target, "Checkbox-icon")
-			, top = fromMouse ? e.clientY - rect.top : rect.height
-			, left = fromMouse ? e.clientX - rect.left : rect.width
-			, maxH = Math.max(top, target.offsetHeight - top)
-			, maxW = Math.max(left, target.offsetWidth - left)
-			, max = Math.sqrt(maxH * maxH + maxW * maxW)
-			, size = (fromMouse ? 2 * max : max) + "px"
-			El.css(ripple, {
-				top: (top - max) + "px",
-				left: (left - max) + "px",
-				width: size,
-				height: size
-			})
-			El.append(target, ripple)
-			clearTimeout(tick)
-			end()
-			wait = 1
-			tick = setTimeout(end, 800)
-			El.one(html, "pointerup", end)
-			ripple.offsetTop // force repaint
-			El.cls(ripple, "waves-ripple--play")
-		}
-		function end() {
-			if (!(wait--)) {
-				El.cls(ripple, "waves-ripple--play", 0)
-			}
-		}
 	}($ui)
 
 

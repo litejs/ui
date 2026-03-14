@@ -1,0 +1,56 @@
+
+%css
+	.waves {
+		position: relative;
+		overflow: hidden;
+	}
+	.waves-ripple {
+		position: absolute;
+		border-radius: 50%;
+		background-color: #000;
+		opacity: 0;
+		transform: scale(0);
+		transition: opacity .6s cubic-bezier(0, 0, .2, 1) 0s, transform 0s cubic-bezier(0, 0, .2, 1) .6s;
+		pointer-events: none;
+	}
+	.waves-ripple--play {
+		opacity: .4;
+		transform: scale(1);
+		transition: opacity 1s cubic-bezier(0, 0, .2, 1) 0ms, transform .4s cubic-bezier(0, 0, .2, 1) 0ms;
+	}
+
+%js
+	!function() {
+		var tick, wait
+		, ripple = El(".waves-ripple")
+		, html = document.documentElement
+		El.on(html, "pointerdown", function(e) {
+			var target = e.target
+			if (!El.hasClass(target, "waves") || target.disabled) return
+			var rect = target.getBoundingClientRect()
+			, top = e.clientY - rect.top
+			, left = e.clientX - rect.left
+			, maxH = Math.max(top, target.offsetHeight - top)
+			, maxW = Math.max(left, target.offsetWidth - left)
+			, max = 2 * Math.sqrt(maxH * maxH + maxW * maxW)
+			El.css(ripple, {
+				top: (top - max / 2) + "px",
+				left: (left - max / 2) + "px",
+				width: max + "px",
+				height: max + "px"
+			})
+			El.append(target, ripple)
+			clearTimeout(tick)
+			end()
+			wait = 1
+			tick = setTimeout(end, 600)
+			El.one(html, "pointerup", end)
+			ripple.offsetTop // force repaint
+			El.cls(ripple, "waves-ripple--play")
+		})
+		function end() {
+			if (!(wait--)) {
+				El.cls(ripple, "waves-ripple--play", 0)
+			}
+		}
+	}()
