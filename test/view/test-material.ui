@@ -1,17 +1,17 @@
 
 
 %el Fab-menu1
-ul.mat-Menu.shadow-1
-	li.mat-Menu-item.waves Some Action
-	li.mat-Menu-item.waves.is-divider Another Action
-	li.mat-Menu-item.waves:disabled Disabled Action
-	li.mat-Menu-item.waves Yet Another Action
+ul.Menu.shadow-1
+	li.Menu-item.waves Some Action
+	li.Menu-item.waves.is-divider Another Action
+	li.Menu-item.waves:disabled Disabled Action
+	li.Menu-item.waves Yet Another Action
 %el Fab-menu2
-ul.mat-Menu.shadow-1
-	li.mat-Menu-item.waves Some Action
-	li.mat-Menu-item.waves.is-divider Another Action
-	li.mat-Menu-item.waves:disabled Disabled Action
-	li.mat-Menu-item.waves Yet Another Action
+ul.Menu.shadow-1
+	li.Menu-item.waves Some Action
+	li.Menu-item.waves.is-divider Another Action
+	li.Menu-item.waves:disabled Disabled Action
+	li.Menu-item.waves Yet Another Action
 
 %view test-material-ui public
 	anim-page

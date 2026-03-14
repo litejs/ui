@@ -23,10 +23,10 @@ svg {
 	margin-bottom: 5px;
 }
 
-.Menu-item {
+.Nav-item {
 	fill: blue;
 }
-.Menu-item:hover {
+.Nav-item:hover {
 	filter: drop-shadow(1px 1px 1px rgba(0,0,0,.6));
 	text-decoration: underline wavy;
 }

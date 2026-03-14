@@ -1,0 +1,219 @@
+
+%css
+	.Menu,
+	.Tooltip {
+		border-radius: 2px;
+		position: absolute;
+		margin: 0;
+		opacity: 0;
+		transform: scale(0);
+		transition: opacity .4s cubic-bezier(0, 0, .2, 1) 0s, transform .2s cubic-bezier(0, 0, .2, 1) 0s;
+	}
+	.Tooltip {
+		padding: 8px;
+		color: #fff;
+		background: #666;
+		font-weight: 500;
+		max-width: 90%;
+		text-align: center;
+		pointer-events: none;
+		z-index: 8;
+	}
+	.Tooltip[data-pos]:before {
+		content: "";
+		position: absolute;
+		display: block;
+		width: .4em;
+		height: .4em;
+		border: .4em solid transparent;
+		border-left-color: #666;
+		border-top-color: #666;
+	}
+	.Tooltip[data-pos=top]:before {
+		bottom: -.3em;
+		left: -.3em;
+		margin-left: 50%;
+		transform: rotate(225deg);
+	}
+	.Tooltip[data-pos=bottom]:before {
+		top: -.3em;
+		left: -.3em;
+		margin-left: 50%;
+		transform: rotate(45deg);
+	}
+	.Tooltip[data-pos=right]:before {
+		top: 50%;
+		left: -.3em;
+		margin-top: -.4em;
+		transform: rotate(315deg);
+	}
+	.Tooltip[data-pos=left]:before {
+		top: -.3em;
+		right: -.3em;
+		margin-top: 50%;
+		transform: rotate(135deg);
+	}
+	.Menu {
+		padding: 8px 0;
+		color: #000;
+		background: #fff;
+		min-width: 124px;
+		max-width: 100%;
+		z-index: 7;
+	}
+	.Menu-item {
+		display: block;
+		padding: 12px 16px;
+		text-decoration: none;
+		line-height: 24px;
+		cursor: pointer;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.Menu-item:hover {
+		background-color: #eee;
+	}
+	.Menu-item[disabled] {
+		color: #bdbdbd;
+		background-color: transparent;
+		cursor: auto;
+	}
+	.Menu-item.is-divider {
+		border-bottom: 1px solid #ddd;
+	}
+	.Menu.is-visible,
+	.Tooltip.is-visible {
+		transform: scale(1);
+		opacity: 1;
+	}
+
+%js
+	!function($ui) {
+		var menuTarget, menuEl, tipTarget, tipEl
+		, html = document.documentElement
+		El.near = near
+		function near(source, target, x, y, margin) {
+			var rect = target.getBoundingClientRect()
+			, top  = rect.top + El.scrollTop()
+			, left = rect.left + El.scrollLeft()
+			// svg elements dont have offsetWidth, IE8 does not have rect.width
+			, width = rect.width || target.offsetWidth || 0
+			, height = rect.height || target.offsetHeight || 0
+			if (x == "left") {
+				left -= source.offsetWidth + margin
+				x = "150%"
+			} else if (x == "left-start") {
+				left -= margin
+				x = "0%"
+			} else if (x == "right") {
+				left += width + margin
+				x = "-50%"
+			} else if (x == "right-end") {
+				left += width + margin - source.offsetWidth
+				x = "100%"
+			} else {
+				left += (width / 2) - (source.offsetWidth/2)
+				x = "50%"
+			}
+			if (y == "top") {
+				top -= margin + source.offsetHeight
+				y = " 150%"
+			} else if (y == "bottom") {
+				top += height + margin
+				y = " -50%"
+				setTimeout(function(){
+				//document.scrollingElement.scrollHeight
+				var overflow = top + source.offsetHeight - El.scrollTop() - document.documentElement.offsetHeight
+				if (overflow > 0) scrollBy({ top: overflow, left: 0, behavior: "smooth" })
+				}, 400)
+			} else {
+				top += (height / 2) - (source.offsetHeight/2)
+				y = " 50%"
+			}
+			El.css(source, {
+				"transform-origin": x + y,
+				top: (top < 0 ? 0 : top) + "px",
+				left: (left < 0 ? 0 : left) + "px"
+			})
+		}
+		El.on(html, "mouseover focusin", onOver)
+		$ui.on("show", closeTooltip)
+		function onOver(e) {
+			var x, y, pos
+			, target = e.target
+			, text = El.get(target, "data-tooltip")
+			, relTarg = e.relatedTarget || e.fromElement
+			// without relTarg is event on click
+			if (!relTarg && e.type !== "focusin" || target === tipTarget) return
+			if (!text && tipTarget) {
+				for (; target = target.parentNode; ) {
+					if (target === tipTarget) return
+				}
+			}
+			closeTooltip()
+			if (!text) return
+			tipEl = openVisible("pre.Tooltip", tipTarget = target)
+			pos = El.get(target, "data-tooltip-pos") || "top"
+			El.txt(tipEl, text)
+			if (pos === "left" || pos === "right") {
+				x = pos
+			} else {
+				y = pos
+			}
+			El.set(tipEl, "data-pos", pos)
+			near(tipEl, target, x, y, 6)
+		}
+		function openVisible(tag, target) {
+			var el = typeof tag == "string" ? El(tag) : tag
+			, scope = El.scope(el, target)
+			scope.openTarget = target
+			El.render(el)
+			El.append(document.body, el)
+			El.cls(el, "is-visible", 1, 5)
+			return el
+		}
+		function closeVisible(el, delay) {
+			if (el) {
+				setTimeout(el.closeFn || El.kill.bind(El, el), 999)
+				El.cls(el, "is-visible", 0, delay)
+			}
+		}
+		function closeTooltip() {
+			if (tipEl) {
+				closeVisible(tipEl)
+				tipTarget = tipEl = null
+			}
+		}
+		function closeMenu(e) {
+			if (e && e.target == menuTarget) return
+			if (menuEl) {
+				closeVisible(menuEl, 200)
+				El.cls(menuTarget, "is-active", menuEl = menuTarget = null)
+			}
+		}
+		$ui.on("ping,closeMenu", closeMenu)
+		$ui.on("showMenu", function(e, target, menu, x, y, margin) {
+			El.stop(e)
+			var close = menuEl && menuTarget == target
+			closeMenu()
+			if (close) return
+			menuEl = openVisible(menu, target)
+			if (x == "mouse") {
+				El.css(menuEl, {
+					top: e.pageY + "px",
+					left: e.pageX + "px"
+				})
+			} else {
+				El.cls(menuTarget = target, "is-active")
+				near(menuEl, target, x, y, margin)
+			}
+			if (menuEl.style.transform !== void 0) {
+				El.cls(menuEl, "no-events")
+				El.on(menuEl, "transitionend", function(e) {
+					if (e.propertyName === "transform") El.cls(menuEl, "no-events", 0)
+				})
+			}
+		})
+		El.on(html, "click", closeMenu)
+	}($ui)

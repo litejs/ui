@@ -44,11 +44,11 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		a[href="#home"].home-link Header
 		span.sizeHint Responsive
 
-%el Menu
+%el Nav
 .bg-2
-	.Menu.App-row.js-viewRender
+	.Nav.App-row.js-viewRender
 		%el nav-row
-		a.Menu-item.waves;cls "selected",(url||$ui.home).indexOf($el.href.split("#")[1]||$ui.home)==0
+		a.Nav-item.waves;cls "selected",(url||$ui.home).indexOf($el.href.split("#")[1]||$ui.home)==0
 		nav-row[href="#"]
 			svg-icon>path[d="M12,2L1,12h3v9h5V14h6v7h5V12h3z"]
 			svg-icon>path[d="M12,2L1,12h3v9h5V14h9V2h-3V21h5V12h3z"]
@@ -118,7 +118,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 .app
 	.App.max-height
 		top
-		Menu
+		Nav
 		.rel.App-row
 			%slot
 		.Footer-spacer
@@ -150,7 +150,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		if (!user && $ui.route != "login") {
 			$ui("login").show()
 		}
-		$$(".Menu,.lang").render()
+		$$(".Nav,.lang").render()
 	}
 }()
 .app
@@ -160,7 +160,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 				span {user.name}
 				button.c0 Logout
 					@click: "logout"
-		Menu
+		Nav
 		.rel.App-row
 			%slot
 		.Footer-spacer
