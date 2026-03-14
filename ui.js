@@ -318,10 +318,11 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		var fn2 = fixFn[ev] && fixFn[ev](el, fn, ev) || fn
 		, ev2 = fixEv[ev] || ev
 
-		if (ev2 !== "" && "on" + ev2 in el) {
+		if (ev2 !== "") {
 			// polyfilled addEventListener returns patched function
 			// useCapture defaults to false
 			// Chrome56 touchstart/move sets {passive:true} by default; use {passive:false} to enable preventDefault()
+			// FF/Chrome el.onfocusin property is not supported, only addEventListener("focusin", fn)
 			fn2 = html.addEventListener.call(el, ev2, fn2, opts) || fn2
 		}
 
@@ -336,7 +337,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			if (fn !== evs[id + 1] && evs[id + 1]._rm) {
 				evs[id + 1]._rm()
 			}
-			if (ev2 !== "" && "on" + ev2 in el) {
+			if (ev2 !== "") {
 				html.removeEventListener.call(el, ev2, evs[id + 1], opts)
 			}
 			evs.splice(id - 1, 3)
