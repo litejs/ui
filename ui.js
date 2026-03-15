@@ -1175,7 +1175,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			},
 			is: bindingsIs,
 			name: function(el, name) {
-				setAttr(el, "name", expand(name, 1))
+				if (name) setAttr(el, "name", expand(name, 1))
 			},
 			ref: function(el, name) {
 				this[name] = el

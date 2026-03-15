@@ -47,7 +47,7 @@
 	:focus > * > .Slider-knob {
 		box-shadow: 0 0 0 8px rgb(0, 0, 0, .2), 0 1px 4px rgba(0, 0, 0, .3);
 	}
-	.Slider-knob.is-active {
+	.is-active > .Slider-knob {
 		box-shadow: 0 0 0 12px rgb(0, 0, 0, .2), 0 1px 5px 5px rgba(0, 0, 0, .3);
 	}
 	/* value bubble */
@@ -68,13 +68,14 @@
 	}
 	.Slider-knob:after {
 		content: attr(data-val);
+		text-align: center;
 		left: 10px;
 		padding: 0 4px;
 		transform: translate(-50%, 0);
 	}
 	:focus > * > .Slider-knob:before,
 	:hover > * > .Slider-knob:before,
-	.Slider-knob.is-active:before {
+	.is-active > .Slider-knob:before {
 		border-radius: 50% 50% 0 50%;
 		box-shadow: 3px 3px 3px 1px rgba(0, 0, 0, .3);
 		opacity: 1;
@@ -82,7 +83,7 @@
 	}
 	:focus > * > .Slider-knob:after,
 	:hover > * > .Slider-knob:after,
-	.Slider-knob.is-active:after {
+	.is-active > .Slider-knob:after {
 		box-shadow: -4px -3px 3px -2px rgba(0, 0, 0, .15), 4px -3px 3px -2px rgba(0, 0, 0, .15);
 		opacity: 1;
 		top: -43px;
@@ -109,110 +110,121 @@
 	, elOff = El.off
 	, elCls = El.cls
 	, elGet = El.get
+	, sliderTypes = {
+		time: ["0:1440:60", function(s) {
+			s = s.split(":")
+			return s[0] * 60 + +s[1]
+		}, function(m) {
+			return (m / 60 | 0) + ":" + ("0" + m % 60).slice(-2)
+		}]
+	}
 	El.$b.sliderInit = function(el, range) {
 		range = (range || elGet(el, "range") || "").split(/[^+\-\d.]/) // min:max:step:margin
-		var knobLen, offset, px, drag, min, max, minPx, maxPx, value
-		//, vert = El.hasClass(el, "is-vertical")
-		, vert = false
-		, attr = vert ? "offsetHeight" : "offsetWidth"
-		, fill = el.firstChild
-		, knob = fill.lastChild
+		var knobLen, offset, px, drag, min, max, minPx, maxPx
+		, step = +(range[2] || 1)
+		, margin = +(range[3] || 0)
+		, fmt = elGet(el, "format")
+		, idx
+		, fill
+		, values = []
+		, inputs = $$("input", el)
+		, type = sliderTypes[elGet(el, "type")]
+		, parse = type ? type[1] : Number
+		, format = type ? type[2] : String
+		, fills = []
 		, emit = El.rate(El.emit.bind(el, el, "change"), 500)
+		if (type && !range[1]) range = type[0].split(/[^+\-\d.]/)
+		for (idx = 0; idx < inputs.length; ) {
+			fills[idx] = El("Slider-fill")
+			values[idx] = parse(inputs[idx].value)
+			idx++
+		}
+		if (fills.length) {
+			El.append(el, fills.slice(0).reverse())
+			load()
+			for (idx = 0; idx < fills.length; idx++) setVal(idx, values[idx])
+			idx = 0
+			fill = fills[0]
+		} else {
+			fill = el.firstChild
+		}
 		elOn(window, "blur", stop)
-		setTimeout(el.val = set, 10, value||0)
 		function load() {
 			min = +(range[0] || 0)
 			max = +(range[1] || 100)
-			knobLen = knob[attr]>>1
+			knobLen = (fills[0] || fill).firstChild.offsetWidth>>1
 			minPx = 0
-			maxPx = el[attr] - knobLen - knobLen
+			maxPx = el.offsetWidth - knobLen - knobLen
 			px = maxPx / (max - min)
 		}
 		elOn(el, "pointerdown", function(e) {
 			drag = true
 			load()
 			var tmp = el.getBoundingClientRect()
-			offset = (vert ? tmp.top + maxPx + El.scrollTop() + knobLen : tmp.left + El.scrollLeft()) + knobLen
-			tmp = offset - e.clientX + (value-min||0)*px
-			if (tmp < knobLen && tmp > -knobLen) offset -= tmp
-			if (el.childNodes.length > 1) {
-				var next
-				, x = maxPx
-				, diff = vert ? offset - e.pageY : e.pageX - offset
-				for (tmp = fill = el.firstChild; tmp; tmp = tmp.nextSibling) {
-					next = diff - tmp[attr] + knobLen
-					if (next < 0 ? -next <= x : next < x) {
-						fill = tmp
-						knob = tmp.firstChild
-						x = next < 0 ? -next : next
-					}
-				}
-				if (fill.previousSibling) {
-					maxPx = fill.previousSibling[attr] - knobLen
-					if (range[3]) maxPx -= px * range[3]
-				}
-				if (fill.nextSibling) {
-					minPx = fill.nextSibling[attr] - knobLen
-					if (range[3]) minPx += px * range[3]
+			offset = tmp.left + El.scrollLeft() + knobLen
+			var next, i
+			, x = maxPx
+			, diff = e.pageX - offset
+			for (i = 0; i < fills.length; i++) {
+				next = diff - fills[i].offsetWidth + knobLen
+				if (next < 0 ? -next <= x : next < x) {
+					idx = i
+					fill = fills[i]
+					x = next < 0 ? -next : next
 				}
 			}
-			move(e)
+			tmp = offset - e.pageX + (values[idx]-min||0)*px
+			if (tmp < knobLen && tmp > -knobLen) offset -= tmp
 			listen(elOn)
+			move(e)
 		})
 		function move(e) {
-			var diff = vert ? offset - e.pageY : e.pageX - offset
+			var diff = e.pageX - offset
 			diff = (diff > maxPx ? maxPx : (diff < minPx ? minPx : diff))
-			set((diff / px) + min, e, diff)
+			setVal(idx, (diff / px) + min, diff)
+			emit(e)
 			return El.stop(e)
 		}
 		function stop(e) {
 			if (drag) {
 				drag = false
 				listen(elOff)
-				set(value)
+				setVal(idx, values[idx])
 			}
 		}
 		function listen(onOff) {
 			elCls(el, "anim", !drag)
-			elCls(knob, "is-active", drag)
+			elCls(fill, "is-active", drag)
 			onOff(document, "pointerup", stop)
 			onOff(document, "pointermove", move)
 		}
-		function set(val, e, pos) {
-			load()
-			val = El.step(val < min ? min : val > max ? max : val || 0, +(range[2] || 1))
-			if (value !== void 0 && (!drag || pos !== void 0)) {
-				El.css(fill, vert ? "height" : "width", ((pos || (val-min)*px)+knobLen) + "px", 0)
+		function setVal(i, val, pos) {
+			val = El.step(val < min ? min : val > max ? max : val || 0, step)
+			if (values[i] !== void 0 && (!drag || pos !== void 0 || i !== idx)) {
+				El.css(fills[i], "width", ((pos || (val-min)*px)+knobLen) + "px", 0)
 			}
-			if (value !== val) {
-				el.value = value = val
-				if (drag && e) emit(e)
-				var format = elGet(el, "format")
-				El.set(knob, "data-val", format ? $d._(format, {val:val}) : val)
+			if (values[i] !== val) {
+				values[i] = val
+				inputs[i].value = format(val)
+				El.set(fills[i].firstChild, "data-val", fmt ? $d._(fmt, {val:val}) : format(val))
+				if (drag && margin) {
+					if (i > 0 && val - values[i - 1] < margin) setVal(i - 1, +val - margin)
+					if (i < fills.length - 1 && values[i + 1] - val < margin) setVal(i + 1, +val + margin)
+				}
 			}
 		}
 	}
+	El.$b.sliderInit.types = sliderTypes
+
+%el Knob
+input[type=hidden]
+
+%el Slider-fill
+.Slider-fill
+	.Slider-knob[tabindex=0]
 
 %el Slider
-button.Slider.anim.reset ;sliderInit!
-	.Slider-fill
-		.Slider-knob[tabindex=0]
-
-%el Slider2
-button.Slider.anim.reset ;sliderInit!
-	.Slider-fill
-		.Slider-knob[tabindex=0]
-	.Slider-fill
-		.Slider-knob[tabindex=0]
-
-%el Slider3
-button.Slider.reset ;sliderInit!
-	.Slider-fill
-		.Slider-knob[tabindex=0]
-	.Slider-fill
-		.Slider-knob[tabindex=0]
-	.Slider-fill
-		.Slider-knob[tabindex=0]
+.Slider.hand.anim[data-out="sliderInit!"]
 
 %el Toggle
 button.Toggle.reset ;sliderInit! "0:1"

@@ -49,11 +49,24 @@ ul.Menu.shadow-1
 				;on! "click", "timerTest"
 			.col-9
 				Slider[range="1:10:.5"]
+					Knob[name=from][b=x] ;val!3
 				br
 				br
-				Slider2.no-first[style="width:400px"]
+				Slider.no-first[style="width:400px"][range="0:100:2:10"]
+					Knob[name=a] ;val!4
+					Knob[name=b] ;val!30
 				br
-				Slider3[range="10:90:2:4"][format="{val}℃"].color[style="width:400px"]
+				Slider[range="10:90:2:4"][format="{val}℃"].color[style="width:400px"]
+					Knob[name=a]
+					Knob[name=b]
+					Knob[name=c]
+				br
+				Slider[type=time][style="width:400px"]
+					Knob[name=from][value="08:00"]
+					Knob[name=to][value="17:00"]
+				br
+				Slider[type=time][range="0:1440:30"][style="width:400px"]
+					Knob[name=start][value="06:00"]
 				br
 				Toggle
 				br
