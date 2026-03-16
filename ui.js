@@ -1782,7 +1782,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			res = res.concat(sources, next && next.src && next.innerHTML)
 			if (res[sources.length = 0]) {
 				if (!parser) {
-					var m = res.join("\n").match(/\n%ui\s+(\{[\s\S]*\})\s*$/)
+					var m = res.join("\n").match(/\n%ui\s+(\{[\s\S]*)/)
 					LiteJS.ui = LiteJS(m && Function("return " + m[1])())
 				}
 				each(res, parser)
