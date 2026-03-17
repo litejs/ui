@@ -1,0 +1,31 @@
+
+%view dialog public
+anim-page
+	h2 Dialog Examples
+	.grid.p2
+		.col
+			h3 Simple message
+			button.btn Open
+				@click 'ask',['Hello World']
+		.col
+			h3 Message with body
+			button.btn Open
+				@click 'ask',['Warning', 'This is the body text']
+		.col
+			h3 Confirm dialog
+			button.btn Open
+				@click 'ask',['Delete item?', {body:'This cannot be undone',actions:[{title:'Cancel'},{action:'del',title:'Delete'}]}]
+		.col
+			h3 Custom event
+			button.btn Open
+				@click 'ask',['Save changes?', {event:'dialog:save',actions:[{title:'Cancel'},{action:'ok',title:'Save',key:'enter'}]}]
+		.col
+			h3 With form input
+			button.btn Open
+				@click 'ask',['Enter name', {el:'Dialog-input',actions:[{title:'Cancel',key:'esc'},{action:'ok',title:'Ok',key:'enter'}]}]
+		.col
+			h3 Numpad
+			button.btn Open
+				@click 'ask',['Your code please', {el:'Dialog-numpad',actions:[{title:'Cancel'},{action:'ok',title:'Ok',key:'enter'}]}]
+		.col.ts3#modal-result Result:
+			;txt modalResult||'-'

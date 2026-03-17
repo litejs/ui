@@ -91,4 +91,8 @@ button,
 	user-select: none;
 }
 
+.no-scroll {
+	overflow: hidden;
+}
+
 

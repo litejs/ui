@@ -1,15 +1,15 @@
 
 %css
 	.Modal {
+		overflow: auto;
+		overscroll-behavior: contain;
 		z-index: 9;
 	}
 	.Modal-bg {
-		position: absolute;
-		position: static;
 		background-color: rgba(0, 0, 0, .6);
+		pointer-events: none;
 	}
 	.Modal-content {
-		position: absolute;
 		left: 0;
 		right: 0;
 		margin: 0 auto;
@@ -59,110 +59,100 @@
 //     { "action": "no", "title": "No", "icon": "images/no.png" }
 //   ]
 %js
-	$ui.on("modal", function(title, opts, next) {
-		El.blur()
-		if (!next && typeof opts === "function") {
-			next = opts
-			opts = null
-		}
-		var sound, vibrate
-		, code = ""
-		, el = El("Dialog")
-		, scope = Object.assign(El.scope(el, el), opts)
-		, kbMap = {}
-		, body = document.body
-		, blurEl = $(scope.blur) || $ui.root.lastChild
-		scope.title = title || "Confirm?"
-		if (!scope.actions) scope.actions = [
-			{ action: "close", title: "Close", key: "esc" }
-		]
-		for (var a, i = 0; a = scope.actions[i++]; ) {
-			if (typeof a == "string") a = scope.actions[i-1] = {title:a,action:a}
-			if (a.key) kbMap[a.key] = resolve.bind(el, el, a.action)
-		}
-		El.cls(blurEl, "Modal--blur")
-		var mm = El("Modal")
-		El.append(mm, el)
-		El.append(body, mm)
-		El.render(mm)
-		if (scope.code) {
-			$$(".js-numpad", el).on("click", numpad)
-			kbMap.backspace = kbMap.del = kbMap.num = numpad
-		}
-		El.addKb(kbMap, el)
-		$$(".js-btn", el).on("click", resolve)
-		$ui.one("show", resolve)
-		if (scope.bgClose) El.on(el, "click", resolve)
-		El.on(el, "wheel", El.stop)
-		El.on(el.lastChild, "click", El.stop)
-		if (scope.vibrate && navigator.vibrate) {
-			vibrate = navigator.vibrate(scope.vibrate)
-		}
-		if (scope.sound && window.Audio) {
-			sound = new Audio(scope.sound)
-			sound.play()
-		}
-		function numpad(e, _num) {
-			// Enter pressed on focused element
-			if (_num == void 0 && e.clientX == 0) return
-			var num = _num == void 0 ? e.target[El.T] : _num
-			code += num
-			if (num == "CLEAR" || num == "del" || num == "backspace") code = ""
-			El.md($(".js-body", el), code.replace(/./g, "•") || opts.body)
-			if (typeof scope.code == "number" && code.length == scope.code && id && !sent) next(sent = code, id, resolve, reject)
-		}
-		function resolve(e, key) {
-			if (el) {
-				var action = key || El.get(this, "data-action")
-				, result = {
-					code: code,
-					input: El.val($(".js-input", el)),
-					inputMd: El.val($(".js-inputMd", el)),
-					select: El.val($(".js-select", el))
+	$ui.on("modal", function(title, opts) {
+		var oldFocus = document.activeElement
+		, modal = El("Modal")
+		, el = El("Dialog.Modal-content.Modal--blur.abs")
+		, scope = El.scope(el, el, typeof opts === "string" ? { body: opts } : opts)
+		, kbMap = {
+			bubble: 1, input: 1,
+			tab: function(e) {
+				var items = $$("a[href],:is(button,input,select,textarea):not(:disabled),[tabindex]:not([tabindex='-1'])", modal)
+				, last = items.length - 1
+				if (document.activeElement === items[e.shiftKey ? 0 : last]) {
+					items[e.shiftKey ? last : 0].focus()
+					El.stop(e)
 				}
-				El.kill(mm, "transparent")
-				El.cls(blurEl, "Modal--blur", el = false)
-				if (action && next) {
-					if (typeof next === "function") next(action, result)
-					else if (typeof next[action] === "function") next[action](result)
-					else if (next[action]) $ui.emit(next[action], result)
-				}
-				if (vibrate) navigator.vibrate(0)
-				if (sound) sound.pause()
 			}
 		}
-		scope.resolve = resolve
-		$ui.emit("modal:open", scope)
+		, body = document.body
+		, scrollEl = document.scrollingElement || document.documentElement
+		, vibrate = scope.vibrate && navigator.vibrate
+		, sound = scope.sound && window.Audio && new Audio(scope.sound)
+		scope.title = title
+		if (!scope.actions) scope.actions = [
+			{ title: "Close", key: "esc" }
+		]
+		for (var a, i = 0; (a = scope.actions[i++]); ) {
+			if (typeof a === "string") a = scope.actions[i - 1] = { title: a, action: a }
+			if (a.key) kbMap[a.key] = resolve.bind(el, a.action)
+		}
+		El.append(modal, el)
+		if (scope.el) El.append(el, El(scope.el))
+		El.append(body, modal)
+		El.render(modal)
+		El.addKb(kbMap, modal)
+		if (El.closest(document.activeElement, 'form') !== el) {
+			el.focus()
+		}
+		El.on(el, "click", function(e) {
+			console.log("click1 resolve")
+			resolve(El.get(e.target, "data-action"), e)
+		}, "[data-action]")
+		El.cls(el, "Modal--blur",!1,1)
+		$ui.emit("modalOpen", scope)
+		$ui.one("show", function() { resolve() })
+		El.on(modal.firstChild, "click", function() {
+			console.log("click resolve")
+			resolve()
+		})
+		if (vibrate) vibrate(scope.vibrate)
+		if (sound) sound.play()
+		El.cls(scrollEl, "no-scroll")
+		function resolve(action, e) {
+			if (modal) {
+				El.stop(e)
+				El.cls(scrollEl, "no-scroll", 0)
+				El.kill(modal, "transparent", 1)
+				if (vibrate) vibrate(0)
+				if (sound) sound.pause()
+				modal = null
+				if (action) {
+					$ui.emit(scope.event || "modal:" + action, El.val(el), scope)
+				}
+				$ui.emit("modalClose", scope)
+				if (oldFocus) oldFocus.focus()
+			}
+		}
 	})
-
-%el Dialog-numpad
-.row.js-numpad
-	@click ".btn", function(){}
-	;each! "num",[1,2,3,4,5,6,7,8,9,"CLEAR",0]
-	.col.w4>.btn {num}
-
-%js
-	$ui.on("showDialog", function(e, el, dialog) {
-		console.log("showDialog", El.scope(el), arguments)
-		El.kill(dialog)
-	})
-
-%el Dialog
-.Dialog.grid.p2.anim
-	.col.ts3 ;txt! _(title, map)
-	.col.js-body ;md! _(body, map)
-	.col
-		.group ;each! 'action',actions
-			.btn.js-btn
-				;txt! _(action.title)
-				;class! "w" + (12/actions.length)
-				;nop! this.focus()
-				;set! "data-action", action.action
-				;class! "is-" + action.action, action.action
 
 %el Modal
-.Modal.max.fix.anim
-	.Modal-bg.max.abs
-	.Modal-content.Modal--blur.grid.p2.anim
-		;cls! "Modal--blur",!1,1
-		%slot
+.Modal.fix.max.anim>.Modal-bg.abs.max
+
+%el Dialog
+form.Dialog.grid.p2.anim[action="javascript:"][method=POST][tabindex='-1']
+	.col>h1 ;txt title
+	.col ;if body; d body
+	%slot
+	.col.group
+			button.btn.js-action
+				;each! 'action',actions
+				;set! "data-action", action.action||"-"
+				;txt _(action.title)
+				;cls! "w" + (12/actions.length)
+				;cls! action.action && "is-" + action.action, action.action
+
+%el Dialog-input
+.col
+	input.field[name=value][type=text][placeholder="Enter value"] ;focus
+
+%el Dialog-numpad
+.grid.p1.js-numpad
+	@click function(e,b,n,v){$s.in.value=(v=$s.in.value,n=b[El.T])>-1?v+n:n=='DEL'?v.slice(0,-1):'',$s.in.focus()},'.btn'
+	;kb!{num:function(e,b,n){$s.in.value=(n)>-1?$s.in.value+n:''},del:function(e,b,n){$s.in.value=$s.in.value.slice(-1)}}
+	.col>input[name=code] ;ref!'in';focus
+	.col.w4
+		;each! "num",[1,2,3,4,5,6,7,8,9,"CLEAR",0,"DEL"]
+		button.btn.w12[type=button]
+			;txt!num
+

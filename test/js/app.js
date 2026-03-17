@@ -46,6 +46,9 @@ var app = LiteJS({
 		}
 	},
 	on: {
+		ask: function(ev, node, title, opts) {
+			app.emit("modal", title, opts)
+		},
 		nav: function() {
 			console.log("Navigating to", app.route)
 		},
@@ -86,6 +89,17 @@ var app = LiteJS({
 			setTimeout(this.wait(), 1000)
 		}
 	}
+})
+
+app.on("modal:ok", function(data, scope) {
+	console.log("modal:ok", data, scope)
+	El.$d.modalResult = JSON.stringify(data)
+	El.render(app.root)
+})
+app.on("dialog:save", function(data, scope) {
+	console.log("dialog:save", data, scope)
+	El.$d.modalResult = "Saved: " + JSON.stringify(data)
+	El.render(app.root)
 })
 
 xhr.view = xhr.tpl = xhr.el = xhr.ui
