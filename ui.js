@@ -739,7 +739,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			// document.documentElement.clientWidth is 0 in IE5
 			bindingsIs(html, (width = html.offsetWidth), breakpoints, "")
 			bindingsIs(html, +(width > html.offsetHeight), "port,1=land", "")
-			emit(View, "resize")
+			emit(LiteJS, "resize")
 		}, 99)
 
 		if (breakpoints) {
