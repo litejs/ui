@@ -1,7 +1,7 @@
 
 /* litejs.com/MIT-LICENSE.txt */
 
-/* global escape, getComputedStyle, navigator, xhr */
+/* global escape, getComputedStyle, navigator, pageXOffset, pageYOffset, scrollTo, xhr */
 
 // Conditional compilation via toggle comments (processed by build tool):
 //   /*** name ***/  code   /**/              - `code` active in source; build can strip it
@@ -508,6 +508,8 @@ console.log("LiteJS is in debug mode and that's fine for production")
 					viewEmit(view, "pong", params, View)
 				}
 				viewEmit(lastView, "show", params)
+				close = history.state || 0
+				scrollTo(close.x|0, close.y|0)
 				blur()
 			}
 			function viewClose(view, open) {
@@ -1010,7 +1012,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	function setUrl(url, rep) {
 		/*** pushState ***/
 		if (pushBase) {
-			history[rep ? "replaceState" : "pushState"](NUL, NUL, pushBase + url)
+			history[rep ? "replaceState" : (history.replaceState({x: pageXOffset, y: pageYOffset}, NUL, location.href), "pushState")](NUL, NUL, pushBase + url)
 		} else
 		/**/
 			location[rep ? "replace" : "assign"]("#" + url)
