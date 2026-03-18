@@ -1480,7 +1480,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 					fn = !input || map.input ? map[code] || map[chr] || map.num && code > 47 && code < 58 && (chr|=0, map.num) || map.all : fn
 				) && map.bubble; );
 			if (isStr(fn)) setUrl(fn)
-			if (isFn(fn)) fn(e, chr, el)
+			else if (isFn(fn)) fn(e, chr, el)
 		}
 	})
 	/**/
