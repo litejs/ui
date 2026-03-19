@@ -1359,9 +1359,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			}
 		}
 	}
-	function elScope(el, parent) {
+	function elScope(el, parent, opts) {
 		return el.$s || (
-			parent ? ((parent = elScope(parent)), el.$s = assign(create(parent), { $up: parent })) :
+			parent ? (el.$s = assign(create(parent = elScope(parent)), opts, { $up: parent })) :
 			closestScope(el)
 		)
 	}
