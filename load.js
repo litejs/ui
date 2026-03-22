@@ -169,7 +169,7 @@
 				)
 				/*** ie9 ***/
 				// ActiveXObject does not accept `null` for onreadystatechange
-				req.onreadystatechange = next = nop
+				req.onreadystatechange = req.onabort = req.onerror = req.ontimeout = next = nop
 				xhrs.push(req)
 				/*/
 				req.onreadystatechange = next = null
