@@ -1,0 +1,40 @@
+
+%view markup public
+anim-page
+	h2 Markup Test
+	.tip This page demonstrates the LiteJS markup syntax.
+
+	h3 Inline Formatting
+	p ;t '[*bold*] [/italic/] [_underline_] [-deleted-] [+inserted+] [~strikethrough~]'
+	p ;t '[:highlighted:] [^super^] [,sub,] [`code`] [;span;]'
+	p ;t '[*bold*.red] with class'
+
+	h3 Nesting
+	p ;t '[:He[_[/ll/]_]o [`world`]:]'
+
+	h3 Title Attribute
+	p ;t '[hover over me *bold*]'
+
+	h3 Links
+	p ;t '[LiteJS <https://litejs.com>]'
+	p ;t '[<https://litejs.com>]'
+	p ;t '[[*bold link*] <https://litejs.com>]'
+	p ;t '[<mailto:test@example.com>.red]'
+
+	h3 Abbreviations
+	p ;t '[HyperText Markup Language ?HTML?] is great. Use [?HTML?] everywhere.'
+	p ;t '[Cascading Style Sheets ?CSS?.tip]'
+
+	h3 Time
+	p ;t 'Released on [@2024-07-12@]'
+	p ;t '[birthday @2020-10-27@]'
+
+	h3 Images
+	p ;t '[!litejs.png!]'
+	p ;t '[LiteJS Logo !litejs.png!.right]'
+
+	h3 Document
+	article ;d articleText
+
+%js
+	$d.articleText = "= Article Title\n\nBy [Author </about>] on [@2024-01-15@]\n\nThis is a paragraph.\n New line after space.\n\n== Section One\n\nText with [*bold*] and [/italic/] formatting.\n\n> A blockquote.\n>  With a line break.\n>\n> > Nested quote.\n\n - First item\n - Second item\n\n 1. Step one\n 2. Step two\n\n---\n\n[!litejs.png!]\n\n== Links\n\nVisit [LiteJS <https://litejs.com>] for more."

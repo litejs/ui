@@ -1,7 +1,7 @@
 
 = Hello
 
-By [!Barney Rubble /author/barney!] on [@2020-10-27@] /
+By [Barney Rubble </author/barney>] on [@2020-10-27@] /
 Leave a Comment /
 #Security /
 2 minutes of reading
@@ -18,9 +18,9 @@ Text can be [*bold*.red][^sup^], [/italic/][,sub,], [_underline_], [~stricken~],
 
 No automaticaly recognized links, as not all link-like text need to be clickable.
 
-A named link is easy -- [!John Smith mailto:js@example.com!], [!mailto:js@example.com!], [!https://www.ee!].
+A named link is easy -- [John Smith <mailto:js@example.com>], [<mailto:js@example.com>], [<https://www.ee>].
 
-[!Wikipedia https://en.wikipedia.org/!]
+[Wikipedia <https://en.wikipedia.org/>]
 
 == Block format
 
@@ -47,9 +47,9 @@ A named link is easy -- [!John Smith mailto:js@example.com!], [!mailto:js@exampl
 
 [!youtube:uhbDfi7Ee7k!]
 
-[! image.gif !] Left-aligned image. Lorem ipsum ...
+[Left-aligned image. Lorem ipsum ... !image.gif!]
 
-[! Right-aligned image. Curabitur quam ... image.gif !>]
+[Right-aligned image. Curabitur quam ... !image.gif!]
 
 
  - List 1

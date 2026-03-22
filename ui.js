@@ -184,10 +184,12 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	, fixFn = Event.fixFn || (Event.fixFn = {})
 
 	/*** markup ***/
-	, blockRe = /^(?:(=+|>| -) ([\s\S]+)|\[! *(\S*) *!] ?(.*))/
+	, blockRe = /^(?:(=+|>| -| \d+\.) ([\s\S]+))/
 	, tags = {
 		" -": "ul",
-		"!": "a",
+		"\"": "q",
+		"%": "small",
+		"&": "kbd",
 		"*": "b",
 		"+": "ins",
 		",": "sub",
@@ -196,33 +198,57 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		":": "mark",
 		";": "span",
 		">": "blockquote",
+		"?": "abbr",
 		"@": "time",
 		"^": "sup",
 		"_": "u",
 		"`": "code",
 		"~": "s"
 	}
-	function inline(tag, op, text, name, link, attr) {
-		return op && !isArr(text) ? "<" +
-			(tag = tags[op] || "h" + op.length) +
-			(tag == "a" ? " href=\"" + (link || text) + "\"" : op == "@" ? " datetime=\"" + name + "\"" : "") +
-			(attr ? " class=\"" + attr.slice(1) + "\">" : ">") +
-			(
-				op === ">" ? doc(replace(/^> ?/gm, "", text)) :
-				tag == "ul" ? "<li>" + text.split(/\n - (?=\S)/).map(inline).join("</li>\n<li>") + "</li>" :
-				inline(tag == "a" ? replace(/^\w+:\/{0,2}/, "", name) : text)
-			) +
-			"</" + tag + ">" :
-		replace(/\[([-!*+,/:;@^_`~])((.+?)(?: (\S+?))?)\1(\.[.\w]+)?]/g, inline, tag)
+	, abbrs = {}
+	, embeds = {}
+	function a(name, val) {
+		return val ? " " + name + "=\"" + replace(/"/g, "&quot;", val) + "\"" : ""
 	}
-	function block(tag, op, text, media, alt) {
-		return op && !isArr(text) ? inline(tag, op, text) :
-		media ? "<img src=\"" + media + "\" alt=\"" + alt + "\">" :
+	function renderOp(op, text, extra) {
+		var num = parseInt(op, 10)
+		, tag = num >= 0 ? (extra += a("start", num != 1 && "" + num), "ol") : tags[op] || "h" + op.length
+		return "<" + (extra ? tag + extra : tag) + ">" + (
+			op === ">" ? doc(replace(/^> ?/gm, "", text)) :
+			tag == "ul" || num >= 0 ? "<li>" + text.split(/\n (?:\d+\.|-) (?=\S)/).map(inline).join("</li>\n<li>") + "</li>" :
+			inline(text)
+		) + "</" + tag + ">"
+	}
+	function inline(tag, text, url, op, content, attr) {
+		var extra = attr ? a("class", attr.slice(1)) : ""
+		if (url && !isArr(url)) {
+			return "<a" + a("href", url) + extra + ">" + inline(text || url) + "</a>"
+		}
+		if (op) {
+			if (op == "!") {
+				var fn = embeds[content.split(":")[0]]
+				return fn ? fn(content, text, extra, a) :
+					"<img" + a("src", content) + a("alt", text || replace(/.*\//, "", content)) + extra + ">"
+			}
+			if (op == "?") {
+				if (text) abbrs[content] = text
+				else text = abbrs[content]
+			}
+			extra += op == "@" ? a("datetime", content) : a(op == "\"" ? "cite" : "title", text)
+			if (op == "@") {
+				content = text || content
+			}
+			return renderOp(op, content, extra)
+		}
+		return replace(/\[(?:(.+?) )?(?:&lt;([^>]+)>|([-!"%&*+,/:;?@^_`~])(.+?)\3)(\.[\w.]+)?]/g, inline, tag)
+	}
+	function block(tag, op, text) {
+		return op && !isArr(text) ? renderOp(op, text, "") :
 		blockRe.test(tag) ? replace(blockRe, block, tag) :
 		tag === "---" ? "<hr>" : "<p>" + inline(tag) + "</p>"
 	}
 	function doc(txt) {
-		return replace(/^ \b/gm, "<br>", txt.trim()).split(/\n\n+/).map(block).join("\n")
+		return replace(/^ (?!\d+\. )\b/gm, "<br>", txt.trim()).split(/\n\n+/).map(block).join("\n")
 	}
 	bindings.t = function(el, text) {
 		el.innerHTML = inline(replace(/</g, "&lt;", text))
@@ -230,6 +256,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	bindings.d = function(el, text) {
 		el.innerHTML = doc(replace(/</g, "&lt;", text))
 	}
+	bindings.d.embed = embeds
 	/**/
 
 	/*** svg ***/

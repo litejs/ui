@@ -9,6 +9,8 @@ describe("ui", function() {
 	, localStorage = {}
 	, parser = new dom.DOMParser()
 	require("@litejs/cli/snapshot.js")
+	dom.HTMLElement.prototype.addEventListener = dom.HTMLElement.prototype.removeEventListener = function() {}
+	global.scrollTo = function() {}
 	global.xhr = require("../load.js").xhr
 
 	it ("should import index.js", function(assert, mock) {
@@ -620,48 +622,43 @@ describe("ui", function() {
 			El.$b.d(el, str)
 			return el.innerHTML
 		}
-		it ("resolves inline tag", function(assert) {
-			var tagMap = {
-				" -": "ul",
-				"!": "a",
-				"*": "b",
-				"+": "ins",
-				",": "sub",
-				"-": "del",
-				"/": "i",
-				":": "mark",
-				";": "span",
-				"=": "h1",
-				">": "blockquote",
-				"^": "sup",
-				"_": "u",
-				"`": "code",
-				"~": "s"
-			}
-			, tags = "b,ins,sub,del,s,i,mark,span,ul,a,blockquote,sup,u,code".split(",")
-			, charCodes = Object.keys(tagMap).map(c=>c.charCodeAt())
-			console.log("charCodes: " + charCodes)
-
-			function getTag(op, tag) {
-				return tags[(tag = op.charCodeAt())-(tag==61?0:tag>120?122:tag>93?83:tag>47?52:tag>41?42:24)] || "h" + op.length
-			}
-
-			assert.equal(Object.keys(tagMap).map(getTag), Object.values(tagMap))
-			assert.end()
-		})
 
 		it ("should render inline markup: {0}", [
 			[ "*Hello* world", "*Hello* world" ],
-			[ "[*Hello*] [/world/]", "<b>Hello</b> <i>world</i>" ],
+			[ 'According to X, ["Firefox 1.0 was released in 2004"]', "According to X, <q>Firefox 1.0 was released in 2004</q>" ],
+			[ 'According to X, [https://mozilla.org/history/ "Firefox 1.0 was released in 2004"]', "According to X, <q cite=\"https://mozilla.org/history/\">Firefox 1.0 was released in 2004</q>" ],
+			[ "Please press [&Ctrl&] + [&R&]", "Please press <kbd>Ctrl</kbd> + <kbd>R</kbd>"],
+			[ "[*Hello*] [%tiny%] [/world/]", "<b>Hello</b> <small>tiny</small> <i>world</i>" ],
 			[ "[~Hello~] [-world-][+moon+]", "<s>Hello</s> <del>world</del><ins>moon</ins>" ],
 			[ "Hel[^lo^] wor[,ld,]", "Hel<sup>lo</sup> wor<sub>ld</sub>" ],
 			[ "[:He[_[/ll/]_]o [`world`]:]", "<mark>He<u><i>ll</i></u>o <code>world</code></mark>" ],
+			[ "[tooltip *bold*]", "<b title=\"tooltip\">bold</b>" ],
 			[ "[@2024-07-12@]", "<time datetime=\"2024-07-12\">2024-07-12</time>" ],
-			[ "See [!more /wiki!]", "See <a href=\"/wiki\">more</a>" ],
-			[ "Write to [![*me*] mailto:a@ex.com!]", "Write to <a href=\"mailto:a@ex.com\"><b>me</b></a>" ],
-			[ "[!mailto:a@ex.com!.red]", "<a href=\"mailto:a@ex.com\" class=\"red\">a@ex.com</a>" ],
-			[ "[!John Smith mailto:j@ex.co!], [!mailto:js@ex.co!], [!https://www.ee!].", "<a href=\"mailto:j@ex.co\">John Smith</a>, <a href=\"mailto:js@ex.co\">js@ex.co</a>, <a href=\"https://www.ee\">www.ee</a>." ],
+			[ "[birthday @2020-10-27@]", "<time datetime=\"2020-10-27\">birthday</time>" ],
+			[ "See [more </wiki>]", "See <a href=\"/wiki\">more</a>" ],
+			[ "Write to [[*me*] <mailto:a@ex.com>]", "Write to <a href=\"mailto:a@ex.com\"><b>me</b></a>" ],
+			[ "[<mailto:a@ex.com>.red]", "<a href=\"mailto:a@ex.com\" class=\"red\">mailto:a@ex.com</a>" ],
+			[ "[John Smith <mailto:j@ex.co>], [<mailto:js@ex.co>], [<https://www.ee>].", "<a href=\"mailto:j@ex.co\">John Smith</a>, <a href=\"mailto:js@ex.co\">mailto:js@ex.co</a>, <a href=\"https://www.ee\">https://www.ee</a>." ],
+			[ "[HyperText Markup Language ?HTML?]", "<abbr title=\"HyperText Markup Language\">HTML</abbr>" ],
+			[ "[Cascading Style Sheets ?CSS?.tip]", "<abbr class=\"tip\" title=\"Cascading Style Sheets\">CSS</abbr>" ],
+			[ "[?HTML?]", "<abbr title=\"HyperText Markup Language\">HTML</abbr>" ],
+			[ "[?CSS?]", "<abbr title=\"Cascading Style Sheets\">CSS</abbr>" ],
+			[ "[;hello;]", "<span>hello</span>" ],
+			[ "[*bold*.red]", "<b class=\"red\">bold</b>" ],
+			[ "[<https://example.com>]", "<a href=\"https://example.com\">https://example.com</a>" ],
+			[ "[[*link*] <https://x.com>]", "<a href=\"https://x.com\"><b>link</b></a>" ],
+			[ "[text <u\"r>]", "<a href=\"u&quot;r\">text</a>" ],
+			[ "[a\"b *bold*]", "<b title=\"a&quot;b\">bold</b>" ],
+			[ "[a\"b ?X?]", "<abbr title=\"a&quot;b\">X</abbr>" ],
+			[ "[!photo.jpg!]", "<img src=\"photo.jpg\" alt=\"photo.jpg\">" ],
+			[ "[sunset !photo.jpg!.right]", "<img src=\"photo.jpg\" alt=\"sunset\" class=\"right\">" ],
+			[ "[!youtube:dQw4w9!]", "<iframe src=\"https://youtube.com/embed/dQw4w9\"></iframe>" ],
+			[ "[my video !youtube:dQw4w9!]", "<iframe src=\"https://youtube.com/embed/dQw4w9\" title=\"my video\"></iframe>" ],
+			[ "[!unknown:foo!]", "<img src=\"unknown:foo\" alt=\"unknown:foo\">" ],
 		], function(str, html, assert, mock) {
+			El.$b.d.embed.youtube = function(id, text, extra, a) {
+				return "<iframe" + a("src", "https://" + id.replace(":", ".com/embed/")) + a("title", text) + extra + "></iframe>"
+			}
 			assert.equal(inline(str), html)
 			assert.end()
 		})
@@ -669,9 +666,15 @@ describe("ui", function() {
 		it ("should render docs: {0}", [
 			[ "= Hello\n\nworld\n\n---\n\nAnd moon.", "<h1>Hello</h1>\n<p>world</p>\n<hr>\n<p>And moon.</p>" ],
 			[ "---\n\n - First\n - Second", "<hr>\n<ul><li>First</li>\n<li>Second</li></ul>" ],
+			[ "---\n\n 1. First\n 2. Second", "<hr>\n<ol><li>First</li>\n<li>Second</li></ol>" ],
+			[ "---\n\n 5. Start from five\n 6. Six", "<hr>\n<ol start=\"5\"><li>Start from five</li>\n<li>Six</li></ol>" ],
 			[ "> Some\n block", "<blockquote><p>Some\n<br>block</p></blockquote>" ],
 			[ "> == Hi\n>\n> > Nested", "<blockquote><h2>Hi</h2>\n<blockquote><p>Nested</p></blockquote></blockquote>" ],
-			[ "[!a.jpg!] Image", "<img src=\"a.jpg\" alt=\"Image\">" ],
+			[ "[Image !a.jpg!]", "<p><img src=\"a.jpg\" alt=\"Image\"></p>" ],
+			[ "[!photo.jpg!]", "<p><img src=\"photo.jpg\" alt=\"photo.jpg\"></p>" ],
+			[ "[sunset !photo.jpg!.right]", "<p><img src=\"photo.jpg\" alt=\"sunset\" class=\"right\"></p>" ],
+			[ "== Heading", "<h2>Heading</h2>" ],
+			[ "hello\n world", "<p>hello\n<br>world</p>" ],
 		], function(str, html, assert, mock) {
 			assert.equal(doc(str), html)
 			assert.end()

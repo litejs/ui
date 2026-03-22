@@ -1,4 +1,8 @@
 
+%css
+	.temp { font-size: 48px;font-weight:bold; }
+	.temp>small {font-size: 24px;position:relative;}
+	.temp>small>sup{font-size: 16px;color: #666;font-weight: lighter;font-stretch: condensed;position:absolute;top:-14px;right:1px;}
 
 %el Fab-menu1
 ul.Menu.shadow-1
@@ -16,6 +20,7 @@ ul.Menu.shadow-1
 %view test-material-ui public
 	anim-page
 		h2 Material UI
+		.temp ;t!'23[%,5[^°C^]%]'
 		.grid-2
 			.col-3 Buttons
 			.col-9

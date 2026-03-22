@@ -9,7 +9,7 @@ Leave a Comment /
 <p>Inline formats are between [].</p>
 <p>Text can be <b class="red">bold</b><sup>sup</sup>, <i>italic</i><sub>sub</sub>, <u>underline</u>, <s>stricken</s>, <mark>marked</mark>, <code>code</code>, <ins>inserted</ins>, and <del>deleted</del>.</p>
 <p>No automaticaly recognized links, as not all link-like text need to be clickable.</p>
-<p>A named link is easy -- <a href="mailto:js@example.com">John Smith</a>, <a href="mailto:js@example.com">js@example.com</a>, <a href="https://www.ee">www.ee</a>.</p>
+<p>A named link is easy -- <a href="mailto:js@example.com">John Smith</a>, <a href="mailto:js@example.com">mailto:js@example.com</a>, <a href="https://www.ee">https://www.ee</a>.</p>
 <p><a href="https://en.wikipedia.org/">Wikipedia</a></p>
 <h2>Block format</h2>
 <blockquote><p>Can be nested. [.left]
@@ -24,9 +24,9 @@ Without linebreak.
 <blockquote><h2>Block</h2>
 <p>Can be nestet</p></blockquote>
 <p>-- Someone</p></blockquote>
-<img src="youtube:uhbDfi7Ee7k" alt="">
-<img src="image.gif" alt="Left-aligned image. Lorem ipsum ...">
-<p>[! Right-aligned image. Curabitur quam ... image.gif !>]</p>
+<p><iframe src="https://youtube.com/embed/uhbDfi7Ee7k"></iframe></p>
+<p><img src="image.gif" alt="Left-aligned image. Lorem ipsum ..."></p>
+<p><img src="image.gif" alt="Right-aligned image. Curabitur quam ..."></p>
 <ul><li>List 1</li>
 <li>List 2</li></ul>
 <h2>My Great Heading [#custom-id]</h2>
