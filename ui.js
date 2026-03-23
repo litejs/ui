@@ -1488,7 +1488,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	/**/
 
 	/*** touch ***/
-	var e0, touchDist, touchAngle, touchMode, touchTick
+	var e0, touchAngle, touchDist, touchMode, touchTick
 	, START = "start"
 	, END = "end"
 	, touches = []
@@ -1500,6 +1500,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		fixEv[name] = fixEv[name + START] = fixEv[name + END] = ""
 		fixFn[name] = fixFn[name + START] = fixFn[name + END] = touchInit
 	})
+	function haveEv(evs, name, set) {
+		return set && (evs[name] || evs[name + START] || evs[name + END]) && name
+	}
 	function touchInit(el) {
 		if (!el._ti) {
 			addEvent(el, "pointerdown", touchDown)
@@ -1577,17 +1580,14 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			if (!touchMode) {
 				var evs = el._e
 				touchMode = (
-					haveEv("pan", e.dx > 10 || e.dx < -10 || e.dy > 10 || e.dy < -10) ||
-					haveEv("hold", fromTimer)
+					haveEv(evs, "pan", e.dx > 10 || e.dx < -10 || e.dy > 10 || e.dy < -10) ||
+					haveEv(evs, "hold", fromTimer)
 				)
 				if (!touchMode) return
 				clearTimeout(touchTick)
 				emit(el, touchMode + START, e, el)
 			}
 			emit(el, touchMode, e, el)
-			function haveEv(name, set) {
-				return set && (evs[name] || evs[name + START] || evs[name + END]) && name
-			}
 		}
 		function moveTwo(e) {
 			touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
