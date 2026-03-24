@@ -1657,13 +1657,14 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	function acceptMany(fn, prepareVal) {
 		return function f(el, name, val, selector, delay, data) {
 			if (el && name) {
-				if (isNum(selector)) {
+				if (!isStr(selector)) {
 					data = delay
 					delay = selector
-					selector = UNDEF
-				} else if (isArr(selector) || isObj(selector)) {
-					data = selector
-					delay = selector = UNDEF
+					selector = ""
+				}
+				if (!isNum(delay)) {
+					data = delay
+					delay = 0
 				}
 				if (delay > 0) {
 					setTimeout(f, delay, el, name, val, selector, 0, data)
