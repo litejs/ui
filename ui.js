@@ -1527,9 +1527,11 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			if (len === 1) {
 				if (e) {
 					e0 = e
+					e.x0 = e.clientX
+					e.y0 = e.clientY
 					touchEl = el
-					touchPos("left", "offsetWidth")
-					touchPos("top", "offsetHeight")
+					touchPos("x", "left", "offsetWidth")
+					touchPos("y", "top", "offsetHeight")
 					if (e.button === 2 || matches(el, "INPUT,TEXTAREA,SELECT,.no-drag")) return
 					touchTick = setTimeout(moveOne, LiteJS.holdDelay || 800, e, 1)
 				}
@@ -1543,8 +1545,8 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			// TODO:2026-03-24:lauri:touches are shared, touchDown is per-element closures, move out
 			;(len === 1 ? addEvent : rmEvent)(document, "pointerup", touchUp)
 			;(len === 2 ? addEvent : rmEvent)(document, MOVE, moveTwo)
-			function touchPos(name, offset) {
-				var val = getAttr(el, name == "top" ? "y" : "x") || getComputedStyle(el)[name]
+			function touchPos(coord, name, offset) {
+				var val = getAttr(el, coord) || getComputedStyle(el)[name]
 				, num = parseInt(val, 10) || 0
 				e0[name] = val && val.indexOf("%") > -1 ? num * el.parentNode[offset] / 100 : num
 			}
@@ -1574,12 +1576,10 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			if (touches[0].buttons && touches[0].buttons !== (e.buttons || [0, 1, 4, 2][e.which || 0])) {
 				return touchUp(e)
 			}
-			e.x0 = e0.clientX
-			e.y0 = e0.clientY
+			e.x0 = e0.x0
+			e.y0 = e0.y0
 			e.dx = e.clientX - e.x0
 			e.dy = e.clientY - e.y0
-			e.ex = e.dx + e0.left
-			e.ey = e.dy + e0.top
 			e.el = touchEl
 			if (!touchMode) {
 				var evs = el._e
@@ -1589,9 +1589,11 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				)
 				if (!touchMode) return
 				clearTimeout(touchTick)
-				e.mode = touchMode
-				emit(el, touchMode + START, e, el)
+				e0.mode = touchMode
+				emit(el, touchMode + START, e0, el)
 			}
+			e.ex = e.dx + e0.left
+			e.ey = e.dy + e0.top
 			emit(el, touchMode, e, el)
 		}
 		function moveTwo(e) {
