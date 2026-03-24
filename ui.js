@@ -1488,7 +1488,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	/**/
 
 	/*** touch ***/
-	var e0, touchAngle, touchDist, touchMode, touchTick
+	var e0, touchAngle, touchDist, touchEl, touchMode, touchTick
 	, START = "start"
 	, END = "end"
 	, touches = []
@@ -1527,6 +1527,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			if (len === 1) {
 				if (e) {
 					e0 = e
+					touchEl = el
 					touchPos("left", "offsetWidth")
 					touchPos("top", "offsetHeight")
 					if (e.button === 2 || matches(el, "INPUT,TEXTAREA,SELECT,.no-drag")) return
@@ -1539,6 +1540,8 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				moveTwo(e)
 			}
 			;(len === 1 ? addEvent : rmEvent)(document, MOVE, moveOne)
+			// TODO:2026-03-24:lauri:touches are shared, touchDown is per-element closures, move out
+			;(len === 1 ? addEvent : rmEvent)(document, "pointerup", touchUp)
 			;(len === 2 ? addEvent : rmEvent)(document, MOVE, moveTwo)
 			function touchPos(name, offset) {
 				var val = getAttr(el, name == "top" ? "y" : "x") || getComputedStyle(el)[name]
@@ -1577,6 +1580,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			e.dy = e.clientY - e.y0
 			e.ex = e.dx + e0.left
 			e.ey = e.dy + e0.top
+			e.el = touchEl
 			if (!touchMode) {
 				var evs = el._e
 				touchMode = (
@@ -1585,6 +1589,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				)
 				if (!touchMode) return
 				clearTimeout(touchTick)
+				e.mode = touchMode
 				emit(el, touchMode + START, e, el)
 			}
 			emit(el, touchMode, e, el)
