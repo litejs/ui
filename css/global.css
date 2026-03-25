@@ -11,6 +11,11 @@
 	min-height: 100%;
 }
 
+.no,
+.no-empty:empty,
+.sm .no-sm,
+.md .no-md,
+.lg .no-lg,
 .sm .sm-hide,
 .md .md-hide,
 .lg .lg-hide,
@@ -19,6 +24,7 @@
 	display: none !important;
 	visibility: hidden;
 }
+.op0,
 .transparent {
 	opacity: 0 !important;
 	filter: alpha(opacity=0) !important;

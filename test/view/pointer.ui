@@ -43,6 +43,52 @@ anim-page
 			li.anim Third
 		ul.sortCol
 			li.anim Blue
+	.grid.b4
+		.col.w6
+			h2 Sortable (pan)
+			.sortable.grid.p2.no-select.rel
+				@holdstart 'dragSort','.sortItem',['.col']
+				@dblclick 'clone','.col'
+				@contextmenu 'kill','.col'
+				@sorted function(){console.log('SORTED')}
+				.col.w6>.sortItem First
+				.col.w6>.sortItem Second
+				.col.w6>.sortItem Third
+				.col.w6>.sortItem Fourth
+				.col.w6>.sortItem Fifth
+		.col.w6
+			h2 Sortable (handle)
+			%el sortItem
+				.col.w6
+					.sortItem
+						.grip ⠿
+						span Item
+			.sortable.grid.p2.no-select.rel
+				@panstart 'dragSort','.grip',['.col']
+				sortItem
+				sortItem
+				sortItem
+				sortItem
+				sortItem
+	h2 Sortable (multi-col)
+	.grid.b4.no-select
+		@panstart 'dragSort','.card',['.card','.kanban']
+		@sorted function(){console.log('SORTED KANBAN')}
+		.col.w4
+			.kanban
+				h3 To Do
+				.card Alpha
+				.card Beta
+				.card Gamma
+		.col.w4
+			.kanban
+				h3 In Progress
+				.card Delta
+		.col.w4
+			.kanban
+				h3 Done
+				.card Epsilon
+				.card Zeta
 	h2 Events
 	div Tap {tapCount}
 		^$s!{tapCount:0}
@@ -71,7 +117,7 @@ anim-page
 	div
 		;$s! {count3:0}
 		;txt "Wheel " + $s.count3
-		;on "wheel", "txt"
+		;on "wheel", "txt", ["Wheel "]
 	h2 addEventListener options
 	div
 		div inner boolean
@@ -84,3 +130,9 @@ anim-page
 	.sortCol{padding:2px;display:block;width:100px;margin:4px;border:1px solid #ccc;height:250px;float:left}
 	.sortCol.is-active{border:1px solid green}
 	.sortCol>li{list-style:none;display:block;margin:4px;border:1px solid #ddd;padding:4px}
+	.kanban{
+		min-height:120px;padding:8px;background:#f0f0f0;border-radius:4px;
+		background-image: linear-gradient(168deg, transparent, rgb(0 0 0 / 25%));
+	}
+	.kanban h3{margin:0 0 8px}
+	.card{padding:8px 12px;margin:4px 0;background:#fff;border:1px solid #ddd;border-radius:4px;cursor:grab}

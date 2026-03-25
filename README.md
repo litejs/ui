@@ -16,7 +16,8 @@ used on heavy-traffic websites since 2006.
    Works seamlessly in ESM projects too.
  - No transpiling/compiling/bundling headache, just write working code.
 
-Includes templates, view routing, data binding, i18n, keyboard shortcuts, and touch gestures.
+Includes templates, view routing, data binding, i18n, keyboard shortcuts,
+touch gestures, FLIP animations.
 
 For usage instructions, see [Quick-Start](https://github.com/litejs/litejs/wiki/Quick-Start) guide
 and [wiki](https://github.com/litejs/ui/wiki).

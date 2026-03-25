@@ -56,9 +56,24 @@ var app = LiteJS({
 			El.scope(el)[field]++
 			El.render(el)
 		},
-		txt: function() {
+		clone: function(e, el) {
+			var parent = el.parentNode
+			var clone = el.cloneNode(true)
+			El.flip(parent, '.col', function() {
+				El.append(parent, clone)
+			}, 0, 'transparent')
+		},
+		kill: function(e, el) {
+			var parent = el.parentNode
+			El.flip(parent, '.col', function() {
+				parent.removeChild(el)
+			}, 0, 'transparent')
+			El.stop(e)
+		},
+		txt: function(e, el, prefix) {
+			El.txt(el, prefix + e.diff)
+			El.stop(e)
 			console.log("txt", arguments)
-
 		},
 		show: function(params, view) {
 			// Re-render all .js-viewHook elements on each View change

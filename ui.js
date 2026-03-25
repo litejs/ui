@@ -1136,9 +1136,12 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	assign(El, bindings, {
 		emit: emit,
 		empty: elEmpty,
+		flip: elFlip,
 		kill: elKill,
+		morph: elMorph,
 		off: acceptMany(rmEvent),
 		render: render,
+		rect: rect,
 		rm: elRm
 	})
 
@@ -1362,6 +1365,100 @@ console.log("LiteJS is in debug mode and that's fine for production")
 
 	function elEmpty(el) {
 		for (; el.lastChild; elKill(el.lastChild));
+	}
+	function elFlip(el, sel, fn, opts) {
+		opts = assign({ anim: "flip", enter: "op0", leave: "op0" }, opts)
+		var newPos, c, idx, r1
+		, i = 0
+		, anim = 0
+		, anims = []
+		, parent = rect(el)
+		, oldPos = opts.old || rects()
+		, leave = opts.leave
+		, stagger = opts.stagger|0
+		, transformTransition = "transform,transition"
+		if (!fn) return oldPos
+		fn()
+		newPos = rects(1)
+		for (; (c = oldPos[i]); i += 2) if (c !== opts.skip) {
+			idx = newPos.indexOf(c)
+			r1 = oldPos[i + 1]
+			if (idx > -1) {
+				if (addTransform(c, r1, newPos[idx + 1], opts)) anims[anim++] = c
+			} else if (leave) {
+				bindingsCss(c, {
+					position: "absolute",
+					left: (r1.left - parent.left) + "px",
+					top: (r1.top - parent.top) + "px",
+					width: r1.width + "px",
+					height: r1.height + "px",
+				})
+				c._flip = 1
+				append(el, (anims[anim++] = c))
+			}
+		}
+		if ((r1 = opts.enter)) for (i = 0; (c = newPos[i]); i += 2) if (oldPos.indexOf(c) < 0) {
+			bindingsCls(c, r1, 1, 0, anim*stagger || 1)
+			anims[anim++] = c
+		}
+		for (el.offsetHeight; anim; ) {
+			c = anims[--anim]
+			bindingsCls(c, opts.anim, 1, 0, -1)
+			if (c._flip) {
+				elKill(c, leave, anim*stagger)
+			} else {
+				bindingsCss(c, transformTransition, "", anim*stagger)
+			}
+		}
+		return newPos
+		function rects(reset) {
+			var child
+			, j = 0
+			, arr = sel ? findAll(el, sel) : el.children
+			, res = []
+			if (reset) {
+				for (el.offsetHeight; (child = arr[j++]); ) if (!child._flip) {
+					cls(child, opts.anim, 0)
+					bindingsCss(child, transformTransition, "none")
+				}
+				j = 0
+			}
+			for (el.offsetHeight; (child = arr[j++]); ) if (!child._flip) {
+				res.push(child, rect(child))
+				bindingsCss(child, transformTransition, "")
+			}
+			return res
+		}
+	}
+	function addTransform(el, from, to, opts) {
+		var a = rect(from)
+		, b = rect(to)
+		, dx = a.left - b.left
+		, dy = a.top - b.top
+		, aw = a.width
+		, ah = a.height
+		, bw = b.width
+		, bh = b.height
+		if (canTransit && (dx || dy || (aw - bw) || (ah - bh))) {
+			bindingsCss(el, "transform", "translate(" + dx + "px," + dy + "px)" + (opts.scale ? " scale(" + (aw / bw) + "," + (ah / bh) + ")" : ""))
+			swap("height", ah, bh)
+			swap("width", aw, bw)
+			return el
+		}
+		function swap(key, from, to) {
+			if (opts[key] && (from - to)) {
+				bindingsCss(el, key, to + "px", 1, -2)
+				bindingsCss(el, key, from + "px")
+			}
+		}
+	}
+	function elMorph(from, to, opts) {
+		opts = assign({ anim: "flip" }, opts)
+		if (from && to && addTransform(to, from, to, opts)) {
+			void to.offsetWidth
+			bindingsCls(to, opts.anim, 1, 0, -1)
+			bindingsCss(to, "transform", "")
+		}
 	}
 	function elKill(el, tr, delay) {
 		if (el) {
@@ -1798,6 +1895,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				tick = setTimeout(onEnd, next - now)
 			}
 		}
+	}
+	function rect(el) {
+		return el && el.nodeType ? el.getBoundingClientRect() : el
 	}
 	function scrollPos(page, key) {
 		return window[page] || html[key] || body[key] || 0
