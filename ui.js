@@ -33,12 +33,11 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	, hasOwn = bind(plugins.hasOwnProperty)
 	, isArr = Array.isArray
 	, slice = emptyArr.slice
-	// Closureless utilities via Function() to avoid capturing outer scope
-	, elReplace = Function("a,b,c", "a&&b&&(c=a.parentNode)&&c.replaceChild(b,a)")
-	, elRm = Function("a,b", "a&&(b=a.parentNode)&&b.removeChild(a)")
-	, getAttr = Function("a,b", "return a&&a.getAttribute&&a.getAttribute(b)")
-	, replace = Function("a,b,c", "return c.replace(a,b)")
-	, toCamel = replace.bind(NUL, /\-([a-z])/g, Function("a,b", "return b.toUpperCase()"))
+	, elReplace = function(el, to, p) { if (el && to && (p = el.parentNode)) p.replaceChild(to, el) }
+	, elRm = function(el, p) { if (el && (p = el.parentNode)) p.removeChild(el) }
+	, getAttr = function(el, key) { return el && el.getAttribute && el.getAttribute(key) }
+	, replace = function(re, to, str) { return str.replace(re, to) }
+	, toCamel = function(str) { return str.replace(/\-([a-z])/g, function(_, ch) { return ch.toUpperCase() }) }
 
 	/*** ie9 ***/
 	// JScript engine in IE8 and below does not recognize vertical tabulation character `\v`.
