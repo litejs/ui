@@ -329,13 +329,19 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		if (emitter === window) emitter = emptyArr
 		var args, i
 		, _e = emitter._e
-		, arr = _e ? (_e[type] || emptyArr).concat(_e["*"] || emptyArr) : emptyArr
-		if ((_e = arr.length)) {
-			for (i = _e - 1, args = slice.call(arguments, 2); i > 1; i -= 3) {
+		, arr = _e && _e[type] || emptyArr
+		, wild = _e && _e["*"] || emptyArr
+		, len = arr.length + wild.length
+		if (len) {
+			args = slice.call(arguments, 2)
+			for (i = arr.length - 1; i > 1; i -= 3) {
 				if (arr[i]) arr[i].apply(arr[i - 2] || emitter, args)
 			}
+			for (i = wild.length - 1; i > 1; i -= 3) {
+				if (wild[i]) wild[i].apply(wild[i - 2] || emitter, args)
+			}
 		}
-		return _e / 3
+		return len / 3
 	}
 
 	function addEvent(el, ev, fn, opts, fix) {
