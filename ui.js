@@ -1328,12 +1328,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 
 	function hasClass(el, name) {
 		var current = el.className || ""
-
-		if (!isStr(current)) {
-			current = getAttr(el, "class") || ""
-		}
-
-		return !!current && current.split(splitRe).indexOf(name) > -1
+		return (" " + (isStr(current) ? current : getAttr(el, "class") || "-") + " ").indexOf(" " + name + " ") > -1
 	}
 
 	function cls(el, name, set) {
