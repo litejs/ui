@@ -1393,15 +1393,10 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		}
 	}
 	function elScope(el, parent, opts) {
-		return el.$s || (
-			parent ? (el.$s = assign(create(parent = elScope(parent)), opts, { $up: parent })) :
-			closestScope(el)
-		)
-	}
-
-	function closestScope(node) {
-		for (; (node = node.parentNode); ) {
-			if (node.$s) return node.$s
+		if (el.$s) return el.$s
+		if (parent) return (el.$s = assign(create(parent = elScope(parent)), opts, { $up: parent }))
+		for (; (el = el.parentNode); ) {
+			if (el.$s) return el.$s
 		}
 		return globalScope
 	}
@@ -1413,7 +1408,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		}
 
 		var el, next
-		, scope = node.$s || $s || closestScope(node)
+		, scope = node.$s || $s || elScope(node)
 
 		/*** ie9 ***/
 		if (ie678 && node.tagName === "SELECT") {
