@@ -1690,8 +1690,8 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				, els = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
 				for (; (node = els[i++]); ) {
 					for (delay = 0; delay < len; delay++) {
-						if (arr[delay]) {
-							result = fn(node, arr[delay], isArr(value) ? value[delay] : value, data)
+						if ((result = arr[delay])) {
+							result = fn(node, result, isArr(value) ? value[delay] : value && typeof value === "object" && !value.nodeType ? value[result] : value, data)
 							if (!prepareVal && data > 0) f(node, name, fn === cls ? !val : result, "", data)
 						}
 					}

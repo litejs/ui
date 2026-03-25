@@ -67,6 +67,60 @@ describe("ui", function() {
 			assert.end()
 		})
 
+		test("cls add, remove, and duplicates", function(assert) {
+			var el = document.createElement("div")
+
+			// Add class
+			El.cls(el, "a")
+			assert.equal(el.className, "a")
+
+			// Duplicate add is a no-op
+			El.cls(el, "a")
+			assert.equal(el.className, "a")
+
+			// Add second class
+			El.cls(el, "b")
+			assert.equal(el.className, "a b")
+
+			// Remove class
+			El.cls(el, "a", 0)
+			assert.equal(el.className, "b")
+
+			// Remove non-existent class is a no-op
+			El.cls(el, "z", 0)
+			assert.equal(el.className, "b")
+
+			// Remove last class
+			El.cls(el, "b", false)
+			assert.equal(el.className, "")
+
+			// Falsy el does not throw
+			El.cls(null, "x")
+			assert.end()
+		})
+
+		test("cls transfer", function(assert) {
+			var a = document.createElement("div")
+			, b = document.createElement("div")
+			El.cls(a, "x")
+			assert.equal(a.className, "x")
+
+			// Transfer: add to b, remove from a
+			El.cls(b, "x", a)
+			assert.equal(b.className, "x")
+			assert.equal(a.className, "")
+
+			// Transfer to self is a no-op (set !== el guard)
+			El.cls(b, "x", b)
+			assert.equal(b.className, "x")
+
+			// Transfer from node without the class
+			El.cls(a, "y", b)
+			assert.equal(a.className, "y")
+			assert.equal(b.className, "x")
+			assert.end()
+		})
+
 		test("step", function(assert) {
 			assert.equal(El.step(7, 5), "5")
 			assert.equal(El.step(8, 5), "10")
