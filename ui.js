@@ -1692,7 +1692,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 					for (delay = 0; delay < len; delay++) {
 						if (arr[delay]) {
 							result = fn(node, arr[delay], isArr(value) ? value[delay] : value, data)
-							if (!prepareVal && data > 0) f(node, name, result, "", data)
+							if (!prepareVal && data > 0) f(node, name, fn === cls ? !val : result, "", data)
 						}
 					}
 				}
