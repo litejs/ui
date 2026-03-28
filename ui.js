@@ -1411,6 +1411,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		/**/
 
 		if (hydrate(node, "_b", scope)) return
+		scope = node.$s || scope
 		for (el = node.firstChild; el; el = next) {
 			next = el.nextSibling
 			render(el, scope)
