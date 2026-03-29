@@ -65,6 +65,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	// Matches tokens to exclude from scope variable extraction: strings, keywords, member access, labels
 	, fnRe = /('|")(?:\\.|[^\\])*?\1|\/(?:\\.|[^\\])+?\/[gim]*|\$el\b|\$[aorsS]\b|\b(?:false|in|if|new|null|this|true|typeof|void|function|var|else|return)\b|\.\w+|\w+:/g
 	, wordRe = /[a-z_$][\w$]*/ig
+	, bindingsCls = acceptMany(cls)
 	, bindingsCss = acceptMany(function(el, key, val, current) {
 		current = el.style[key = toCamel(key)]
 		el.style[key] = val
@@ -72,7 +73,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	})
 	, bindingsOn = acceptMany(addEvent, 1)
 	, bindings = {
-		cls: acceptMany(cls),
+		cls: bindingsCls,
 		css: bindingsCss,
 		on: bindingsOn,
 		one: acceptMany(function(el, ev, fn) {
