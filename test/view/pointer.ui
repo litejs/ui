@@ -51,6 +51,7 @@ anim-page
 				@dblclick 'clone','.col'
 				@contextmenu 'kill','.col'
 				@sorted function(){console.log('SORTED')}
+				@tap function(){console.log('TAP')}
 				.col.w6>.sortItem First
 				.col.w6>.sortItem Second
 				.col.w6>.sortItem Third
@@ -74,6 +75,7 @@ anim-page
 	.grid.b4.no-select
 		@panstart 'dragSort','.card',['.card','.kanban']
 		@sorted function(){console.log('SORTED KANBAN')}
+		@tap function(){console.log('TAP')},'.card'
 		.col.w4
 			.kanban
 				h3 To Do

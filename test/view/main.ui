@@ -2,7 +2,7 @@
 %def #mat ../../el/material.ui
 %def
 	settings %.ui,%.css
-	dialog,test-form,test-grid,markup,pointer %.ui
+	dialog,gallery,test-form,test-grid,markup,pointer %.ui
 	test-form ../../binding/persist.js
 	test-svg #mat,../../binding/svg.js,../../el/Pie.tpl,test-svg.ui
 	testman,+/lcov,+/lcov/{file} %.ui
@@ -269,6 +269,7 @@ anim-page
 		li>a[href="#markup"] Test markup
 		li>a[href="#test-material-ui"] Test Material-UI
 		li>a[href="#dialog"] Dialog
+		li>a[href="#gallery"] Gallery
 		li>a[href="#pointer"] PointerEvent
 		li>a[href="iframe.html#test1"] Iframe
 		li>a[href="//localhost:81/litejs/litejs/ui/iframe.html#test2"] Iframe 81

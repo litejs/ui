@@ -1,0 +1,27 @@
+
+%view gallery public
+section
+	h2 Inline Gallery
+	.p2
+		ImageGrid
+			@tap "flipToFirst", "[data-index]"
+			img[src="https://picsum.photos/seed/lit1/800/600"]
+			img[src="https://picsum.photos/seed/lit2/800/600"]
+			img[src="https://picsum.photos/seed/lit3/800/600"]
+			img[src="https://picsum.photos/seed/lit4/800/600"]
+			img[src="https://picsum.photos/seed/lit5/800/600"]
+			img[src="https://picsum.photos/seed/lit6/800/600"]
+			img[src="https://picsum.photos/seed/lit7/800/600"]
+
+	h2 Photo Gallery
+	.p2
+		ImageGrid
+			@tap "gallery", "[data-index]"
+			img[src="https://picsum.photos/seed/lit1/800/600"]
+			img[src="https://picsum.photos/seed/lit2/800/600"]
+			img[src="https://picsum.photos/seed/lit3/800/600"]
+			img[src="https://picsum.photos/seed/lit4/800/600"]
+			img[src="https://picsum.photos/seed/lit5/800/600"]
+			img[src="https://picsum.photos/seed/lit6/800/600"]
+			img[src="https://picsum.photos/seed/lit7/800/600"]
+

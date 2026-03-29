@@ -58,16 +58,15 @@ var app = LiteJS({
 		},
 		clone: function(e, el) {
 			var parent = el.parentNode
-			var clone = el.cloneNode(true)
 			El.flip(parent, '.col', function() {
-				El.append(parent, clone)
-			}, 0, 'transparent')
+				El.append(parent, Array.from({length:5}, ()=>el.cloneNode(true)))
+			}, {stagger: 100})
 		},
 		kill: function(e, el) {
 			var parent = el.parentNode
 			El.flip(parent, '.col', function() {
-				parent.removeChild(el)
-			}, 0, 'transparent')
+				El.rm(el)
+			})
 			El.stop(e)
 		},
 		txt: function(e, el, prefix) {

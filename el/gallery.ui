@@ -1,0 +1,188 @@
+
+%css
+	.Gallery {
+		display: grid;
+		place-items: center;
+	}
+	.Gallery-img {
+		grid-area: 1 / 1;
+		max-width: 90%;
+		max-height: 90%;
+		object-fit: contain;
+		opacity: 0;
+		transition: opacity .3s;
+	}
+	.Gallery-img.is-active {
+		opacity: 1;
+	}
+	.Gallery-nav {
+		grid-area: 1 / 1;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+	}
+	.Gallery-nav > button {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		background: none;
+		border: none;
+		color: #fff;
+		font-size: 2em;
+		cursor: pointer;
+		opacity: .5;
+		padding: .5em;
+	}
+	.Gallery-nav > button:hover {
+		opacity: 1;
+	}
+	.Gallery-nav--prev {
+		left: 0;
+	}
+	.Gallery-nav--next {
+		right: 0;
+	}
+	.Gallery-counter {
+		position: absolute;
+		bottom: 1em;
+		left: 50%;
+		transform: translateX(-50%);
+		color: #fff;
+		opacity: .7;
+		z-index: 2;
+	}
+	.Gallery-anim {
+		transition: transform .3s ease;
+		transform-origin: 0 0;
+	}
+	.ImageGrid {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		grid-template-rows: repeat(3, 1fr);
+		gap: 2px;
+		cursor: pointer;
+		max-width: 600px;
+	}
+	.ImageGrid-frame {
+		overflow: hidden;
+		position: relative;
+		transform-origin: 0 0;
+	}
+	.ImageGrid-anim {
+		transform-origin: 0 0;
+	}
+	.ImageGrid-frame:first-child {
+		grid-row: 1 / -1;
+	}
+	.ImageGrid-frame>img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.ImageGrid-count {
+		position: absolute;
+		bottom: 2px;
+		right: 2px;
+		background: rgba(0, 0, 0, .6);
+		color: #fff;
+		font-size: 1.5em;
+		font-weight: 700;
+		border-radius: 20px;
+		border: 1px solid #999;
+		z-index: 2;
+	}
+
+%js
+	$d.initGalleryImages = function(el) {
+		for (var images = $$("img[src]", el), i = images.length, arr = []; i--; ) arr[i] = images[i].src
+		images.kill()
+		return arr
+	}
+	$ui.on("flipToFirst", function toFirst(ev, el) {
+		var parent = el.parentNode
+		, first = parent.firstChild
+		if (el !== first) {
+			El.stop(ev)
+			El.flip(parent, 0, function() {
+				El.append(parent, el, first)
+			}, {scale:1})
+			El.cls(el, "is-lifted", toFirst._prev, 1, -1)
+			toFirst._prev = el
+		}
+	})
+	$ui.on("gallery", function(ev, thumb) {
+		var preview = El.closest(thumb, ".ImageGrid")
+		if (!preview) return
+		var images = El.scope(preview).images
+		, current = +El.get(thumb, "data-index") || 0
+		, el = El("Gallery")
+		, img1 = el.querySelector(".Gallery-img")
+		, img2 = img1.nextSibling
+		, counter = el.querySelector(".Gallery-counter")
+		, activeImg = img1
+		, thumbImg = thumb.querySelector("img") || thumb
+		, scope = El.scope(el, el, {
+			images: images,
+			nav: function(e, btn) {
+				El.stop(e)
+				show(current + (El.matches(btn, ".Gallery-nav--prev") ? -1 : 1))
+			},
+			flipIn: function() {
+				El.morph(thumbImg, activeImg, { anim: "Gallery-anim", scale:1 })
+			},
+			beforeKill: function() {
+				var thumbs = $$("[data-index]", preview)
+				, target = thumbs[current] || thumbs.pop()
+				if (target) {
+					El.morph(activeImg, target, { scale:1 })
+					El.css(target, "z-index", 10, 0, -2)
+					El.kill(activeImg)
+				}
+			}
+		})
+		show(current, 1)
+		$ui.emit("modal", "", {
+			modalContent: el,
+			actions: [{ title: "Close", key: "esc" }]
+		})
+		activeImg.src = thumbImg.src
+
+		function show(idx, initial) {
+			current = scope.current = ((idx % images.length) + images.length) % images.length
+			var nextImg = activeImg === img1 ? img2 : img1
+			if (initial && activeImg.src === images[current]) return
+			nextImg.src = images[current]
+			nextImg.onload = function() {
+				El.cls(nextImg, "is-active", activeImg)
+				activeImg = nextImg
+			}
+			El.render(el)
+		}
+	})
+
+%el Gallery
+.Gallery.abs.max
+	img.Gallery-img
+		@load!flipIn
+	img.Gallery-img
+	.Gallery-nav
+		;if images.length > 1
+		@tap nav,"button"
+		button.Gallery-nav--prev[aria-label=Previous] ;txt! "\u276E"
+		button.Gallery-nav--next[aria-label=Next] ;txt! "\u276F"
+		.Gallery-counter
+			;txt (current+1)+" / "+images.length
+
+%el ImageGrid
+.ImageGrid.rel
+	;$s!{images:initGalleryImages($el)}
+	.ImageGrid-frame[data-index=0]
+		img ;src!images[0]
+	.ImageGrid-frame
+		;each! "src", images.slice(1, 4)
+		;data-index!$i+1
+		img ;src!src
+	.ImageGrid-count.p02 ;if images.length > 4
+		;txt '+' + (images.length - 4)

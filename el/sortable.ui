@@ -1,0 +1,85 @@
+
+%css
+	.sortable{margin:-8px}
+	.sortable:after{content:"";display:block;clear:both;}
+	.sortItem{padding:8px 12px;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;}
+	.is-dragging{box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:grabbing;z-index:2;position:relative;pointer-events:none;}
+	.grip{font-size:2em;cursor:grab;float:left;}
+	.is-active{outline:2px dashed #4a90d9;position:relative;z-index:1;perspective:1000px;}
+
+%js
+	var closest = El.closest, cls = El.cls, css = El.css
+	$ui.on("dragSort", function(e0, handle, sel, cols) {
+		var mode = e0.mode
+		, el = e0.el
+		, item = closest(handle, sel)
+		if (!item) return
+		var items = El.flip(el, sel)
+		, fromIdx = items.indexOf(item)
+		, toIdx = fromIdx
+		, fromCol = cols && item.parentNode
+		, toCol = fromCol
+		, flipSel = cols ? sel + "," + cols : sel
+		e0.left = items[fromIdx + 1].left
+		e0.top = items[fromIdx + 1].top
+		cls(item, "is-dragging")
+		cls(el, "no-select")
+		cls(toCol, "is-active")
+		El.on(el, mode, move)
+		El.on(el, mode + "end", end)
+		function move(e) {
+			if (!item) return
+			El.stop(e)
+			var dist, dx, dy
+			, i = items.length
+			, idx = toIdx
+			, min = Infinity
+			, col = cols && closest(document.elementFromPoint(e.clientX, e.clientY), cols)
+			if (col && col !== toCol) {
+				cls(col, "is-active", toCol)
+				toCol = col
+				if (!$ui.$(sel, col)) idx = -1
+			}
+			if (idx > -1) for (; i > 0; i -= 2) {
+				if (cols && items[i - 2].parentNode !== (col || toCol)) continue
+				dx = e.ex - items[i - 1].left
+				dy = e.ey - items[i - 1].top
+				dist = dx * dx + dy * dy
+				if (dist < min) {
+					min = dist
+					idx = i - 2
+				}
+			}
+			dx = dy = 0
+			if (idx - toIdx) {
+				items = El.flip(el, flipSel, function() {
+					if (idx < 0) return col.appendChild(item)
+					var target = items[idx]
+					, rect = items[idx + 1]
+					, after = col && target.parentNode !== item.parentNode ? e.ey > rect.top : toIdx < idx
+					target.parentNode.insertBefore(item, after ? target.nextSibling : target)
+				}, { skip: item, height: 1 })
+				toIdx = items.indexOf(item)
+				dx = e0.left - items[toIdx + 1].left
+				dy = e0.top - items[toIdx + 1].top
+				e0.x0 -= dx
+				e0.y0 -= dy
+				e0.left -= dx
+				e0.top -= dy
+			}
+			css(item, "transform", "translate3d(" + (e.dx + dx) + "px," + (e.dy + dy) + "px,20px)")
+		}
+		function end() {
+			if (item) {
+				El.off(el, mode, move)
+				El.off(el, mode + "end", end)
+				cls(el, "no-select", 0)
+				cls(item, "anim,is-dragging", 1, 0, -1)
+				cls(toCol, "is-active", 0, 350)
+				css(item, "transform", "")
+				css(item, "box-shadow", "0 0 0 rgba(0,0,0,0)",0,-2)
+				if (fromIdx - toIdx || fromCol !== toCol) El.emit(el, "sorted")
+				item = null
+			}
+		}
+	})
