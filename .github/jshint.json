@@ -3,7 +3,7 @@
   "esversion": 5,
   "evil": true,
   "laxcomma": true,
-  "maxdepth": 6,
+  "maxdepth": 7,
   "node": true,
   "nonbsp": true,
   "nonew": true,

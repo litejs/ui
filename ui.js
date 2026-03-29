@@ -21,6 +21,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	, THIS = this
 	, html = document.documentElement
 	, body = document.body
+	, canTransit = "on" + (canTransit = "transitionend") in body && canTransit
 	, splitRe = /[,\s]+/
 	, emptyArr = []
 	, plugins = {}
@@ -1338,12 +1339,11 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	function elKill(el, tr, delay) {
 		if (el) {
 			if (delay > 0) return setTimeout(elKill, delay, el, tr)
-			if (tr) {
+			if (tr && canTransit) {
 				if (isStr(tr)) cls(el, tr)
 				if (isObj(tr)) bindingsCss(el, tr)
-				tr = "transitionend"
 				// transitionend fires for each property transitioned
-				if ("on" + tr in el) return addEvent(el, tr, bind(elKill, el, el, el = UNDEF))
+				return onceEvent(el, canTransit, bind(elKill, el, el, UNDEF))
 			}
 			if (el._e) {
 				emit(el, "kill")
@@ -1351,12 +1351,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			}
 			elRm(el)
 			if (el.nodeType < 2) {
-				el.$s = UNDEF
 				elKill(el._r) // Replacement element like comment from if binding
 				elEmpty(el)
-				if (el.valObject !== UNDEF) {
-					el.valObject = UNDEF
-				}
+				el.$s = el.valObject = UNDEF
 			} else {
 				if (el.kill) el.kill()
 			}
@@ -1688,11 +1685,16 @@ console.log("LiteJS is in debug mode and that's fine for production")
 					}
 				} : val
 				, els = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
-				for (; (node = els[i++]); ) {
-					for (delay = 0; delay < len; delay++) {
-						if ((result = arr[delay])) {
-							result = fn(node, result, isArr(value) ? value[delay] : value && typeof value === "object" && !value.nodeType ? value[result] : value, data)
-							if (!prepareVal && data > 0) f(node, name, fn === cls ? !val : result, "", data)
+				for (; (node = els[i++]); ) for (delay = 0; delay < len; delay++) {
+					if ((result = arr[delay])) {
+						result = fn(node, result, isArr(value) ? value[delay] : value && typeof value === "object" && !value.nodeType ? value[result] : value, data)
+						if (!prepareVal) {
+							if (fn === cls || data < -1) result = !val || ""
+							if (data < 0) {
+								if (canTransit) onceEvent(node, canTransit, bind(f, node, node, name, result))
+								else data = 1
+							}
+							if (data > 0) f(node, name, result, "", data)
 						}
 					}
 				}
