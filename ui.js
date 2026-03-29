@@ -76,12 +76,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		cls: bindingsCls,
 		css: bindingsCss,
 		on: bindingsOn,
-		one: acceptMany(function(el, ev, fn) {
-			addEvent(el, ev, function remove() {
-				rmEvent(el, ev, remove)
-				fn.apply(el, arguments)
-			})
-		}, 1),
+		one: acceptMany(onceEvent, 1),
 		set: acceptMany(setAttr),
 		txt: elTxt,
 		/*** form ***/
@@ -315,8 +310,8 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		return _e / 3
 	}
 
-	function addEvent(el, ev, fn, opts) {
-		var fn2 = fixFn[ev] && fixFn[ev](el, fn, ev) || fn
+	function addEvent(el, ev, fn, opts, fix) {
+		var fn2 = fix || fixFn[ev] && fixFn[ev](el, fn, ev) || fn
 		, ev2 = fixEv[ev] || ev
 
 		if (ev2 !== "") {
@@ -329,7 +324,12 @@ console.log("LiteJS is in debug mode and that's fine for production")
 
 		on(el, ev, fn2, el, fn)
 	}
-
+	function onceEvent(el, ev, fn, opts) {
+		addEvent(el, ev, fn, opts, function remove() {
+			rmEvent(el, ev, fn, opts)
+			fn.apply(el, arguments)
+		})
+	}
 	function rmEvent(el, ev, fn, opts) {
 		var evs = el._e && el._e[ev]
 		, id = evs && evs.indexOf(fn)
