@@ -160,17 +160,17 @@
 		elOn(el, "pointerdown", function(e) {
 			drag = true
 			load()
-			var tmp = el.getBoundingClientRect()
+			var tmp = El.rect(el)
 			offset = tmp.left + El.scrollLeft() + knobLen
-			var next, i
+			var next, i = 0
 			, x = maxPx
 			, diff = e.pageX - offset
-			for (i = 0; i < fills.length; i++) {
+			for (; i < fills.length; i++) {
 				next = diff - fills[i].offsetWidth + knobLen
-				if (next < 0 ? -next <= x : next < x) {
+				if ((next < 0 ? next*=-1 : next) <= x) {
 					idx = i
 					fill = fills[i]
-					x = next < 0 ? -next : next
+					x = next
 				}
 			}
 			tmp = offset - e.pageX + (values[idx]-min||0)*px
@@ -185,9 +185,9 @@
 			emit(e)
 			return El.stop(e)
 		}
-		function stop(e) {
+		function stop() {
 			if (drag) {
-				drag = false
+				drag = 0
 				listen(elOff)
 				setVal(idx, values[idx])
 			}
