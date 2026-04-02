@@ -148,7 +148,6 @@
 			actions: [{ title: "Close", key: "esc" }]
 		})
 		activeImg.src = thumbImg.src
-
 		function show(idx, initial) {
 			current = scope.current = ((idx % images.length) + images.length) % images.length
 			var nextImg = activeImg === img1 ? img2 : img1
