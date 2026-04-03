@@ -242,7 +242,8 @@ anim-page
 		;txt! "Load " + new Date()
 	.time
 		;txt "Load " + new Date()
-	ul>li+li+li
+	button Button
+		@click function(e){var a=1;console.log('a',a)}
 
 
 %view users public

@@ -57,8 +57,6 @@ console.log("LiteJS is in debug mode and that's fine for production")
 
 	, elSeq = 0
 	, elCache = {}
-	// Parses ";name! args" binding expressions from _b attribute
-	, renderRe = /[;\s]*([-.\w$]+)(?:(!?)[ :]*((?:(["'\/])(?:\\.|[^\\])*?\4|[^;])*))?/g
 	// Parses CSS selectors: .class #id [attr=val] :pseudo
 	, selectorRe = /([.#:[])([-\w]+)(?:([~^$*|]?)=(("|')(?:\\.|[^\\])*?\5|[-\w]+))?]?/g
 	, fnCache = {}
@@ -762,9 +760,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				var expr = getAttr(plugin.e, "_b")
 				, view = View(plugin.n, usePluginContent(plugin), plugin.x)
 				if (expr) {
-					viewEval(replace(renderRe, function(_, name, op, args) {
+					viewEval(renderEach(expr, function(_, name, op, args) {
 						return "($s." + name + (isFn(view[name]) ? "(" + (args || "") + ")" : "=" + args) + "),"
-					}, expr) + "1", view)
+					}) + "1", view)
 				}
 			}
 		}, 1)
@@ -989,11 +987,11 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				return format(iGet(translations, str, str || ""), data, getExt)
 			}
 			function getExt(obj, str) {
-				var fn = cache[str] || (cache[str] = (replace(renderRe, function(_, name, op, args) {
-					fn = (_ === name) ? name : "$el." + name + "(" + fn + (args ? "," + args : "") + ")"
-				}, replace(/;\s*([#*?@~])(.*)/, function(_, op, arg) {
+				var fn = cache[str] || (cache[str] = (renderEach(replace(/;\s*([#*?@~])(.*)/, function(_, op, arg) {
 					return ";" + iAlias[op] + " " + quote(arg)
-				}, str)), fn === str ? str : makeFn(fn, fn)))
+				}, str), function(_, name, op, args) {
+					fn = (_ === name) ? name : "$el." + name + "(" + fn + (args ? "," + args : "") + ")"
+				}), fn === str ? str : makeFn(fn, fn)))
 				return str == "$" ? obj : isStr(fn) ? iGet(obj, str, "") : isFn(fn) ? fn(iExt, obj, translations) : ""
 			}
 		})
@@ -1529,15 +1527,33 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			throw e + "\n" + attr + ": " + expr
 		}
 	}
+	// Iterates ";name! args" binding expressions, handles ;{}() in args
+	function renderEach(str, fn) {
+		var m, tok, argStart
+		, bindRe = /[;\s]*([-.\w$]+)(!?)[ :]*/g
+		, tokRe = /(["'\/])(?:\\.|[^\\])*?\1|(([{(\[])|[})\]])|;/g
+		, depth = 0
+		, result = ""
+		while ((m = bindRe.exec(str))) {
+			argStart = tokRe.lastIndex = bindRe.lastIndex
+			for (depth = 0; (tok = tokRe.exec(str)); ) {
+				if (tok[0] === ";" && depth < 1) break
+				else if (tok[2]) depth += tok[3] ? 1 : -1
+			}
+			depth = bindRe.lastIndex = tok ? tok.index : str.length
+			result += fn(str.slice(m.index, depth), m[1], m[2], str.slice(argStart, depth))
+		}
+		return result
+	}
 	// Compiles binding expression string (e.g. ";txt foo;cls 'active',bar") into a Function.
 	// Extracts free variable names and aliases them from scope ($s.varName).
 	// raw parameter bypasses the $s guard wrapper (used by i18n getExt).
 	function makeFn(fn, raw, i) {
-		fn = raw || "$s&&(" + replace(renderRe, function(match, name, op, args) {
+		fn = raw || "$s&&(" + renderEach(fn, function(match, name, op, args) {
 			return (
 				op ? "($el[$a]=$el[$a].replace($o[" + (i = bindOnce.indexOf(match), i < 0 ? bindOnce.push(match) - 1 : i)+ "],''),0)||" : ""
 			) + "$b['" + (bindings[name] ? name + "'].call($s" + (name == "$s" ? "=$S($el,$el)": "") + ",$el" : "set']($el,'" + name + "'") + (args ? "," + args : "") + ")||"
-		}, fn) + "$r)"
+		}) + "$r)"
 		var vars = replace(fnRe, "", fn).match(wordRe) || []
 		for (i = vars.length; i--; ) {
 			if (window[vars[i]] || vars.indexOf(vars[i]) !== i) vars.splice(i, 1)

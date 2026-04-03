@@ -803,6 +803,17 @@ describe("ui", function() {
 			assert.equal(document.body.innerHTML, '<ul><li class="first"></li><!--each i--><li>3</li><li>4</li><li class="last"></li></ul>')
 			assert.end()
 		})
+		test ("semicolon in handler", function(assert, mock) {
+			var document = new dom.Document()
+			, app = LiteJS({
+				root: document.body
+			})
+			xhr.ui('p ;txt function(e){var a=1;return a}()\nb ;txt _(\'Button\',$s);on!\'click\',function(e){var a=1;console.log(\'a\',a)}')
+			LiteJS.start()
+			assert.equal(document.body.querySelector("p")._b, 'txt function(e){var a=1;return a}()')
+			assert.equal(document.body.innerHTML, '<p>1</p><b>Button</b>')
+			assert.end()
+		})
 		test ("el", function(assert, mock) {
 			//mock.swap(console, "log", mock.fn())
 			var document = new dom.Document()
