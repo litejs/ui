@@ -70,6 +70,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		return current
 	})
 	, bindingsOn = acceptMany(addEvent, 1)
+	, bindingsOff = acceptMany(rmEvent)
 	, bindings = {
 		cls: bindingsCls,
 		css: bindingsCss,
@@ -356,10 +357,10 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		on(el, ev, fn2, el, fn)
 	}
 	function onceEvent(el, ev, fn, opts) {
-		addEvent(el, ev, fn, opts, function remove() {
-			rmEvent(el, ev, fn, opts)
+		if (ev) bindingsOn(el, ev, function remove() {
+			bindingsOff(el, ev, remove, 0, 0, opts)
 			fn.apply(el, arguments)
-		})
+		}, 0, 0, opts)
 	}
 	function rmEvent(el, ev, fn, opts) {
 		var evs = el._e && el._e[ev]
@@ -1135,7 +1136,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		flip: elFlip,
 		kill: elKill,
 		morph: elMorph,
-		off: acceptMany(rmEvent),
+		off: bindingsOff,
 		render: render,
 		rect: rect,
 		rm: elRm
@@ -1820,9 +1821,13 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				} : val
 				, els = !prepareVal && selector ? findAll(el, selector) : isArr(el) ? el : [ el ]
 				for (; (node = els[i++]); ) for (delay = 0; delay < len; delay++) {
-					if ((result = arr[delay])) {
-						result = fn(node, result, isArr(value) ? value[delay] : value && typeof value === "object" && !value.nodeType ? value[result] : value, data)
-						if (!prepareVal) {
+					if ((name = arr[delay])) {
+						result = fn(node, name, isArr(value) ? value[delay] : value && typeof value === "object" && !value.nodeType ? value[result] : value, data)
+						if (prepareVal) {
+							if (fn === addEvent && data) {
+								onceEvent(data.el || node, data.until, bind(rmEvent, node, node, name, value, data))
+							}
+						} else {
 							if (fn === cls || data < -1) result = !val || ""
 							if (data < 0) {
 								if (canTransit) onceEvent(node, canTransit, bind(f, node, node, name, result))

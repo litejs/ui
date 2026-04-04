@@ -179,6 +179,24 @@ describe("ui", function() {
 			assert.end()
 		})
 
+		test("El.on with until", function(assert) {
+			var el = document.createElement("div")
+			, calls = 0
+			function handler() { calls++ }
+			El.on(el, "move", handler, 0, {until: "stop,cancel"})
+			El.emit(el, "move")
+			El.emit(el, "move")
+			assert.equal(calls, 2)
+			El.emit(el, "cancel")
+			El.emit(el, "move")
+			assert.equal(calls, 2, "listener removed after first stop event")
+			// other stop event should also be cleaned up (no leak), harmless to fire
+			El.emit(el, "stop")
+			El.emit(el, "move")
+			assert.equal(calls, 2)
+			assert.end()
+		})
+
 		test("set with object", function(assert) {
 			var el = document.createElement("div")
 			El.set(el, { "data-a": "1", "data-b": "2" })
