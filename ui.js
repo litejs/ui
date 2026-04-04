@@ -1003,22 +1003,20 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			}
 		})
 		function format(str, data, getter) {
-			for (var char, inQuote, inExpr, depth = 0, pos = 0, len = str.length; pos < len; ) {
-				char = str.charAt(pos++)
-				if (char == "'" || char == "\"") { // '"
-					inQuote = (!inExpr || char === inQuote) ? "" : char
+			for (var ch, inQuote, inExpr, depth = 0, start = 0, pos = 0, len = str.length, result = ""; pos < len; ) {
+				ch = str.charCodeAt(pos++)
+				if (ch == 39 || ch == 34) { // '"
+					inQuote = (!inExpr || ch === inQuote) ? 0 : ch
 				} else if (inQuote) {
-					if (char == "\\") pos++
-				} else if (char == "{" && depth++ < 1) {
+					if (ch == 92) pos++
+				} else if (ch == 123 && depth++ < 1) {
 					inExpr = pos
-				} else if (char == "}" && inExpr && --depth < 1) {
-					char = getter(data, str.slice(inExpr, pos - 1), "")
-					str = str.slice(0, inExpr - 1) + char + str.slice(pos)
-					pos = inExpr + char.length - 1
-					len = str.length
+				} else if (ch == 125 && inExpr > start && --depth < 1) {
+					result += str.slice(start, inExpr - 1) + getter(data, str.slice(inExpr, pos - 1), "")
+					start = pos
 				}
 			}
-			return str
+			return result + str.slice(start)
 		}
 		function iGet(obj, path, fallback, tmp) {
 			return isStr(path) ? (
