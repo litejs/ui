@@ -1,4 +1,69 @@
 
+%css
+	.ImgCompare {
+		cursor: col-resize;
+		touch-action: pan-y;
+		user-select: none;
+	}
+	.ImgCompare-handle,
+	.ImgCompare-handle:after {
+		position: absolute;
+		top: 0;
+		width: 1px;
+		height: 100%;
+		content: "";
+		background: ButtonFace;
+		box-shadow: 0 0 4px rgba(0, 0, 0, .5);
+	}
+	.ImgCompare-handle:after {
+		top: 50%;
+		content: "⁞";
+		width: 9px;
+		height: 32px;
+		margin: -16px -4px;
+		font: 16px/2 serif;
+		color: CanvasText;
+		border-radius: 4px;
+		text-align: center;
+	}
+
+%js
+	var css = El.css
+	El.$b.imgCompare = function(el) {
+		var width
+		, divs = $$("div", el)
+		, imgs = $$("img", el)
+		, over = divs[0]
+		, handle = divs[1]
+		El.append(over, imgs[0])
+		init()
+		function init() {
+			width = el.offsetWidth
+			imgs.css("width", width + "px")
+		}
+		function setPos(px) {
+			px = px < 0 ? 0 : px > width ? width : px
+			css(over, "width", px + "px")
+			css(handle, "left", (px-1) + "px")
+		}
+		setPos(width / 2)
+		El.on(el, "pointerdown", function(e) {
+			var rect = El.rect(el)
+			init()
+			El.on(document.body, "pointermove", move, 0, {until: "pointerup,pointercancel"})
+			move(e)
+			function move(e) {
+				setPos(e.clientX - rect.left)
+				return El.stop(e)
+			}
+		})
+	}
+
+%el ImgCompare
+.ImgCompare.rel ;imgCompare!
+	.abs.max
+	.ImgCompare-handle
+
 %view gallery public
 section
 	h2 Inline Gallery
@@ -24,4 +89,11 @@ section
 			img[src="https://picsum.photos/seed/lit5/800/600"]
 			img[src="https://picsum.photos/seed/lit6/800/600"]
 			img[src="https://picsum.photos/seed/lit7/800/600"]
+
+	h2 Before / After
+	.p2
+		ImgCompare
+			img[src="https://picsum.photos/seed/lit1/800/600?grayscale"]
+			img[src="https://picsum.photos/seed/lit1/800/600"]
+			.abs Before
 
