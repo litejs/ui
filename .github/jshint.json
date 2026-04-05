@@ -1,5 +1,6 @@
 {
   "asi": true,
+  "browser": true,
   "esversion": 5,
   "evil": true,
   "laxcomma": true,

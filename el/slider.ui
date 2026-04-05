@@ -161,7 +161,7 @@
 			drag = true
 			load()
 			var tmp = El.rect(el)
-			offset = tmp.left + El.scrollLeft() + knobLen
+			offset = tmp.left + El.scroll().x + knobLen
 			var next, i = 0
 			, x = maxPx
 			, diff = e.pageX - offset

@@ -93,9 +93,10 @@
 		, html = document.documentElement
 		El.near = near
 		function near(source, target, x, y, margin) {
-			var rect = target.getBoundingClientRect()
-			, top  = rect.top + El.scrollTop()
-			, left = rect.left + El.scrollLeft()
+			var rect = El.rect(target)
+			, scroll = El.scroll()
+			, top  = rect.top + scroll.y
+			, left = rect.left + scroll.x
 			// svg elements dont have offsetWidth, IE8 does not have rect.width
 			, width = rect.width || target.offsetWidth || 0
 			, height = rect.height || target.offsetHeight || 0
@@ -122,7 +123,7 @@
 				top += height + margin
 				y = " -50%"
 				setTimeout(function() {
-					var overflow = top + source.offsetHeight - El.scrollTop() - html.offsetHeight
+					var overflow = top + source.offsetHeight - scroll.y - html.offsetHeight
 					if (overflow > 0) scrollBy({ top: overflow, left: 0, behavior: "smooth" })
 				}, 400)
 			} else {

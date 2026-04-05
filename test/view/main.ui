@@ -124,7 +124,7 @@ svg[viewBox="0 0 4 3"][width=32px][height=24px]
 		.Footer-spacer
 	Footer
 	.scroll-up.anim
-		;cls "is-visible",El.scrollTop()>200
+		;cls "is-visible",El.scroll().y>200
 		@init El.on(window,'scroll',El.render.bind(_,$el,$s))
 		@click window.scrollTo.bind(window,0,0)
 

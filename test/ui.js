@@ -289,6 +289,75 @@ describe("ui", function() {
 				assert.end()
 			})
 		})
+
+		test("val on form returns nested object with bracket notation", function(assert) {
+			var form = document.createElement("form")
+			function input(name, value, opts) {
+				var el = document.createElement("input")
+				el.name = name
+				el.value = value
+				if (opts) for (var k in opts) el[k] = opts[k]
+				form.appendChild(el)
+				return el
+			}
+			input("a", "1")
+			input("user[email]", "x@y")
+			input("tags[]", "red")
+			input("skip", "no", { disabled: true })
+			input("agree", "yes", { type: "checkbox", checked: true })
+			input("off", "no", { type: "checkbox", checked: false })
+			assert.equal(El.val(form), {
+				a: "1",
+				user: { email: "x@y" },
+				tags: ["red"],
+				agree: "yes",
+				off: null
+			})
+			assert.end()
+		})
+
+		test("val on select-multiple returns selected values", function(assert) {
+			var sel = document.createElement("select")
+			sel.multiple = true
+			sel.type = "select-multiple"
+			function opt(value, selected, disabled) {
+				var o = document.createElement("option")
+				o.value = value
+				o.selected = !!selected
+				o.disabled = !!disabled
+				return o
+			}
+			sel.options = [opt("a", 1), opt("b"), opt("c", 1), opt("d", 1, 1)]
+			assert.equal(El.val(sel), ["a", "c"])
+			assert.end()
+		})
+
+		test("scroll()", function(assert, mock) {
+			var body = document.scrollingElement = document.body
+			mock.swap(body, { scrollLeft: 13, scrollTop: 9 })
+			assert.equal(El.scroll(), { x: 13, y: 9 }, "falls through to body")
+			mock.swap(body, { scrollLeft: 0, scrollTop: 0 })
+			assert.equal(El.scroll(), { x: 0, y: 0 }, "zero when nothing set")
+			assert.end()
+		})
+
+		test("hasClass handles non-string className (SVG)", function(assert) {
+			// SVGElement.className is SVGAnimatedString, not a string
+			var svgMock = {
+				className: { baseVal: "foo bar" },
+				getAttribute: function(k) { return k === "class" ? "foo bar" : null }
+			}
+			assert.ok(El.hasClass(svgMock, "foo"))
+			assert.ok(El.hasClass(svgMock, "bar"))
+			assert.notOk(El.hasClass(svgMock, "baz"))
+			// fallback "-" when class attribute is also missing
+			var empty = {
+				className: { baseVal: "" },
+				getAttribute: function() { return null }
+			}
+			assert.notOk(El.hasClass(empty, "foo"))
+			assert.end()
+		})
 	})
 
 	describe("i18n", function() {

@@ -35,7 +35,7 @@
 		, css = El.css
 		El.on(window, "scroll", function() {
 			var pos
-			, top = El.scrollTop()
+			, top = El.scroll().y
 
 			// scroll up
 			if (top < lastTop) {

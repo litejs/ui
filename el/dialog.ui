@@ -71,7 +71,7 @@
 			tab: setFocus,
 		}
 		, body = doc.body
-		, scrollEl = doc.scrollingElement || doc.documentElement
+		, scrollEl = doc.scrollingElement
 		, vibrate = scope.vibrate && navigator.vibrate
 		, sound = scope.sound && window.Audio && new Audio(scope.sound)
 		scope.title = title

@@ -42,7 +42,6 @@
 	, IS_NODE = false
 	/**/
 	, html = document.documentElement
-	, body = document.body
 	// JScript engine in IE<9 does not recognize vertical tabulation character
 	// The documentMode is an IE only property, supported from IE8
 	, a = document.documentMode | 0
@@ -424,6 +423,8 @@
 		return false
 	})
 
+	O = document
+	var scrollEl = patch("scrollingElement", (document.compatMode === "CSS1Compat" ? html : document.body))
 	// The HTML5 document.head DOM tree accessor
 	// patch("head", document.getElementsByTagName("head")[0])
 	// HTMLElement (IE9) -> Element (IE8)
@@ -455,11 +456,11 @@
 	, matches = patch("matches", "return!!X(a)(t)", 0, selectorFn)
 
 	/* node:coverage ignore next 13 */
+	b = "removeEventListener"
 	try {
 		O[a = "addEventListener"]("t", NULL, Object.defineProperties({}, {
 			capture: { get: function() { canCapture = 1 } }
 		}))
-		b = "removeEventListener"
 		c = "O.call(t,a,b,X(c)?!!c.capture:!!c)"
 		if (!canCapture) {
 			patch("c:" + a, c, 1, isObj)
@@ -474,8 +475,8 @@
 		return function() {
 			var e = new Event(ev)
 			if (e.clientX !== UNDEF) {
-				e.pageX = e.clientX + (window.pageXOffset || html.scrollLeft || body.scrollLeft || 0)
-				e.pageY = e.clientY + (window.pageYOffset || html.scrollTop || body.scrollTop || 0)
+				e.pageX = e.clientX + (window.pageXOffset || scrollEl.scrollLeft)
+				e.pageY = e.clientY + (window.pageYOffset || scrollEl.scrollTop)
 			}
 			fn.call(el, e)
 		}
