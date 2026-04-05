@@ -1901,18 +1901,27 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		, next = 0
 		onStart = isFn(onStart) ? onStart : (onStart === tick || onStart) && fn
 		onEnd = isFn(onEnd) ? onEnd : (onEnd === tick || onEnd) && fn
-		return function() {
-			var now = Date.now()
-			clearTimeout(tick)
-			if (now >= next) {
-				if (next < 1) {
-					if (onStart) onStart()
-				} else fn()
-				next = now + ms
+		return function(e) {
+			if (!ms) {
+				next = e
+				if (!tick) tick = requestAnimationFrame(callLast)
+			} else {
+				var now = Date.now()
+				if (now >= next) {
+					if (next < 1) {
+						if (onStart) onStart(e)
+					} else fn(e)
+					next = now + ms
+				}
+				if (onEnd) {
+					clearTimeout(tick)
+					tick = setTimeout(onEnd, next - now, e)
+				}
 			}
-			if (onEnd) {
-				tick = setTimeout(onEnd, next - now)
-			}
+		}
+		function callLast() {
+			fn(next)
+			tick = 0
 		}
 	}
 	function rect(el) {

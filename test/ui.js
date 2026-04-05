@@ -235,6 +235,60 @@ describe("ui", function() {
 
 			assert.end()
 		})
+
+		describe("rate", function() {
+			test("defaults to leading and trailing edge using fn", function(assert, mock) {
+				mock.time(1000000)
+				var calls = []
+				var fn = function(e) { calls.push(e) }
+				var rated = El.rate(fn, 100)
+				rated("a")
+				rated("b")
+				rated("c")
+				assert.equal(calls, ["a"], "only leading call fires in burst")
+				mock.tick(100)
+				assert.equal(calls, ["a", "c"], "trailing fires with last event")
+				rated("d")
+				assert.equal(calls, ["a", "c", "d"], "past window fires fn directly")
+				assert.end()
+			})
+
+			test("custom onStart, onEnd=false disables trailing", function(assert, mock) {
+				mock.time(2000000)
+				var starts = [], mains = []
+				var rated = El.rate(
+					function(e) { mains.push(e) },
+					100,
+					function(e) { starts.push(e) },
+					false
+				)
+				rated("a")
+				rated("b")
+				assert.equal(starts, ["a"], "custom onStart fired on leading")
+				assert.equal(mains, [], "fn not called on leading")
+				mock.tick(100)
+				assert.equal(mains, [], "no trailing call when onEnd disabled")
+				assert.end()
+			})
+
+			test("schedules requestAnimationFrame when ms is 0", function(assert, mock) {
+				var rafCb
+				mock.swap(global, "requestAnimationFrame", function(cb) {
+					rafCb = cb
+					return 1
+				})
+				var calls = []
+				var rated = El.rate(function(e) { calls.push(e) }, 0)
+				rated("x")
+				rated("y")
+				rated("z")
+				assert.type(rafCb, "function", "raf scheduled once")
+				assert.equal(calls, [], "fn not called synchronously")
+				rafCb()
+				assert.equal(calls, ["z"], "fn called with last event on frame")
+				assert.end()
+			})
+		})
 	})
 
 	describe("i18n", function() {
