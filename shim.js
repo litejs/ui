@@ -35,6 +35,7 @@
 	/*** debug ***/
 	, IS_NODE = !window.document
 	, document = patch("document", {body:{},documentElement:{}})
+	, history = patch("history", {})
 	, location = patch("location", {href:""})
 	, navigator = patch("navigator", {})
 	/*/
@@ -51,7 +52,6 @@
 	/* node:coverage ignore next 19 */
 	, ie678 = !+"\v1" && a < 9 // jshint ignore:line
 	, ie6789 = ie678 || a == 9
-	, ie67 = ie678 && a < 8
 	, EV = "Event"
 	, Event = patch(
 		EV,
@@ -102,8 +102,8 @@
 		c: "touchcancel"
 	}
 
-	, lastHash
-	, onhashchange = "onhashchange"
+	, lastHref
+	, onpopstate = "onpopstate"
 
 
 	// Patch parameters support for setTimeout callback
@@ -119,13 +119,13 @@
 	// window.msRequestAnimationFrame     || // IE 10 PP2+
 	patch("cancel" + a, "clearTimeout(a)")
 
-
 	/* node:coverage ignore next 8 */
-	if (!IS_NODE && !(onhashchange in window) || ie67) {
-		patch(onhashchange, NULL)
+	if (!IS_NODE && !(onpopstate in window)) {
+		patch(onpopstate, NULL)
 		setInterval(function() {
-			if (lastHash !== (lastHash = location.href.split("#")[1]) && isFn(window[onhashchange])) {
-				window[onhashchange]()
+			if (isFn(window[onpopstate]) && lastHref !== (lastHref = "" + location)) {
+				window[onpopstate]()
+				scroll(0, 0)
 			}
 		}, 60)
 	}
@@ -334,8 +334,16 @@
 	// Chrome7, FF4, IE9, Opera 11.60, Safari 5.1.4
 	patch("bind", "b=S.call(A,1);c=function(){return t.apply(this instanceof c?this:a,b.concat(S.call(arguments)))};if(t[P])c[P]=t[P];return c")
 
+	O = history
+	a = "replace"
+	b = "State"
+	c = "location[X](c)"
+	patch(a + b, c, 0, a)
+	a = "assign"
+	patch("push" + b, c, 0, a)
+
 	O = Object
-	patch("assign", "for(var k,i=1,l=A.length;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
+	patch(a, "for(var k,i=1,l=A.length;i<l;)if(t=A[i++])for(k in t)if(o.call(t,k))a[k]=t[k];return a")
 	patch("create", "X[P]=a||Y;return new X", 0, nop, {
 		// oKeys is undefined at this point
 		constructor: oKeys,
@@ -425,6 +433,7 @@
 
 	O = document
 	var scrollEl = patch("scrollingElement", (document.compatMode === "CSS1Compat" ? html : document.body))
+
 	// The HTML5 document.head DOM tree accessor
 	// patch("head", document.getElementsByTagName("head")[0])
 	// HTMLElement (IE9) -> Element (IE8)
@@ -434,12 +443,12 @@
 	, selectorLastRe = /([\s>+~]*)(?:("|')(?:\\.|[^\\])*?\2|\((?:[^()]|\([^()]+\))+?\)|~=|[^'"()\s>+~])+$/
 	, selectorSplitRe = /\s*,\s*(?=(?:[^'"()]|"(?:\\.|[^\\"])*?"|'(?:\\.|[^\\'])*?'|\((?:[^()]|\([^()]+\))+?\))+$)/
 	, selectorMap = {
-		"empty": "!_.lastChild",
-		"enabled": "!m(_,':disabled')",
+		empty: "!_.lastChild",
+		enabled: "!m(_,':disabled')",
 		"first-child": "(a=_.parentNode)&&a.firstChild==_",
-		"lang": "m(c(_,'[lang]'),'[lang|='+v+']')",
+		lang: "m(c(_,'[lang]'),'[lang|='+v+']')",
 		"last-child": "(a=_.parentNode)&&a.lastChild==_",
-		"link": "m(_,'a[href]')",
+		link: "m(_,'a[href]')",
 		"only-child": "(a=_.parentNode)&&a.firstChild==a.lastChild",
 		".": "~_.className.split(/\\s+/).indexOf(a)",
 		"#": "_.id==a",
