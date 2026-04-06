@@ -541,8 +541,6 @@ console.log("LiteJS is in debug mode and that's fine for production")
 					viewEmit(view, "pong", params, View)
 				}
 				viewEmit(lastView, "show", params)
-				close = history.state || 0
-				scrollTo(close.x|0, close.y|0)
 				blur()
 			}
 			function viewClose(view, open) {
@@ -1040,52 +1038,40 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		return View
 	}
 
-	function setUrl(url, rep) {
-		/*** pushState ***/
-		if (pushBase) {
-			history[rep ? "replaceState" : (history.replaceState(elScroll(), NUL, location.href), "pushState")](NUL, NUL, pushBase + url)
-		} else
-		/**/
-			location[rep ? "replace" : "assign"]("#" + url)
-	}
-
-	LiteJS.go = setUrl
 	LiteJS.start = histStart
 	function histStart(cb) {
-		/*** pushState ***/
-		// Chrome5, Firefox4, IE10, Safari5, Opera11.50
+		LiteJS.go = setUrl
 		var histLast
-		, baseEl = find(html, "base")
-		, url = getUrl()
-		if (baseEl && history.pushState) {
-			pushBase = replace(/.*:\/\/[^/]*|[^\/]*$/g, "", baseEl.href)
-
-			if (url && !getUrl()) {
-				setUrl(url, 1)
+		, hashFallback = getUrl()
+		, base = find(html, "base")
+		if ((base = base && base.href)) {
+			pushBase = LiteJS.push = replace(/.+?:\/\/[^/]+|[^\/]*$/g, "", base)
+		}
+		bindingsOn(body, "click", function(e, el, href) {
+			href = replace(/\/?#\/?/, "/", el.href || "-").split(base || location)
+			if (href[0] === "" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+				eventStop(e)
+				setUrl(href[1])
 			}
-
-			// Chrome and Safari emit a popstate event on page load, Firefox doesn't.
-			// Firing popstate after onload is as designed.
-			//
-			// See the discussion on https://bugs.webkit.org/show_bug.cgi?id=41372,
-			// https://code.google.com/p/chromium/issues/detail?id=63040
-			// and the change to the HTML5 spec that was made:
-			// http://html5.org/tools/web-apps-tracker?from=5345&to=5346.
-			window.onpopstate = checkUrl
-		} else
-		/**/
-			window.onhashchange = checkUrl
-		readTemplates(checkUrl)
+		}, "a")
+		// Chrome and Safari emit a popstate event on page load, Firefox doesn't.
+		// Firing popstate after onload is as designed.
+		readTemplates(window.onpopstate = checkUrl)
 		function checkUrl() {
-			if (cb && histLast != (histLast = getUrl())) cb(histLast)
+			if (cb && histLast != (histLast = getUrl() || hashFallback)) {
+				hashFallback = ""
+				cb(histLast)
+			}
 		}
 		function getUrl() {
 			return replace(/^[#\/\!]+|[\s\/]+$/g, "",
-				/*** pushState ***/
 				pushBase ? location.pathname.slice(pushBase.length) :
-				/**/
 				// NOTE: in Firefox location.hash is decoded; in Safari location.pathname is decoded
 				location.href.split("#")[1] || "")
+		}
+		function setUrl(url, rep) {
+			history[rep ? "replaceState" : "pushState"](NUL, NUL, (pushBase || "#") + url)
+			checkUrl()
 		}
 	}
 
@@ -1224,7 +1210,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				})
 			},
 			view: function(el, url) {
-				setAttr(el, "href", (pushBase || "#") + expand(url || ""))
+				el.href = (pushBase || "#") + expand(url || "")
 			}
 		}),
 		$d: globalScope,
@@ -1620,7 +1606,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				(map = kbMaps[i++]) && !(
 					fn = !input || map.input ? map[code] || map[chr] || map.num && code > 47 && code < 58 && (chr|=0, map.num) || map.all : fn
 				) && map.bubble; );
-			if (isStr(fn)) setUrl(fn)
+			if (isStr(fn)) LiteJS.go(fn)
 			else if (isFn(fn)) fn(e, chr, el)
 		}
 	})

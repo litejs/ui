@@ -77,7 +77,6 @@ var app = LiteJS({
 		show: function(params, view) {
 			// Re-render all .js-viewHook elements on each View change
 			app.$$(".js-viewRender").render()
-			scroll(0, 1)
 		},
 		xhr406: function(body, method, url, data, onResponse, send) {
 			this.emit("confirm", body.title || "Not Acceptable", body, function(action) {
@@ -128,7 +127,7 @@ xhr.view = xhr.tpl = xhr.el = xhr.ui
 	, body = document.body
 
 
-	history.scrollRestoration = "manual"
+	//history.scrollRestoration = "manual"
 
 	El.cls(html, {
 		"is-app": "standalone" in navigator ? navigator.standalone : matchMedia("(display-mode:standalone)").matches,
