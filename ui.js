@@ -1442,6 +1442,12 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			bindingsCss(to, "transform", "")
 		}
 	}
+	function transit(fn, el, a, b) {
+		if (canTransit && /[1-9]/.test(getComputedStyle(el).transitionDuration)) {
+			onceEvent(el, canTransit, bind(fn, el, el, a, b))
+			return 1
+		}
+	}
 	function elKill(el, tr, delay) {
 		if (el) {
 			if (delay > 0) return setTimeout(elKill, delay, el, tr)
@@ -1449,7 +1455,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				if (isStr(tr)) cls(el, tr)
 				if (isObj(tr)) bindingsCss(el, tr)
 				// transitionend fires for each property transitioned
-				return onceEvent(el, canTransit, bind(elKill, el, el, UNDEF))
+				if (transit(elKill, el)) return
 			}
 			if (el._e) {
 				emit(el, "kill")
@@ -1821,10 +1827,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 							}
 						} else {
 							if (fn === cls || data < -1) result = !val || ""
-							if (data < 0) {
-								if (canTransit) onceEvent(node, canTransit, bind(f, node, node, name, result))
-								else data = 1
-							}
+							if (data < 0 && !transit(f, node, name, result)) data = 1
 							if (data > 0) f(node, name, result, "", data)
 						}
 					}
