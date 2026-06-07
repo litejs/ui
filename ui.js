@@ -427,6 +427,10 @@ console.log("LiteJS is in debug mode and that's fine for production")
 
 		asEmitter(View)
 		asEmitter(View.prototype = {
+			show: function(params) {
+				lastView = this
+				bubbleUp(lastParams = params || {})
+			},
 			wait: function() {
 				var params = lastParams
 				params._p = 1 + (params._p | 0) // pending
