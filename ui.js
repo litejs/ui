@@ -1051,13 +1051,6 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		if ((base = base && base.href)) {
 			pushBase = LiteJS.push = replace(/.+?:\/\/[^/]+|[^\/]*$/g, "", base)
 		}
-		bindingsOn(body, "click", function(e, el, href) {
-			href = replace(/\/?#\/?/, "/", el.href || "-").split(base || location)
-			if (href[0] === "" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
-				eventStop(e)
-				setUrl(href[1])
-			}
-		}, "a")
 		// Chrome and Safari emit a popstate event on page load, Firefox doesn't.
 		// Firing popstate after onload is as designed.
 		readTemplates(window.onpopstate = checkUrl)
