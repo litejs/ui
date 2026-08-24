@@ -1167,8 +1167,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 						append(comm.parentNode, sub, (pos++ ? nodes[pos - 2] : comm).nextSibling)
 						elScope(sub, comm)
 					}
-					for (; i--; ) {
-						sub = nodes[i].$s
+					for (; i--; ) if ((sub = nodes[i].$s)) {
 						sub[name] = list[sub.$k = keys[sub.$i = i]]
 						sub.$len = pos
 						render(nodes[i])
