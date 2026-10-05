@@ -231,6 +231,13 @@ describe("ui", function() {
 			radio.type = "radio"
 			assert.equal(El.val(radio), undefined)
 
+			// setting a radio checks it only when the value matches
+			radio.value = "red"
+			El.val(radio, "green")
+			assert.equal(radio.checked, false)
+			El.val(radio, "red")
+			assert.equal(radio.checked, true)
+
 			assert.equal(El.val(null), undefined)
 
 			assert.end()

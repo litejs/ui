@@ -85,7 +85,8 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			, i = 0
 			, type = el.type
 			, opts = el.options
-			, checkbox = type === "checkbox" || type === "radio"
+			, isRadio = type === "radio"
+			, checkbox = type === "checkbox" || isRadio
 
 			if (el.tagName === "FORM") {
 				// Disabled controls do not receive focus,
@@ -118,7 +119,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				} else if (el.val) {
 					el.val(val)
 				} else if (checkbox) {
-					el.checked = !!val
+					el.checked = isRadio ? el.value == val : !!val
 				} else {
 					el.value = val
 				}
@@ -139,8 +140,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				el = value > -1 && opts[value] || el
 			}
 
-			return checkbox && !el.checked ?
-			(type === "radio" ? UNDEF : NUL) :
+			return checkbox && !el.checked ? (isRadio ? UNDEF : NUL) :
 			el.valObject !== UNDEF ? el.valObject : el.value
 
 			function replacer(_, _key, offset) {
