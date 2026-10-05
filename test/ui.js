@@ -243,6 +243,23 @@ describe("ui", function() {
 			assert.end()
 		})
 
+		test("pinch follows both pointers", function(assert, mock) {
+			var el = El("div")
+			, diffs = []
+			, down = function(id, x) {
+				El.emit(el, "pointerdown", { pointerId: id, clientX: x, clientY: 0 })
+			}
+			mock.swap(global, "getComputedStyle", function() { return {} })
+			El.on(el, "pinch", function(e) { diffs.push(e.diff) })
+			down(1, 0)
+			down(2, 100)
+			El.emit(document, "pointermove", { pointerId: 1, clientX: -50, clientY: 0 })
+			assert.equal(diffs, [ 50 ])
+			El.emit(el, "pointerup", { pointerId: 1 })
+			El.emit(el, "pointerup", { pointerId: 2 })
+			assert.end()
+		})
+
 		describe("rate", function() {
 			test("defaults to leading and trailing edge using fn", function(assert, mock) {
 				mock.time(1000000)

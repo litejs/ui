@@ -1733,8 +1733,8 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		function moveTwo(e) {
 			touches[ touches[0].pointerId == e.pointerId ? 0 : 1] = e
 			var diff
-			, x = e0.clientX - touches[1].clientX
-			, y = e0.clientY - touches[1].clientY
+			, x = touches[0].clientX - touches[1].clientX
+			, y = touches[0].clientY - touches[1].clientY
 			, dist = Math.sqrt(x*x + y*y) | 0
 			, angle = Math.atan2(y, x)
 
