@@ -15,7 +15,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	window.El = El
 	asEmitter(window.LiteJS = LiteJS)
 
-	var UNDEF, parser, pushBase, styleNode
+	var UNDEF, parser, styleNode
 	, NUL = null
 	// THIS will be `undefined` in strict mode and `window` in sloppy mode
 	, THIS = this
@@ -180,6 +180,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	, Event = window.Event || window
 	, fixEv = Event.fixEv || (Event.fixEv = {})
 	, fixFn = Event.fixFn || (Event.fixFn = {})
+
+	, base = find(html, "base")
+	, pushBase = (base = base && base.href) && (LiteJS.push = replace(/.+?:\/\/[^/]+|[^\/]*$/g, "", base))
 
 	/*** markup ***/
 	, blockRe = /^(?:(=+|>| -| \d+\.) ([\s\S]+))/
@@ -1047,9 +1050,16 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		LiteJS.go = setUrl
 		var histLast
 		, hashFallback = getUrl()
-		, base = find(html, "base")
-		if ((base = base && base.href)) {
-			pushBase = LiteJS.push = replace(/.+?:\/\/[^/]+|[^\/]*$/g, "", base)
+		if (pushBase) {
+			bindingsOn(body, "click", function(e, el) {
+				if (
+					!(e.defaultPrevented || e.button || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || getAttr(el, "target") || el.href.indexOf(base)) &&
+					getAttr(el, "download") == NUL
+				) {
+					eventStop(e)
+					setUrl(el.href.slice(base.length))
+				}
+			}, "a[href]")
 		}
 		// Chrome and Safari emit a popstate event on page load, Firefox doesn't.
 		// Firing popstate after onload is as designed.
@@ -1062,7 +1072,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		}
 		function getUrl() {
 			return replace(/^[#\/\!]+|[\s\/]+$/g, "",
-				pushBase ? location.pathname.slice(pushBase.length) :
+				pushBase && hashFallback !== UNDEF ? location.pathname.slice(pushBase.length) :
 				// NOTE: in Firefox location.hash is decoded; in Safari location.pathname is decoded
 				location.href.split("#")[1] || "")
 		}
@@ -1863,8 +1873,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	}
 	function injectCss(cssText) {
 		if (!styleNode) {
-			// Safari and IE6-8 requires dynamically created
-			// <style> elements to be inserted into the <head>
+			// Safari and IE6-8 requires dynamically created <style> elements to be in <head>
 			append(find(html, "head"), styleNode = El("style"))
 		}
 		if (styleNode.styleSheet) styleNode.styleSheet.cssText += cssText

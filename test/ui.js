@@ -1041,5 +1041,44 @@ describe("ui", function() {
 		assert.equal(console.log.called, logCount)
 		assert.end()
 	})
+
+	it ("should route push URL link clicks", function(assert, mock) {
+		var lib, link
+		, pushState = mock.fn()
+		, doc = parser.parseFromString('<html><head><base href="http://x/app/"></head><body></body></html>')
+		, ev = function(a, opts) {
+			return Object.assign({ target: a.firstChild || a, preventDefault: mock.fn(), stopPropagation: mock.fn() }, opts)
+		}
+		mock.swap(global, {
+			document: doc,
+			history: { pushState },
+			localStorage: {},
+			location: { href: "http://x/app/", pathname: "/app/" }
+		})
+		mock.swap(xhr, { css: xhr.css, ui: xhr.ui })
+		mock.swap(require.cache, require.resolve(".."))
+		lib = require("..")
+		lib.LiteJS({ root: doc.body }).parse("a.nav ;view 'about'\n b")
+		link = doc.body.querySelector(".nav")
+		assert.equal(link.getAttribute("href"), "/app/about")
+		// @litejs/dom does not resolve href against <base>
+		link.href = "http://x/app/about"
+		lib.LiteJS.start()
+		lib.El.emit(doc.body, "click", ev(link))
+		assert.equal(pushState.calls[0].args, [null, null, "/app/about"])
+		;[
+			[ link, { ctrlKey: true } ],
+			[ link, { button: 1 } ],
+			[ link, { defaultPrevented: true } ],
+			[ lib.El("a[href='http://x/app/new'][target=_blank]"), {} ],
+			[ lib.El("a[href='http://x/app/file'][download]"), {} ],
+			[ lib.El("a[href='http://y/app/about']"), {} ]
+		].forEach(function(row) {
+			doc.body.appendChild(row[0])
+			lib.El.emit(doc.body, "click", ev(row[0], row[1]))
+		})
+		assert.equal(pushState.called, 1)
+		assert.end()
+	})
 })
 
