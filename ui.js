@@ -608,7 +608,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				console.log("Outside view defined elements are rendered immediately into UI")
 				/**/
 			}
-			if (parent.i) {
+			if (parent.I) {
 				histStart(viewShow)
 			}
 
@@ -616,7 +616,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				if (offset && all === indent) return
 
 				for (q = indent.length; q <= stack[0]; ) {
-					if ((offset = parent.p)) {
+					if ((offset = parent.P)) {
 						if (offset.c && !offset.e.childNodes[0]) break
 						offset.d(offset)
 					}
@@ -626,8 +626,8 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				if (op === "@") {
 					text = replace(/([\w,.]+)[!:]?/, /^\w+!/.test(text) ? "one!'$1'," : "on!'$1',", text)
 				}
-				if (parent.r) {
-					parent.t += "\n" + all
+				if (parent.R) {
+					parent.T += "\n" + all
 				} else if (plugin || mapStart && (sel = "map")) {
 					if (plugins[sel]) {
 						parentStack.push(parent)
@@ -678,7 +678,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		//   .n  name           .x  parent view name  .u  parent DOM element
 		//   .e  container el   .d  done callback     .c  saved elCache (for %el/%view)
 		// When proto is a function, plugin accumulates raw text:
-		//   .r  raw handler    .t  accumulated text   .o  original op+text  .s  separator
+		//   .R  raw handler    .T  accumulated text   .o  original op+text  .s  separator
 		function addPlugin(name, proto, expectContent) {
 			plugins[name] = Plugin
 			function Plugin(parent, op, sep) {
@@ -687,9 +687,9 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				plugin.n = arr[0] // name
 				plugin.x = arr[1] // View parent
 				plugin.u = parent
-				if (plugin.r) {
-					plugin.t = ""
-					plugin.p = plugin.e = plugin
+				if (plugin.R) {
+					plugin.T = ""
+					plugin.P = plugin.e = plugin
 					plugin.o = op
 					plugin.s = sep
 				} else {
@@ -697,10 +697,10 @@ console.log("LiteJS is in debug mode and that's fine for production")
 						elCache = create(plugin.c = elCache)
 					}
 					plugin.e = El(name === "svg" ? name : "div")
-					plugin.e.p = plugin
+					plugin.e.P = plugin
 				}
 			}
-			assign(Plugin.prototype, isFn(proto) ? { d: Function("p", "p.r(p.o+p.t)"), r: proto } : proto)
+			assign(Plugin.prototype, isFn(proto) ? { d: Function("p", "p.R(p.o+p.T)"), R: proto } : proto)
 		}
 		function usePluginContent(plugin) {
 			var el = plugin.e
@@ -715,12 +715,12 @@ console.log("LiteJS is in debug mode and that's fine for production")
 				child._s = el._s
 			}
 			if (plugin.c) elCache = plugin.c
-			el.p = plugin.e = plugin.u = UNDEF
+			el.P = plugin.e = plugin.u = UNDEF
 			return child
 		}
 
 		addPlugin("ui", {
-			d: Function("p", "p.u.i=1")
+			d: Function("p", "p.u.I=1")
 		})
 		plugins.start = plugins.ui
 		addPlugin("slot", {
@@ -739,7 +739,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 		addPlugin("def", viewDef)
 		addPlugin("js", viewEval)
 		addPlugin("each", function() {
-			var txt = this.t
+			var txt = this.T
 			each(this.o, function(param) {
 				viewParse(replace(/{key}/g, param, txt))
 			})

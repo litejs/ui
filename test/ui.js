@@ -882,6 +882,26 @@ describe("ui", function() {
 			assert.ok(document.querySelector("style"))
 			assert.end()
 		})
+
+		test ("raw plugin check ignores SVG circle.r", function(assert) {
+			var document = new dom.Document()
+			, proto = dom.HTMLElement.prototype
+			LiteJS({
+				root: document.body
+			})
+			// Browsers expose SVGCircleElement.r as an object, @litejs/dom has no SVG classes
+			Object.defineProperty(proto, "r", {
+				configurable: true,
+				get: function() {
+					return this.tagName.toLowerCase() === "circle" ? {} : void 0
+				}
+			})
+			xhr.ui('svg\n circle\n  ;set "cx", 1')
+			LiteJS.start()
+			delete proto.r
+			assert.equal(document.body.innerHTML, '<svg><circle cx="1"></circle></svg>')
+			assert.end()
+		})
 	})
 
 	describe("bindings", function() {
