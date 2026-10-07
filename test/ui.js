@@ -1005,17 +1005,17 @@ describe("ui", function() {
 			, app = LiteJS({
 				root: document.body
 			})
-			xhr.ui('%el El-a\n li.a\n%el El-b\n li.b\n%el El-c\n li.c\nul>.sub ;el subEl,"El-c"')
+			xhr.ui('%el El-a\n li.a\n%el El-b\n li.b\n%el El-c\n li.c\nul>.sub ;el subEl,"El-c"\nol>.sub ;el subEl')
 			app.$d.subEl = "El-a"
 			LiteJS.start()
 			El.render(app.root)
-			assert.equal(document.body.innerHTML, '<ul><li class="a sub"></li></ul>')
+			assert.equal(document.body.innerHTML, '<ul><li class="a sub"></li></ul><ol><li class="a sub"></li></ol>')
 			app.$d.subEl = "El-b"
 			El.render(app.root)
-			assert.equal(document.body.innerHTML, '<ul><li class="b sub"></li></ul>')
+			assert.equal(document.body.innerHTML, '<ul><li class="b sub"></li></ul><ol><li class="b sub"></li></ol>')
 			app.$d.subEl = "El-d"
 			El.render(app.root)
-			assert.equal(document.body.innerHTML, '<ul><li class="c sub"></li></ul>')
+			assert.equal(document.body.innerHTML, '<ul><li class="c sub"></li></ul><ol><li class="b sub"></li></ol>')
 			assert.end()
 		})
 		test ("$s", function(assert, mock) {

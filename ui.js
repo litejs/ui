@@ -1179,7 +1179,7 @@ console.log("LiteJS is in debug mode and that's fine for production")
 			},
 			el: function(el, tag, fallback) {
 				tag = elCache[tag] ? tag : fallback
-				if (el._el !== tag) {
+				if (tag && el._el !== tag) {
 					var child = El(tag)
 					, tmp = child._elb = el._el ? el._elb : el._b
 					if (tmp) appendBind(child, tmp, ";", "^")
