@@ -1,0 +1,38 @@
+
+%css
+	.Toggle {
+		width: 60px;
+	}
+	.Toggle:before {
+		content: "☀️  🌙";
+		display: block;
+		filter: grayscale(1);
+	}
+	.Toggle:after {
+		background: #eee;
+		border-radius: 16px;
+		box-shadow: inset 0 0 3px #222;
+		content: "☀️";
+		display: block;
+		position: absolute;
+		top: 0;
+		transform: rotate(-360deg);
+		transition: all .6s;
+		width: 32px;
+	}
+	.theme-dark .Toggle:after {
+		background: #333;
+		box-shadow: inset 0 0 3px #eee;
+		content: "🌙";
+		margin-left: 28px;
+		transform: rotate(-20deg);
+	}
+
+
+%el Toggle-theme
+button.Toggle.reset
+	@click function(e){
+		LiteJS.theme("-")
+		if (e.pageX) El.blur()
+	}
+

@@ -79,15 +79,13 @@
 
 	/*** theme ***/
 	, savedTheme
-	, ALT_THEME = "dark"
+	, preferDark = xhr._d = (preferDark = window.matchMedia) && preferDark("(prefers-color-scheme:dark)")
 	try {
 		savedTheme = window.localStorage.theme
-	} catch(e){}
-	if (ALT_THEME == (
-		savedTheme ||
-		(savedTheme = window.matchMedia) && savedTheme("(prefers-color-scheme:dark)").matches && ALT_THEME
-	)) {
-		document.documentElement.className = "is-" + ALT_THEME
+	} catch(e) {}
+	if (savedTheme || (savedTheme = preferDark && preferDark.matches && "dark")) {
+		// load overwrite HTML element class, no default classes there
+		document.documentElement.className = "theme-" + (xhr._s = savedTheme)
 	}
 	/**/
 

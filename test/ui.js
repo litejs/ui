@@ -36,6 +36,42 @@ describe("ui", function() {
 		assert.end()
 	})
 
+	it ("should set theme", function(assert, mock) {
+		var html = document.documentElement
+		, media = { matches: true }
+		, isCls = function() {
+			return (html.className.match(/\btheme-\S+/g) || []).join(" ")
+		}
+		mock.swap(xhr, { _d: media, _s: xhr._s })
+		;[
+			[ "dark", "theme-dark", "dark" ],
+			[ "-", "theme-light", "light" ],
+			[ "-", "theme-dark", "dark" ],
+			[ "christmas", "theme-christmas", "christmas" ],
+			[ "-", "theme-dark", "dark" ],
+			[ "", "theme-dark", "" ],
+			[ "-", "theme-light", "light" ],
+			[ { key: "lang" }, "theme-light", "dark", "dark" ],
+			[ { key: "theme" }, "theme-dark", "dark" ],
+			[ { key: null }, "theme-dark", "", "" ],
+			[ { matches: false }, "", "", "", false ],
+			[ "-", "theme-dark", "dark" ],
+			[ { matches: false }, "theme-christmas", "christmas", "christmas" ]
+		].forEach(function(row) {
+			if (row.length > 3) localStorage.theme = row[3]
+			if (row.length > 4) media.matches = row[4]
+			LiteJS.theme(row[0])
+			assert.equal(isCls(), row[1])
+			assert.equal(localStorage.theme, row[2])
+		})
+		LiteJS.theme("")
+		assert.equal(isCls(), "")
+		delete localStorage.theme
+		LiteJS.theme({ matches: false })
+		assert.equal("theme" in localStorage, false)
+		assert.end()
+	})
+
 	describe("El", function() {
 		var app = LiteJS({
 			root: document.body

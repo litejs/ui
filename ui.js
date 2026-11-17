@@ -273,6 +273,19 @@ console.log("LiteJS is in debug mode and that's fine for production")
 	}
 	/**/
 
+	/*** theme ***/
+	// Single fn to listen "(prefers-color-scheme:dark)" and localStorage.theme change
+	// and to set manually LiteJS.theme( "-"=toggle dark/light | ""=system | "anyName"=class theme-anyName )
+	addEvent(window, "storage", LiteJS.theme = (xhr._d || addEvent).onchange = function(e) {
+		if (!e.key || e.key == "theme") {
+			if (isStr(e)) localStorage.theme = e != "-" ? e : xhr._s == "dark" ? "light" : "dark"
+			bindingsCss(html, "transition", "all .6s", 0, 999)
+			cls(html, "theme-" + xhr._s, 0)
+			cls(html, "theme-" + (xhr._s = localStorage.theme || xhr._d && xhr._d.matches && "dark"), xhr._s)
+		}
+	})
+	/**/
+
 	xhr.css = injectCss
 	xhr.ui = function(src) {
 		sources.push(src)

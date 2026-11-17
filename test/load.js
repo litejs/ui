@@ -211,9 +211,10 @@ describe("load.js", function() {
 		it ("should set theme", [
 			[ "", {} ],
 			[ "", { localStorage: {}, matchMedia: () => ({ matches: false }) } ],
-			[ "", { localStorage: { theme: "light" } } ],
-			[ "is-dark", { localStorage: { theme: "dark" } } ],
-			[ "is-dark", { localStorage: {}, matchMedia: () => ({ matches: true }) } ],
+			[ "theme-light", { localStorage: { theme: "light" } } ],
+			[ "theme-christmas", { localStorage: { theme: "christmas" }, matchMedia: () => ({ matches: true }) } ],
+			[ "theme-dark", { localStorage: { theme: "dark" } } ],
+			[ "theme-dark", { localStorage: {}, matchMedia: () => ({ matches: true }) } ],
 		], function(theme, window, assert, mock) {
 			var doc = { documentElement: { className: "" } }
 			mock.swap(global, "document", doc)
@@ -231,6 +232,7 @@ describe("load.js", function() {
 			lib = require("../load.js")
 
 			assert.equal(doc.documentElement.className, theme)
+			assert.equal(lib.xhr._s || "", theme.slice(6))
 			assert.end()
 		})
 		it("should use matchMedia when localStorage throws", function(assert, mock) {
@@ -247,7 +249,7 @@ describe("load.js", function() {
 			delete require.cache[require.resolve("../load.js")]
 			require("../load.js")
 
-			assert.equal(doc.documentElement.className, "is-dark")
+			assert.equal(doc.documentElement.className, "theme-dark")
 			assert.end()
 		})
 	})
